@@ -1,0 +1,5397 @@
+{
+  "meta": {
+    "repo": {
+      "name": "flask",
+      "source": "https://github.com/pallets/flask",
+      "commit": "d086db8"
+    },
+    "source": "C:/Users/Selman/AppData/Local/Temp/claude/C--/2893ddbc-306e-4b5d-94d8-359c5612cb51/scratchpad/repos/flask",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\C--\\2893ddbc-306e-4b5d-94d8-359c5612cb51\\scratchpad\\repos\\flask",
+      "commit": "d086db856be187255b8ec61ef409357393020f32",
+      "golden_commit": "d086db8",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20",
+      "q21",
+      "q22",
+      "q23",
+      "q24",
+      "q25",
+      "q26",
+      "q27",
+      "q28",
+      "q29",
+      "q30"
+    ],
+    "started": "2026-10-08T01:07:22",
+    "open_workspace_s": 0.184,
+    "total_s": 0.213,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "pipeline": "search_baseline (build_index + SearchIndex; chunks = symbol-hit ranges)"
+  },
+  "summary": {
+    "overall": {
+      "n": 30,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 27,
+          "yes": 10,
+          "rate": 0.37
+        },
+        "hit@3": {
+          "n": 27,
+          "yes": 13,
+          "rate": 0.481
+        },
+        "hit@k": {
+          "n": 27,
+          "yes": 18,
+          "rate": 0.667
+        },
+        "loose_hit@1": {
+          "n": 27,
+          "yes": 12,
+          "rate": 0.444
+        },
+        "loose_hit@3": {
+          "n": 27,
+          "yes": 16,
+          "rate": 0.593
+        },
+        "loose_hit@k": {
+          "n": 27,
+          "yes": 22,
+          "rate": 0.815
+        },
+        "mrr": 0.451,
+        "chunk_recall": {
+          "n": 27,
+          "yes": 20,
+          "rate": 0.741
+        },
+        "all@k": {
+          "n": 5,
+          "yes": 1,
+          "rate": 0.2
+        },
+        "pointer@k": {
+          "n": 3,
+          "yes": 2,
+          "rate": 0.667
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        }
+      },
+      "elapsed_s": {
+        "total": 0.027,
+        "mean": 0.001,
+        "median": 0.001,
+        "max": 0.003
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 12,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 12,
+            "yes": 9,
+            "rate": 0.75
+          },
+          "hit@3": {
+            "n": 12,
+            "yes": 10,
+            "rate": 0.833
+          },
+          "hit@k": {
+            "n": 12,
+            "yes": 11,
+            "rate": 0.917
+          },
+          "loose_hit@1": {
+            "n": 12,
+            "yes": 9,
+            "rate": 0.75
+          },
+          "loose_hit@3": {
+            "n": 12,
+            "yes": 10,
+            "rate": 0.833
+          },
+          "loose_hit@k": {
+            "n": 12,
+            "yes": 12,
+            "rate": 1.0
+          },
+          "mrr": 0.812,
+          "chunk_recall": {
+            "n": 12,
+            "yes": 12,
+            "rate": 1.0
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.009,
+          "mean": 0.001,
+          "median": 0.001,
+          "max": 0.002
+        }
+      },
+      "locate-feature": {
+        "n": 10,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 10,
+            "yes": 1,
+            "rate": 0.1
+          },
+          "hit@3": {
+            "n": 10,
+            "yes": 3,
+            "rate": 0.3
+          },
+          "hit@k": {
+            "n": 10,
+            "yes": 5,
+            "rate": 0.5
+          },
+          "loose_hit@1": {
+            "n": 10,
+            "yes": 3,
+            "rate": 0.3
+          },
+          "loose_hit@3": {
+            "n": 10,
+            "yes": 5,
+            "rate": 0.5
+          },
+          "loose_hit@k": {
+            "n": 10,
+            "yes": 7,
+            "rate": 0.7
+          },
+          "mrr": 0.206,
+          "chunk_recall": {
+            "n": 10,
+            "yes": 6,
+            "rate": 0.6
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.011,
+          "mean": 0.001,
+          "median": 0.001,
+          "max": 0.003
+        }
+      },
+      "flow": {
+        "n": 5,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 5,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "hit@3": {
+            "n": 5,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "hit@k": {
+            "n": 5,
+            "yes": 2,
+            "rate": 0.4
+          },
+          "loose_hit@1": {
+            "n": 5,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "loose_hit@3": {
+            "n": 5,
+            "yes": 1,
+            "rate": 0.2
+          },
+          "loose_hit@k": {
+            "n": 5,
+            "yes": 3,
+            "rate": 0.6
+          },
+          "mrr": 0.073,
+          "chunk_recall": {
+            "n": 5,
+            "yes": 2,
+            "rate": 0.4
+          },
+          "all@k": {
+            "n": 5,
+            "yes": 1,
+            "rate": 0.2
+          },
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.005,
+          "mean": 0.001,
+          "median": 0.001,
+          "max": 0.002
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.002,
+          "mean": 0.001,
+          "median": 0.0,
+          "max": 0.001
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 20,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 18,
+            "yes": 6,
+            "rate": 0.333
+          },
+          "hit@3": {
+            "n": 18,
+            "yes": 9,
+            "rate": 0.5
+          },
+          "hit@k": {
+            "n": 18,
+            "yes": 13,
+            "rate": 0.722
+          },
+          "loose_hit@1": {
+            "n": 18,
+            "yes": 6,
+            "rate": 0.333
+          },
+          "loose_hit@3": {
+            "n": 18,
+            "yes": 9,
+            "rate": 0.5
+          },
+          "loose_hit@k": {
+            "n": 18,
+            "yes": 14,
+            "rate": 0.778
+          },
+          "mrr": 0.443,
+          "chunk_recall": {
+            "n": 18,
+            "yes": 14,
+            "rate": 0.778
+          },
+          "all@k": {
+            "n": 3,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": {
+            "n": 2,
+            "yes": 1,
+            "rate": 0.5
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.023,
+          "mean": 0.001,
+          "median": 0.001,
+          "max": 0.003
+        }
+      },
+      "tr": {
+        "n": 10,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 9,
+            "yes": 4,
+            "rate": 0.444
+          },
+          "hit@3": {
+            "n": 9,
+            "yes": 4,
+            "rate": 0.444
+          },
+          "hit@k": {
+            "n": 9,
+            "yes": 5,
+            "rate": 0.556
+          },
+          "loose_hit@1": {
+            "n": 9,
+            "yes": 6,
+            "rate": 0.667
+          },
+          "loose_hit@3": {
+            "n": 9,
+            "yes": 7,
+            "rate": 0.778
+          },
+          "loose_hit@k": {
+            "n": 9,
+            "yes": 8,
+            "rate": 0.889
+          },
+          "mrr": 0.467,
+          "chunk_recall": {
+            "n": 9,
+            "yes": 6,
+            "rate": 0.667
+          },
+          "all@k": {
+            "n": 2,
+            "yes": 1,
+            "rate": 0.5
+          },
+          "pointer@k": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.005,
+          "mean": 0.0,
+          "median": 0.0,
+          "max": 0.002
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is the route decorator implemented?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/sansio/scaffold.py",
+          "symbol": "Scaffold.route",
+          "start_line": 343,
+          "end_line": 373
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0004,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.route.<locals>.decorator",
+            "start_line": 368,
+            "end_line": 371,
+            "kind": "symbol",
+            "score": 17.8305,
+            "match": "overlap",
+            "why": "name match: decorator; nested x0.5; bm25: decorator, route"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.route",
+            "start_line": 343,
+            "end_line": 373,
+            "kind": "symbol",
+            "score": 16.5622,
+            "match": "symbol",
+            "why": "name match: route; bm25: route"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.endpoint.<locals>.decorator",
+            "start_line": 461,
+            "end_line": 463,
+            "kind": "symbol",
+            "score": 9.7329,
+            "match": null,
+            "why": "name match: decorator; nested x0.5; bm25: decorator"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": "src/flask/helpers.py::stream_with_context.<locals>.decorator",
+            "start_line": 120,
+            "end_line": 122,
+            "kind": "symbol",
+            "score": 9.608,
+            "match": null,
+            "why": "name match: decorator; nested x0.5; bm25: decorator"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::with_appcontext.<locals>.decorator",
+            "start_line": 394,
+            "end_line": 400,
+            "kind": "symbol",
+            "score": 9.3676,
+            "match": null,
+            "why": "name match: decorator; nested x0.5; bm25: decorator"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::AppGroup.command.<locals>.decorator",
+            "start_line": 422,
+            "end_line": 425,
+            "kind": "symbol",
+            "score": 9.2518,
+            "match": null,
+            "why": "name match: decorator; nested x0.5; bm25: decorator"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.errorhandler.<locals>.decorator",
+            "start_line": 643,
+            "end_line": 645,
+            "kind": "symbol",
+            "score": 9.0287,
+            "match": null,
+            "why": "name match: decorator; nested x0.5; bm25: decorator"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.template_filter.<locals>.decorator",
+            "start_line": 693,
+            "end_line": 695,
+            "kind": "symbol",
+            "score": 8.816,
+            "match": null,
+            "why": "name match: decorator; nested x0.5; bm25: decorator"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 368,
+            "end_line": 371,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.route.<locals>.decorator"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 343,
+            "end_line": 373,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.route"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 461,
+            "end_line": 463,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.endpoint.<locals>.decorator"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "start_line": 120,
+            "end_line": 122,
+            "label": "src/flask/helpers.py::stream_with_context.<locals>.decorator"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 394,
+            "end_line": 400,
+            "label": "src/flask/cli.py::with_appcontext.<locals>.decorator"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 422,
+            "end_line": 425,
+            "label": "src/flask/cli.py::AppGroup.command.<locals>.decorator"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 643,
+            "end_line": 645,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.errorhandler.<locals>.decorator"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 693,
+            "end_line": 695,
+            "label": "src/flask/sansio/app.py::App.template_filter.<locals>.decorator"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is the url_for function defined?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/helpers.py",
+          "symbol": "url_for",
+          "start_line": 200,
+          "end_line": 251
+        },
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.url_for",
+          "start_line": 1102,
+          "end_line": 1222
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0003,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": "src/flask/helpers.py::url_for",
+            "start_line": 200,
+            "end_line": 251,
+            "kind": "symbol",
+            "score": 55.1458,
+            "match": "symbol",
+            "why": "name match: url_for; bm25: url_for, for, url"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.url_for",
+            "start_line": 1102,
+            "end_line": 1222,
+            "kind": "symbol",
+            "score": 51.1796,
+            "match": "symbol",
+            "why": "name match: url_for; bm25: url_for, for, url"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.handle_url_build_error",
+            "start_line": 982,
+            "end_line": 1014,
+            "kind": "symbol",
+            "score": 12.2522,
+            "match": null,
+            "why": "bm25: url_for, url, for"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 679,
+            "kind": "file",
+            "score": 11.6249,
+            "match": "file",
+            "why": "bm25: url_for, for, url"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint.add_url_rule",
+            "start_line": 412,
+            "end_line": 441,
+            "kind": "symbol",
+            "score": 10.0582,
+            "match": null,
+            "why": "bm25: url, url_for, for"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1625,
+            "kind": "file",
+            "score": 9.2178,
+            "match": "file",
+            "why": "bm25: url_for, url, for"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint.register_blueprint",
+            "start_line": 255,
+            "end_line": 271,
+            "kind": "symbol",
+            "score": 8.0795,
+            "match": null,
+            "why": "bm25: url_for, for, url"
+          },
+          {
+            "path": "tests/test_helpers.py",
+            "symbol_id": "tests/test_helpers.py::TestUrlFor",
+            "start_line": 94,
+            "end_line": 161,
+            "kind": "symbol",
+            "score": 7.2567,
+            "match": null,
+            "why": "class boost; test file x0.5; bm25: for, url"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/helpers.py",
+            "start_line": 200,
+            "end_line": 251,
+            "label": "src/flask/helpers.py::url_for"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 1102,
+            "end_line": 1222,
+            "label": "src/flask/app.py::Flask.url_for"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 982,
+            "end_line": 1014,
+            "label": "src/flask/sansio/app.py::App.handle_url_build_error"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 412,
+            "end_line": 441,
+            "label": "src/flask/sansio/blueprints.py::Blueprint.add_url_rule"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 255,
+            "end_line": 271,
+            "label": "src/flask/sansio/blueprints.py::Blueprint.register_blueprint"
+          },
+          {
+            "path": "tests/test_helpers.py",
+            "start_line": 94,
+            "end_line": 161,
+            "label": "tests/test_helpers.py::TestUrlFor"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is the jsonify helper defined?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/json/__init__.py",
+          "symbol": "jsonify",
+          "start_line": 138,
+          "end_line": 170
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0001,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/json/__init__.py",
+            "symbol_id": "src/flask/json/__init__.py::jsonify",
+            "start_line": 138,
+            "end_line": 170,
+            "kind": "symbol",
+            "score": 17.4669,
+            "match": "symbol",
+            "why": "name match: jsonify; bm25: jsonify"
+          },
+          {
+            "path": "src/flask/json/__init__.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 170,
+            "kind": "file",
+            "score": 7.297,
+            "match": "file",
+            "why": "bm25: jsonify"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "symbol_id": "tests/test_basic.py::test_enctype_debug_helper",
+            "start_line": 1129,
+            "end_line": 1141,
+            "kind": "symbol",
+            "score": 4.606,
+            "match": null,
+            "why": "test file x0.5; bm25: helper"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::ScriptInfo",
+            "start_line": 293,
+            "end_line": 372,
+            "kind": "symbol",
+            "score": 4.5717,
+            "match": null,
+            "why": "class boost; bm25: helper"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::_endpoint_from_view_func",
+            "start_line": 709,
+            "end_line": 714,
+            "kind": "symbol",
+            "score": 4.2885,
+            "match": null,
+            "why": "bm25: helper"
+          },
+          {
+            "path": "tests/test_json.py",
+            "symbol_id": "tests/test_json.py::test_jsonify_arrays",
+            "start_line": 105,
+            "end_line": 130,
+            "kind": "symbol",
+            "score": 4.0887,
+            "match": null,
+            "why": "test file x0.5; bm25: jsonify"
+          },
+          {
+            "path": "tests/test_json.py",
+            "symbol_id": "tests/test_json.py::test_jsonify_uuid_types",
+            "start_line": 176,
+            "end_line": 188,
+            "kind": "symbol",
+            "score": 3.9453,
+            "match": null,
+            "why": "test file x0.5; bm25: jsonify"
+          },
+          {
+            "path": "tests/test_json.py",
+            "symbol_id": "tests/test_json.py::test_jsonify_dicts",
+            "start_line": 78,
+            "end_line": 102,
+            "kind": "symbol",
+            "score": 3.9275,
+            "match": null,
+            "why": "test file x0.5; bm25: jsonify"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/json/__init__.py",
+            "start_line": 138,
+            "end_line": 170,
+            "label": "src/flask/json/__init__.py::jsonify"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "start_line": 1129,
+            "end_line": 1141,
+            "label": "tests/test_basic.py::test_enctype_debug_helper"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 293,
+            "end_line": 372,
+            "label": "src/flask/cli.py::ScriptInfo"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 709,
+            "end_line": 714,
+            "label": "src/flask/sansio/scaffold.py::_endpoint_from_view_func"
+          },
+          {
+            "path": "tests/test_json.py",
+            "start_line": 105,
+            "end_line": 130,
+            "label": "tests/test_json.py::test_jsonify_arrays"
+          },
+          {
+            "path": "tests/test_json.py",
+            "start_line": 176,
+            "end_line": 188,
+            "label": "tests/test_json.py::test_jsonify_uuid_types"
+          },
+          {
+            "path": "tests/test_json.py",
+            "start_line": 78,
+            "end_line": 102,
+            "label": "tests/test_json.py::test_jsonify_dicts"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Which method loads the app config from a Python file?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/config.py",
+          "symbol": "Config.from_pyfile",
+          "start_line": 187,
+          "end_line": 216
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0016,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 5,
+        "top_hits": [
+          {
+            "path": "src/flask/json/__init__.py",
+            "symbol_id": "src/flask/json/__init__.py::loads",
+            "start_line": 77,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 29.4367,
+            "match": null,
+            "why": "name match: loads; bm25: loads, app"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::DefaultJSONProvider.loads",
+            "start_line": 181,
+            "end_line": 187,
+            "kind": "symbol",
+            "score": 25.3314,
+            "match": null,
+            "why": "name match: loads; bm25: loads"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": "src/flask/json/tag.py::TaggedJSONSerializer.loads",
+            "start_line": 325,
+            "end_line": 327,
+            "kind": "symbol",
+            "score": 24.2116,
+            "match": null,
+            "why": "name match: loads; bm25: loads"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider.loads",
+            "start_line": 59,
+            "end_line": 65,
+            "kind": "symbol",
+            "score": 23.6731,
+            "match": null,
+            "why": "name match: loads; bm25: loads"
+          },
+          {
+            "path": "src/flask/config.py",
+            "symbol_id": "src/flask/config.py::Config",
+            "start_line": 50,
+            "end_line": 367,
+            "kind": "symbol",
+            "score": 22.9273,
+            "match": "broad",
+            "why": "name match: Config; class boost; bm25: config, app"
+          },
+          {
+            "path": "src/flask/config.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 367,
+            "kind": "file",
+            "score": 11.443,
+            "match": "file",
+            "why": "path match: config; bm25: config"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 327,
+            "kind": "file",
+            "score": 10.6735,
+            "match": null,
+            "why": "bm25: python, loads"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 215,
+            "kind": "file",
+            "score": 8.3619,
+            "match": null,
+            "why": "bm25: loads"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/json/__init__.py",
+            "start_line": 77,
+            "end_line": 105,
+            "label": "src/flask/json/__init__.py::loads"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 181,
+            "end_line": 187,
+            "label": "src/flask/json/provider.py::DefaultJSONProvider.loads"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "start_line": 325,
+            "end_line": 327,
+            "label": "src/flask/json/tag.py::TaggedJSONSerializer.loads"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 59,
+            "end_line": 65,
+            "label": "src/flask/json/provider.py::JSONProvider.loads"
+          },
+          {
+            "path": "src/flask/config.py",
+            "start_line": 50,
+            "end_line": 367,
+            "label": "src/flask/config.py::Config"
+          }
+        ],
+        "rank": null,
+        "loose_rank": 5,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Which class implements the test client?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/testing.py",
+          "symbol": "FlaskClient",
+          "start_line": 109,
+          "end_line": 262
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0024,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.test_client",
+            "start_line": 755,
+            "end_line": 811,
+            "kind": "symbol",
+            "score": 36.6528,
+            "match": null,
+            "why": "name match: test_client; bm25: test_client, client, test"
+          },
+          {
+            "path": "examples/tutorial/tests/conftest.py",
+            "symbol_id": "examples/tutorial/tests/conftest.py::client",
+            "start_line": 35,
+            "end_line": 38,
+            "kind": "symbol",
+            "score": 14.3386,
+            "match": null,
+            "why": "name match: client; bm25: client, test"
+          },
+          {
+            "path": "tests/conftest.py",
+            "symbol_id": "tests/conftest.py::client",
+            "start_line": 49,
+            "end_line": 51,
+            "kind": "symbol",
+            "score": 12.9348,
+            "match": null,
+            "why": "name match: client; bm25: client"
+          },
+          {
+            "path": "src/flask/testing.py",
+            "symbol_id": "src/flask/testing.py::FlaskClient",
+            "start_line": 109,
+            "end_line": 262,
+            "kind": "symbol",
+            "score": 12.7615,
+            "match": "symbol",
+            "why": "class boost; bm25: test_client, client, test"
+          },
+          {
+            "path": "examples/javascript/tests/conftest.py",
+            "symbol_id": "examples/javascript/tests/conftest.py::client",
+            "start_line": 13,
+            "end_line": 15,
+            "kind": "symbol",
+            "score": 12.5941,
+            "match": null,
+            "why": "name match: client; bm25: client"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1625,
+            "kind": "file",
+            "score": 6.084,
+            "match": null,
+            "why": "bm25: test_client, client, test"
+          },
+          {
+            "path": "tests/test_testing.py",
+            "symbol_id": "tests/test_testing.py::test_reuse_client",
+            "start_line": 243,
+            "end_line": 250,
+            "kind": "symbol",
+            "score": 4.7656,
+            "match": null,
+            "why": "bm25: client, test"
+          },
+          {
+            "path": "tests/test_testing.py",
+            "symbol_id": "tests/test_testing.py::test_test_client_context_binding",
+            "start_line": 214,
+            "end_line": 240,
+            "kind": "symbol",
+            "score": 4.5605,
+            "match": null,
+            "why": "bm25: client, test"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/app.py",
+            "start_line": 755,
+            "end_line": 811,
+            "label": "src/flask/app.py::Flask.test_client"
+          },
+          {
+            "path": "examples/tutorial/tests/conftest.py",
+            "start_line": 35,
+            "end_line": 38,
+            "label": "examples/tutorial/tests/conftest.py::client"
+          },
+          {
+            "path": "tests/conftest.py",
+            "start_line": 49,
+            "end_line": 51,
+            "label": "tests/conftest.py::client"
+          },
+          {
+            "path": "src/flask/testing.py",
+            "start_line": 109,
+            "end_line": 262,
+            "label": "src/flask/testing.py::FlaskClient"
+          },
+          {
+            "path": "examples/javascript/tests/conftest.py",
+            "start_line": 13,
+            "end_line": 15,
+            "label": "examples/javascript/tests/conftest.py::client"
+          },
+          {
+            "path": "tests/test_testing.py",
+            "start_line": 243,
+            "end_line": 250,
+            "label": "tests/test_testing.py::test_reuse_client"
+          },
+          {
+            "path": "tests/test_testing.py",
+            "start_line": 214,
+            "end_line": 240,
+            "label": "tests/test_testing.py::test_test_client_context_binding"
+          }
+        ],
+        "rank": 4,
+        "loose_rank": 4,
+        "rr": 0.25,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is make_response implemented on the Flask application object?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.make_response",
+          "start_line": 1224,
+          "end_line": 1364
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0012,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": "src/flask/helpers.py::make_response",
+            "start_line": 151,
+            "end_line": 197,
+            "kind": "symbol",
+            "score": 68.2456,
+            "match": null,
+            "why": "name match: make_response; bm25: make_response, response, make, object, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.make_response",
+            "start_line": 1224,
+            "end_line": 1364,
+            "kind": "symbol",
+            "score": 60.8389,
+            "match": "symbol",
+            "why": "name match: make_response; bm25: make_response, response, make, object, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask",
+            "start_line": 109,
+            "end_line": 1625,
+            "kind": "symbol",
+            "score": 35.0877,
+            "match": "broad",
+            "why": "name match: Flask; class boost; bm25: application, object, flask"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "symbol_id": "src/flask/wrappers.py::Response",
+            "start_line": 222,
+            "end_line": 257,
+            "kind": "symbol",
+            "score": 22.5425,
+            "match": null,
+            "why": "class boost; bm25: response, object, make_response, make, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.dispatch_request",
+            "start_line": 966,
+            "end_line": 990,
+            "kind": "symbol",
+            "score": 14.7997,
+            "match": null,
+            "why": "bm25: response, make_response, object, make, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1625,
+            "kind": "file",
+            "score": 14.6514,
+            "match": "file",
+            "why": "bm25: make, response, make_response, flask"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 679,
+            "kind": "file",
+            "score": 12.9868,
+            "match": null,
+            "why": "bm25: make_response, make, response, flask"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint",
+            "start_line": 119,
+            "end_line": 692,
+            "kind": "symbol",
+            "score": 12.9343,
+            "match": null,
+            "why": "class boost; bm25: application, object, flask"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/helpers.py",
+            "start_line": 151,
+            "end_line": 197,
+            "label": "src/flask/helpers.py::make_response"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 1224,
+            "end_line": 1364,
+            "label": "src/flask/app.py::Flask.make_response"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 109,
+            "end_line": 1625,
+            "label": "src/flask/app.py::Flask"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "start_line": 222,
+            "end_line": 257,
+            "label": "src/flask/wrappers.py::Response"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 966,
+            "end_line": 990,
+            "label": "src/flask/app.py::Flask.dispatch_request"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 119,
+            "end_line": 692,
+            "label": "src/flask/sansio/blueprints.py::Blueprint"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 2,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is the before_request decorator defined?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/sansio/scaffold.py",
+          "symbol": "Scaffold.before_request",
+          "start_line": 467,
+          "end_line": 492
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0006,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.before_request",
+            "start_line": 467,
+            "end_line": 492,
+            "kind": "symbol",
+            "score": 48.5364,
+            "match": "symbol",
+            "why": "name match: before_request; bm25: before_request, before, request"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint.before_app_request",
+            "start_line": 613,
+            "end_line": 621,
+            "kind": "symbol",
+            "score": 16.9003,
+            "match": null,
+            "why": "bm25: before, before_request, request"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 800,
+            "kind": "file",
+            "score": 15.0833,
+            "match": "file",
+            "why": "bm25: decorator, before_request, request, before"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "symbol_id": "tests/test_basic.py::test_request_processing.<locals>.before_request",
+            "start_line": 713,
+            "end_line": 715,
+            "kind": "symbol",
+            "score": 14.5051,
+            "match": null,
+            "why": "name match: before_request; nested x0.5; test file x0.5; bm25: before_request, before, request"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "symbol_id": "tests/test_basic.py::test_error_handler_after_processor_error.<locals>.before_request",
+            "start_line": 1103,
+            "end_line": 1106,
+            "kind": "symbol",
+            "score": 13.8018,
+            "match": null,
+            "why": "name match: before_request; nested x0.5; test file x0.5; bm25: before_request, before, request"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.preprocess_request",
+            "start_line": 1366,
+            "end_line": 1392,
+            "kind": "symbol",
+            "score": 10.7484,
+            "match": null,
+            "why": "bm25: before, request, before_request"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 692,
+            "kind": "file",
+            "score": 9.7486,
+            "match": null,
+            "why": "bm25: decorator, request, before"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.endpoint.<locals>.decorator",
+            "start_line": 461,
+            "end_line": 463,
+            "kind": "symbol",
+            "score": 9.7329,
+            "match": null,
+            "why": "name match: decorator; nested x0.5; bm25: decorator"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 467,
+            "end_line": 492,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.before_request"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 613,
+            "end_line": 621,
+            "label": "src/flask/sansio/blueprints.py::Blueprint.before_app_request"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "start_line": 713,
+            "end_line": 715,
+            "label": "tests/test_basic.py::test_request_processing.<locals>.before_request"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "start_line": 1103,
+            "end_line": 1106,
+            "label": "tests/test_basic.py::test_error_handler_after_processor_error.<locals>.before_request"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 1366,
+            "end_line": 1392,
+            "label": "src/flask/app.py::Flask.preprocess_request"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 461,
+            "end_line": 463,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.endpoint.<locals>.decorator"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is the `flask run` command defined?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/cli.py",
+          "symbol": "run_command",
+          "start_line": 881,
+          "end_line": 992
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0011,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::run_command",
+            "start_line": 881,
+            "end_line": 992,
+            "kind": "symbol",
+            "score": 50.7593,
+            "match": "symbol",
+            "why": "name match: run_command; bm25: run_command, run, command, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::AppGroup.command",
+            "start_line": 413,
+            "end_line": 427,
+            "kind": "symbol",
+            "score": 23.3757,
+            "match": null,
+            "why": "name match: command; bm25: command, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.run",
+            "start_line": 630,
+            "end_line": 753,
+            "kind": "symbol",
+            "score": 19.5599,
+            "match": null,
+            "why": "name match: run; bm25: run, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1126,
+            "kind": "file",
+            "score": 15.3767,
+            "match": "file",
+            "why": "bm25: command, run_command, run, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::shell_command",
+            "start_line": 998,
+            "end_line": 1044,
+            "kind": "symbol",
+            "score": 10.2,
+            "match": null,
+            "why": "bm25: command, run, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::FlaskGroup.get_command",
+            "start_line": 609,
+            "end_line": 634,
+            "kind": "symbol",
+            "score": 9.1125,
+            "match": null,
+            "why": "bm25: command, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::routes_command",
+            "start_line": 1047,
+            "end_line": 1106,
+            "kind": "symbol",
+            "score": 7.9013,
+            "match": null,
+            "why": "bm25: command, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::run_command.<locals>.app",
+            "start_line": 962,
+            "end_line": 965,
+            "kind": "symbol",
+            "score": 7.7174,
+            "match": "overlap",
+            "why": "nested x0.5; bm25: run_command, command, run, flask"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 881,
+            "end_line": 992,
+            "label": "src/flask/cli.py::run_command"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 413,
+            "end_line": 427,
+            "label": "src/flask/cli.py::AppGroup.command"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 630,
+            "end_line": 753,
+            "label": "src/flask/app.py::Flask.run"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 998,
+            "end_line": 1044,
+            "label": "src/flask/cli.py::shell_command"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 609,
+            "end_line": 634,
+            "label": "src/flask/cli.py::FlaskGroup.get_command"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 1047,
+            "end_line": 1106,
+            "label": "src/flask/cli.py::routes_command"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 962,
+            "end_line": 965,
+            "label": "src/flask/cli.py::run_command.<locals>.app"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "`abort` fonksiyonu nerede tanımlı?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/helpers.py",
+          "symbol": "abort",
+          "start_line": 281,
+          "end_line": 301
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0001,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": "src/flask/helpers.py::abort",
+            "start_line": 281,
+            "end_line": 301,
+            "kind": "symbol",
+            "score": 21.3192,
+            "match": "symbol",
+            "why": "name match: abort; bm25: abort"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 679,
+            "kind": "file",
+            "score": 4.6295,
+            "match": "file",
+            "why": "bm25: abort"
+          },
+          {
+            "path": "tests/test_helpers.py",
+            "symbol_id": "tests/test_helpers.py::test_abort_no_app",
+            "start_line": 180,
+            "end_line": 185,
+            "kind": "symbol",
+            "score": 4.2016,
+            "match": null,
+            "why": "test file x0.5; bm25: abort"
+          },
+          {
+            "path": "tests/test_helpers.py",
+            "symbol_id": "tests/test_helpers.py::test_abort_with_app",
+            "start_line": 199,
+            "end_line": 206,
+            "kind": "symbol",
+            "score": 4.1538,
+            "match": null,
+            "why": "test file x0.5; bm25: abort"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.make_aborter",
+            "start_line": 496,
+            "end_line": 506,
+            "kind": "symbol",
+            "score": 3.7075,
+            "match": null,
+            "why": "bm25: abort"
+          },
+          {
+            "path": "tests/test_user_error_handler.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 295,
+            "kind": "file",
+            "score": 2.1267,
+            "match": null,
+            "why": "test file x0.5; bm25: abort"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "symbol_id": "tests/test_basic.py::test_trap_bad_request_key_error.<locals>.allow_abort",
+            "start_line": 1066,
+            "end_line": 1068,
+            "kind": "symbol",
+            "score": 2.0769,
+            "match": null,
+            "why": "nested x0.5; test file x0.5; bm25: abort"
+          },
+          {
+            "path": "tests/test_user_error_handler.py",
+            "symbol_id": "tests/test_user_error_handler.py::TestGenericHandlers.app.<locals>.do_abort",
+            "start_line": 233,
+            "end_line": 235,
+            "kind": "symbol",
+            "score": 2.0769,
+            "match": null,
+            "why": "nested x0.5; test file x0.5; bm25: abort"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/helpers.py",
+            "start_line": 281,
+            "end_line": 301,
+            "label": "src/flask/helpers.py::abort"
+          },
+          {
+            "path": "tests/test_helpers.py",
+            "start_line": 180,
+            "end_line": 185,
+            "label": "tests/test_helpers.py::test_abort_no_app"
+          },
+          {
+            "path": "tests/test_helpers.py",
+            "start_line": 199,
+            "end_line": 206,
+            "label": "tests/test_helpers.py::test_abort_with_app"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 496,
+            "end_line": 506,
+            "label": "src/flask/sansio/app.py::App.make_aborter"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "start_line": 1066,
+            "end_line": 1068,
+            "label": "tests/test_basic.py::test_trap_bad_request_key_error.<locals>.allow_abort"
+          },
+          {
+            "path": "tests/test_user_error_handler.py",
+            "start_line": 233,
+            "end_line": 235,
+            "label": "tests/test_user_error_handler.py::TestGenericHandlers.app.<locals>.do_abort"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Dosya göndermek için kullanılan `send_file` nerede tanımlanmış?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/helpers.py",
+          "symbol": "send_file",
+          "start_line": 417,
+          "end_line": 540
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0001,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": "src/flask/helpers.py::send_file",
+            "start_line": 417,
+            "end_line": 540,
+            "kind": "symbol",
+            "score": 48.875,
+            "match": "symbol",
+            "why": "name match: send_file; bm25: file, send_file, send"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 679,
+            "kind": "file",
+            "score": 17.8607,
+            "match": "file",
+            "why": "bm25: send, send_file, file"
+          },
+          {
+            "path": "src/flask/blueprints.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 128,
+            "kind": "file",
+            "score": 15.1363,
+            "match": null,
+            "why": "bm25: send, file"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.get_send_file_max_age",
+            "start_line": 363,
+            "end_line": 388,
+            "kind": "symbol",
+            "score": 15.1295,
+            "match": null,
+            "why": "bm25: send, file, send_file"
+          },
+          {
+            "path": "src/flask/blueprints.py",
+            "symbol_id": "src/flask/blueprints.py::Blueprint.get_send_file_max_age",
+            "start_line": 55,
+            "end_line": 80,
+            "kind": "symbol",
+            "score": 15.1295,
+            "match": null,
+            "why": "bm25: send, file, send_file"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": "src/flask/helpers.py::_prepare_send_file_kwargs",
+            "start_line": 402,
+            "end_line": 414,
+            "kind": "symbol",
+            "score": 13.9744,
+            "match": null,
+            "why": "bm25: send, file"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": "src/flask/helpers.py::send_from_directory",
+            "start_line": 543,
+            "end_line": 584,
+            "kind": "symbol",
+            "score": 13.1161,
+            "match": null,
+            "why": "bm25: send, file, send_file"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.send_static_file",
+            "start_line": 390,
+            "end_line": 410,
+            "kind": "symbol",
+            "score": 11.0768,
+            "match": null,
+            "why": "bm25: send, file"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/helpers.py",
+            "start_line": 417,
+            "end_line": 540,
+            "label": "src/flask/helpers.py::send_file"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 363,
+            "end_line": 388,
+            "label": "src/flask/app.py::Flask.get_send_file_max_age"
+          },
+          {
+            "path": "src/flask/blueprints.py",
+            "start_line": 55,
+            "end_line": 80,
+            "label": "src/flask/blueprints.py::Blueprint.get_send_file_max_age"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "start_line": 402,
+            "end_line": 414,
+            "label": "src/flask/helpers.py::_prepare_send_file_kwargs"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "start_line": 543,
+            "end_line": 584,
+            "label": "src/flask/helpers.py::send_from_directory"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 390,
+            "end_line": 410,
+            "label": "src/flask/app.py::Flask.send_static_file"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "`register_error_handler` metodu hangi dosyada, hangi sınıfta?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/sansio/scaffold.py",
+          "symbol": "Scaffold.register_error_handler",
+          "start_line": 649,
+          "end_line": 662
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0007,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.register_error_handler",
+            "start_line": 649,
+            "end_line": 662,
+            "kind": "symbol",
+            "score": 66.2241,
+            "match": "symbol",
+            "why": "name match: register_error_handler; bm25: register_error_handler, register, handler, error"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 800,
+            "kind": "file",
+            "score": 12.2851,
+            "match": "file",
+            "why": "bm25: register_error_handler, register, handler, error"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.errorhandler",
+            "start_line": 605,
+            "end_line": 647,
+            "kind": "symbol",
+            "score": 10.8349,
+            "match": null,
+            "why": "bm25: register, error, handler"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App._find_error_handler",
+            "start_line": 869,
+            "end_line": 892,
+            "kind": "symbol",
+            "score": 8.7487,
+            "match": null,
+            "why": "bm25: handler, error"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1014,
+            "kind": "file",
+            "score": 6.9408,
+            "match": null,
+            "why": "bm25: register, error, handler"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": "examples/tutorial/flaskr/auth.py::register",
+            "start_line": 46,
+            "end_line": 81,
+            "kind": "symbol",
+            "score": 6.9017,
+            "match": null,
+            "why": "bm25: register"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": "src/flask/json/tag.py::TaggedJSONSerializer.register",
+            "start_line": 256,
+            "end_line": 287,
+            "kind": "symbol",
+            "score": 6.604,
+            "match": null,
+            "why": "bm25: register, error"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint.register",
+            "start_line": 273,
+            "end_line": 377,
+            "kind": "symbol",
+            "score": 6.3118,
+            "match": null,
+            "why": "bm25: register"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 649,
+            "end_line": 662,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.register_error_handler"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 605,
+            "end_line": 647,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.errorhandler"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 869,
+            "end_line": 892,
+            "label": "src/flask/sansio/app.py::App._find_error_handler"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "start_line": 46,
+            "end_line": 81,
+            "label": "examples/tutorial/flaskr/auth.py::register"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "start_line": 256,
+            "end_line": 287,
+            "label": "src/flask/json/tag.py::TaggedJSONSerializer.register"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 273,
+            "end_line": 377,
+            "label": "src/flask/sansio/blueprints.py::Blueprint.register"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Class-based view'ların temel sınıfı `View` nerede tanımlı? `as_view` metodu orada mı?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/views.py",
+          "symbol": "View",
+          "start_line": 16,
+          "end_line": 135
+        },
+        {
+          "path": "src/flask/views.py",
+          "symbol": "View.as_view",
+          "start_line": 85,
+          "end_line": 135
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0003,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View",
+            "start_line": 16,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 55.2288,
+            "match": "symbol",
+            "why": "name match: View; class boost; bm25: view, as_view, based, as"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View.as_view",
+            "start_line": 85,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 51.6244,
+            "match": "symbol",
+            "why": "name match: as_view; bm25: as_view, as, view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View.as_view.<locals>.view",
+            "start_line": 106,
+            "end_line": 110,
+            "kind": "symbol",
+            "score": 26.7248,
+            "match": "overlap",
+            "why": "name match: view; nested x0.5; bm25: as_view, as, view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View.as_view.<locals>.view",
+            "start_line": 115,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 26.7248,
+            "match": "overlap",
+            "why": "name match: view; nested x0.5; bm25: as_view, as, view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 191,
+            "kind": "file",
+            "score": 20.8842,
+            "match": "file",
+            "why": "bm25: as_view, as, view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::MethodView",
+            "start_line": 138,
+            "end_line": 191,
+            "kind": "symbol",
+            "score": 8.867,
+            "match": null,
+            "why": "class boost; bm25: view, based"
+          },
+          {
+            "path": "tests/test_views.py",
+            "symbol_id": "tests/test_views.py::test_method_based_view",
+            "start_line": 28,
+            "end_line": 38,
+            "kind": "symbol",
+            "score": 6.7024,
+            "match": null,
+            "why": "test file x0.5; bm25: based, view"
+          },
+          {
+            "path": "tests/test_views.py",
+            "symbol_id": "tests/test_views.py::test_remove_method_from_parent.<locals>.View",
+            "start_line": 246,
+            "end_line": 247,
+            "kind": "symbol",
+            "score": 4.6602,
+            "match": null,
+            "why": "name match: View; class boost; nested x0.5; test file x0.5; bm25: view"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/views.py",
+            "start_line": 16,
+            "end_line": 135,
+            "label": "src/flask/views.py::View"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 85,
+            "end_line": 135,
+            "label": "src/flask/views.py::View.as_view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 106,
+            "end_line": 110,
+            "label": "src/flask/views.py::View.as_view.<locals>.view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 115,
+            "end_line": 116,
+            "label": "src/flask/views.py::View.as_view.<locals>.view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 138,
+            "end_line": 191,
+            "label": "src/flask/views.py::MethodView"
+          },
+          {
+            "path": "tests/test_views.py",
+            "start_line": 28,
+            "end_line": 38,
+            "label": "tests/test_views.py::test_method_based_view"
+          },
+          {
+            "path": "tests/test_views.py",
+            "start_line": 246,
+            "end_line": 247,
+            "label": "tests/test_views.py::test_remove_method_from_parent.<locals>.View"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How does Flask sign the session cookie?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/sessions.py",
+          "symbol": "SecureCookieSessionInterface.get_signing_serializer",
+          "start_line": 303,
+          "end_line": 321
+        },
+        {
+          "path": "src/flask/sessions.py",
+          "symbol": "SecureCookieSessionInterface.save_session",
+          "start_line": 337,
+          "end_line": 385
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.001,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::AppContext.session",
+            "start_line": 395,
+            "end_line": 403,
+            "kind": "symbol",
+            "score": 17.5465,
+            "match": null,
+            "why": "name match: session; bm25: session, flask"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 385,
+            "kind": "file",
+            "score": 13.9863,
+            "match": "file",
+            "why": "bm25: cookie, session, flask"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SecureCookieSessionInterface",
+            "start_line": 284,
+            "end_line": 385,
+            "kind": "symbol",
+            "score": 13.2604,
+            "match": "overlap",
+            "why": "class boost; bm25: cookie, session, flask"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SecureCookieSession",
+            "start_line": 57,
+            "end_line": 80,
+            "kind": "symbol",
+            "score": 12.13,
+            "match": null,
+            "why": "class boost; bm25: cookie, session, flask"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SessionInterface.should_set_cookie",
+            "start_line": 233,
+            "end_line": 247,
+            "kind": "symbol",
+            "score": 12.0506,
+            "match": null,
+            "why": "bm25: cookie, session, flask"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SessionInterface.get_cookie_name",
+            "start_line": 171,
+            "end_line": 173,
+            "kind": "symbol",
+            "score": 11.949,
+            "match": null,
+            "why": "bm25: cookie, session, flask"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SessionInterface.get_cookie_httponly",
+            "start_line": 195,
+            "end_line": 200,
+            "kind": "symbol",
+            "score": 11.8445,
+            "match": null,
+            "why": "bm25: cookie, session, flask"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SecureCookieSessionInterface.open_session",
+            "start_line": 323,
+            "end_line": 335,
+            "kind": "symbol",
+            "score": 11.4593,
+            "match": null,
+            "why": "bm25: cookie, session, flask"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 395,
+            "end_line": 403,
+            "label": "src/flask/ctx.py::AppContext.session"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 284,
+            "end_line": 385,
+            "label": "src/flask/sessions.py::SecureCookieSessionInterface"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 57,
+            "end_line": 80,
+            "label": "src/flask/sessions.py::SecureCookieSession"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 233,
+            "end_line": 247,
+            "label": "src/flask/sessions.py::SessionInterface.should_set_cookie"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 171,
+            "end_line": 173,
+            "label": "src/flask/sessions.py::SessionInterface.get_cookie_name"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 195,
+            "end_line": 200,
+            "label": "src/flask/sessions.py::SessionInterface.get_cookie_httponly"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 323,
+            "end_line": 335,
+            "label": "src/flask/sessions.py::SecureCookieSessionInterface.open_session"
+          }
+        ],
+        "rank": 3,
+        "loose_rank": 2,
+        "rr": 0.3333333333333333,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Where are static files served from? Which code handles requests to /static/<filename>?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.send_static_file",
+          "start_line": 390,
+          "end_line": 410
+        },
+        {
+          "path": "src/flask/app.py",
+          "start_line": 344,
+          "end_line": 361
+        },
+        {
+          "path": "src/flask/blueprints.py",
+          "symbol": "Blueprint.send_static_file",
+          "start_line": 82,
+          "end_line": 102
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0002,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.send_static_file",
+            "start_line": 390,
+            "end_line": 410,
+            "kind": "symbol",
+            "score": 10.2754,
+            "match": "symbol",
+            "why": "bm25: static, filename"
+          },
+          {
+            "path": "src/flask/blueprints.py",
+            "symbol_id": "src/flask/blueprints.py::Blueprint.send_static_file",
+            "start_line": 82,
+            "end_line": 102,
+            "kind": "symbol",
+            "score": 10.2754,
+            "match": "symbol",
+            "why": "bm25: static, filename"
+          },
+          {
+            "path": "src/flask/config.py",
+            "symbol_id": "src/flask/config.py::Config.from_pyfile",
+            "start_line": 187,
+            "end_line": 216,
+            "kind": "symbol",
+            "score": 7.7214,
+            "match": null,
+            "why": "bm25: filename"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold",
+            "start_line": 52,
+            "end_line": 706,
+            "kind": "symbol",
+            "score": 7.4316,
+            "match": null,
+            "why": "class boost; bm25: static"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.static_folder",
+            "start_line": 223,
+            "end_line": 231,
+            "kind": "symbol",
+            "score": 7.3733,
+            "match": null,
+            "why": "bm25: static"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.has_static_folder",
+            "start_line": 240,
+            "end_line": 246,
+            "kind": "symbol",
+            "score": 7.0309,
+            "match": null,
+            "why": "bm25: static"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.static_url_path",
+            "start_line": 248,
+            "end_line": 262,
+            "kind": "symbol",
+            "score": 6.9997,
+            "match": null,
+            "why": "bm25: static"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.url_defaults",
+            "start_line": 591,
+            "end_line": 603,
+            "kind": "symbol",
+            "score": 6.9407,
+            "match": null,
+            "why": "bm25: handles, requests"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/app.py",
+            "start_line": 390,
+            "end_line": 410,
+            "label": "src/flask/app.py::Flask.send_static_file"
+          },
+          {
+            "path": "src/flask/blueprints.py",
+            "start_line": 82,
+            "end_line": 102,
+            "label": "src/flask/blueprints.py::Blueprint.send_static_file"
+          },
+          {
+            "path": "src/flask/config.py",
+            "start_line": 187,
+            "end_line": 216,
+            "label": "src/flask/config.py::Config.from_pyfile"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 52,
+            "end_line": 706,
+            "label": "src/flask/sansio/scaffold.py::Scaffold"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 223,
+            "end_line": 231,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.static_folder"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 240,
+            "end_line": 246,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.has_static_folder"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 248,
+            "end_line": 262,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.static_url_path"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 591,
+            "end_line": 603,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.url_defaults"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How is the JSON provider chosen?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/sansio/app.py",
+          "start_line": 228,
+          "end_line": 238
+        },
+        {
+          "path": "src/flask/sansio/app.py",
+          "start_line": 327,
+          "end_line": 341
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0003,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider",
+            "start_line": 19,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 64.6757,
+            "match": null,
+            "why": "name match: JSONProvider; class boost; bm25: provider, jsonprovider, json"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 215,
+            "kind": "file",
+            "score": 39.48,
+            "match": null,
+            "why": "path match: provider; bm25: provider, jsonprovider, json"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider.__init__",
+            "start_line": 38,
+            "end_line": 39,
+            "kind": "symbol",
+            "score": 17.2923,
+            "match": null,
+            "why": "bm25: provider, jsonprovider, json"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::DefaultJSONProvider",
+            "start_line": 124,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 16.6808,
+            "match": null,
+            "why": "class boost; bm25: provider, json, jsonprovider"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider.dumps",
+            "start_line": 41,
+            "end_line": 47,
+            "kind": "symbol",
+            "score": 15.8813,
+            "match": null,
+            "why": "bm25: provider, jsonprovider, json"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider.loads",
+            "start_line": 59,
+            "end_line": 65,
+            "kind": "symbol",
+            "score": 15.4164,
+            "match": null,
+            "why": "bm25: provider, jsonprovider, json"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider._prepare_response_obj",
+            "start_line": 75,
+            "end_line": 87,
+            "kind": "symbol",
+            "score": 14.4688,
+            "match": null,
+            "why": "bm25: provider, jsonprovider, json"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider.load",
+            "start_line": 67,
+            "end_line": 73,
+            "kind": "symbol",
+            "score": 13.642,
+            "match": null,
+            "why": "bm25: provider, json, jsonprovider"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 19,
+            "end_line": 105,
+            "label": "src/flask/json/provider.py::JSONProvider"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 38,
+            "end_line": 39,
+            "label": "src/flask/json/provider.py::JSONProvider.__init__"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 124,
+            "end_line": 215,
+            "label": "src/flask/json/provider.py::DefaultJSONProvider"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 41,
+            "end_line": 47,
+            "label": "src/flask/json/provider.py::JSONProvider.dumps"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 59,
+            "end_line": 65,
+            "label": "src/flask/json/provider.py::JSONProvider.loads"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 75,
+            "end_line": 87,
+            "label": "src/flask/json/provider.py::JSONProvider._prepare_response_obj"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 67,
+            "end_line": 73,
+            "label": "src/flask/json/provider.py::JSONProvider.load"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Where does the test client build a request?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/testing.py",
+          "symbol": "FlaskClient._request_from_builder_args",
+          "start_line": 193,
+          "end_line": 202
+        },
+        {
+          "path": "src/flask/testing.py",
+          "symbol": "EnvironBuilder.__init__",
+          "start_line": 49,
+          "end_line": 86
+        },
+        {
+          "path": "src/flask/testing.py",
+          "symbol": "FlaskClient.open",
+          "start_line": 204,
+          "end_line": 247
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0026,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.test_client",
+            "start_line": 755,
+            "end_line": 811,
+            "kind": "symbol",
+            "score": 36.6528,
+            "match": null,
+            "why": "name match: test_client; bm25: test_client, client, test"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "symbol_id": "src/flask/wrappers.py::Request",
+            "start_line": 18,
+            "end_line": 219,
+            "kind": "symbol",
+            "score": 14.716,
+            "match": null,
+            "why": "name match: Request; class boost; bm25: request"
+          },
+          {
+            "path": "examples/tutorial/tests/conftest.py",
+            "symbol_id": "examples/tutorial/tests/conftest.py::client",
+            "start_line": 35,
+            "end_line": 38,
+            "kind": "symbol",
+            "score": 14.3386,
+            "match": null,
+            "why": "name match: client; bm25: client, test"
+          },
+          {
+            "path": "src/flask/testing.py",
+            "symbol_id": "src/flask/testing.py::FlaskClient",
+            "start_line": 109,
+            "end_line": 262,
+            "kind": "symbol",
+            "score": 14.3364,
+            "match": "overlap",
+            "why": "class boost; bm25: test_client, client, request, test"
+          },
+          {
+            "path": "tests/conftest.py",
+            "symbol_id": "tests/conftest.py::client",
+            "start_line": 49,
+            "end_line": 51,
+            "kind": "symbol",
+            "score": 12.9348,
+            "match": null,
+            "why": "name match: client; bm25: client"
+          },
+          {
+            "path": "examples/javascript/tests/conftest.py",
+            "symbol_id": "examples/javascript/tests/conftest.py::client",
+            "start_line": 13,
+            "end_line": 15,
+            "kind": "symbol",
+            "score": 12.5941,
+            "match": null,
+            "why": "name match: client; bm25: client"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::AppContext.request",
+            "start_line": 370,
+            "end_line": 379,
+            "kind": "symbol",
+            "score": 12.5175,
+            "match": null,
+            "why": "name match: request; bm25: request"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1625,
+            "kind": "file",
+            "score": 9.8288,
+            "match": null,
+            "why": "bm25: test_client, request, client, test"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/app.py",
+            "start_line": 755,
+            "end_line": 811,
+            "label": "src/flask/app.py::Flask.test_client"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "start_line": 18,
+            "end_line": 219,
+            "label": "src/flask/wrappers.py::Request"
+          },
+          {
+            "path": "examples/tutorial/tests/conftest.py",
+            "start_line": 35,
+            "end_line": 38,
+            "label": "examples/tutorial/tests/conftest.py::client"
+          },
+          {
+            "path": "src/flask/testing.py",
+            "start_line": 109,
+            "end_line": 262,
+            "label": "src/flask/testing.py::FlaskClient"
+          },
+          {
+            "path": "tests/conftest.py",
+            "start_line": 49,
+            "end_line": 51,
+            "label": "tests/conftest.py::client"
+          },
+          {
+            "path": "examples/javascript/tests/conftest.py",
+            "start_line": 13,
+            "end_line": 15,
+            "label": "examples/javascript/tests/conftest.py::client"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 370,
+            "end_line": 379,
+            "label": "src/flask/ctx.py::AppContext.request"
+          }
+        ],
+        "rank": 4,
+        "loose_rank": 4,
+        "rr": 0.25,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Where do I register cleanup code that should run on app context teardown?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/sansio/app.py",
+          "symbol": "App.teardown_appcontext",
+          "start_line": 827,
+          "end_line": 856
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0015,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::AppContext",
+            "start_line": 260,
+            "end_line": 525,
+            "kind": "symbol",
+            "score": 53.1758,
+            "match": null,
+            "why": "name match: AppContext; class boost; bm25: appcontext, context, app_context, app"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.app_context",
+            "start_line": 1481,
+            "end_line": 1499,
+            "kind": "symbol",
+            "score": 53.1313,
+            "match": null,
+            "why": "name match: app_context; bm25: app_context, context, appcontext, app"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1625,
+            "kind": "file",
+            "score": 34.9451,
+            "match": null,
+            "why": "path match: app; bm25: app_context, context, teardown, run, appcontext, app"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint.register",
+            "start_line": 273,
+            "end_line": 377,
+            "kind": "symbol",
+            "score": 22.7259,
+            "match": null,
+            "why": "name match: register; bm25: register, app"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": "examples/tutorial/flaskr/auth.py::register",
+            "start_line": 46,
+            "end_line": 81,
+            "kind": "symbol",
+            "score": 20.705,
+            "match": null,
+            "why": "name match: register; bm25: register"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1014,
+            "kind": "file",
+            "score": 20.4269,
+            "match": "file",
+            "why": "path match: app; bm25: register, appcontext, teardown, context, app"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.teardown_appcontext",
+            "start_line": 827,
+            "end_line": 856,
+            "kind": "symbol",
+            "score": 18.4328,
+            "match": "symbol",
+            "why": "bm25: teardown, appcontext, app_context, context, app"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.run",
+            "start_line": 630,
+            "end_line": 753,
+            "kind": "symbol",
+            "score": 17.8235,
+            "match": null,
+            "why": "name match: run; bm25: run, app"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 260,
+            "end_line": 525,
+            "label": "src/flask/ctx.py::AppContext"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 1481,
+            "end_line": 1499,
+            "label": "src/flask/app.py::Flask.app_context"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 273,
+            "end_line": 377,
+            "label": "src/flask/sansio/blueprints.py::Blueprint.register"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "start_line": 46,
+            "end_line": 81,
+            "label": "examples/tutorial/flaskr/auth.py::register"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 827,
+            "end_line": 856,
+            "label": "src/flask/sansio/app.py::App.teardown_appcontext"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 630,
+            "end_line": 753,
+            "label": "src/flask/app.py::Flask.run"
+          }
+        ],
+        "rank": 7,
+        "loose_rank": 6,
+        "rr": 0.14285714285714285,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How can config values be loaded from environment variables that start with FLASK_?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/config.py",
+          "symbol": "Config.from_prefixed_env",
+          "start_line": 126,
+          "end_line": 185
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0011,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/templating.py",
+            "symbol_id": "src/flask/templating.py::Environment",
+            "start_line": 36,
+            "end_line": 46,
+            "kind": "symbol",
+            "score": 33.9114,
+            "match": null,
+            "why": "name match: Environment; class boost; bm25: environment, flask"
+          },
+          {
+            "path": "src/flask/config.py",
+            "symbol_id": "src/flask/config.py::Config",
+            "start_line": 50,
+            "end_line": 367,
+            "kind": "symbol",
+            "score": 23.5097,
+            "match": "broad",
+            "why": "name match: Config; class boost; bm25: config, flask"
+          },
+          {
+            "path": "src/flask/config.py",
+            "symbol_id": "src/flask/config.py::Config.from_prefixed_env",
+            "start_line": 126,
+            "end_line": 185,
+            "kind": "symbol",
+            "score": 19.4568,
+            "match": "symbol",
+            "why": "bm25: values, config, loaded, start, variables, environment, flask"
+          },
+          {
+            "path": "src/flask/config.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 367,
+            "kind": "file",
+            "score": 14.3733,
+            "match": "file",
+            "why": "path match: config; bm25: config, flask"
+          },
+          {
+            "path": "src/flask/config.py",
+            "symbol_id": "src/flask/config.py::Config.from_file",
+            "start_line": 256,
+            "end_line": 302,
+            "kind": "symbol",
+            "score": 11.8956,
+            "match": null,
+            "why": "bm25: config, loaded, values, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.__call__",
+            "start_line": 1618,
+            "end_line": 1625,
+            "kind": "symbol",
+            "score": 11.6309,
+            "match": null,
+            "why": "bm25: start, environment, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::ScriptInfo.load_app",
+            "start_line": 333,
+            "end_line": 372,
+            "kind": "symbol",
+            "score": 9.4636,
+            "match": null,
+            "why": "bm25: loaded, flask"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.create_jinja_environment",
+            "start_line": 477,
+            "end_line": 478,
+            "kind": "symbol",
+            "score": 9.1265,
+            "match": null,
+            "why": "bm25: environment, flask"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/templating.py",
+            "start_line": 36,
+            "end_line": 46,
+            "label": "src/flask/templating.py::Environment"
+          },
+          {
+            "path": "src/flask/config.py",
+            "start_line": 50,
+            "end_line": 367,
+            "label": "src/flask/config.py::Config"
+          },
+          {
+            "path": "src/flask/config.py",
+            "start_line": 126,
+            "end_line": 185,
+            "label": "src/flask/config.py::Config.from_prefixed_env"
+          },
+          {
+            "path": "src/flask/config.py",
+            "start_line": 256,
+            "end_line": 302,
+            "label": "src/flask/config.py::Config.from_file"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 1618,
+            "end_line": 1625,
+            "label": "src/flask/app.py::Flask.__call__"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 333,
+            "end_line": 372,
+            "label": "src/flask/cli.py::ScriptInfo.load_app"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 477,
+            "end_line": 478,
+            "label": "src/flask/sansio/app.py::App.create_jinja_environment"
+          }
+        ],
+        "rank": 3,
+        "loose_rank": 2,
+        "rr": 0.3333333333333333,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q19",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Which pytest fixture in Flask's own test suite fails a test that leaves an app context pushed?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "tests/conftest.py",
+          "symbol": "leak_detector",
+          "start_line": 67,
+          "end_line": 79
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0033,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.app_context",
+            "start_line": 1481,
+            "end_line": 1499,
+            "kind": "symbol",
+            "score": 73.0252,
+            "match": null,
+            "why": "name match: app_context; bm25: app_context, pushed, context, appcontext, app, flask"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::AppContext",
+            "start_line": 260,
+            "end_line": 525,
+            "kind": "symbol",
+            "score": 70.5218,
+            "match": null,
+            "why": "name match: AppContext; class boost; bm25: appcontext, context, app_context, pushed, app, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1625,
+            "kind": "file",
+            "score": 25.9726,
+            "match": null,
+            "why": "path match: app; bm25: app_context, context, appcontext, flask, app, test"
+          },
+          {
+            "path": "tests/test_reqctx.py",
+            "symbol_id": "tests/test_reqctx.py::test_copy_context_thread",
+            "start_line": 147,
+            "end_line": 174,
+            "kind": "symbol",
+            "score": 18.0416,
+            "match": null,
+            "why": "bm25: pytest, fixture, context, flask, app, test"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "symbol_id": "tests/test_basic.py::test_teardown_request_handler_error.<locals>.fails",
+            "start_line": 841,
+            "end_line": 843,
+            "kind": "symbol",
+            "score": 16.9849,
+            "match": null,
+            "why": "name match: fails; nested x0.5; bm25: fails, test"
+          },
+          {
+            "path": "src/flask/globals.py",
+            "symbol_id": "src/flask/globals.py::AppContextProxy",
+            "start_line": 24,
+            "end_line": 24,
+            "kind": "symbol",
+            "score": 14.5286,
+            "match": null,
+            "why": "class boost; bm25: appcontext, context, app, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.request_context",
+            "start_line": 1501,
+            "end_line": 1515,
+            "kind": "symbol",
+            "score": 14.4947,
+            "match": null,
+            "why": "bm25: pushed, context, appcontext, app, flask, test"
+          },
+          {
+            "path": "tests/test_appctx.py",
+            "symbol_id": "tests/test_appctx.py::test_url_generation_without_context_fails",
+            "start_line": 27,
+            "end_line": 29,
+            "kind": "symbol",
+            "score": 13.6827,
+            "match": null,
+            "why": "bm25: fails, context, test"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/app.py",
+            "start_line": 1481,
+            "end_line": 1499,
+            "label": "src/flask/app.py::Flask.app_context"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 260,
+            "end_line": 525,
+            "label": "src/flask/ctx.py::AppContext"
+          },
+          {
+            "path": "tests/test_reqctx.py",
+            "start_line": 147,
+            "end_line": 174,
+            "label": "tests/test_reqctx.py::test_copy_context_thread"
+          },
+          {
+            "path": "tests/test_basic.py",
+            "start_line": 841,
+            "end_line": 843,
+            "label": "tests/test_basic.py::test_teardown_request_handler_error.<locals>.fails"
+          },
+          {
+            "path": "src/flask/globals.py",
+            "start_line": 24,
+            "end_line": 24,
+            "label": "src/flask/globals.py::AppContextProxy"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 1501,
+            "end_line": 1515,
+            "label": "src/flask/app.py::Flask.request_context"
+          },
+          {
+            "path": "tests/test_appctx.py",
+            "start_line": 27,
+            "end_line": 29,
+            "label": "tests/test_appctx.py::test_url_generation_without_context_fails"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q20",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Şablonlarda `request`, `session` ve `g` değişkenleri otomatik olarak nereden geliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/templating.py",
+          "symbol": "_default_template_ctx_processor",
+          "start_line": 21,
+          "end_line": 33
+        },
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.create_jinja_environment",
+          "start_line": 467,
+          "end_line": 505
+        },
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.update_template_context",
+          "start_line": 588,
+          "end_line": 616
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0006,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::AppContext.session",
+            "start_line": 395,
+            "end_line": 403,
+            "kind": "symbol",
+            "score": 19.7249,
+            "match": null,
+            "why": "name match: session; bm25: session, request"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "symbol_id": "src/flask/wrappers.py::Request",
+            "start_line": 18,
+            "end_line": 219,
+            "kind": "symbol",
+            "score": 14.716,
+            "match": null,
+            "why": "name match: Request; class boost; bm25: request"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::AppContext.request",
+            "start_line": 370,
+            "end_line": 379,
+            "kind": "symbol",
+            "score": 12.5175,
+            "match": null,
+            "why": "name match: request; bm25: request"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 540,
+            "kind": "file",
+            "score": 7.9639,
+            "match": null,
+            "why": "bm25: request, session"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SecureCookieSessionInterface.open_session",
+            "start_line": 323,
+            "end_line": 335,
+            "kind": "symbol",
+            "score": 7.6999,
+            "match": null,
+            "why": "bm25: session, request"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SessionInterface.open_session",
+            "start_line": 249,
+            "end_line": 261,
+            "kind": "symbol",
+            "score": 7.3284,
+            "match": null,
+            "why": "bm25: session, request"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "symbol_id": "src/flask/sessions.py::SessionInterface.save_session",
+            "start_line": 263,
+            "end_line": 270,
+            "kind": "symbol",
+            "score": 7.2651,
+            "match": null,
+            "why": "bm25: session, request"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::AppContext.__init__",
+            "start_line": 300,
+            "end_line": 337,
+            "kind": "symbol",
+            "score": 7.1957,
+            "match": null,
+            "why": "bm25: session, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 395,
+            "end_line": 403,
+            "label": "src/flask/ctx.py::AppContext.session"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "start_line": 18,
+            "end_line": 219,
+            "label": "src/flask/wrappers.py::Request"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 370,
+            "end_line": 379,
+            "label": "src/flask/ctx.py::AppContext.request"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 323,
+            "end_line": 335,
+            "label": "src/flask/sessions.py::SecureCookieSessionInterface.open_session"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 249,
+            "end_line": 261,
+            "label": "src/flask/sessions.py::SessionInterface.open_session"
+          },
+          {
+            "path": "src/flask/sessions.py",
+            "start_line": 263,
+            "end_line": 270,
+            "label": "src/flask/sessions.py::SessionInterface.save_session"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 300,
+            "end_line": 337,
+            "label": "src/flask/ctx.py::AppContext.__init__"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q21",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "JSON yanıtlarında `datetime` nesneleri nasıl metne çevriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/flask/json/provider.py",
+          "symbol": "_default",
+          "start_line": 108,
+          "end_line": 121
+        },
+        {
+          "path": "src/flask/json/provider.py",
+          "start_line": 138,
+          "end_line": 142
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0003,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::DefaultJSONProvider",
+            "start_line": 124,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 12.9117,
+            "match": "broad",
+            "why": "class boost; bm25: datetime, json"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": "src/flask/json/tag.py::TaggedJSONSerializer",
+            "start_line": 219,
+            "end_line": 327,
+            "kind": "symbol",
+            "score": 11.7918,
+            "match": null,
+            "why": "class boost; bm25: datetime, json"
+          },
+          {
+            "path": "src/flask/json/__init__.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 170,
+            "kind": "file",
+            "score": 7.99,
+            "match": null,
+            "why": "path match: json; bm25: json"
+          },
+          {
+            "path": "tests/test_json.py",
+            "symbol_id": "tests/test_json.py::test_jsonify_datetime",
+            "start_line": 133,
+            "end_line": 142,
+            "kind": "symbol",
+            "score": 5.8263,
+            "match": null,
+            "why": "test file x0.5; bm25: datetime, json"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": "src/flask/json/tag.py::JSONTag",
+            "start_line": 60,
+            "end_line": 90,
+            "kind": "symbol",
+            "score": 5.7212,
+            "match": null,
+            "why": "class boost; bm25: json"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider",
+            "start_line": 19,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 5.2944,
+            "match": null,
+            "why": "class boost; bm25: json"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 327,
+            "kind": "file",
+            "score": 5.1761,
+            "match": null,
+            "why": "bm25: json"
+          },
+          {
+            "path": "tests/test_json.py",
+            "symbol_id": "tests/test_json.py::FixedOffset",
+            "start_line": 145,
+            "end_line": 163,
+            "kind": "symbol",
+            "score": 5.0297,
+            "match": null,
+            "why": "class boost; test file x0.5; bm25: datetime, json"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 124,
+            "end_line": 215,
+            "label": "src/flask/json/provider.py::DefaultJSONProvider"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "start_line": 219,
+            "end_line": 327,
+            "label": "src/flask/json/tag.py::TaggedJSONSerializer"
+          },
+          {
+            "path": "tests/test_json.py",
+            "start_line": 133,
+            "end_line": 142,
+            "label": "tests/test_json.py::test_jsonify_datetime"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "start_line": 60,
+            "end_line": 90,
+            "label": "src/flask/json/tag.py::JSONTag"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 19,
+            "end_line": 105,
+            "label": "src/flask/json/provider.py::JSONProvider"
+          },
+          {
+            "path": "tests/test_json.py",
+            "start_line": 145,
+            "end_line": 163,
+            "label": "tests/test_json.py::FixedOffset"
+          }
+        ],
+        "rank": null,
+        "loose_rank": 1,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q22",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Tutorial örneğindeki (flaskr) uygulama fabrikası nerede? Blueprint'ler orada nasıl ekleniyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "examples/tutorial/flaskr/__init__.py",
+          "symbol": "create_app",
+          "start_line": 6,
+          "end_line": 48
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0003,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 4,
+        "top_hits": [
+          {
+            "path": "examples/tutorial/flaskr/__init__.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 48,
+            "kind": "file",
+            "score": 25.6586,
+            "match": "file",
+            "why": "path match: flaskr; bm25: flaskr, tutorial"
+          },
+          {
+            "path": "src/flask/blueprints.py",
+            "symbol_id": "src/flask/blueprints.py::Blueprint",
+            "start_line": 18,
+            "end_line": 128,
+            "kind": "symbol",
+            "score": 19.1333,
+            "match": null,
+            "why": "name match: Blueprint; class boost; bm25: blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint",
+            "start_line": 119,
+            "end_line": 692,
+            "kind": "symbol",
+            "score": 15.456,
+            "match": null,
+            "why": "name match: Blueprint; class boost; bm25: blueprint"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "symbol_id": "src/flask/wrappers.py::Request.blueprint",
+            "start_line": 161,
+            "end_line": 178,
+            "kind": "symbol",
+            "score": 14.8503,
+            "match": null,
+            "why": "name match: blueprint; bm25: blueprint"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 125,
+            "kind": "file",
+            "score": 12.4009,
+            "match": null,
+            "why": "bm25: flaskr, tutorial"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 116,
+            "kind": "file",
+            "score": 11.5045,
+            "match": null,
+            "why": "bm25: flaskr, tutorial"
+          },
+          {
+            "path": "examples/tutorial/flaskr/db.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 56,
+            "kind": "file",
+            "score": 11.2717,
+            "match": null,
+            "why": "bm25: flaskr, tutorial"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "symbol_id": "examples/tutorial/flaskr/blog.py::index",
+            "start_line": 16,
+            "end_line": 25,
+            "kind": "symbol",
+            "score": 10.1117,
+            "match": null,
+            "why": "bm25: flaskr, tutorial"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/blueprints.py",
+            "start_line": 18,
+            "end_line": 128,
+            "label": "src/flask/blueprints.py::Blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 119,
+            "end_line": 692,
+            "label": "src/flask/sansio/blueprints.py::Blueprint"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "start_line": 161,
+            "end_line": 178,
+            "label": "src/flask/wrappers.py::Request.blueprint"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "start_line": 16,
+            "end_line": 25,
+            "label": "examples/tutorial/flaskr/blog.py::index"
+          }
+        ],
+        "rank": null,
+        "loose_rank": 1,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q23",
+      "category": "flow",
+      "lang": "en",
+      "question": "What happens between receiving a request and calling the view function?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.wsgi_app",
+          "start_line": 1566,
+          "end_line": 1616
+        },
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.full_dispatch_request",
+          "start_line": 992,
+          "end_line": 1019
+        },
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.dispatch_request",
+          "start_line": 966,
+          "end_line": 990
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0006,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View",
+            "start_line": 16,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 26.8096,
+            "match": null,
+            "why": "name match: View; class boost; bm25: view, request"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "symbol_id": "src/flask/wrappers.py::Request",
+            "start_line": 18,
+            "end_line": 219,
+            "kind": "symbol",
+            "score": 21.0655,
+            "match": null,
+            "why": "name match: Request; class boost; bm25: request, view"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::AppContext.request",
+            "start_line": 370,
+            "end_line": 379,
+            "kind": "symbol",
+            "score": 12.5175,
+            "match": null,
+            "why": "name match: request; bm25: request"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 191,
+            "kind": "file",
+            "score": 9.4899,
+            "match": null,
+            "why": "bm25: view, request"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View.as_view.<locals>.view",
+            "start_line": 106,
+            "end_line": 110,
+            "kind": "symbol",
+            "score": 8.0192,
+            "match": null,
+            "why": "name match: view; nested x0.5; bm25: view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View.as_view.<locals>.view",
+            "start_line": 115,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 8.0192,
+            "match": null,
+            "why": "name match: view; nested x0.5; bm25: view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View.as_view",
+            "start_line": 85,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 7.4747,
+            "match": null,
+            "why": "bm25: view, request"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::MethodView",
+            "start_line": 138,
+            "end_line": 191,
+            "kind": "symbol",
+            "score": 6.5084,
+            "match": null,
+            "why": "class boost; bm25: view, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/views.py",
+            "start_line": 16,
+            "end_line": 135,
+            "label": "src/flask/views.py::View"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "start_line": 18,
+            "end_line": 219,
+            "label": "src/flask/wrappers.py::Request"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 370,
+            "end_line": 379,
+            "label": "src/flask/ctx.py::AppContext.request"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 106,
+            "end_line": 110,
+            "label": "src/flask/views.py::View.as_view.<locals>.view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 115,
+            "end_line": 116,
+            "label": "src/flask/views.py::View.as_view.<locals>.view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 85,
+            "end_line": 135,
+            "label": "src/flask/views.py::View.as_view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 138,
+            "end_line": 191,
+            "label": "src/flask/views.py::MethodView"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q24",
+      "category": "flow",
+      "lang": "en",
+      "question": "How does the return value of a view function get turned into a Response object?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.finalize_request",
+          "start_line": 1021,
+          "end_line": 1051
+        },
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.make_response",
+          "start_line": 1224,
+          "end_line": 1364
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.001,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/flask/wrappers.py",
+            "symbol_id": "src/flask/wrappers.py::Response",
+            "start_line": 222,
+            "end_line": 257,
+            "kind": "symbol",
+            "score": 38.1256,
+            "match": null,
+            "why": "name match: Response; class boost; bm25: response, object"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::JSONProvider.response",
+            "start_line": 89,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 27.8484,
+            "match": null,
+            "why": "name match: response; bm25: response, object, value"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "symbol_id": "src/flask/ctx.py::_AppCtxGlobals.get",
+            "start_line": 68,
+            "end_line": 77,
+            "kind": "symbol",
+            "score": 25.9198,
+            "match": null,
+            "why": "name match: get; bm25: get, value"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "symbol_id": "src/flask/json/provider.py::DefaultJSONProvider.response",
+            "start_line": 189,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 23.4456,
+            "match": null,
+            "why": "name match: response; bm25: response, object"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View.as_view.<locals>.view",
+            "start_line": 106,
+            "end_line": 110,
+            "kind": "symbol",
+            "score": 17.8819,
+            "match": null,
+            "why": "name match: view; nested x0.5; bm25: view, response, value"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View.as_view.<locals>.view",
+            "start_line": 115,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 17.8819,
+            "match": null,
+            "why": "name match: view; nested x0.5; bm25: view, response, value"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View",
+            "start_line": 16,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 16.9829,
+            "match": null,
+            "why": "name match: View; class boost; bm25: view"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "symbol_id": "src/flask/helpers.py::make_response",
+            "start_line": 151,
+            "end_line": 197,
+            "kind": "symbol",
+            "score": 15.4561,
+            "match": null,
+            "why": "bm25: response, object, view, get, value"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/wrappers.py",
+            "start_line": 222,
+            "end_line": 257,
+            "label": "src/flask/wrappers.py::Response"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 89,
+            "end_line": 105,
+            "label": "src/flask/json/provider.py::JSONProvider.response"
+          },
+          {
+            "path": "src/flask/ctx.py",
+            "start_line": 68,
+            "end_line": 77,
+            "label": "src/flask/ctx.py::_AppCtxGlobals.get"
+          },
+          {
+            "path": "src/flask/json/provider.py",
+            "start_line": 189,
+            "end_line": 215,
+            "label": "src/flask/json/provider.py::DefaultJSONProvider.response"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 106,
+            "end_line": 110,
+            "label": "src/flask/views.py::View.as_view.<locals>.view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 115,
+            "end_line": 116,
+            "label": "src/flask/views.py::View.as_view.<locals>.view"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 16,
+            "end_line": 135,
+            "label": "src/flask/views.py::View"
+          },
+          {
+            "path": "src/flask/helpers.py",
+            "start_line": 151,
+            "end_line": 197,
+            "label": "src/flask/helpers.py::make_response"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q25",
+      "category": "flow",
+      "lang": "en",
+      "question": "When a view raises an exception, how does Flask find the error handler to call?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.handle_user_exception",
+          "start_line": 865,
+          "end_line": 895
+        },
+        {
+          "path": "src/flask/sansio/app.py",
+          "symbol": "App._find_error_handler",
+          "start_line": 869,
+          "end_line": 892
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0015,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.errorhandler",
+            "start_line": 605,
+            "end_line": 647,
+            "kind": "symbol",
+            "score": 53.3669,
+            "match": null,
+            "why": "name match: errorhandler; bm25: errorhandler, exception, error, handler, flask"
+          },
+          {
+            "path": "src/flask/views.py",
+            "symbol_id": "src/flask/views.py::View",
+            "start_line": 16,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 30.8042,
+            "match": null,
+            "why": "name match: View; class boost; bm25: view, call, flask"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint.app_errorhandler",
+            "start_line": 655,
+            "end_line": 670,
+            "kind": "symbol",
+            "score": 17.7544,
+            "match": null,
+            "why": "bm25: errorhandler, handler, error, exception, flask"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.register_error_handler",
+            "start_line": 649,
+            "end_line": 662,
+            "kind": "symbol",
+            "score": 15.324,
+            "match": null,
+            "why": "bm25: handler, error, errorhandler, exception, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask",
+            "start_line": 109,
+            "end_line": 1625,
+            "kind": "symbol",
+            "score": 14.0303,
+            "match": "broad",
+            "why": "name match: Flask; class boost; bm25: flask, view"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App._find_error_handler",
+            "start_line": 869,
+            "end_line": 892,
+            "kind": "symbol",
+            "score": 13.5778,
+            "match": "symbol",
+            "why": "bm25: handler, exception, error, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.handle_exception",
+            "start_line": 897,
+            "end_line": 948,
+            "kind": "symbol",
+            "score": 11.4213,
+            "match": null,
+            "why": "bm25: exception, error, handler, flask"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.trap_http_exception",
+            "start_line": 894,
+            "end_line": 927,
+            "kind": "symbol",
+            "score": 11.0732,
+            "match": null,
+            "why": "bm25: exception, error, handler, view, flask"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 605,
+            "end_line": 647,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.errorhandler"
+          },
+          {
+            "path": "src/flask/views.py",
+            "start_line": 16,
+            "end_line": 135,
+            "label": "src/flask/views.py::View"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 655,
+            "end_line": 670,
+            "label": "src/flask/sansio/blueprints.py::Blueprint.app_errorhandler"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 649,
+            "end_line": 662,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.register_error_handler"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 109,
+            "end_line": 1625,
+            "label": "src/flask/app.py::Flask"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 869,
+            "end_line": 892,
+            "label": "src/flask/sansio/app.py::App._find_error_handler"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 897,
+            "end_line": 948,
+            "label": "src/flask/app.py::Flask.handle_exception"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 894,
+            "end_line": 927,
+            "label": "src/flask/sansio/app.py::App.trap_http_exception"
+          }
+        ],
+        "rank": 6,
+        "loose_rank": 5,
+        "rr": 0.16666666666666666,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q26",
+      "category": "flow",
+      "lang": "tr",
+      "question": "`flask run` komutu `--app` verilmediğinde çalıştıracağı uygulamayı nasıl buluyor?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "src/flask/cli.py",
+          "symbol": "ScriptInfo.load_app",
+          "start_line": 333,
+          "end_line": 372
+        },
+        {
+          "path": "src/flask/cli.py",
+          "symbol": "find_best_app",
+          "start_line": 41,
+          "end_line": 91
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0019,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.run",
+            "start_line": 630,
+            "end_line": 753,
+            "kind": "symbol",
+            "score": 21.2704,
+            "match": null,
+            "why": "name match: run; bm25: run, flask, app"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask",
+            "start_line": 109,
+            "end_line": 1625,
+            "kind": "symbol",
+            "score": 10.9481,
+            "match": null,
+            "why": "name match: Flask; class boost; bm25: flask, app"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1625,
+            "kind": "file",
+            "score": 10.0935,
+            "match": null,
+            "why": "path match: app; bm25: run, flask, app"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App",
+            "start_line": 60,
+            "end_line": 1014,
+            "kind": "symbol",
+            "score": 9.9546,
+            "match": null,
+            "why": "name match: App; class boost; bm25: app, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::run_command.<locals>.app",
+            "start_line": 962,
+            "end_line": 965,
+            "kind": "symbol",
+            "score": 9.9426,
+            "match": null,
+            "why": "name match: app; nested x0.5; bm25: run, app, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::FlaskGroup",
+            "start_line": 531,
+            "end_line": 688,
+            "kind": "symbol",
+            "score": 6.712,
+            "match": null,
+            "why": "class boost; bm25: run, flask, app"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1126,
+            "kind": "file",
+            "score": 5.966,
+            "match": "file",
+            "why": "bm25: run, app, flask"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.name",
+            "start_line": 423,
+            "end_line": 438,
+            "kind": "symbol",
+            "score": 5.7945,
+            "match": null,
+            "why": "bm25: run, flask, app"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/app.py",
+            "start_line": 630,
+            "end_line": 753,
+            "label": "src/flask/app.py::Flask.run"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 109,
+            "end_line": 1625,
+            "label": "src/flask/app.py::Flask"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 60,
+            "end_line": 1014,
+            "label": "src/flask/sansio/app.py::App"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 962,
+            "end_line": 965,
+            "label": "src/flask/cli.py::run_command.<locals>.app"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 531,
+            "end_line": 688,
+            "label": "src/flask/cli.py::FlaskGroup"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 423,
+            "end_line": 438,
+            "label": "src/flask/sansio/app.py::App.name"
+          }
+        ],
+        "rank": null,
+        "loose_rank": 7,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q27",
+      "category": "flow",
+      "lang": "tr",
+      "question": "Blueprint'ler uygulamaya nasıl kaydediliyor?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "src/flask/sansio/app.py",
+          "symbol": "App.register_blueprint",
+          "start_line": 570,
+          "end_line": 596
+        },
+        {
+          "path": "src/flask/sansio/blueprints.py",
+          "symbol": "Blueprint.register",
+          "start_line": 273,
+          "end_line": 377
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0002,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/flask/blueprints.py",
+            "symbol_id": "src/flask/blueprints.py::Blueprint",
+            "start_line": 18,
+            "end_line": 128,
+            "kind": "symbol",
+            "score": 19.1333,
+            "match": null,
+            "why": "name match: Blueprint; class boost; bm25: blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint",
+            "start_line": 119,
+            "end_line": 692,
+            "kind": "symbol",
+            "score": 15.456,
+            "match": "broad",
+            "why": "name match: Blueprint; class boost; bm25: blueprint"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "symbol_id": "src/flask/wrappers.py::Request.blueprint",
+            "start_line": 161,
+            "end_line": 178,
+            "kind": "symbol",
+            "score": 14.8503,
+            "match": null,
+            "why": "name match: blueprint; bm25: blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::BlueprintSetupState",
+            "start_line": 34,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 5.3664,
+            "match": null,
+            "why": "class boost; bm25: blueprint"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.register_blueprint",
+            "start_line": 570,
+            "end_line": 596,
+            "kind": "symbol",
+            "score": 5.2521,
+            "match": "symbol",
+            "why": "bm25: blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint.register_blueprint",
+            "start_line": 255,
+            "end_line": 271,
+            "kind": "symbol",
+            "score": 5.1221,
+            "match": null,
+            "why": "bm25: blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint._merge_blueprint_funcs",
+            "start_line": 379,
+            "end_line": 410,
+            "kind": "symbol",
+            "score": 4.73,
+            "match": null,
+            "why": "bm25: blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "symbol_id": "src/flask/sansio/blueprints.py::Blueprint.register",
+            "start_line": 273,
+            "end_line": 377,
+            "kind": "symbol",
+            "score": 4.4904,
+            "match": "symbol",
+            "why": "bm25: blueprint"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/blueprints.py",
+            "start_line": 18,
+            "end_line": 128,
+            "label": "src/flask/blueprints.py::Blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 119,
+            "end_line": 692,
+            "label": "src/flask/sansio/blueprints.py::Blueprint"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "start_line": 161,
+            "end_line": 178,
+            "label": "src/flask/wrappers.py::Request.blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 34,
+            "end_line": 116,
+            "label": "src/flask/sansio/blueprints.py::BlueprintSetupState"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 570,
+            "end_line": 596,
+            "label": "src/flask/sansio/app.py::App.register_blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 255,
+            "end_line": 271,
+            "label": "src/flask/sansio/blueprints.py::Blueprint.register_blueprint"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 379,
+            "end_line": 410,
+            "label": "src/flask/sansio/blueprints.py::Blueprint._merge_blueprint_funcs"
+          },
+          {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 273,
+            "end_line": 377,
+            "label": "src/flask/sansio/blueprints.py::Blueprint.register"
+          }
+        ],
+        "rank": 5,
+        "loose_rank": 2,
+        "rr": 0.2,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": true,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q28",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "How does Flask match an incoming URL like /user/42 against the registered rules and convert <int:id> to an int?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "src/flask/ctx.py",
+          "symbol": "AppContext.match_request",
+          "start_line": 405,
+          "end_line": 414
+        },
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.create_url_adapter",
+          "start_line": 507,
+          "end_line": 558
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0014,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::CertParamType.convert",
+            "start_line": 791,
+            "end_line": 825,
+            "kind": "symbol",
+            "score": 30.583,
+            "match": null,
+            "why": "name match: convert; bm25: convert, flask"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "symbol_id": "src/flask/cli.py::SeparatedPathType.convert",
+            "start_line": 873,
+            "end_line": 878,
+            "kind": "symbol",
+            "score": 30.583,
+            "match": null,
+            "why": "name match: convert; bm25: convert, flask"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask",
+            "start_line": 109,
+            "end_line": 1625,
+            "kind": "symbol",
+            "score": 28.1448,
+            "match": "broad",
+            "why": "name match: Flask; class boost; bm25: rules, flask, url"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": "examples/tutorial/flaskr/auth.py::login",
+            "start_line": 84,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 15.8943,
+            "match": null,
+            "why": "bm25: id, registered, user"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "symbol_id": "src/flask/wrappers.py::Request.blueprint",
+            "start_line": 161,
+            "end_line": 178,
+            "kind": "symbol",
+            "score": 13.2599,
+            "match": null,
+            "why": "bm25: registered, match, url, flask"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "symbol_id": "examples/tutorial/flaskr/blog.py::get_post",
+            "start_line": 28,
+            "end_line": 57,
+            "kind": "symbol",
+            "score": 12.0613,
+            "match": null,
+            "why": "bm25: id, user"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": "examples/tutorial/flaskr/auth.py::load_logged_in_user",
+            "start_line": 32,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 10.2999,
+            "match": null,
+            "why": "bm25: user, id"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "symbol_id": "examples/tutorial/flaskr/blog.py::update",
+            "start_line": 86,
+            "end_line": 110,
+            "kind": "symbol",
+            "score": 9.8877,
+            "match": null,
+            "why": "bm25: id, user"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 791,
+            "end_line": 825,
+            "label": "src/flask/cli.py::CertParamType.convert"
+          },
+          {
+            "path": "src/flask/cli.py",
+            "start_line": 873,
+            "end_line": 878,
+            "label": "src/flask/cli.py::SeparatedPathType.convert"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 109,
+            "end_line": 1625,
+            "label": "src/flask/app.py::Flask"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "start_line": 84,
+            "end_line": 109,
+            "label": "examples/tutorial/flaskr/auth.py::login"
+          },
+          {
+            "path": "src/flask/wrappers.py",
+            "start_line": 161,
+            "end_line": 178,
+            "label": "src/flask/wrappers.py::Request.blueprint"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "start_line": 28,
+            "end_line": 57,
+            "label": "examples/tutorial/flaskr/blog.py::get_post"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "start_line": 32,
+            "end_line": 43,
+            "label": "examples/tutorial/flaskr/auth.py::load_logged_in_user"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "start_line": 86,
+            "end_line": 110,
+            "label": "examples/tutorial/flaskr/blog.py::update"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": null,
+        "pointer_at_k": false,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q29",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "Jinja şablonları Python koduna nasıl derleniyor? Lexer ve parser kodu nerede?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "src/flask/templating.py",
+          "symbol": "render_template",
+          "start_line": 136,
+          "end_line": 148
+        },
+        {
+          "path": "src/flask/templating.py",
+          "symbol": "_render",
+          "start_line": 123,
+          "end_line": 133
+        },
+        {
+          "path": "src/flask/templating.py",
+          "symbol": "Environment",
+          "start_line": 36,
+          "end_line": 46
+        },
+        {
+          "path": "src/flask/app.py",
+          "symbol": "Flask.create_jinja_environment",
+          "start_line": 467,
+          "end_line": 505
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0002,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/flask/templating.py",
+            "symbol_id": "src/flask/templating.py::DispatchingJinjaLoader",
+            "start_line": 49,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 7.5756,
+            "match": null,
+            "why": "class boost; bm25: jinja"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 327,
+            "kind": "file",
+            "score": 6.9879,
+            "match": null,
+            "why": "bm25: python"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.jinja_env",
+            "start_line": 467,
+            "end_line": 475,
+            "kind": "symbol",
+            "score": 6.8999,
+            "match": null,
+            "why": "bm25: jinja"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "symbol_id": "src/flask/sansio/scaffold.py::Scaffold.jinja_loader",
+            "start_line": 271,
+            "end_line": 282,
+            "kind": "symbol",
+            "score": 6.851,
+            "match": null,
+            "why": "bm25: jinja"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "symbol_id": "src/flask/sansio/app.py::App.create_jinja_environment",
+            "start_line": 477,
+            "end_line": 478,
+            "kind": "symbol",
+            "score": 6.7538,
+            "match": null,
+            "why": "bm25: jinja"
+          },
+          {
+            "path": "src/flask/app.py",
+            "symbol_id": "src/flask/app.py::Flask.create_jinja_environment",
+            "start_line": 467,
+            "end_line": 505,
+            "kind": "symbol",
+            "score": 6.6892,
+            "match": "symbol",
+            "why": "bm25: jinja"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": "src/flask/json/tag.py::TagDict.to_python",
+            "start_line": 114,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 6.5215,
+            "match": null,
+            "why": "bm25: python"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "symbol_id": "src/flask/json/tag.py::TagTuple.to_python",
+            "start_line": 143,
+            "end_line": 144,
+            "kind": "symbol",
+            "score": 6.5215,
+            "match": null,
+            "why": "bm25: python"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/flask/templating.py",
+            "start_line": 49,
+            "end_line": 120,
+            "label": "src/flask/templating.py::DispatchingJinjaLoader"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 467,
+            "end_line": 475,
+            "label": "src/flask/sansio/app.py::App.jinja_env"
+          },
+          {
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 271,
+            "end_line": 282,
+            "label": "src/flask/sansio/scaffold.py::Scaffold.jinja_loader"
+          },
+          {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 477,
+            "end_line": 478,
+            "label": "src/flask/sansio/app.py::App.create_jinja_environment"
+          },
+          {
+            "path": "src/flask/app.py",
+            "start_line": 467,
+            "end_line": 505,
+            "label": "src/flask/app.py::Flask.create_jinja_environment"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "start_line": 114,
+            "end_line": 116,
+            "label": "src/flask/json/tag.py::TagDict.to_python"
+          },
+          {
+            "path": "src/flask/json/tag.py",
+            "start_line": 143,
+            "end_line": 144,
+            "label": "src/flask/json/tag.py::TagTuple.to_python"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 6,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q30",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "In the flaskr tutorial, how are user passwords hashed? Where is the hashing algorithm implemented?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "examples/tutorial/flaskr/auth.py",
+          "start_line": 11,
+          "end_line": 12
+        },
+        {
+          "path": "examples/tutorial/flaskr/auth.py",
+          "symbol": "register",
+          "start_line": 46,
+          "end_line": 81
+        },
+        {
+          "path": "examples/tutorial/flaskr/auth.py",
+          "symbol": "login",
+          "start_line": 84,
+          "end_line": 109
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0004,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 5,
+        "top_hits": [
+          {
+            "path": "examples/tutorial/flaskr/__init__.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 48,
+            "kind": "file",
+            "score": 25.6586,
+            "match": null,
+            "why": "path match: flaskr; bm25: flaskr, tutorial"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 116,
+            "kind": "file",
+            "score": 15.9354,
+            "match": "file",
+            "why": "bm25: flaskr, tutorial, user"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": "examples/tutorial/flaskr/auth.py::login",
+            "start_line": 84,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 14.258,
+            "match": "symbol",
+            "why": "bm25: flaskr, user, tutorial"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "symbol_id": "examples/tutorial/flaskr/blog.py::create",
+            "start_line": 60,
+            "end_line": 83,
+            "kind": "symbol",
+            "score": 13.6532,
+            "match": null,
+            "why": "bm25: flaskr, tutorial, user"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "symbol_id": "examples/tutorial/flaskr/blog.py::update",
+            "start_line": 86,
+            "end_line": 110,
+            "kind": "symbol",
+            "score": 13.3175,
+            "match": null,
+            "why": "bm25: flaskr, tutorial, user"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": "examples/tutorial/flaskr/auth.py::logout",
+            "start_line": 112,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 12.9979,
+            "match": null,
+            "why": "bm25: flaskr, tutorial, user"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "symbol_id": "examples/tutorial/flaskr/auth.py::load_logged_in_user",
+            "start_line": 32,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 12.8056,
+            "match": null,
+            "why": "bm25: user, flaskr, tutorial"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 125,
+            "kind": "file",
+            "score": 12.4009,
+            "match": null,
+            "why": "bm25: flaskr, tutorial"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "start_line": 84,
+            "end_line": 109,
+            "label": "examples/tutorial/flaskr/auth.py::login"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "start_line": 60,
+            "end_line": 83,
+            "label": "examples/tutorial/flaskr/blog.py::create"
+          },
+          {
+            "path": "examples/tutorial/flaskr/blog.py",
+            "start_line": 86,
+            "end_line": 110,
+            "label": "examples/tutorial/flaskr/blog.py::update"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "start_line": 112,
+            "end_line": 116,
+            "label": "examples/tutorial/flaskr/auth.py::logout"
+          },
+          {
+            "path": "examples/tutorial/flaskr/auth.py",
+            "start_line": 32,
+            "end_line": 43,
+            "label": "examples/tutorial/flaskr/auth.py::load_logged_in_user"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 3,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    }
+  ]
+}

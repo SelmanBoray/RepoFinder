@@ -1,0 +1,476 @@
+{
+  "repo": {"name": "flask", "source": "https://github.com/pallets/flask", "commit": "d086db8"},
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Where is the route decorator implemented?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold.route", "start_line": 343, "end_line": 373}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/sansio/app.py", "symbol": "App.add_url_rule", "start_line": 605, "end_line": 662},
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold.add_url_rule", "start_line": 375, "end_line": 441},
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold._method_route", "start_line": 284, "end_line": 293}
+      ],
+      "notes": "route is defined once on Scaffold (shared by Flask and Blueprint); its inner decorator pops 'endpoint' and calls self.add_url_rule (scaffold.py:368-373). Wrong but plausible: Scaffold.add_url_rule (only a docstring, raises NotImplementedError at 441), App.add_url_rule (creates the werkzeug Rule; related, not the decorator), the get/post shortcuts (_method_route)."
+    },
+    {
+      "id": "q02",
+      "question": "Where is the url_for function defined?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/helpers.py", "symbol": "url_for", "start_line": 200, "end_line": 251},
+        {"path": "src/flask/app.py", "symbol": "Flask.url_for", "start_line": 1102, "end_line": 1222}
+      ],
+      "accept_any": true,
+      "notes": "The public flask.url_for is helpers.url_for, which only forwards to current_app.url_for (helpers.py:244-251). The real URL building (blueprint-relative endpoints, _external, url_adapter.build) is Flask.url_for in app.py. Either is a correct answer. Wrong but plausible: App.inject_url_defaults, App.handle_url_build_error, Scaffold.url_defaults."
+    },
+    {
+      "id": "q03",
+      "question": "Where is the jsonify helper defined?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/json/__init__.py", "symbol": "jsonify", "start_line": 138, "end_line": 170}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/json/provider.py", "symbol": "DefaultJSONProvider.response", "start_line": 189, "end_line": 215},
+        {"path": "src/flask/json/provider.py", "symbol": "JSONProvider.response", "start_line": 89, "end_line": 105}
+      ],
+      "notes": "jsonify lives in the flask.json package __init__ and returns current_app.json.response(...) (json/__init__.py:170). The response is actually built by DefaultJSONProvider.response (related). Wrong but plausible: json.dumps in the same file, Flask.make_response's dict branch."
+    },
+    {
+      "id": "q04",
+      "question": "Which method loads the app config from a Python file?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/config.py", "symbol": "Config.from_pyfile", "start_line": 187, "end_line": 216}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/config.py", "symbol": "Config.from_envvar", "start_line": 102, "end_line": 124},
+        {"path": "src/flask/config.py", "symbol": "Config.from_object", "start_line": 218, "end_line": 254}
+      ],
+      "notes": "Natural-language phrasing of a symbol lookup. Config.from_pyfile compiles and execs the file into a module and then calls from_object (config.py:204-215). Wrong but plausible: Config.from_file (JSON/TOML via a load callable), Config.from_mapping. from_envvar delegates to from_pyfile (related)."
+    },
+    {
+      "id": "q05",
+      "question": "Which class implements the test client?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/testing.py", "symbol": "FlaskClient", "start_line": 109, "end_line": 262}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/app.py", "symbol": "Flask.test_client", "start_line": 755, "end_line": 811}
+      ],
+      "notes": "FlaskClient subclasses werkzeug.test.Client. Flask.test_client only instantiates test_client_class (related, but it is not the class). Wrong but plausible: FlaskCliRunner (the CLI runner), EnvironBuilder."
+    },
+    {
+      "id": "q06",
+      "question": "Where is make_response implemented on the Flask application object?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/app.py", "symbol": "Flask.make_response", "start_line": 1224, "end_line": 1364}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/helpers.py", "symbol": "make_response", "start_line": 151, "end_line": 197}
+      ],
+      "notes": "The question asks for the app method. helpers.make_response is the module-level helper that forwards to current_app.make_response (helpers.py:197): related, not the answer, and the most likely wrong top hit."
+    },
+    {
+      "id": "q07",
+      "question": "Where is the before_request decorator defined?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold.before_request", "start_line": 467, "end_line": 492}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/app.py", "symbol": "Flask.preprocess_request", "start_line": 1366, "end_line": 1392},
+        {"path": "src/flask/sansio/blueprints.py", "symbol": "Blueprint.before_app_request", "start_line": 613, "end_line": 621}
+      ],
+      "notes": "Registration appends to before_request_funcs[None] (scaffold.py:491). The functions are run in Flask.preprocess_request (related). Wrong but plausible: Blueprint.before_app_request (the blueprint-wide variant), the request_started signal."
+    },
+    {
+      "id": "q08",
+      "question": "Where is the `flask run` command defined?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/cli.py", "symbol": "run_command", "start_line": 881, "end_line": 992}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/cli.py", "symbol": "ScriptInfo.load_app", "start_line": 333, "end_line": 372}
+      ],
+      "notes": "A click command named \"run\" whose function is run_command; the range starts at the @click.command decorator (881). Wrong but plausible: Flask.run in app.py (the app.run() method, not the CLI command), FlaskGroup, main."
+    },
+    {
+      "id": "q09",
+      "question": "`abort` fonksiyonu nerede tanımlı?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/helpers.py", "symbol": "abort", "start_line": 281, "end_line": 301}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/sansio/app.py", "symbol": "App.make_aborter", "start_line": 496, "end_line": 506}
+      ],
+      "notes": "helpers.abort calls current_app.aborter when an app context is active, otherwise werkzeug's abort (helpers.py:298-301). The aborter object is created by App.make_aborter (related)."
+    },
+    {
+      "id": "q10",
+      "question": "Dosya göndermek için kullanılan `send_file` nerede tanımlanmış?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/helpers.py", "symbol": "send_file", "start_line": 417, "end_line": 540}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/helpers.py", "symbol": "_prepare_send_file_kwargs", "start_line": 402, "end_line": 414},
+        {"path": "src/flask/helpers.py", "symbol": "send_from_directory", "start_line": 543, "end_line": 584}
+      ],
+      "notes": "Flask's send_file wraps werkzeug.utils.send_file with app-aware kwargs from _prepare_send_file_kwargs. Wrong but plausible: send_from_directory, Flask.send_static_file."
+    },
+    {
+      "id": "q11",
+      "question": "`register_error_handler` metodu hangi dosyada, hangi sınıfta?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold.register_error_handler", "start_line": 649, "end_line": 662}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold.errorhandler", "start_line": 605, "end_line": 647},
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold._get_exc_class_and_code", "start_line": 664, "end_line": 706}
+      ],
+      "notes": "Defined on Scaffold (so available on Flask and Blueprint); stores the handler in error_handler_spec[None][code][exc_class] (scaffold.py:661-662). Wrong but plausible: Blueprint.app_errorhandler, App._find_error_handler (lookup, not registration)."
+    },
+    {
+      "id": "q12",
+      "question": "Class-based view'ların temel sınıfı `View` nerede tanımlı? `as_view` metodu orada mı?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/flask/views.py", "symbol": "View", "start_line": 16, "end_line": 135},
+        {"path": "src/flask/views.py", "symbol": "View.as_view", "start_line": 85, "end_line": 135}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/views.py", "symbol": "MethodView", "start_line": 138, "end_line": 191}
+      ],
+      "notes": "View is in views.py and as_view (a classmethod of View) builds the view function. Wrong but plausible: MethodView (a subclass), Flask.dispatch_request (not the class-based view's dispatch_request)."
+    },
+    {
+      "id": "q13",
+      "question": "How does Flask sign the session cookie?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/flask/sessions.py", "symbol": "SecureCookieSessionInterface.get_signing_serializer", "start_line": 303, "end_line": 321},
+        {"path": "src/flask/sessions.py", "symbol": "SecureCookieSessionInterface.save_session", "start_line": 337, "end_line": 385}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/sessions.py", "symbol": "SecureCookieSessionInterface.open_session", "start_line": 323, "end_line": 335},
+        {"path": "src/flask/app.py", "symbol": "Flask.process_response", "start_line": 1394, "end_line": 1418}
+      ],
+      "notes": "Known-weak query ('session cookie': search ranked AppContext.session first). get_signing_serializer builds an itsdangerous URLSafeTimedSerializer from SECRET_KEY (plus SECRET_KEY_FALLBACKS) with salt 'cookie-session' and HMAC/SHA-1; save_session calls .dumps(dict(session)) and set_cookie (sessions.py:373-384). Wrong but plausible: AppContext.session / _get_session in ctx.py (loads the session, no signing), SecureCookieSession, SessionMixin, the session proxy in globals.py."
+    },
+    {
+      "id": "q14",
+      "question": "Where are static files served from? Which code handles requests to /static/<filename>?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/flask/app.py", "symbol": "Flask.send_static_file", "start_line": 390, "end_line": 410},
+        {"path": "src/flask/app.py", "start_line": 344, "end_line": 361},
+        {"path": "src/flask/blueprints.py", "symbol": "Blueprint.send_static_file", "start_line": 82, "end_line": 102}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/helpers.py", "symbol": "send_from_directory", "start_line": 543, "end_line": 584},
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold.static_folder", "start_line": 223, "end_line": 231},
+        {"path": "src/flask/sansio/blueprints.py", "start_line": 323, "end_line": 328}
+      ],
+      "notes": "Flask.__init__ registers the '<static_url_path>/<path:filename>' rule with endpoint 'static' (app.py:344-361) whose view calls Flask.send_static_file, which serves from static_folder via send_from_directory. Blueprints have their own send_static_file. Wrong but plausible: helpers.send_file alone, Scaffold.static_url_path."
+    },
+    {
+      "id": "q15",
+      "question": "How is the JSON provider chosen?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/flask/sansio/app.py", "start_line": 228, "end_line": 238},
+        {"path": "src/flask/sansio/app.py", "start_line": 327, "end_line": 341}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/json/provider.py", "symbol": "JSONProvider", "start_line": 19, "end_line": 105},
+        {"path": "src/flask/json/provider.py", "symbol": "DefaultJSONProvider", "start_line": 124, "end_line": 215}
+      ],
+      "notes": "The class attribute App.json_provider_class (default DefaultJSONProvider, sansio/app.py:228-238) is instantiated in App.__init__ as self.json = self.json_provider_class(self) (327-341). Both are attribute lines, not symbols: a symbol-level search can at best return App.__init__ or the App class, which the runner scores as 'broad' (loose only). Wrong but plausible: flask.json.dumps/loads (they use current_app.json), DefaultJSONProvider by itself."
+    },
+    {
+      "id": "q16",
+      "question": "Where does the test client build a request?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/flask/testing.py", "symbol": "FlaskClient._request_from_builder_args", "start_line": 193, "end_line": 202},
+        {"path": "src/flask/testing.py", "symbol": "EnvironBuilder.__init__", "start_line": 49, "end_line": 86},
+        {"path": "src/flask/testing.py", "symbol": "FlaskClient.open", "start_line": 204, "end_line": 247}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/app.py", "symbol": "Flask.test_client", "start_line": 755, "end_line": 811},
+        {"path": "src/flask/app.py", "symbol": "Flask.test_request_context", "start_line": 1517, "end_line": 1564}
+      ],
+      "notes": "FlaskClient.open builds the request (from an EnvironBuilder, a dict environ, or _request_from_builder_args at 228), and _request_from_builder_args uses Flask's EnvironBuilder, which fills base_url from SERVER_NAME / APPLICATION_ROOT / PREFERRED_URL_SCHEME (testing.py:65-83). Wrong but plausible: Flask.test_client (only creates the client), Flask.test_request_context (builds a context, not a client request)."
+    },
+    {
+      "id": "q17",
+      "question": "Where do I register cleanup code that should run on app context teardown?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/flask/sansio/app.py", "symbol": "App.teardown_appcontext", "start_line": 827, "end_line": 856}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/app.py", "symbol": "Flask.do_teardown_appcontext", "start_line": 1453, "end_line": 1479},
+        {"path": "src/flask/ctx.py", "symbol": "AppContext.pop", "start_line": 446, "end_line": 504},
+        {"path": "examples/tutorial/flaskr/db.py", "symbol": "init_app", "start_line": 51, "end_line": 56}
+      ],
+      "notes": "Known-weak query ('app context teardown': teardown_appcontext ranked 4th). Registration is App.teardown_appcontext, which appends to teardown_appcontext_funcs (sansio/app.py:855). They run in Flask.do_teardown_appcontext, called from AppContext.pop (related). Wrong but plausible: Scaffold.teardown_request (request teardown, a different hook), Blueprint.teardown_app_request."
+    },
+    {
+      "id": "q18",
+      "question": "How can config values be loaded from environment variables that start with FLASK_?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/flask/config.py", "symbol": "Config.from_prefixed_env", "start_line": 126, "end_line": 185}
+      ],
+      "accept_any": true,
+      "notes": "from_prefixed_env iterates sorted os.environ keys with the 'FLASK_' prefix, json-loads values, and supports nested keys with '__'. Wrong but plausible (and a good trap): Config.from_envvar, which reads one env var holding a config FILE path; cli.load_dotenv; helpers.get_debug_flag (FLASK_DEBUG only)."
+    },
+    {
+      "id": "q19",
+      "question": "Which pytest fixture in Flask's own test suite fails a test that leaves an app context pushed?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "tests/conftest.py", "symbol": "leak_detector", "start_line": 67, "end_line": 79}
+      ],
+      "accept_any": true,
+      "notes": "Answer lives in tests/. The autouse fixture leak_detector pops every context still on _app_ctx after the test and asserts there were none. Wrong but plausible: the app_ctx / req_ctx fixtures in the same file, tests/test_appctx.py tests, AppContext.pop."
+    },
+    {
+      "id": "q20",
+      "question": "Şablonlarda `request`, `session` ve `g` değişkenleri otomatik olarak nereden geliyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/flask/templating.py", "symbol": "_default_template_ctx_processor", "start_line": 21, "end_line": 33},
+        {"path": "src/flask/app.py", "symbol": "Flask.create_jinja_environment", "start_line": 467, "end_line": 505},
+        {"path": "src/flask/app.py", "symbol": "Flask.update_template_context", "start_line": 588, "end_line": 616}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/sansio/scaffold.py", "start_line": 182, "end_line": 184},
+        {"path": "src/flask/templating.py", "symbol": "_render", "start_line": 123, "end_line": 133}
+      ],
+      "notes": "Two mechanisms: create_jinja_environment puts the request/session/g proxies into jinja_env.globals (app.py:493-503), and the default context processor _default_template_ctx_processor (registered in Scaffold.__init__, scaffold.py:182-184) injects concrete g and request; update_template_context runs the processors for each render. Wrong but plausible: globals.py proxies, Scaffold.context_processor (the decorator for user processors)."
+    },
+    {
+      "id": "q21",
+      "question": "JSON yanıtlarında `datetime` nesneleri nasıl metne çevriliyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/flask/json/provider.py", "symbol": "_default", "start_line": 108, "end_line": 121},
+        {"path": "src/flask/json/provider.py", "start_line": 138, "end_line": 142}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/json/provider.py", "symbol": "DefaultJSONProvider.dumps", "start_line": 166, "end_line": 179}
+      ],
+      "notes": "_default turns date/datetime into an HTTP date string with werkzeug's http_date (provider.py:109-110); DefaultJSONProvider.default = staticmethod(_default) (138-142) and dumps passes it to json.dumps (related). Wrong but plausible: json/tag.py TagDateTime, which serializes datetimes for the SESSION cookie, not for JSON responses."
+    },
+    {
+      "id": "q22",
+      "question": "Tutorial örneğindeki (flaskr) uygulama fabrikası nerede? Blueprint'ler orada nasıl ekleniyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "examples/tutorial/flaskr/__init__.py", "symbol": "create_app", "start_line": 6, "end_line": 48}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/flask/sansio/app.py", "symbol": "App.register_blueprint", "start_line": 570, "end_line": 596}
+      ],
+      "notes": "Answer lives in examples/ (nested project). create_app registers auth.bp and blog.bp with app.register_blueprint (__init__.py:39-40). Wrong but plausible: examples/celery/src/task_app/__init__.py create_app (another example), tests/test_apps/cliapp/factory.py create_app, the many create_app functions inside tests/test_cli.py."
+    },
+    {
+      "id": "q23",
+      "question": "What happens between receiving a request and calling the view function?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "src/flask/app.py", "symbol": "Flask.wsgi_app", "start_line": 1566, "end_line": 1616},
+        {"path": "src/flask/app.py", "symbol": "Flask.full_dispatch_request", "start_line": 992, "end_line": 1019},
+        {"path": "src/flask/app.py", "symbol": "Flask.dispatch_request", "start_line": 966, "end_line": 990}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "src/flask/app.py", "symbol": "Flask.__call__", "start_line": 1618, "end_line": 1625},
+        {"path": "src/flask/app.py", "symbol": "Flask.request_context", "start_line": 1501, "end_line": 1515},
+        {"path": "src/flask/ctx.py", "symbol": "AppContext.from_environ", "start_line": 339, "end_line": 348},
+        {"path": "src/flask/ctx.py", "symbol": "AppContext.push", "start_line": 416, "end_line": 444},
+        {"path": "src/flask/ctx.py", "symbol": "AppContext.match_request", "start_line": 405, "end_line": 414},
+        {"path": "src/flask/app.py", "symbol": "Flask.preprocess_request", "start_line": 1366, "end_line": 1392},
+        {"path": "src/flask/app.py", "symbol": "Flask.ensure_sync", "start_line": 1065, "end_line": 1077}
+      ],
+      "notes": "wsgi_app creates the context (request_context) and pushes it (push opens the session and matches the URL), then full_dispatch_request sends request_started, runs preprocess_request (url_value_preprocessors, before_request funcs) and calls dispatch_request, which looks up view_functions[rule.endpoint] and calls it with view_args (app.py:989-990). All three required. Since 3.2 RequestContext is merged into AppContext."
+    },
+    {
+      "id": "q24",
+      "question": "How does the return value of a view function get turned into a Response object?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "src/flask/app.py", "symbol": "Flask.finalize_request", "start_line": 1021, "end_line": 1051},
+        {"path": "src/flask/app.py", "symbol": "Flask.make_response", "start_line": 1224, "end_line": 1364}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "src/flask/app.py", "symbol": "Flask.full_dispatch_request", "start_line": 992, "end_line": 1019},
+        {"path": "src/flask/app.py", "symbol": "Flask.process_response", "start_line": 1394, "end_line": 1418},
+        {"path": "src/flask/json/provider.py", "symbol": "DefaultJSONProvider.response", "start_line": 189, "end_line": 215}
+      ],
+      "notes": "full_dispatch_request passes the view's return value to finalize_request, which calls make_response (str/bytes/iterator -> response_class, dict/list -> app.json.response, tuples unpacked into body/status/headers) and then process_response. Both finalize_request and make_response required. Wrong but plausible: helpers.make_response (user-facing wrapper), wrappers.Response."
+    },
+    {
+      "id": "q25",
+      "question": "When a view raises an exception, how does Flask find the error handler to call?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "src/flask/app.py", "symbol": "Flask.handle_user_exception", "start_line": 865, "end_line": 895},
+        {"path": "src/flask/sansio/app.py", "symbol": "App._find_error_handler", "start_line": 869, "end_line": 892}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "src/flask/app.py", "symbol": "Flask.full_dispatch_request", "start_line": 992, "end_line": 1019},
+        {"path": "src/flask/app.py", "symbol": "Flask.handle_http_exception", "start_line": 830, "end_line": 863},
+        {"path": "src/flask/app.py", "symbol": "Flask.handle_exception", "start_line": 897, "end_line": 948},
+        {"path": "src/flask/app.py", "symbol": "Flask.wsgi_app", "start_line": 1566, "end_line": 1616},
+        {"path": "src/flask/sansio/scaffold.py", "symbol": "Scaffold._get_exc_class_and_code", "start_line": 664, "end_line": 706}
+      ],
+      "notes": "full_dispatch_request catches the exception and calls handle_user_exception (HTTPException goes to handle_http_exception); both use App._find_error_handler, which checks blueprint then app handlers, by code then by exception class along the MRO (sansio/app.py:877-891). Unhandled ones reach handle_exception (500) from wsgi_app. Wrong but plausible: Scaffold.errorhandler / register_error_handler (registration, not lookup)."
+    },
+    {
+      "id": "q26",
+      "question": "`flask run` komutu `--app` verilmediğinde çalıştıracağı uygulamayı nasıl buluyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "src/flask/cli.py", "symbol": "ScriptInfo.load_app", "start_line": 333, "end_line": 372},
+        {"path": "src/flask/cli.py", "symbol": "find_best_app", "start_line": 41, "end_line": 91}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "src/flask/cli.py", "symbol": "locate_app", "start_line": 241, "end_line": 264},
+        {"path": "src/flask/cli.py", "symbol": "prepare_import", "start_line": 200, "end_line": 226},
+        {"path": "src/flask/cli.py", "symbol": "run_command", "start_line": 881, "end_line": 992},
+        {"path": "src/flask/cli.py", "symbol": "find_app_by_string", "start_line": 120, "end_line": 197}
+      ],
+      "notes": "run_command calls info.load_app(); without an import path (no --app, and no FLASK_APP, which click maps to --app through auto_envvar_prefix='FLASK' at cli.py:585) load_app tries wsgi.py then app.py (cli.py:351-356) through prepare_import + locate_app, and locate_app calls find_best_app, which looks for 'app'/'application', a single Flask instance, then create_app/make_app factories. load_app and find_best_app required. Wrong but plausible: Flask.run, FlaskGroup.make_context."
+    },
+    {
+      "id": "q27",
+      "question": "Blueprint'ler uygulamaya nasıl kaydediliyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "src/flask/sansio/app.py", "symbol": "App.register_blueprint", "start_line": 570, "end_line": 596},
+        {"path": "src/flask/sansio/blueprints.py", "symbol": "Blueprint.register", "start_line": 273, "end_line": 377}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "src/flask/sansio/blueprints.py", "symbol": "BlueprintSetupState", "start_line": 34, "end_line": 116},
+        {"path": "src/flask/sansio/blueprints.py", "symbol": "Blueprint.make_setup_state", "start_line": 246, "end_line": 253},
+        {"path": "src/flask/sansio/blueprints.py", "symbol": "Blueprint.record", "start_line": 223, "end_line": 230},
+        {"path": "src/flask/sansio/blueprints.py", "symbol": "Blueprint.add_url_rule", "start_line": 412, "end_line": 441},
+        {"path": "src/flask/sansio/blueprints.py", "symbol": "Blueprint._merge_blueprint_funcs", "start_line": 379, "end_line": 410}
+      ],
+      "notes": "App.register_blueprint only calls blueprint.register(self, options) (sansio/app.py:596); Blueprint.register records the blueprint in app.blueprints, creates a BlueprintSetupState, adds the static route, merges handlers, runs the deferred functions (which call BlueprintSetupState.add_url_rule with the url_prefix) and registers nested blueprints. Both required. Wrong but plausible: src/flask/blueprints.py (the non-sansio Blueprint subclass, no registration logic), Blueprint.register_blueprint (nesting)."
+    },
+    {
+      "id": "q28",
+      "question": "How does Flask match an incoming URL like /user/42 against the registered rules and convert <int:id> to an int?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "src/flask/ctx.py", "symbol": "AppContext.match_request", "start_line": 405, "end_line": 414},
+        {"path": "src/flask/app.py", "symbol": "Flask.create_url_adapter", "start_line": 507, "end_line": 558}
+      ],
+      "related": [
+        {"path": "src/flask/sansio/app.py", "start_line": 251, "end_line": 261},
+        {"path": "src/flask/sansio/app.py", "symbol": "App.add_url_rule", "start_line": 605, "end_line": 662},
+        {"path": "src/flask/app.py", "symbol": "Flask.dispatch_request", "start_line": 966, "end_line": 990}
+      ],
+      "notes": "Rule matching and converters are Werkzeug's (werkzeug.routing Map/Rule/MapAdapter); Flask has no matcher or converter code. Correct behaviour: say the matching is not in the excerpts/repo and point to the delegating calls: AppContext.match_request calls self.url_adapter.match(return_rule=True) (ctx.py:410) on the adapter that Flask.create_url_adapter binds with url_map.bind_to_environ (app.py:546-548). url_rule_class = Rule / url_map_class = Map (sansio/app.py:251-261) are related."
+    },
+    {
+      "id": "q29",
+      "question": "Jinja şablonları Python koduna nasıl derleniyor? Lexer ve parser kodu nerede?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "src/flask/templating.py", "symbol": "render_template", "start_line": 136, "end_line": 148},
+        {"path": "src/flask/templating.py", "symbol": "_render", "start_line": 123, "end_line": 133},
+        {"path": "src/flask/templating.py", "symbol": "Environment", "start_line": 36, "end_line": 46},
+        {"path": "src/flask/app.py", "symbol": "Flask.create_jinja_environment", "start_line": 467, "end_line": 505}
+      ],
+      "related": [
+        {"path": "src/flask/templating.py", "symbol": "DispatchingJinjaLoader", "start_line": 49, "end_line": 120},
+        {"path": "src/flask/templating.py", "symbol": "render_template_string", "start_line": 151, "end_line": 160}
+      ],
+      "notes": "Template compilation (lexer, parser, code generator) is inside Jinja2, not Flask. Correct behaviour: say so and point to where Flask hands off: render_template calls jinja_env.get_or_select_template (templating.py:147), _render calls template.render (129), Environment subclasses jinja2.Environment (36-46), and Flask.create_jinja_environment builds it. DispatchingJinjaLoader (template lookup, not compilation) is related."
+    },
+    {
+      "id": "q30",
+      "question": "In the flaskr tutorial, how are user passwords hashed? Where is the hashing algorithm implemented?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "examples/tutorial/flaskr/auth.py", "start_line": 11, "end_line": 12},
+        {"path": "examples/tutorial/flaskr/auth.py", "symbol": "register", "start_line": 46, "end_line": 81},
+        {"path": "examples/tutorial/flaskr/auth.py", "symbol": "login", "start_line": 84, "end_line": 109}
+      ],
+      "notes": "Pointer lives in examples/ (nested project). The tutorial imports generate_password_hash / check_password_hash from werkzeug.security (auth.py:11-12) and calls them in register (68) and login (98); the algorithm itself is Werkzeug's. Correct behaviour: say the implementation is not in the repo and cite these call sites. Wrong but plausible: anything in src/flask/sessions.py (cookie signing is not password hashing)."
+    }
+  ]
+}
