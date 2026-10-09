@@ -15,14 +15,19 @@ A query is analysed into *units* (see :meth:`SearchIndex._analyze`):
   "nerede", "tanımlı", ...) is dropped. In a query that looks Turkish, a word
   that is not in the index vocabulary is translated through a small
   stem-prefix lexicon ("kaydediliyor" -> register, "uygulamaya" -> app,
-  application) and matched by the translation's stem;
+  application; two-word phrases such as "zaman aşımı" -> timeout) and matched
+  by the translation's stem. Turkish typed in ASCII ("govdesi", "basligina")
+  is matched too: words and lexicon keys are compared ASCII-folded;
 * runs of adjacent words that, joined, form an identifier present in the index
   ("app context" -> ``app_context``/``appcontext``; with common abbreviations,
   "python file" -> ``pyfile``).
 
 Each unit weighs its IDF (a joined run only what it adds over its words). The
 units' tokens, their stems and abbreviations are scored with Okapi BM25 and the
-score is multiplied by boosts:
+score is multiplied by boosts. A token derived from a query word (its stem or
+abbreviation) never weighs more than the word itself: in the requests repo
+"request" is in nearly every document and its abbreviation "req" in four, so
+"req" would otherwise outweigh the word the user wrote. Boosts:
 
 * name: ``NAME_BOOST ** (coverage * part_coverage ** NAME_PART_EXP)``, where
   *coverage* is the share of the query's unit weight that the symbol name
@@ -30,11 +35,18 @@ score is multiplied by boosts:
   (snake/camel pieces) found in the query. A name that is the whole query gets
   the full boost; a common word that happens to be a name ("loads", "session")
   in a longer question gets little; ``teardown_appcontext`` for "app context
-  teardown" gets much;
+  teardown" gets much. In a test file only a full name match counts (tests are
+  named after what they test), unless the query asks about tests;
+* explicit identifier: a name the query writes as code (backticked, dotted
+  ``Session.request``/``requests.get``, snake_case or camelCase) gets the full
+  name boost when it is the only identifier named, however common its words
+  are; the qualifier of a dotted name ("Session" in ``Session.request``) is not
+  a name match by itself;
 * owner: the enclosing class is named in the query too (``make_response`` "on
   the Flask application object" -> ``Flask.make_response``), scaled by how
   strongly the name itself matched;
-* qualname/path: a dotted or slashed query term names the symbol or file;
+* qualname/path: a dotted or slashed query term names the symbol or file
+  (``requests.get`` also names ``get`` in module ``requests.api``);
 * class, kind ("which class ..."), test-file and nested-function adjustments.
 
 Every boost that fires is named in :attr:`Hit.why`. Pure Python, standard
@@ -72,6 +84,12 @@ _CAMEL_RE = re.compile(r"[A-Z]+(?=[A-Z][a-z])|[A-Z]?[a-z]+|[A-Z]+|[0-9]+")
 # "Flask.run", "flask/app.py", "sansio.scaffold.Scaffold.route"
 _COMPOUND_RE = re.compile(r"[A-Za-z0-9_]+(?:[./][A-Za-z0-9_]+)+")
 _LOCALS_RE = re.compile(r"\.?<locals>")
+# Explicit identifiers: a backticked name, a dotted name ("Session.request",
+# "requests.get(url)"), a snake_case or camelCase word.
+_BACKTICK_RE = re.compile(r"`([^`]+)`")
+_IDENTIFIER_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")
+_DOTTED_RE = re.compile(r"(?<![\w./])[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+(?![\w/])")
+_CAMEL_HUMP_RE = re.compile(r"[a-z0-9][A-Z]|[A-Z]{2}[a-z]")
 _CLASS_BASED_RE = re.compile(r"(?i)\bclass-based\b")
 
 # Dropped wherever they stand alone. Parts of a compound identifier are kept
@@ -145,7 +163,9 @@ _ABBREVIATIONS: dict[str, tuple[str, ...]] = {
 # to English words (the longest stem the word starts with wins; an empty tuple
 # means "filler"). Both apply only to a query that looks Turkish and only to
 # words outside the index vocabulary, so an English or code word is never
-# translated ("rotate" does not become "route", "silent" not "delete").
+# translated ("rotate" does not become "route", "silent" not "delete"). Words
+# and keys are compared ASCII-folded (:func:`_fold`), so Turkish typed without
+# its letters ("govdesi", "istegi", "basligina") matches too.
 _TR_FILLER = frozenset(
     {
         "ne", "mi", "mı", "mu", "mü", "ve", "veya", "ile", "bu", "şu", "o", "bir", "da",
@@ -156,6 +176,8 @@ _TR_FILLER = frozenset(
         "hangisi", "orada", "burada", "şurada", "içinde", "olarak",
     }
 )
+# Only unambiguous mappings: "bağlantı" is a connection here far more often
+# than a link, and "işle" (handle, process, operate, ...) has no one sense.
 _TR_LEXICON: dict[str, tuple[str, ...]] = {
     # question words and words that only describe the question
     "nere": (), "tanım": (), "fonksiyon": (), "metod": (), "metot": (), "modül": (),
@@ -174,7 +196,7 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     "çalış": ("run",), "çevir": ("convert",), "çevri": ("convert",),
     "dönüştür": ("convert",),
     "hata": ("error",), "istisna": ("exception",), "işleyici": ("handler",),
-    "işle": ("handle", "process"), "yönlendir": ("redirect",), "rota": ("route",),
+    "yönlendir": ("redirect",), "rota": ("route",),
     "adres": ("url", "address"), "ayar": ("config", "setting"),
     "yapılandır": ("config", "configure"), "ortam": ("environment",), "önek": ("prefix",),
     "komut": ("command",), "parola": ("password",), "şifre": ("password",),
@@ -192,13 +214,27 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     "sağlayıcı": ("provider",), "serileştir": ("serialize",), "gizli": ("secret",),
     "anahtar": ("key",), "gönder": ("send",), "yükle": ("load",), "oluştur": ("create",),
     "yarat": ("create",), "sil": ("delete", "remove"), "güncelle": ("update",),
-    "bağlantı": ("connection", "link"), "içerik": ("content",), "biçim": ("format",),
-    "doğrulama": ("validation", "auth"),
+    "bağlantı": ("connection",), "içerik": ("content",), "biçim": ("format",),
+    "doğrulama": ("validation", "auth"), "birleştir": ("merge",), "birleşti": ("merge",),
+}
+# Two-word phrases: (first stem, second stem) -> English. The first word is
+# then filler and the second carries the translation ("zaman aşımı" -> timeout,
+# not time + exceed).
+_TR_PHRASES: dict[tuple[str, str], tuple[str, ...]] = {
+    ("zaman", "aşım"): ("timeout",), ("yeniden", "dene"): ("retry",),
+    ("tekrar", "dene"): ("retry",),
 }
 _TR_MIN_STEM = 3
-# A query is treated as Turkish when it has a Turkish letter or one of these words.
+# A query is treated as Turkish when it has a Turkish letter or one of these
+# words (ASCII-folded).
 _TR_LETTERS = frozenset("çğıöşüÇĞİÖŞÜ")
-_TR_HINTS = frozenset({"nerede", "nereden", "nasil", "hangi", "neden", "icin", "ile", "veya"})
+_TR_HINTS = frozenset(
+    {
+        "nerede", "nereden", "nasil", "hangi", "hangisi", "neden", "niye", "nicin", "icin",
+        "icinde", "ile", "veya", "gibi", "kadar", "olarak", "orada", "burada", "tanimli",
+    }
+)
+_TR_FOLD = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
 # Final consonants that soften before a vowel suffix: örnek -> örneği, kayıt -> kaydı.
 _TR_SOFTEN = {"k": "ğ", "t": "d", "p": "b", "ç": "c"}
 
@@ -316,21 +352,33 @@ def _abbreviations(word: str) -> tuple[str, ...]:
     return _ABBR.get(word) or _ABBR.get(stem(word)) or ()
 
 
+def _fold(word: str) -> str:
+    """Turkish letters to their ASCII look-alikes: ``gövdesi`` -> ``govdesi``."""
+    return word.translate(_TR_FOLD)
+
+
 def _tr_lexicon() -> dict[str, tuple[str, ...]]:
-    table = dict(_TR_LEXICON)
+    """The lexicon keyed by ASCII-folded stems, softened stems included."""
+    table: dict[str, tuple[str, ...]] = {}
+    for stem_, english in _TR_LEXICON.items():
+        table.setdefault(_fold(stem_), english)
     for stem_, english in _TR_LEXICON.items():
         soft = _TR_SOFTEN.get(stem_[-1])
         if soft:
-            table.setdefault(stem_[:-1] + soft, english)
+            table.setdefault(_fold(stem_[:-1] + soft), english)
     return table
 
 
 _TR = _tr_lexicon()
+_TR_PHRASES_FOLDED = {(_fold(a), _fold(b)): english for (a, b), english in _TR_PHRASES.items()}
+_TR_FILLER_FOLDED = frozenset(_fold(w) for w in _TR_FILLER)
+_CLASS_WORDS_FOLDED = frozenset(_fold(w) for w in _CLASS_WORDS)
 
 
 def _translate_tr(word: str) -> Optional[tuple[str, ...]]:
     """English words for a Turkish ``word`` (empty: filler), or None if unknown."""
-    if word in _TR_FILLER:
+    word = _fold(word)
+    if word in _TR_FILLER_FOLDED:
         return ()
     for end in range(len(word), _TR_MIN_STEM - 1, -1):
         hit = _TR.get(word[:end])
@@ -339,8 +387,20 @@ def _translate_tr(word: str) -> Optional[tuple[str, ...]]:
     return None
 
 
+def _tr_phrases(words: list[str]) -> dict[int, tuple[str, ...]]:
+    """Positions of the words of Turkish phrases -> their translation (the
+    first word of a phrase -> ``()``, filler)."""
+    folded = [_fold(w) for w in words]
+    out: dict[int, tuple[str, ...]] = {}
+    for i in range(len(folded) - 1):
+        for (first, second), english in _TR_PHRASES_FOLDED.items():
+            if folded[i].startswith(first) and folded[i + 1].startswith(second):
+                out[i], out[i + 1] = (), english
+    return out
+
+
 def _looks_turkish(query: str, words: list[str]) -> bool:
-    return any(ch in _TR_LETTERS for ch in query) or any(w in _TR_HINTS for w in words)
+    return any(ch in _TR_LETTERS for ch in query) or any(_fold(w) in _TR_HINTS for w in words)
 
 
 def _path_text(path: str) -> str:
@@ -398,13 +458,23 @@ class _Unit:
 
 
 @dataclass
+class _Explicit:
+    text: str                   # the identifier, lowercase ("session.request")
+    name: str                   # its last part as written, outer underscores stripped
+    qualifiers: frozenset[int]  # units of the parts before the name ("session")
+
+
+@dataclass
 class _Query:
     tokens: list[str]                  # BM25 tokens
     labels: dict[str, str]             # BM25 token -> the query word it stands for
+    idf: dict[str, float]              # BM25 token -> its IDF for this query (see _analyze_with)
     units: list[_Unit]
     keys: dict[str, frozenset[int]]    # name part / stem / abbreviation -> units it covers
     total: float                       # sum of unit weights
     compounds: list[str]               # dotted/slashed terms, lowercase
+    explicit: list[_Explicit]          # identifiers the query names outright
+    qualifiers: frozenset[int]         # units only written as the qualifier of a dotted identifier
     mentions_tests: bool
     wants_class: bool
 
@@ -499,6 +569,7 @@ class SearchIndex:
         self._idf = {
             tok: math.log(1.0 + (n_docs - df + 0.5) / (df + 0.5)) for tok, df in self._df.items()
         }
+        self._idf_unseen = math.log(1.0 + (n_docs + 0.5) / 0.5)  # a word no document has
 
     def _add(self, tokens: list[str], doc: _Doc) -> None:
         """Index ``tokens`` plus the stem of every simple token whose stem differs."""
@@ -534,7 +605,7 @@ class SearchIndex:
             postings = self._postings.get(tok)
             if not postings:
                 continue
-            idf = self._idf[tok]
+            idf = q.idf[tok]
             for doc_id, tf in postings:
                 doc = self._docs[doc_id]
                 norm = K1 * (1.0 - B + B * doc.length / self._avgdl[doc.kind])
@@ -577,7 +648,11 @@ class SearchIndex:
         """Product of the boosts that apply to ``doc``; explanations go to ``why`` if given."""
         f = 1.0
         if doc.kind == "symbol":
-            name_f, name_exp, name_units = self._name_factor(doc, q, NAME_BOOST, "name match", why)
+            explicit = _explicit_match(doc, q.explicit)
+            if explicit is not None:
+                name_f, name_exp, name_units = self._explicit_factor(doc, q, explicit, why)
+            else:
+                name_f, name_exp, name_units = self._name_factor(doc, q, NAME_BOOST, "name match", why)
             f *= name_f
             if name_exp > 0.0 and doc.owner_parts:
                 owner_units, owner_cov = self._cover(doc.owner_whole, doc.owner_parts, q)
@@ -644,11 +719,18 @@ class SearchIndex:
     ) -> tuple[float, float, frozenset[int]]:
         """``(boost ** exponent, exponent, covered units)`` for the name of ``doc``."""
         units, part_cov = self._cover(doc.whole, doc.parts, q)
+        # "Session" in "Session.request" says whose method is asked for: it
+        # qualifies the name, it is not a name asked for itself.
+        units = units - q.qualifiers
         if not units or q.total <= 0.0:
             return 1.0, 0.0, units
         coverage = sum(q.units[u].weight for u in units) / q.total
         exponent = coverage * part_cov ** NAME_PART_EXP
         if exponent <= 0.0:
+            return 1.0, 0.0, units
+        if exponent < 0.999 and doc.is_test and not q.mentions_tests:
+            # Tests are named after what they test ("test_env_cert_bundles"): a
+            # partial name match there says nothing the test penalty should undo.
             return 1.0, 0.0, units
         factor = boost ** exponent
         if why is not None:
@@ -657,6 +739,31 @@ class SearchIndex:
             else:
                 covered = ", ".join(sorted({q.units[u].text for u in units}))
                 why.append(f"{label}: {doc.name} x{factor:.2f} ({covered})")
+        return factor, exponent, units
+
+    def _explicit_factor(
+        self, doc: _Doc, q: _Query, explicit: _Explicit, why: Optional[list[str]]
+    ) -> tuple[float, float, frozenset[int]]:
+        """Name boost of a symbol the query names outright (see :func:`_explicit_match`).
+
+        The only identifier a query names is what it asks about: full boost,
+        however common its words are (``Session.request`` in the requests
+        repo). A query that names several (```request```, ```session``` and
+        ```g``` in templates) asks about something around them: the usual
+        coverage decides, with the identifier's qualifiers counted as covered.
+        """
+        units, _part_cov = self._cover(doc.whole, doc.parts, q)
+        units = units | explicit.qualifiers
+        covered = sum(q.units[u].weight for u in units) / q.total if q.total > 0.0 else 0.0
+        exponent = 1.0 if len(q.explicit) == 1 else min(covered, 1.0)
+        factor = NAME_BOOST ** exponent
+        if why is not None:
+            if covered >= 0.999:
+                why.append(f"name match: {doc.name}")
+            elif exponent >= 0.999:
+                why.append(f"name match: {doc.name} (explicit {explicit.text})")
+            else:
+                why.append(f"name match: {doc.name} x{factor:.2f} (explicit {explicit.text})")
         return factor, exponent, units
 
     def _bm25_terms(self, doc_id: int, q: _Query) -> str:
@@ -673,7 +780,7 @@ class SearchIndex:
                 continue
             label = q.labels.get(tok, tok)
             group = groups.setdefault(label, [0.0, False])
-            group[0] += self._idf[tok] * tf * (K1 + 1.0) / (tf + norm)
+            group[0] += q.idf[tok] * tf * (K1 + 1.0) / (tf + norm)
             group[1] = group[1] or tok == label
         ordered = sorted(groups.items(), key=lambda kv: (-kv[1][0], kv[0]))
         return ", ".join(label if exact else label + "~" for label, (_s, exact) in ordered)
@@ -708,24 +815,40 @@ class SearchIndex:
         units: list[_Unit] = []
         keys: dict[str, set[int]] = {}
         labels: dict[str, str] = {}
+        idf: dict[str, float] = {}
         tokens: list[str] = []
         spellings: list[list[str]] = []      # per raw word: forms tried when joining
         word_unit: list[Optional[int]] = []  # per raw word: its unit, if any
         seen: dict[str, tuple[Optional[int], list[str]]] = {}
+        phrases = _tr_phrases(raw) if turkish else {}
+        seen_phrase: dict[tuple[str, tuple[str, ...]], tuple[Optional[int], list[str]]] = {}
 
         def key(k: str, uid: Optional[int]) -> None:
             bucket = keys.setdefault(k, set())
             if uid is not None:
                 bucket.add(uid)
 
-        def emit(tok: str, label: str) -> None:
+        def emit(tok: str, label: str, cap: Optional[float] = None) -> None:
+            # A token derived from a query word (its stem or abbreviation) is
+            # never worth more than the word itself: "request" is in every
+            # document of the requests repo, its abbreviation "req" in four.
             tokens.append(tok)
             labels.setdefault(tok, label)
+            value = self._idf.get(tok, 0.0)
+            if cap is not None:
+                value = min(value, cap)
+            idf[tok] = max(idf.get(tok, 0.0), value)
 
-        for w in raw:
-            if w not in seen:
-                seen[w] = self._add_word(w, drop, turkish, units, key, emit)
-            uid, forms = seen[w]
+        for i, w in enumerate(raw):
+            phrase = phrases.get(i) if w not in self._postings else None
+            if phrase is not None:
+                if (w, phrase) not in seen_phrase:
+                    seen_phrase[w, phrase] = self._add_word(w, drop, turkish, units, key, emit, phrase)
+                uid, forms = seen_phrase[w, phrase]
+            else:
+                if w not in seen:
+                    seen[w] = self._add_word(w, drop, turkish, units, key, emit)
+                uid, forms = seen[w]
             word_unit.append(uid)
             spellings.append(forms)
 
@@ -755,15 +878,34 @@ class SearchIndex:
                     emit(candidate, candidate)
                 consumed.update(range(i, i + size))
 
+        # A word written only as a qualifier ("session" in "Session.request")
+        # does not make a name match by itself.
+        explicit: list[_Explicit] = []
+        qualifier_words: Counter[str] = Counter()
+        for parts in _explicit_identifiers(query):
+            lowered = [_lower(p) for p in parts]
+            qualifier_words.update(lowered[:-1])
+            quals = frozenset(seen[w][0] for w in lowered[:-1] if w in seen and seen[w][0] is not None)
+            explicit.append(_Explicit(".".join(lowered), parts[-1], quals))
+        word_count = Counter(raw)
+        qualifiers = frozenset(
+            uid
+            for w, (uid, _forms) in seen.items()
+            if uid is not None and qualifier_words[w] >= word_count[w]
+        )
         return _Query(
             tokens=list(dict.fromkeys(tokens)),
             labels=labels,
+            idf=idf,
             units=units,
             keys={k: frozenset(v) for k, v in keys.items()},
             total=sum(u.weight for u in units),
             compounds=[c.lower() for c in _COMPOUND_RE.findall(query)],
+            explicit=explicit,
+            qualifiers=qualifiers,
             mentions_tests=any(w in _TEST_WORDS for i, w in enumerate(raw) if i not in consumed),
-            wants_class=bool(_CLASS_WORDS & set(raw)) and not _CLASS_BASED_RE.search(query),
+            wants_class=bool(_CLASS_WORDS_FOLDED & {_fold(w) for w in raw})
+            and not _CLASS_BASED_RE.search(query),
         )
 
     def _add_word(
@@ -773,44 +915,57 @@ class SearchIndex:
         turkish: bool,
         units: list[_Unit],
         key: Callable[[str, Optional[int]], None],
-        emit: Callable[[str, str], None],
+        emit: Callable[..., None],
+        phrase: Optional[tuple[str, ...]] = None,
     ) -> tuple[Optional[int], list[str]]:
         """Turn one query word into a unit (or nothing). Returns its unit id and the
-        spellings tried when joining it with its neighbours."""
+        spellings tried when joining it with its neighbours. ``phrase`` is the
+        word's translation as part of a Turkish phrase."""
         spellings = ([w] + [a for a in _abbreviations(w) if a != w]) if w else []
-        forms = self._forms(w, drop, turkish) if len(w) >= 2 else None
+        if phrase is not None:
+            forms: Optional[list[str]] = [e for e in phrase if e not in drop] or None
+        else:
+            forms = self._forms(w, drop, turkish) if len(w) >= 2 else None
         if forms is None:  # stopword, filler or too short: may still complete a name's parts
             if len(w) >= 2:
                 key(w, None)
             return None, spellings
         uid = len(units)
         translated = forms != [w]
-        unit_tokens: list[str] = []
+        unit_tokens: list[tuple[str, Optional[float]]] = []  # (token, IDF cap)
+
+        def add(tok: str, label: str, cap: Optional[float] = None) -> None:
+            unit_tokens.append((tok, cap))
+            emit(tok, label, cap)
+
         for form in forms:
             if _is_compound(form):
                 for tok in _tokenize(form, drop):
-                    unit_tokens.append(tok)
-                    emit(tok, tok)
+                    add(tok, tok)
                 key(_whole(form), uid)
                 continue
             s = stem(form)
+            # Derived tokens are capped at the IDF of the word they come from
+            # (a word no document has is not a cap: then the derived form is
+            # the only way to match it).
+            cap = self._idf.get(form, self._idf_unseen)
             if not translated:
-                unit_tokens.append(form)
-                emit(form, form)
+                add(form, form)
             if s != form or translated:
                 # A translation's inflection is arbitrary: it matches by its stem only.
-                unit_tokens.append(s)
-                emit(s, form)
+                add(s, form, None if translated else cap)
             key(form, uid)
             key(s, uid)
             for a in _abbreviations(form):
                 key(a, uid)
                 if a in self._postings and a not in STOPWORDS:
-                    unit_tokens.append(a)
-                    emit(a, form)
+                    add(a, form, cap)
         if translated:
             spellings += [f for f in forms if f != w and not _is_compound(f)]
-        weight = max((self._idf[t] for t in unit_tokens if t in self._idf), default=0.0)
+        weight = max(
+            (min(self._idf[t], cap if cap is not None else math.inf) for t, cap in unit_tokens if t in self._idf),
+            default=0.0,
+        )
         units.append(_Unit(w, weight))
         return uid, spellings
 
@@ -828,17 +983,72 @@ class SearchIndex:
         return [word]
 
 
+def _explicit_identifiers(query: str) -> list[tuple[str, ...]]:
+    """Identifiers the query names outright, as dot-separated parts (outer
+    underscores stripped, case kept).
+
+    A backticked identifier (```abort```, ```Session.request```), a dotted name
+    outside a path (``requests.get(url)``; not ``app.py`` or "e.g.") and a
+    snake_case or camelCase word (``url_for``, ``CaseInsensitiveDict``). Plain
+    words, even backticked ones in a phrase (```flask run```), are not.
+    """
+    found: list[str] = []
+    for span in _BACKTICK_RE.findall(query):
+        span = span.strip()
+        if span.endswith("()"):
+            span = span[:-2]
+        if _IDENTIFIER_RE.fullmatch(span):
+            found.append(span)
+    for term in _DOTTED_RE.findall(query):
+        parts = term.split(".")
+        # Not a file name ("app.py") nor an abbreviation ("e.g").
+        if parts[-1].lower() not in ("py", "pyi") and all(len(p) >= 2 for p in parts):
+            found.append(term)
+    for word in _WORD_RE.findall(query):
+        if word.isascii() and ("_" in word.strip("_") or _CAMEL_HUMP_RE.search(word)):
+            found.append(word)
+    out: list[tuple[str, ...]] = []
+    for name in found:
+        parts = tuple(p.strip("_") for p in name.split("."))
+        if all(parts) and parts not in out:
+            out.append(parts)
+    return out
+
+
+def _explicit_match(doc: _Doc, explicit: list[_Explicit]) -> Optional[_Explicit]:
+    """The explicit identifier that names this symbol, else None.
+
+    The name must match as written, case included (```request``` is not the
+    class ``Request``); a dotted identifier names only the symbols it
+    qualifies (see :func:`_compound_match`).
+    """
+    if not explicit or doc.symbol is None:
+        return None
+    name = doc.symbol.name.strip("_")
+    for e in explicit:
+        if e.name != name:
+            continue
+        if "." not in e.text or _compound_match(doc, [e.text]) is not None:
+            return e
+    return None
+
+
 def _compound_match(doc: _Doc, compounds: list[str]) -> Optional[str]:
     """First dotted/slashed query term that names this document, else None.
 
     ``Flask.run`` matches qualname ``Flask.run`` and dotted ``flask.app.Flask.run``
-    on dot boundaries (not ``Flask.run_simple``); ``flask/app.py`` or ``app.py``
-    matches the path on ``/`` boundaries.
+    on dot boundaries (not ``Flask.run_simple``); so does ``flask.Flask.run``, a
+    qualname prefixed by some of its module's parts (``requests.get`` names
+    ``get`` in ``requests.api``, the way a package re-exports it, not
+    ``Session.get``). ``flask/app.py`` or ``app.py`` matches the path on ``/``
+    boundaries.
     """
     for term in compounds:
         if doc.qualname and term == doc.qualname:
             return term
         if doc.dotted and f".{term}." in doc.dotted:
+            return term
+        if doc.qualname and doc.dotted and "/" not in term and _module_qualified(term, doc):
             return term
         at = doc.slashed.find("/" + term)
         if at >= 0:
@@ -846,3 +1056,12 @@ def _compound_match(doc: _Doc, compounds: list[str]) -> Optional[str]:
             if end == len(doc.slashed) or doc.slashed[end] in "/.":
                 return term
     return None
+
+
+def _module_qualified(term: str, doc: _Doc) -> bool:
+    """``term`` is ``<some module parts>.<qualname>``, the parts in order."""
+    if not term.endswith("." + doc.qualname):
+        return False
+    prefix = term[: -len(doc.qualname) - 1].split(".")
+    module = iter(doc.dotted.strip(".")[: -len(doc.qualname) - 1].split("."))
+    return all(part in module for part in prefix)

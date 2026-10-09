@@ -456,6 +456,187 @@ def test_only_turkish_looking_queries_are_translated() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# v3: derived-token IDF cap, explicit identifiers, test names, Turkish ASCII
+# --------------------------------------------------------------------------- #
+
+
+def _request_heavy_index() -> RepoIndex:
+    """A small requests-like repo: "request" is in almost every document."""
+    return make_index(
+        [
+            sym("src/requests/cookies.py", "MockRequest.get_origin_req_host", "method", start=10,
+                doc="Return the origin host."),
+            sym("src/requests/sessions.py", "Session", "class", start=1, end=400,
+                doc="A Requests session. Provides cookie persistence and connection pooling. "
+                    "Basic usage: s = requests.Session(); s.get(url). A session sends a request "
+                    "and keeps the session cookies of the session across requests."),
+            sym("src/requests/sessions.py", "Session.request", "method", start=100, end=200,
+                signature="def request(self, method, url, params=None, data=None, headers=None, "
+                          "cookies=None, files=None, auth=None, timeout=None)",
+                doc="Constructs a Request, prepares it and sends it. Returns a Response object. "
+                    "method: method for the new Request object. url: URL for the new Request "
+                    "object. params: dictionary to send in the query string. data: body to "
+                    "attach. headers: dictionary of HTTP headers to send. cookies: dict or "
+                    "CookieJar to send. files: dictionary of files for multipart encoding."),
+            sym("src/requests/sessions.py", "Session.prepare_request", "method", start=50, end=90,
+                doc="Constructs a PreparedRequest for transmission from a Request."),
+            sym("src/requests/models.py", "Request", "class", start=1, end=80,
+                doc="A user-created Request object, used to prepare a PreparedRequest."),
+            sym("src/requests/api.py", "request", start=1, end=20, doc="Constructs and sends a Request."),
+            sym("src/requests/api.py", "get", start=30, end=40, doc="Sends a GET request."),
+            sym("src/requests/sessions.py", "Session.get", "method", start=210, end=220,
+                doc="Sends a GET request. Returns a Response object."),
+            sym("src/requests/structures.py", "LookupDict.get", "method", start=5, end=8,
+                doc="Get a request status by name."),
+            sym("src/requests/hooks.py", "dispatch_hook", doc="Dispatches a hook for a request."),
+            sym("src/requests/auth.py", "HTTPBasicAuth", "class", doc="Attaches Basic Authentication to a request."),
+        ]
+    )
+
+
+def test_a_derived_token_never_outweighs_the_word_it_comes_from() -> None:
+    search = SearchIndex(_request_heavy_index())
+    # "req" (the abbreviation of "request") is in one document, "request" in
+    # nearly all: the rare abbreviation must not weigh more than the common word.
+    q = search._analyze("request")
+    assert q.idf["req"] <= q.idf["request"]
+    assert q.units[0].weight == pytest.approx(search._idf["request"])
+    order = ids(search.search("request", k=10))
+    # Names that are the word itself come before a name that only has "req".
+    origin = order.index("src/requests/cookies.py::MockRequest.get_origin_req_host")
+    assert origin > order.index("src/requests/api.py::request")
+    assert origin > order.index("src/requests/models.py::Request")
+    # A word no document has is no cap: its abbreviation is then the only match.
+    index = make_index([sym("pkg/conf.py", "load_cfg", doc="Read the settings.")])
+    hit = SearchIndex(index).search("configuration")[0]
+    assert hit.symbol_id == "pkg/conf.py::load_cfg"
+    assert hit.why.endswith("bm25: configuration~")
+
+
+def test_an_explicit_dotted_identifier_gets_the_full_name_boost() -> None:
+    search = SearchIndex(_request_heavy_index())
+    hits = search.search("Where is `Session.request` defined?")
+    assert hits[0].symbol_id == "src/requests/sessions.py::Session.request"
+    assert hits[0].why.startswith("name match: request; ")  # the full boost
+    assert "qualname/path match: session.request" in hits[0].why
+    # "Session" only qualifies the name: the class itself is not a name match.
+    session = next(h for h in hits if h.symbol_id == "src/requests/sessions.py::Session")
+    assert "name match" not in session.why
+    # More words around it: still the full boost, because the query names it.
+    hit = search.search("Which cookies and files does Session.request send?")[0]
+    assert hit.symbol_id == "src/requests/sessions.py::Session.request"
+    assert hit.why.startswith("name match: request (explicit session.request); ")
+
+
+def test_a_package_qualified_identifier_names_the_reexported_function() -> None:
+    search = SearchIndex(_request_heavy_index())
+    hits = search.search("Where is the top-level `requests.get` function defined?")
+    assert hits[0].symbol_id == "src/requests/api.py::get"
+    assert "qualname/path match: requests.get" in hits[0].why
+    by_id = {h.symbol_id: h for h in hits}
+    # Session.get and LookupDict.get are named get, but not requests.get.
+    for other in ("src/requests/sessions.py::Session.get", "src/requests/structures.py::LookupDict.get"):
+        assert "explicit" not in by_id[other].why and "qualname/path" not in by_id[other].why
+
+
+def test_explicit_identifiers_match_case_and_share_the_query() -> None:
+    index = make_index(
+        [
+            sym("pkg/ctx.py", "Context.request", "method", doc="The current request."),
+            sym("pkg/wrappers.py", "Request", "class", doc="The request object."),
+            sym("pkg/app.py", "App.update_template_context", "method",
+                doc="Inject request, session and g into the template context."),
+        ]
+    )
+    search = SearchIndex(index)
+    by_id = {h.symbol_id: h for h in search.search("Where does `request` come from?")}
+    assert by_id["pkg/ctx.py::Context.request"].why.startswith("name match: request")
+    assert "explicit" not in by_id["pkg/wrappers.py::Request"].why  # `request` is not the class Request
+    # Several identifiers: none of them is the question by itself, coverage decides.
+    hit = next(
+        h for h in search.search("templates: where do `request`, `session` and `g` come from?")
+        if h.symbol_id == "pkg/ctx.py::Context.request"
+    )
+    assert "name match: request x" in hit.why
+
+
+def test_a_partial_name_match_does_not_lift_a_test_over_the_code() -> None:
+    index = make_index(
+        [
+            sym("src/pkg/sessions.py", "Session.merge_environment_settings", "method",
+                doc="Check the environment and merge it with some settings. Uses a custom CA bundle."),
+            sym("tests/test_pkg.py", "TestPkg.test_env_cert_bundles", "method",
+                doc="Bundles from the environment."),
+        ]
+    )
+    search = SearchIndex(index)
+    hits = search.search("How can I point the client at a custom CA bundle with an environment variable?")
+    assert hits[0].symbol_id == "src/pkg/sessions.py::Session.merge_environment_settings"
+    test_hit = next(h for h in hits if h.path == "tests/test_pkg.py")
+    assert "name match" not in test_hit.why and "test file x0.5" in test_hit.why
+    # Asked about tests, the test's name counts again.
+    test_hit = next(h for h in search.search("tests for environment cert bundles") if h.path == "tests/test_pkg.py")
+    assert "name match: test_env_cert_bundles" in test_hit.why
+
+
+@pytest.mark.parametrize(
+    "query, expected",
+    [
+        ("Istek govdesi nerede olusturuluyor?", "pkg/models.py::PreparedRequest.prepare_body"),
+        ("Cookie basligina nasil yaziliyor?", "pkg/cookies.py::get_cookie_header"),
+        ("Hangi sinif oturum tutuyor?", "pkg/store.py::SessionStore"),  # "sınıf": a class is asked for
+    ],
+)
+def test_turkish_typed_without_turkish_letters_is_translated(query: str, expected: str) -> None:
+    index = make_index(
+        [
+            sym("pkg/models.py", "PreparedRequest.prepare_body", "method", doc="Prepares the given HTTP body data."),
+            sym("pkg/models.py", "PreparedRequest.prepare_url", "method", doc="Prepares the given HTTP URL."),
+            sym("pkg/cookies.py", "get_cookie_header", doc="Produce an appropriate Cookie header string."),
+            sym("pkg/cookies.py", "morsel_to_cookie",
+                doc="Convert a cookie Morsel into a cookie: the cookie name, the cookie value."),
+            sym("pkg/sessions.py", "session", doc="Returns a session."),
+            sym("pkg/store.py", "SessionStore", "class", doc="Keeps a session."),
+        ]
+    )
+    hit = SearchIndex(index).search(query)[0]
+    assert hit.symbol_id == expected, hit.why
+
+
+def test_ambiguous_turkish_words_are_not_translated_to_their_rare_sense() -> None:
+    index = make_index(
+        [
+            sym("pkg/models.py", "Response.links", "method", doc="Returns the parsed header links of the response."),
+            sym("pkg/adapters.py", "Adapter.get_connection", "method", doc="Returns a connection for the given URL."),
+            sym("pkg/hooks.py", "handle_hook", doc="Handle a hook."),
+        ]
+    )
+    search = SearchIndex(index)
+    hits = search.search("Bağlantı nerede açılıyor?")
+    assert hits[0].symbol_id == "pkg/adapters.py::Adapter.get_connection"
+    assert "pkg/models.py::Response.links" not in ids(hits)  # bağlantı is not "link"
+    assert search.search("istek nasıl işleniyor?") == []  # işle: no single sense, not "handle"
+
+
+def test_turkish_phrases_translate_as_one() -> None:
+    index = make_index(
+        [
+            sym("pkg/exceptions.py", "Timeout", "class", doc="The request timed out."),
+            sym("pkg/clock.py", "current_time", doc="The current time."),
+            sym("pkg/adapters.py", "Adapter.max_retries", "method", doc="Retry configuration."),
+            sym("pkg/cookies.py", "merge_cookies", doc="Add cookies to a cookie jar."),
+        ]
+    )
+    search = SearchIndex(index)
+    hits = search.search("Zaman aşımı nerede tanımlı?")
+    assert hits[0].symbol_id == "pkg/exceptions.py::Timeout"
+    assert "pkg/clock.py::current_time" not in ids(hits)  # "zaman aşımı" is not time + something
+    assert search.search("Istek nasil yeniden deneniyor?")[0].symbol_id == "pkg/adapters.py::Adapter.max_retries"
+    assert search.search("tekrar deneme nerede")[0].symbol_id == "pkg/adapters.py::Adapter.max_retries"
+    assert search.search("Cookie'ler nasıl birleştiriliyor?")[0].symbol_id == "pkg/cookies.py::merge_cookies"
+
+
+# --------------------------------------------------------------------------- #
 # Flask integration
 # --------------------------------------------------------------------------- #
 

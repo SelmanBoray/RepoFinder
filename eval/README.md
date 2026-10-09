@@ -256,3 +256,69 @@ and flow `chunk_recall` 0.40 -> 0.20 (q25). Both come from the whole `Flask` cla
 pseudo-chunk covered every location inside the class. The ranking parameters
 were tuned on these same 30 questions and there is no separate validation set
 yet, so these numbers are optimistic for unseen questions and repositories.
+An independently written second set (`golden/requests.json`, psf/requests @
+611c6162) then showed that v2 did not generalize: on requests it fell below v1
+(hit@3 0.65 -> 0.53, hit@8 0.88 -> 0.65, MRR 0.608 -> 0.520); see Search v3.
+
+## Search v3 (2026-10-09)
+
+`search_baseline.py` after four mechanism fixes in `repofinder/search.py`, with
+Flask as the tuning set and requests as the validation set. Reports:
+`results/flask-search-v3-d086db8-k8.json`, `results/requests-search-v3-611c6162-k8.json`.
+
+* **A. Derived tokens are capped at the IDF of their word.** A stem or
+  abbreviation never weighs more than the word the user wrote, in BM25 and in
+  the unit weight. In requests "request" is in almost every document (IDF 0.24)
+  and its abbreviation "req" in four (IDF 4.87), so `MockRequest.origin_req_host`
+  had climbed into the top 8 of seven questions.
+* **B. Explicit identifiers.** A name written as code (backticked, dotted
+  `Session.request` / `requests.get`, snake_case, camelCase; case-sensitive)
+  gets the full name boost when it is the only identifier in the query. The
+  qualifier of a dotted name ("Session") is not a name match by itself, and
+  `requests.get` also matches `get` in module `requests.api` (package
+  re-export). With several identifiers (`request`, `session`, `g`) coverage
+  decides as before.
+* **C. No partial name boost in test files** (unless the query is about tests):
+  long test names (`test_env_cert_bundles`) were undoing the x0.5 test penalty.
+* **D. Turkish.** (a) words and lexicon keys are compared ASCII-folded, so
+  "govdesi", "istegi", "basligina" are translated; (b) ambiguous mappings
+  dropped (`bağlantı` -> link, `işle` -> handle/process); (c) "zaman aşımı" ->
+  timeout, "yeniden/tekrar dene" -> retry, "birleştir" -> merge.
+
+| set | version | hit@1 | hit@3 | hit@8 | MRR | pointer@8 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Flask (27 + 3) | v1 | 0.37 | 0.48 | 0.67 | 0.451 | 2/3 |
+| | v2 | 0.74 | 0.85 | 0.89 | 0.789 | 2/3 |
+| | v3 | 0.67 | 0.85 | 0.89 | 0.752 | 2/3 |
+| requests (17 + 3) | v1 | 0.47 | 0.65 | 0.88 | 0.608 | 2/3 |
+| | v2 | 0.47 | 0.53 | 0.65 | 0.520 | 2/3 |
+| | v3 | 0.59 | 0.65 | 0.82 | 0.642 | 3/3 |
+
+Cumulative ablation (hit@1 / hit@3 / hit@8, MRR):
+
+| step | Flask | requests |
+| --- | --- | --- |
+| v2 | 0.74 / 0.85 / 0.89, 0.789 | 0.47 / 0.53 / 0.65, 0.520 |
+| + A | 0.67 / 0.85 / 0.89, 0.752 | 0.47 / 0.53 / 0.77, 0.542 |
+| + B | 0.67 / 0.85 / 0.89, 0.752 | 0.59 / 0.65 / 0.82, 0.648 |
+| + C | 0.67 / 0.85 / 0.89, 0.752 | 0.59 / 0.65 / 0.82, 0.649 |
+| + D (= v3) | 0.67 / 0.85 / 0.89, 0.752 | 0.59 / 0.65 / 0.82, 0.642 |
+
+Flask lost two top-1 hits to A (q16, q18: near ties that v2 won through the
+inflated "req" and "env" weights; both now rank 2). On requests B fixes q01
+`Session.request` (3 -> 1) and q02 `requests.get` (13 -> 1); A brings q05, q09
+and q12 back towards v1; C cuts test-file hits in the top 8 over the 20
+questions (28 -> 16; v2 had 25, v3 has 11); D finds the not-in-repo pointer of
+q20 (retry) and moves q17 from nowhere to 19, but sends q14 from 4 to 8 (the
+ASCII words now translate, and "yükle" -> load, "gövde" -> body pull in other
+code). Against v1, requests hit@8 is still one question short (0.82 vs 0.88:
+q13 is at 10, v1 had 6).
+
+Honesty notes. The four mechanisms come from the error analysis of the
+requests set, and the D(c) phrases were added for requests questions (q13,
+q17, q20), so requests is no longer a clean held-out set; a third golden set is
+needed for the next round. No parameter was tuned on requests. Two choices were
+made on Flask: B's full boost only for a single identifier (a full boost for
+every identifier sends Flask q20 from 1 to 3, a share of 1/n of it to 2;
+requests has no question with several identifiers), and rejecting a "best form, not sum" BM25 variant for a
+word's synonyms (Flask hit@3 0.85 -> 0.81; not run on requests).
