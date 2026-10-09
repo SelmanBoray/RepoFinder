@@ -1,0 +1,342 @@
+{
+  "repo": {"name": "requests", "source": "https://github.com/psf/requests", "commit": "611c6162"},
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Where is `Session.request` defined?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/requests/sessions.py", "symbol": "Session.request", "start_line": 557, "end_line": 653}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/api.py", "symbol": "request", "start_line": 24, "end_line": 71},
+        {"path": "src/requests/sessions.py", "symbol": "Session.prepare_request", "start_line": 511, "end_line": 555},
+        {"path": "src/requests/sessions.py", "symbol": "Session.send", "start_line": 752, "end_line": 829}
+      ],
+      "notes": "Exact identifier. Session.request builds a Request, prepares it with prepare_request, merges environment settings and calls self.send (sessions.py:622-653). Wrong but plausible: api.request (the module-level wrapper that opens a Session and calls session.request, api.py:70-71), the Request class in models.py, Session.send."
+    },
+    {
+      "id": "q02",
+      "question": "Where is the top-level `requests.get` function defined?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/requests/api.py", "symbol": "get", "start_line": 74, "end_line": 87}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/api.py", "symbol": "request", "start_line": 24, "end_line": 71},
+        {"path": "src/requests/sessions.py", "symbol": "Session.get", "start_line": 655, "end_line": 671}
+      ],
+      "notes": "'get' collides with many symbols. requests.get is api.get (re-exported in __init__.py:171), which returns request(\"get\", url, params=params, **kwargs) (api.py:87). Session.get is the session method (related, not the top-level function). Wrong but plausible: Session.get, RequestsCookieJar.get (cookies.py:211), LookupDict.get (structures.py:123-130)."
+    },
+    {
+      "id": "q03",
+      "question": "Which method raises an exception when a response has a 4xx or 5xx status code?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/requests/models.py", "symbol": "Response.raise_for_status", "start_line": 1144, "end_line": 1171}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/models.py", "symbol": "Response.ok", "start_line": 861, "end_line": 874},
+        {"path": "src/requests/exceptions.py", "symbol": "HTTPError", "start_line": 66, "end_line": 67}
+      ],
+      "notes": "No identifier in the question. raise_for_status builds the 'Client Error' / 'Server Error' message and raises HTTPError (models.py:1160-1171). Response.ok calls it and catches HTTPError (related). Wrong but plausible: Response.ok / __bool__ (they return False instead of raising), HTTPAdapter.send (raises transport errors, not status errors), HTTPDigestAuth.handle_401."
+    },
+    {
+      "id": "q04",
+      "question": "Which class makes header lookups case-insensitive?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/requests/structures.py", "symbol": "CaseInsensitiveDict", "start_line": 20, "end_line": 93}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/models.py", "symbol": "PreparedRequest.prepare_headers", "start_line": 565, "end_line": 574},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.build_response", "start_line": 365, "end_line": 401}
+      ],
+      "notes": "Describes one class. CaseInsensitiveDict stores key.lower() -> (original key, value) in _store (structures.py:59-62); request and response headers are CaseInsensitiveDicts (models.py:568, adapters.py:382). Wrong but plausible: LookupDict in the same file (status codes), RequestsCookieJar (dict-like cookies), default_headers."
+    },
+    {
+      "id": "q05",
+      "question": "Where does the HTTP adapter send a prepared request?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.send", "start_line": 634, "end_line": 748}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/sessions.py", "symbol": "Session.send", "start_line": 752, "end_line": 829},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.get_connection_with_tls_context", "start_line": 455, "end_line": 510},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.build_response", "start_line": 365, "end_line": 401}
+      ],
+      "notes": "'send' collides with several symbols. HTTPAdapter.send gets a pool connection, sets TLS options, resolves the timeout and calls conn.urlopen (adapters.py:695-708), maps urllib3 errors, then build_response (748). Wrong but plausible: BaseAdapter.send (abstract, raises NotImplementedError at 151), SessionRedirectMixin.send (a typing stub at sessions.py:132), Session.send (picks the adapter and calls adapter.send at 784; related)."
+    },
+    {
+      "id": "q06",
+      "question": "What happens when I call close on a response?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/requests/models.py", "symbol": "Response.close", "start_line": 1173, "end_line": 1184}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/models.py", "symbol": "Response.__exit__", "start_line": 815, "end_line": 816}
+      ],
+      "notes": "'close' collides with Session.close, HTTPAdapter.close and BaseAdapter.close. Response.close closes raw if the content was not consumed and calls raw.release_conn() to give the connection back to the pool (models.py:1179-1184). Wrong but plausible: Session.close (closes adapters, sessions.py:883-886), HTTPAdapter.close (clears the PoolManager), BaseAdapter.close (abstract)."
+    },
+    {
+      "id": "q07",
+      "question": "Digest kimlik doğrulaması hangi sınıfta yapılıyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/requests/auth.py", "symbol": "HTTPDigestAuth", "start_line": 124, "end_line": 354}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/auth.py", "symbol": "HTTPDigestAuth.build_digest_header", "start_line": 157, "end_line": 266},
+        {"path": "src/requests/auth.py", "symbol": "HTTPDigestAuth.handle_401", "start_line": 273, "end_line": 319}
+      ],
+      "notes": "Describes one class in Turkish. HTTPDigestAuth(AuthBase): __call__ registers handle_401 as a response hook (auth.py:339), handle_401 parses the WWW-Authenticate challenge and resends, build_digest_header computes the digest (MD5/SHA/SHA-256/SHA-512). Methods inside the class overlap its range and count. Wrong but plausible: HTTPBasicAuth, HTTPProxyAuth, _basic_auth_str."
+    },
+    {
+      "id": "q08",
+      "question": "post istegi gonderen fonksiyon nerede tanimli?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/requests/api.py", "symbol": "post", "start_line": 117, "end_line": 134},
+        {"path": "src/requests/sessions.py", "symbol": "Session.post", "start_line": 695, "end_line": 712}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/api.py", "symbol": "request", "start_line": 24, "end_line": 71},
+        {"path": "src/requests/sessions.py", "symbol": "Session.request", "start_line": 557, "end_line": 653}
+      ],
+      "notes": "Turkish without Turkish letters ('POST isteği gönderen fonksiyon nerede tanımlı'); 'post' collides with an ordinary word. Either requests.post (api.py:117-134, calls request(\"post\", ...)) or Session.post (sessions.py:695-712, calls self.request(\"POST\", ...)) answers it. Wrong but plausible: SessionRedirectMixin.rebuild_method (turns POST into GET on 301), PreparedRequest.prepare_method, prepare_body."
+    },
+    {
+      "id": "q09",
+      "question": "How does requests decide which proxy to use for a given URL?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/requests/utils.py", "symbol": "select_proxy", "start_line": 885, "end_line": 908},
+        {"path": "src/requests/utils.py", "symbol": "resolve_proxies", "start_line": 911, "end_line": 939}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/utils.py", "symbol": "get_environ_proxies", "start_line": 873, "end_line": 882},
+        {"path": "src/requests/utils.py", "symbol": "should_bypass_proxies", "start_line": 810, "end_line": 870},
+        {"path": "src/requests/sessions.py", "symbol": "Session.merge_environment_settings", "start_line": 831, "end_line": 868},
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.rebuild_proxies", "start_line": 334, "end_line": 368},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.get_connection_with_tls_context", "start_line": 455, "end_line": 510}
+      ],
+      "notes": "select_proxy tries the keys scheme://host, scheme, all://host, all in order (utils.py:896-906); resolve_proxies adds the environment proxy for the scheme unless NO_PROXY says to bypass (926-939). Session.send calls resolve_proxies (sessions.py:763) and the adapter calls select_proxy (adapters.py:483). Wrong but plausible: HTTPAdapter.proxy_manager_for (builds the manager for an already chosen proxy), HTTPAdapter.proxy_headers, HTTPProxyAuth."
+    },
+    {
+      "id": "q10",
+      "question": "How is the text encoding of a response guessed when the server does not declare a charset?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/requests/models.py", "symbol": "Response.text", "start_line": 1053, "end_line": 1089},
+        {"path": "src/requests/models.py", "symbol": "Response.apparent_encoding", "start_line": 896, "end_line": 904},
+        {"path": "src/requests/utils.py", "symbol": "get_encoding_from_headers", "start_line": 569, "end_line": 591}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/compat.py", "symbol": "_resolve_char_detection", "start_line": 36, "end_line": 45},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.build_response", "start_line": 365, "end_line": 401},
+        {"path": "src/requests/utils.py", "symbol": "guess_json_utf", "start_line": 1008, "end_line": 1037}
+      ],
+      "notes": "Without a charset parameter get_encoding_from_headers returns ISO-8859-1 for text/* and utf-8 for application/json, else None (utils.py:583-591; called from build_response, adapters.py:385). When encoding is None, Response.text falls back to apparent_encoding (models.py:1074-1075), which runs chardet/charset_normalizer detect (899-904). Any of the three answers. Wrong but plausible: get_encodings_from_content and get_unicode_from_response (deprecated, unused), stream_decode_response_unicode, guess_json_utf (JSON only)."
+    },
+    {
+      "id": "q11",
+      "question": "When a redirect goes to a different host, where is the Authorization header removed?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.rebuild_auth", "start_line": 309, "end_line": 332},
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.should_strip_auth", "start_line": 154, "end_line": 184}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.resolve_redirects", "start_line": 186, "end_line": 307}
+      ],
+      "notes": "rebuild_auth deletes headers['Authorization'] when should_strip_auth(original_url, url) is true (sessions.py:324-327); should_strip_auth compares hostnames and allows http->https on default ports (158-184). resolve_redirects calls rebuild_auth (273). Wrong but plausible: rebuild_proxies (Proxy-Authorization), HTTPDigestAuth.handle_redirect (resets a counter), prepare_auth."
+    },
+    {
+      "id": "q12",
+      "question": "How can I point requests at a custom CA bundle with an environment variable?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/requests/sessions.py", "symbol": "Session.merge_environment_settings", "start_line": 831, "end_line": 868}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.cert_verify", "start_line": 307, "end_line": 363},
+        {"path": "src/requests/utils.py", "start_line": 81, "end_line": 82},
+        {"path": "src/requests/certs.py", "start_line": 15, "end_line": 15},
+        {"path": "src/requests/sessions.py", "symbol": "Session.request", "start_line": 557, "end_line": 653}
+      ],
+      "notes": "With trust_env and verify True/None, merge_environment_settings reads REQUESTS_CA_BUNDLE, then CURL_CA_BUNDLE (sessions.py:855-860); Session.request calls it (641-643). Wrong but plausible: certs.where / DEFAULT_CA_BUNDLE_PATH (the certifi default, utils.py:81-82), get_environ_proxies (environment proxies), HTTPAdapter.cert_verify (uses the value, does not read the environment)."
+    },
+    {
+      "id": "q13",
+      "question": "Zaman aşımı (timeout) tek bir sayı ya da (bağlantı, okuma) ikilisi olarak verildiğinde nasıl işleniyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.send", "start_line": 634, "end_line": 748}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/sessions.py", "symbol": "Session.request", "start_line": 557, "end_line": 653},
+        {"path": "src/requests/exceptions.py", "symbol": "ConnectTimeout", "start_line": 91, "end_line": 95},
+        {"path": "src/requests/exceptions.py", "symbol": "ReadTimeout", "start_line": 98, "end_line": 99}
+      ],
+      "notes": "The answer is a few lines inside HTTPAdapter.send: a (connect, read) tuple becomes urllib3 Timeout (TimeoutSauce), a Timeout object passes through, a single value is used for both (adapters.py:681-693); ConnectTimeoutError / ReadTimeoutError become ConnectTimeout / ReadTimeout (714-717, 741-742). The whole method is the expected symbol because the search returns symbols. Wrong but plausible: the Timeout exception classes in exceptions.py, Session.request (only forwards timeout in send_kwargs)."
+    },
+    {
+      "id": "q14",
+      "question": "Dosya yuklerken multipart govdesi nasil olusturuluyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/requests/models.py", "symbol": "RequestEncodingMixin._encode_files", "start_line": 182, "end_line": 251}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/requests/models.py", "symbol": "PreparedRequest.prepare_body", "start_line": 576, "end_line": 652},
+        {"path": "src/requests/utils.py", "symbol": "guess_filename", "start_line": 283, "end_line": 287}
+      ],
+      "notes": "Turkish without Turkish letters ('Dosya yüklerken multipart gövdesi nasıl oluşturuluyor'). _encode_files turns data fields and 2/3/4-tuple files into urllib3 RequestFields and calls urllib3's encode_multipart_formdata (models.py:199-251); prepare_body calls it when files are given (636-637, related). The boundary encoding itself is urllib3's. Wrong but plausible: _encode_params (urlencoded form body), prepare_body alone, prepare_content_length."
+    },
+    {
+      "id": "q15",
+      "question": "What is the call path from requests.get(url) down to the transport adapter that sends it?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "src/requests/sessions.py", "symbol": "Session.request", "start_line": 557, "end_line": 653},
+        {"path": "src/requests/sessions.py", "symbol": "Session.send", "start_line": 752, "end_line": 829}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "src/requests/api.py", "symbol": "get", "start_line": 74, "end_line": 87},
+        {"path": "src/requests/api.py", "symbol": "request", "start_line": 24, "end_line": 71},
+        {"path": "src/requests/sessions.py", "symbol": "Session.prepare_request", "start_line": 511, "end_line": 555},
+        {"path": "src/requests/models.py", "symbol": "PreparedRequest.prepare", "start_line": 424, "end_line": 451},
+        {"path": "src/requests/sessions.py", "symbol": "Session.get_adapter", "start_line": 870, "end_line": 881},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.send", "start_line": 634, "end_line": 748},
+        {"path": "src/requests/sessions.py", "symbol": "Session.merge_environment_settings", "start_line": 831, "end_line": 868}
+      ],
+      "notes": "api.get -> api.request opens a Session and calls session.request (api.py:70-71); Session.request builds a Request, prepare_request merges session settings into a PreparedRequest, merge_environment_settings adds env proxies/CA bundle, then self.send (sessions.py:622-653); Session.send picks the adapter with get_adapter (778) and calls adapter.send (784), i.e. HTTPAdapter.send. Session.request and Session.send are required; the wrappers and HTTPAdapter.send are related. Wrong but plausible: Session.get (the session method, not the top-level path), Request.prepare."
+    },
+    {
+      "id": "q16",
+      "question": "`Session.send` yönlendirmeleri (redirect) nasıl takip ediyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "src/requests/sessions.py", "symbol": "Session.send", "start_line": 752, "end_line": 829},
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.resolve_redirects", "start_line": 186, "end_line": 307}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.get_redirect_target", "start_line": 134, "end_line": 152},
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.rebuild_method", "start_line": 370, "end_line": 392},
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.rebuild_auth", "start_line": 309, "end_line": 332},
+        {"path": "src/requests/sessions.py", "symbol": "SessionRedirectMixin.rebuild_proxies", "start_line": 334, "end_line": 368},
+        {"path": "src/requests/models.py", "symbol": "Response.is_redirect", "start_line": 876, "end_line": 881},
+        {"path": "src/requests/models.py", "start_line": 103, "end_line": 103}
+      ],
+      "notes": "Exact identifier in a Turkish question. With allow_redirects, Session.send runs self.resolve_redirects(r, request, **kwargs) and builds history (sessions.py:801-815). resolve_redirects loops while get_redirect_target finds a Location: copies the request, enforces max_redirects (TooManyRedirects, 216-219), resolves relative URLs, rebuild_method, drops the body except on 307/308, re-prepares cookies, rebuild_proxies / rebuild_auth, rewinds the body and calls self.send(..., allow_redirects=False) (186-307). Both required. Wrong but plausible: Response.is_redirect alone, HTTPDigestAuth.handle_redirect, HTTPAdapter.send (redirect=False there)."
+    },
+    {
+      "id": "q17",
+      "question": "Istege verilen cookie'ler session cookie'leriyle nasil birlestirilip Cookie basligina yaziliyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "src/requests/sessions.py", "symbol": "Session.prepare_request", "start_line": 511, "end_line": 555},
+        {"path": "src/requests/models.py", "symbol": "PreparedRequest.prepare_cookies", "start_line": 699, "end_line": 720}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "src/requests/cookies.py", "symbol": "merge_cookies", "start_line": 604, "end_line": 625},
+        {"path": "src/requests/cookies.py", "symbol": "get_cookie_header", "start_line": 153, "end_line": 161},
+        {"path": "src/requests/cookies.py", "symbol": "cookiejar_from_dict", "start_line": 579, "end_line": 601},
+        {"path": "src/requests/cookies.py", "symbol": "MockRequest", "start_line": 31, "end_line": 111},
+        {"path": "src/requests/models.py", "symbol": "PreparedRequest.prepare", "start_line": 424, "end_line": 451}
+      ],
+      "notes": "Turkish without Turkish letters ('İsteğe verilen cookie'ler session cookie'leriyle nasıl birleştirilip Cookie başlığına yazılıyor'). prepare_request turns request cookies into a jar and merges session cookies, then request cookies, into a new RequestsCookieJar (sessions.py:524-533) and passes it to PreparedRequest.prepare (552); prepare_cookies calls get_cookie_header (MockRequest + CookieJar.add_cookie_header) and sets headers['Cookie'] (models.py:712-720). Both required. Wrong but plausible: extract_cookies_to_jar (response -> jar, the other direction), the cookie persistence in Session.send (793-799), RequestsCookieJar.set."
+    },
+    {
+      "id": "q18",
+      "question": "How are connections pooled and reused across requests to the same host?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.init_poolmanager", "start_line": 239, "end_line": 267},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.get_connection_with_tls_context", "start_line": 455, "end_line": 510}
+      ],
+      "related": [
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.__init__", "start_line": 201, "end_line": 221},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.close", "start_line": 555, "end_line": 563},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.proxy_manager_for", "start_line": 269, "end_line": 305},
+        {"path": "src/requests/models.py", "symbol": "Response.close", "start_line": 1173, "end_line": 1184}
+      ],
+      "notes": "Pooling is urllib3's PoolManager / HTTPConnectionPool. requests only creates PoolManager(num_pools, maxsize, block) in init_poolmanager (adapters.py:262-267) and asks it for a pool with connection_from_host (501-508); release back to the pool is raw.release_conn in Response.close. Correct behaviour: say the pool implementation is not in the repo and cite the pointer. Wrong but plausible: Session.mount / get_adapter (adapter selection, not pooling), HTTPAdapter class docstring."
+    },
+    {
+      "id": "q19",
+      "question": "Where is the server's TLS certificate checked against the CA bundle during the handshake?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.cert_verify", "start_line": 307, "end_line": 363},
+        {"path": "src/requests/adapters.py", "symbol": "_urllib3_request_context", "start_line": 85, "end_line": 119}
+      ],
+      "related": [
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.build_connection_pool_key_attributes", "start_line": 403, "end_line": 453},
+        {"path": "src/requests/sessions.py", "symbol": "Session.merge_environment_settings", "start_line": 831, "end_line": 868},
+        {"path": "src/requests/certs.py", "start_line": 15, "end_line": 15},
+        {"path": "src/requests/utils.py", "start_line": 81, "end_line": 82}
+      ],
+      "notes": "The handshake and certificate verification happen in urllib3 / Python's ssl; the CA bundle comes from certifi. requests only passes settings: _urllib3_request_context builds cert_reqs CERT_REQUIRED/CERT_NONE and ca_certs/ca_cert_dir pool kwargs (adapters.py:97-105), cert_verify sets the same on the connection and checks the bundle path exists (321-346). Correct behaviour: say verification is not in the repo and cite these. Wrong but plausible: SSLError in exceptions.py, the docstrings about verify in Session.request."
+    },
+    {
+      "id": "q20",
+      "question": "Bağlantı koparsa istek nasıl yeniden deneniyor, yeniden deneme döngüsü nerede?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.__init__", "start_line": 201, "end_line": 221},
+        {"path": "src/requests/adapters.py", "symbol": "HTTPAdapter.send", "start_line": 634, "end_line": 748}
+      ],
+      "related": [
+        {"path": "src/requests/adapters.py", "start_line": 79, "end_line": 82},
+        {"path": "src/requests/exceptions.py", "symbol": "RetryError", "start_line": 142, "end_line": 143}
+      ],
+      "notes": "No identifier. The retry loop is urllib3's Retry. HTTPAdapter.__init__ sets max_retries = Retry(0, read=False) by default (DEFAULT_RETRIES = 0, adapters.py:81) or Retry.from_int (208-211); HTTPAdapter.send passes retries=self.max_retries to conn.urlopen (705) and maps MaxRetryError to ConnectTimeout / RetryError / ProxyError / SSLError / ConnectionError (713-729). Correct behaviour: say the retry logic is not in the repo (and that requests does not retry by default) and cite the pointer. Wrong but plausible: resolve_redirects (a loop, but for redirects), HTTPDigestAuth.handle_401 (resends once after a 401)."
+    }
+  ]
+}
