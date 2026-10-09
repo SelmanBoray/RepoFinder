@@ -22,7 +22,7 @@ activate the environment or call it by that path.
 
 ## LLM access: two options
 
-`index`, `map` and `search` work offline. `ask` and `summarize` need Claude,
+`index`, `map` and `search` work offline. `ask`, `chat` and `summarize` need Claude,
 which RepoFinder can reach in two ways. Pick one.
 
 **A. Anthropic API key** (pay as you go). Create a key at
@@ -54,6 +54,29 @@ instructions and exit with code 2.
 Models default to `claude-sonnet-5-5` for per-file summaries and
 `claude-opus-5-5` for answers and the overview; override them with
 `REPOFINDER_MODEL_FAST` and `REPOFINDER_MODEL_SMART`.
+
+### Decisions (optional, Jev)
+
+Chat mode makes a few small decisions on every turn before Claude writes the
+reply: what kind of message it is (a "where is" question, an explanation, a
+follow-up, small talk), which search hit answers it, and whether the excerpts
+already shown cover a follow-up. By default built-in English and Turkish rules
+make them, offline and free; the rules never reorder search results.
+TypeSafe's Jev model, which returns typed choices with probabilities rather
+than text, can make them instead:
+
+```powershell
+.venv\Scripts\python -m pip install -e ".[jev]"     # installs typesafe-sdk
+$env:OPENROUTER_API_KEY = "sk-or-..."               # through OpenRouter, or
+$env:TYPESAFE_API_KEY = "..."                       # through TypeSafe's own API
+$env:REPOFINDER_DECISIONS = "jev"                   # "rules" or "off" (the default) use the rules
+```
+
+The keys can also go in the `.env` file. When both are set, the OpenRouter key
+is used (model `~typesafe/jev-latest`). Jev bills input only (about $0.042 per
+million tokens; output is free), and each request is kept under its 32k-token
+context. `REPOFINDER_DECISIONS=jev` without a key or without `typesafe-sdk` is
+a configuration error that prints these setup steps.
 
 ## Quick start (Flask)
 
@@ -96,6 +119,7 @@ one model call per file (about 80 for Flask), so try `--limit 10` first.
 | `repofinder index <source> [--refresh]` | Clone (for a URL) and index. `--refresh` rebuilds an existing index and keeps the summaries of files that still exist. |
 | `repofinder map <source> [--out FILE] [--max-modules N]` | Architecture map in Markdown: entry points, core modules by fan-in, package layout, hot spots and where to start. |
 | `repofinder ask <source> "question" [-k N] [--show-context] [--json]` | Answer with citations. `-k` sets how many search hits become context (default 8); `--show-context` lists the excerpts sent to Claude; `--json` prints `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage` and `elapsed_s`. |
+| `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | A conversation about the code, one message per line from stdin (see [Chat mode](#chat-mode)). `-k` sets the search hits per search (default 8); `--decisions` picks the decision layer for this run. `/context` lists the excerpts of the last search, `/route` shows how the last message was routed, `/help` lists the commands, `/quit` or the end of input leaves. `--json` prints one JSON object per line for every turn (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). The `you>` prompt is shown only when you type in a terminal, so piped output stays clean. |
 | `repofinder summarize <source> [--limit N] [--all]` | Per-file summaries, then the repository overview. Only files without a summary are done unless `--all`. Stops after 3 failures in a row (usually a usage limit); finished work is kept. |
 | `repofinder status <source>` | Counts of files, symbols and imports, summaries, overview present, files changed since indexing, LLM backend, data directory. |
 | `repofinder search <source> "query" [-k N]` | The raw search hits with their scores and why they matched. No LLM; useful when an answer misses something. |
@@ -105,6 +129,27 @@ default (or in `$REPOFINDER_HOME`): `repos/<name>/index.db`, plus
 `repos/<name>/checkout/<name>/` for cloned repositories. Write the map with
 `--out` rather than `>` in Windows PowerShell 5, whose redirection re-encodes
 the output.
+
+### Chat mode
+
+`repofinder chat <repo>` holds a conversation about one repository: the
+decision layer decides, Claude talks. Every message is routed first. A "where
+is" question (*locate*) or a "how does it work" question (*explain*) runs a
+search, puts the excerpts the decision layer judges most relevant first and,
+when it judges none of them relevant, searches once more with three times as
+many hits. A *follow-up* reuses the previous excerpts when the decision layer
+says they cover it, and otherwise searches again for the previous question
+together with the new message. Small talk (*chat*) and questions about
+something the repository leaves to another library (*outside*) get a short
+reply without a search. Claude (`REPOFINDER_MODEL_SMART`) writes every reply
+with the same `path:start-end` citation rules as `ask` and sees the last six
+messages of the conversation. After each reply a dim line shows the route,
+whether the excerpts were reused or the search was widened, the time, the
+tokens and the decision calls.
+
+The decisions are made by the built-in rules unless Jev is set up, as described
+in [Decisions (optional, Jev)](#decisions-optional-jev); with the rules, chat
+makes no model calls besides Claude's reply.
 
 ## How it works
 
@@ -154,7 +199,8 @@ error).
 The code is in `repofinder/`: `ingest` and `parser` (clone, walk, tree-sitter),
 `store` (SQLite), `search` (BM25), `graph` and `mapper` (import graph, map),
 `llm`, `prompts` and `backends` (Claude), `chunker` (hits to excerpts),
-`pipeline` (the API the CLI and the evaluation call) and `cli`.
+`pipeline` (the API the CLI and the evaluation call), `chat` and `decisions`
+(conversation mode and its routing choices) and `cli`.
 
 Notes for contributors:
 

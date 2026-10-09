@@ -1,4 +1,4 @@
-"""LLM layer: per-file summaries, a repository overview, and cited answers.
+"""LLM layer: per-file summaries, a repository overview, cited answers and chat turns.
 
 :class:`LLM` builds the prompts (wording in :mod:`repofinder.prompts`) and
 sends them through a :class:`~repofinder.backends.Backend`: the Anthropic API
@@ -222,17 +222,41 @@ class LLM:
             max_tokens=ANSWER_MAX_TOKENS,
             effort=SMART_EFFORT,
         )
-        text = result.text.strip()
-        if result.stop_reason == "max_tokens":
-            text += prompts.TRUNCATED_ANSWER_NOTE
-        return Answer(
-            text=text,
-            citations=parse_citations(result.text, chunks),
-            model=result.model,
-            input_tokens=result.input_tokens,
-            output_tokens=result.output_tokens,
-            cache_read_tokens=result.cache_read_tokens,
+        return _to_answer(result, chunks)
+
+    def chat(
+        self,
+        message: str,
+        chunks: Optional[list[ContextChunk]],
+        repo_name: str,
+        history_text: str,
+        mode_note: str,
+        repo_summary: Optional[str] = None,
+        effort: Optional[str] = None,
+    ) -> Answer:
+        """One conversational turn (smart model).
+
+        ``history_text`` is the rendered conversation so far
+        (:func:`prompts.render_history`, may be empty) and ``mode_note`` tells
+        the model what kind of turn this is (see :data:`prompts.CHAT_MODE_NOTES`).
+        ``chunks=None`` means no search ran for this turn: the prompt has no
+        excerpt block. Citations are parsed against ``chunks`` only, so a turn
+        without chunks has none. ``effort`` defaults to :data:`SMART_EFFORT`;
+        a turn that needs little thought (small talk) can pass ``"low"``.
+        """
+        if not message or not message.strip():
+            raise ValueError("message must not be empty")
+        rendered = None if chunks is None else [
+            prompts.render_chunk(c.path, c.start_line, c.end_line, c.text, c.label) for c in chunks
+        ]
+        result = self._complete(
+            model=self.smart_model,
+            system=prompts.chat_system(repo_name),
+            user=prompts.chat_user(repo_summary, history_text, rendered, message, mode_note),
+            max_tokens=ANSWER_MAX_TOKENS,
+            effort=effort or SMART_EFFORT,
         )
+        return _to_answer(result, chunks or [])
 
     # ----------------------------------------------------------- internals --
 
@@ -256,6 +280,22 @@ class LLM:
         if not result.text.strip():
             raise LLMError(f"the model returned no text (stop_reason={result.stop_reason})")
         return result
+
+
+def _to_answer(result: Completion, chunks: list[ContextChunk]) -> Answer:
+    """An :class:`Answer` from a completion: the text (marked when cut off by
+    the length limit) and the citations that fall inside ``chunks``."""
+    text = result.text.strip()
+    if result.stop_reason == "max_tokens":
+        text += prompts.TRUNCATED_ANSWER_NOTE
+    return Answer(
+        text=text,
+        citations=parse_citations(result.text, chunks),
+        model=result.model,
+        input_tokens=result.input_tokens,
+        output_tokens=result.output_tokens,
+        cache_read_tokens=result.cache_read_tokens,
+    )
 
 
 # --------------------------------------------------------------------------- #

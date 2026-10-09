@@ -197,3 +197,212 @@ def test_ask_long_markdown_lines_are_wrapped_not_cropped(home: Path, monkeypatch
     assert result.exit_code == 0, result.output
     flat = " ".join(result.stdout.split())
     assert words in flat and "mypkg/core.py:13-30" in flat
+
+
+# --------------------------------------------------------------------------- #
+# chat
+# --------------------------------------------------------------------------- #
+
+import importlib  # noqa: E402
+import sys  # noqa: E402
+from types import SimpleNamespace  # noqa: E402
+
+from repofinder.backends import BackendError  # noqa: E402
+
+
+class _ChatDecisions:
+    """Stands in for ``repofinder.decisions`` (the module and its backend) in the
+    chat command tests: routes are scripted, rerank keeps the search order and
+    the previous excerpts always suffice."""
+
+    ROUTE_LOCATE, ROUTE_EXPLAIN, ROUTE_FOLLOWUP = "locate", "explain", "followup"
+    ROUTE_CHAT, ROUTE_OUTSIDE = "chat", "outside"
+    ROUTES = ("locate", "explain", "followup", "chat", "outside")
+
+    class DecisionsError(RuntimeError):
+        pass
+
+    class DecisionsConfigError(DecisionsError):
+        pass
+
+    def __init__(self, *routes: str, name: str = "rules") -> None:
+        self.name = name
+        self.routes = list(routes)
+        self.preferred: list[Optional[str]] = []
+
+    def route_message(self, decisions, message, history):
+        route = self.routes.pop(0) if self.routes else "locate"
+        runner_up = "locate" if route == "chat" else "chat"
+        return SimpleNamespace(route=route, probabilities={route: 0.75, runner_up: 0.25}, cost_usd=0.0)
+
+    def rerank_cards(self, decisions, question, cards, allow_none=True):
+        return SimpleNamespace(order=list(range(len(cards))), none_selected=False, probabilities={},
+                               cost_usd=0.0)
+
+    def context_suffices(self, decisions, message, previous_question, cards):
+        return SimpleNamespace(probability=0.8, cost_usd=0.0, input_tokens=0)
+
+
+def _decisions_module(monkeypatch: pytest.MonkeyPatch, stub: _ChatDecisions):
+    """``repofinder.decisions``, or ``stub`` registered under that name while the
+    real module does not exist yet."""
+    try:
+        return importlib.import_module("repofinder.decisions")
+    except ModuleNotFoundError as exc:
+        if exc.name != "repofinder.decisions":
+            raise
+        monkeypatch.setitem(sys.modules, "repofinder.decisions", stub)
+        return stub
+
+
+@pytest.fixture
+def chat_stub(monkeypatch: pytest.MonkeyPatch):
+    def install(*routes: str, name: str = "rules") -> _ChatDecisions:
+        stub = _ChatDecisions(*routes, name=name)
+        _decisions_module(monkeypatch, stub)
+        chat_mod = importlib.import_module("repofinder.chat")
+        monkeypatch.setattr(chat_mod, "_decisions", stub)
+
+        def make_decisions(preferred: Optional[str]) -> _ChatDecisions:
+            stub.preferred.append(preferred)
+            return stub
+
+        monkeypatch.setattr(cli, "_make_decisions", make_decisions)
+        return stub
+
+    return install
+
+
+def _chat(home: Path, stdin: str, *args: str):
+    return runner.invoke(cli.app, ["chat", str(SAMPLE_REPO), "--data-dir", str(home), *args], input=stdin)
+
+
+def test_help_lists_chat():
+    result = _run("--help")
+    assert result.exit_code == 0 and "chat" in result.stdout
+    result = _run("chat", "--help")
+    assert result.exit_code == 0
+    for option in ("--decisions", "--json", "--top-k", "--data-dir"):
+        assert option in result.stdout
+
+
+def test_chat_text_session(home: Path, fake: FakeBackend, chat_stub, monkeypatch: pytest.MonkeyPatch):
+    stub = chat_stub("locate", "chat")
+    monkeypatch.setattr(cli, "_stdin_is_tty", lambda: True)   # a person typing: prompts are shown
+    stdin = "How does the engine run?\n\nteşekkürler!\n/context\n/route\n/nope\n/quit\nnever sent\n"
+    result = _chat(home, stdin, "--decisions", "rules")
+    assert result.exit_code == 0, result.output
+    out = result.stdout
+
+    assert stub.preferred == ["rules"]
+    assert f"Backend: fake · model {LLM().smart_model} · decisions: rules" in out
+    assert out.count("you> ") == 7                  # the empty line and the commands re-prompt
+    assert len(fake.calls) == 2                     # two turns; nothing after /quit
+    assert "The engine runs in" in out
+    sources = out.split("Sources", 1)[1].split("route=locate", 1)[0]
+    assert "mypkg/core.py:13-30" in sources
+    assert out.count("Sources") == 1                # the chat turn has no excerpts to list
+    (locate_line,) = [line for line in out.splitlines() if line.startswith("route=locate")]
+    assert "tokens 1,234 in / 56 out" in locate_line and locate_line.endswith("decisions: rules (0 calls)")
+    after_chat = out.split("route=chat ·", 1)[1]
+    assert "Excerpts of the last search (1) for: How does the engine run?" in after_chat
+    assert "mypkg/core.py:1-63" in after_chat       # /context
+    assert "route=chat (decisions: rules)" in after_chat and "chat 0.75 · locate 0.25" in after_chat
+    assert "Unknown command /nope" in result.stderr
+    assert "2 calls" in out.splitlines()[-1]        # session usage on the way out
+
+
+def test_chat_json_lines(home: Path, fake: FakeBackend, chat_stub):
+    chat_stub("locate")
+    result = _chat(home, "How does the engine run?\n/route\n/context\n", "--json", "-k", "4")
+    assert result.exit_code == 0, result.output
+    lines = result.stdout.splitlines()
+    assert len(lines) == 3
+    turn, route, context = (json.loads(line) for line in lines)
+
+    assert turn["route"] == "locate" and turn["route_probabilities"] == {"locate": 0.75, "chat": 0.25}
+    assert turn["answer"].startswith("The engine runs in")
+    assert turn["citations"] == [{"path": "mypkg/core.py", "start_line": 13, "end_line": 30}]
+    assert turn["reused_context"] is False and turn["widened"] is False
+    assert turn["usage"] == {"input_tokens": 1234, "output_tokens": 56, "cache_read_tokens": 7}
+    assert turn["decisions"] == {"name": "rules", "calls": 0, "cost_usd": 0.0, "errors": []}
+    assert turn["chunks"] and set(turn["chunks"][0]) == {"path", "start_line", "end_line", "label"}
+
+    assert route["command"] == "route" and route["route"] == "locate"
+    assert context["command"] == "context" and context["question"] == "How does the engine run?"
+    assert "you> " not in result.stdout and "you> " not in result.stderr   # piped: no prompt
+
+
+@pytest.mark.parametrize("tty", [False, True])
+def test_chat_json_stdout_is_one_json_object_per_line(home: Path, fake: FakeBackend, chat_stub,
+                                                      monkeypatch: pytest.MonkeyPatch, tty: bool):
+    chat_stub("locate", "chat")
+    monkeypatch.setattr(cli, "_stdin_is_tty", lambda: tty)
+    stdin = "How does the engine run?\n\n/help\n/nope\nthanks\n/context\n/route\n/quit\n"
+    result = _chat(home, stdin, "--json")
+    assert result.exit_code == 0, result.output
+
+    lines = result.stdout.splitlines()
+    payloads = [json.loads(line) for line in lines]          # every stdout line is one JSON object
+    assert all(isinstance(p, dict) for p in payloads)
+    assert [p.get("route") for p in payloads[:2]] == ["locate", "chat"]
+    assert [p.get("command") for p in payloads[2:]] == ["context", "route"]
+    assert "you> " not in result.stdout
+    assert ("you> " in result.stderr) is tty                 # the prompt only for a person, on stderr
+    assert "/context" in result.stderr                       # /help goes to stderr too
+    assert "Unknown command /nope" in result.stderr
+
+
+def test_chat_piped_text_mode_has_no_prompt(home: Path, fake: FakeBackend, chat_stub):
+    chat_stub("chat")
+    result = _chat(home, "hello\n")
+    assert result.exit_code == 0, result.output
+    assert "you> " not in result.stdout and "you> " not in result.stderr
+    assert "route=chat" in result.stdout
+
+
+def test_chat_ends_at_end_of_input(home: Path, fake: FakeBackend, chat_stub):
+    chat_stub("chat")
+    result = _chat(home, "hello")
+    assert result.exit_code == 0, result.output
+    assert len(fake.calls) == 1 and "route=chat" in result.stdout
+
+
+def test_chat_failed_turn_does_not_end_the_session(home: Path, monkeypatch: pytest.MonkeyPatch, chat_stub):
+    class FlakyBackend(FakeBackend):
+        def complete(self, **kwargs):
+            if not self.calls:
+                self.calls.append(kwargs)
+                raise BackendError("rate limited")
+            return super().complete(**kwargs)
+
+    backend = FlakyBackend("Second try.")
+    monkeypatch.setattr(cli, "_make_llm", lambda: LLM(backend=backend))
+    chat_stub("chat", "chat")
+    result = _chat(home, "hi\nhi again\n")
+    assert result.exit_code == 0, result.output
+    assert "LLM call failed: rate limited" in result.stderr
+    assert "Second try." in result.stdout
+
+
+def test_chat_without_backend_exits_2(home: Path, monkeypatch: pytest.MonkeyPatch, chat_stub):
+    chat_stub()
+    monkeypatch.setattr(cli, "_make_llm", lambda: NoBackendLLM())
+    result = _chat(home, "hello\n")
+    assert result.exit_code == 2
+    assert "RepoFinder needs access to Claude" in result.stderr
+
+
+def test_chat_decisions_config_error_exits_2(home: Path, monkeypatch: pytest.MonkeyPatch,
+                                             fake: FakeBackend, chat_stub):
+    stub = chat_stub()
+    errors = _decisions_module(monkeypatch, stub)
+
+    def no_decisions(preferred: Optional[str]):
+        raise errors.DecisionsConfigError(f"unknown decision layer: {preferred}")
+
+    monkeypatch.setattr(cli, "_make_decisions", no_decisions)
+    result = _chat(home, "hello\n", "--decisions", "bogus")
+    assert result.exit_code == 2
+    assert "unknown decision layer: bogus" in result.stderr
+    assert fake.calls == []

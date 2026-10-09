@@ -1,4 +1,4 @@
-"""Command-line interface: ``repofinder index|map|ask|summarize|status|search``.
+"""Command-line interface: ``repofinder index|map|ask|chat|summarize|status|search``.
 
 Results go to stdout; progress spinners and errors go to stderr. Exit codes:
 0 success, 1 failure, 2 no usable LLM backend (the message says how to set one up).
@@ -9,11 +9,12 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
+import re
 import sys
 import time
 from dataclasses import asdict
 from pathlib import Path
-from typing import Annotated, Iterator, Optional
+from typing import TYPE_CHECKING, Annotated, Any, Iterator, Optional
 
 import typer
 from rich.console import Console
@@ -24,6 +25,9 @@ from . import __version__, pipeline
 from .ingest import IngestError
 from .llm import LLM, Citation, LLMConfigError, LLMError
 from .store import StoreError
+
+if TYPE_CHECKING:  # chat and decisions are imported lazily, by the chat command only
+    from .chat import ChatSession, TurnResult
 
 app = typer.Typer(
     name="repofinder",
@@ -50,8 +54,36 @@ def _err() -> Console:
 
 
 def _make_llm() -> LLM:
-    """The LLM used by ``ask`` and ``summarize`` (tests replace this)."""
+    """The LLM used by ``ask``, ``chat`` and ``summarize`` (tests replace this)."""
     return LLM()
+
+
+def _make_decisions(preferred: Optional[str]) -> Any:
+    """The decision layer used by ``chat`` (tests replace this)."""
+    from . import decisions
+
+    return decisions.detect_decisions(preferred)
+
+
+def _make_session(ws: pipeline.Workspace, llm: LLM, decisions: Any, k: int) -> "ChatSession":
+    """The conversation used by ``chat`` (tests replace this)."""
+    from .chat import ChatSession
+
+    return ChatSession(ws, llm, decisions, k=k)
+
+
+def _decision_errors() -> tuple[type[BaseException], type[BaseException]]:
+    """``(DecisionsError, DecisionsConfigError)``, or two never-raised
+    placeholders while the decisions module cannot be imported."""
+    try:
+        from .decisions import DecisionsConfigError, DecisionsError
+    except ImportError:
+        return (_NeverRaised, _NeverRaised)
+    return (DecisionsError, DecisionsConfigError)
+
+
+class _NeverRaised(Exception):
+    pass
 
 
 @contextlib.contextmanager
@@ -68,6 +100,15 @@ def _errors() -> Iterator[None]:
     except (IngestError, StoreError) as exc:
         _err().print(f"Error: {exc}", markup=False)
         raise typer.Exit(1)
+    except Exception as exc:
+        decisions_error, decisions_config_error = _decision_errors()
+        if isinstance(exc, decisions_config_error):
+            _err().print(str(exc), markup=False)
+            raise typer.Exit(2)
+        if isinstance(exc, decisions_error):
+            _err().print(f"Decision layer failed: {exc}", markup=False)
+            raise typer.Exit(1)
+        raise
 
 
 def _open(source: str, data_dir: Optional[Path], refresh: bool = False, quiet: bool = False) -> pipeline.Workspace:
@@ -108,6 +149,16 @@ def source_ranges(citations: list[Citation]) -> list[tuple[str, int, int]]:
         if not inside:
             kept.append((path, start, end))
     return kept
+
+
+def _print_sources(out: Console, citations: list[Citation]) -> None:
+    out.print("Sources", style="bold")
+    sources = source_ranges(citations)
+    if sources:
+        for path, start, end in sources:
+            out.print(f"  {path}:{start}" + (f"-{end}" if end != start else ""), markup=False)
+    else:
+        out.print("  (the answer cites no lines from the excerpts)", markup=False)
 
 
 def _usage_line(llm: LLM, elapsed_s: Optional[float] = None) -> str:
@@ -232,15 +283,216 @@ def ask(
         out.print()
     out.print(Markdown(result.answer.text), soft_wrap=False)
     out.print()
-    out.print("Sources", style="bold")
-    sources = source_ranges(result.answer.citations)
-    if sources:
-        for path, start, end in sources:
-            out.print(f"  {path}:{start}" + (f"-{end}" if end != start else ""), markup=False)
-    else:
-        out.print("  (the answer cites no lines from the excerpts)", markup=False)
+    _print_sources(out, result.answer.citations)
     out.print()
     out.print(_usage_line(llm, result.elapsed_s), markup=False, style="dim")
+
+
+CHAT_COMMANDS_HELP = """\
+Commands:
+  /context   list the excerpts of the last search
+  /route     show the last turn's route and its probabilities
+  /help      show this help
+  /quit      leave (also /exit, or end of input)"""
+
+_COMMAND_LIKE = re.compile(r"/[A-Za-z]+")
+
+
+@app.command("chat")
+def chat_(
+    source: SourceArg,
+    k: Annotated[int, typer.Option("-k", "--top-k", min=1, help="Search hits turned into context per search.")] = pipeline.DEFAULT_K,
+    decisions_name: Annotated[Optional[str], typer.Option(
+        "--decisions", help="Decision layer: jev or rules (default: $REPOFINDER_DECISIONS, else detected).",
+    )] = None,
+    as_json: Annotated[bool, typer.Option("--json", help="Print one JSON object per turn (one line each).")] = False,
+    data_dir: DataDirOpt = None,
+) -> None:
+    """Talk about the code: messages are read from stdin, follow-ups reuse or refine the last search."""
+    with _errors():
+        llm = _make_llm()
+        backend = _backend(llm)
+        decisions = _make_decisions(decisions_name)
+        with _open(source, data_dir, quiet=as_json) as ws:
+            session = _make_session(ws, llm, decisions, k)
+            _chat_loop(session, backend, as_json)
+
+
+def _chat_loop(session: "ChatSession", backend: str, as_json: bool) -> None:
+    """Read messages until /quit or end of input. The ``you>`` prompt is shown
+    only to a person typing (stdin is a terminal), on stderr with ``--json``,
+    so that piped stdout carries exactly one JSON object per line."""
+    out, err = _out(), _err()
+    prompt_console = err if as_json else out
+    show_prompt = _stdin_is_tty()
+    if not as_json:
+        out.print(f"Backend: {backend} · model {session.llm.smart_model} · decisions: {session.decisions_name}",
+                  markup=False, style="dim")
+        out.print("Ask about the code. /help lists the commands, /quit leaves.", markup=False, style="dim")
+    while True:
+        line = _read_message(prompt_console if show_prompt else None)
+        if line is None:
+            break
+        text = line.strip()
+        if not text:
+            continue
+        command = text.lower()
+        if command in ("/quit", "/exit"):
+            break
+        if command == "/help":
+            prompt_console.print(CHAT_COMMANDS_HELP, markup=False)
+            continue
+        if command == "/context":
+            _chat_context(session, out, as_json)
+            continue
+        if command == "/route":
+            _chat_route(session, out, as_json)
+            continue
+        if _COMMAND_LIKE.fullmatch(text):
+            err.print(f"Unknown command {text}. Type /help for the commands.", markup=False)
+            continue
+        try:
+            status = contextlib.nullcontext() if as_json else err.status("Thinking…", spinner="dots")
+            with status:
+                result = session.turn(text)
+        except KeyboardInterrupt:
+            err.print("(interrupted)", markup=False)
+            continue
+        except LLMConfigError:
+            raise
+        except LLMError as exc:  # one failed turn does not end the conversation
+            err.print(f"LLM call failed: {exc}", markup=False)
+            continue
+        if as_json:
+            typer.echo(json.dumps(_turn_payload(session, result), ensure_ascii=False))
+        else:
+            _print_turn(out, session, result)
+    if not as_json and session.llm.usage.calls:
+        out.print(_usage_line(session.llm), markup=False, style="dim")
+
+
+def _stdin_is_tty() -> bool:
+    """Whether stdin is a terminal, i.e. a person is typing (tests replace this)."""
+    try:
+        return bool(sys.stdin.isatty())
+    except (AttributeError, ValueError, OSError):
+        return False
+
+
+def _read_message(console: Optional[Console]) -> Optional[str]:
+    """One line from stdin, after a ``you>`` prompt on ``console`` (no prompt
+    when it is None); None at end of input or on Ctrl+C."""
+    try:
+        if console is None:
+            return input()
+        return console.input("you> ", markup=False)
+    except EOFError:
+        return None
+    except KeyboardInterrupt:
+        if console is not None:
+            console.print()
+        return None
+
+
+def _print_turn(out: Console, session: "ChatSession", result: "TurnResult") -> None:
+    out.print()
+    out.print(Markdown(result.answer.text), soft_wrap=False)
+    out.print()
+    if result.chunks or result.answer.citations:
+        _print_sources(out, result.answer.citations)
+        out.print()
+    out.print(_turn_line(session, result), markup=False, style="dim")
+    out.print()
+
+
+def _turn_line(session: "ChatSession", result: "TurnResult") -> str:
+    parts = [f"route={result.route}"]
+    if result.reused_context:
+        parts.append("reused excerpts")
+    if result.widened:
+        parts.append("widened")
+    if result.off_target:
+        parts.append("no clear match")
+    parts.append(f"{result.elapsed_s:.1f} s")
+    answer = result.answer
+    parts.append(f"tokens {answer.input_tokens:,} in / {answer.output_tokens:,} out")
+    calls = result.decision_calls
+    decision = f"decisions: {session.decisions_name} ({calls} call{'' if calls == 1 else 's'}"
+    if result.decision_cost_usd > 0:
+        decision += f", ${result.decision_cost_usd:.4f}"
+    decision += ")"
+    if result.decision_errors:
+        decision += f", {len(result.decision_errors)} step{'' if len(result.decision_errors) == 1 else 's'} fell back"
+    parts.append(decision)
+    return " · ".join(parts)
+
+
+def _chunk_rows(chunks: list[Any]) -> list[dict[str, Any]]:
+    return [{"path": c.path, "start_line": c.start_line, "end_line": c.end_line, "label": c.label}
+            for c in chunks]
+
+
+def _turn_payload(session: "ChatSession", result: "TurnResult") -> dict[str, Any]:
+    answer = result.answer
+    return {
+        "route": result.route,
+        "route_probabilities": result.route_probabilities,
+        "answer": answer.text,
+        "citations": [asdict(c) for c in answer.citations],
+        "reused_context": result.reused_context,
+        "widened": result.widened,
+        "off_target": result.off_target,
+        "chunks": _chunk_rows(result.chunks),
+        "model": answer.model,
+        "usage": {"input_tokens": answer.input_tokens, "output_tokens": answer.output_tokens,
+                  "cache_read_tokens": answer.cache_read_tokens},
+        "decisions": {"name": session.decisions_name, "calls": result.decision_calls,
+                      "cost_usd": result.decision_cost_usd, "errors": result.decision_errors},
+        "elapsed_s": round(result.elapsed_s, 3),
+    }
+
+
+def _chat_context(session: "ChatSession", out: Console, as_json: bool) -> None:
+    chunks = session.last_chunks
+    if as_json:
+        typer.echo(json.dumps({"command": "context", "question": session.last_question,
+                               "chunks": _chunk_rows(chunks)}, ensure_ascii=False))
+        return
+    if not chunks:
+        out.print("(no excerpts yet: ask a question about the code)", markup=False)
+        return
+    question = " ".join((session.last_question or "").split())
+    out.print(f"Excerpts of the last search ({len(chunks)}) for: {question}", markup=False, style="bold")
+    for c in chunks:
+        n = c.end_line - c.start_line + 1
+        out.print(f"  {c.path}:{c.start_line}-{c.end_line}  {c.label or ''}  ({n} lines)", markup=False)
+
+
+def _chat_route(session: "ChatSession", out: Console, as_json: bool) -> None:
+    result = session.last_result
+    if as_json:
+        payload: dict[str, Any] = {"command": "route", "route": None}
+        if result is not None:
+            payload.update(route=result.route, route_probabilities=result.route_probabilities,
+                           context_probability=result.context_probability,
+                           reused_context=result.reused_context, widened=result.widened,
+                           off_target=result.off_target, decision_errors=result.decision_errors)
+        typer.echo(json.dumps(payload, ensure_ascii=False))
+        return
+    if result is None:
+        out.print("(no turn yet)", markup=False)
+        return
+    out.print(f"route={result.route} (decisions: {session.decisions_name})", markup=False, style="bold")
+    probs = sorted(result.route_probabilities.items(), key=lambda kv: -kv[1])
+    if probs:
+        out.print("  " + " · ".join(f"{name} {p:.2f}" for name, p in probs), markup=False)
+    else:
+        out.print("  (no probabilities reported)", markup=False)
+    if result.context_probability is not None:
+        verdict = "reused" if result.reused_context else "searched again"
+        out.print(f"  previous excerpts suffice: {result.context_probability:.2f} ({verdict})", markup=False)
+    for error in result.decision_errors:
+        out.print(f"  fell back: {error}", markup=False, style="yellow")
 
 
 @app.command()

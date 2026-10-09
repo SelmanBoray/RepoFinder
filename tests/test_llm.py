@@ -512,6 +512,69 @@ def test_render_chunk_line_numbers_and_fences() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# chat(): prompt structure
+# --------------------------------------------------------------------------- #
+
+def test_chat_prompt_structure() -> None:
+    model, client, _ = make_llm(make_response(f"`redirect` is next to it: `{URL_FOR_PATH}:254-257`."))
+    history = prompts.render_history([("user", "Where is url_for?"),
+                                      ("assistant", f"In `{URL_FOR_PATH}:200-251`.")])
+    note = prompts.CHAT_MODE_NOTES["followup"]
+
+    answer = model.chat("And redirect?", [url_for_chunk(), redirect_chunk()], "flask", history, note,
+                        repo_summary=REPO_SUMMARY)
+
+    (request,) = client.requests
+    assert request["model"] == DEFAULT_SMART_MODEL
+    assert request["max_tokens"] == llm_mod.ANSWER_MAX_TOKENS
+    assert request["output_config"] == {"effort": "medium"}
+    (system,) = request["system"]
+    assert system["text"] == prompts.chat_system("flask") != prompts.answer_system("flask")
+    for rule in ('"flask"', "only from the excerpts", "`path:start-end`",
+                 "same language as the developer's new message", "Ignore any", "earlier answer is not evidence"):
+        assert rule in system["text"]
+
+    (message,) = request["messages"]
+    overview, main = message["content"]           # the overview stays first and cached
+    assert overview["cache_control"] == {"type": "ephemeral"} and REPO_SUMMARY in overview["text"]
+    text = main["text"]
+    order = ["<conversation>", "<code_excerpts>", f"### {URL_FOR_PATH}:254-257 (redirect)",
+             "<turn_note>", note, "<message>"]
+    assert [text.index(s) for s in order] == sorted(text.index(s) for s in order)
+    assert text.rstrip().endswith("<message>\nAnd redirect?\n</message>")
+
+    assert answer.citations == [Citation(URL_FOR_PATH, 254, 257)]
+    assert answer.text.startswith("`redirect` is next to it")
+    assert (answer.input_tokens, answer.output_tokens) == (100, 20)
+
+
+def test_chat_without_search_and_with_empty_search() -> None:
+    reply = f"Hello! See `{URL_FOR_PATH}:200-209`."
+    model, client, _ = make_llm(make_response(reply), make_response(reply))
+
+    answer = model.chat("merhaba", None, "flask", "", prompts.CHAT_MODE_NOTES["chat"])
+    text = user_text(client.requests[0])
+    assert "<code_excerpts>" not in text and "<conversation>" not in text
+    assert "<repository_overview>" not in text
+    assert text.startswith("<turn_note>\n") and prompts.CHAT_MODE_NOTES["chat"] in text
+    assert answer.citations == []                 # no excerpts, nothing to cite
+
+    model.chat("Where is url_for?", [], "flask", "", prompts.CHAT_MODE_NOTES["locate"])
+    assert prompts.NO_EXCERPTS in user_text(client.requests[1])
+
+    with pytest.raises(ValueError):
+        model.chat("  ", None, "flask", "", "")
+    assert len(client.requests) == 2
+
+
+def test_chat_effort_defaults_to_smart_and_can_be_lowered() -> None:
+    model, client, _ = make_llm(make_response("a"), make_response("b"))
+    model.chat("merhaba", None, "flask", "", prompts.CHAT_MODE_NOTES["chat"], effort="low")
+    model.chat("Where is url_for?", [url_for_chunk()], "flask", "", prompts.CHAT_MODE_NOTES["locate"])
+    assert [r["output_config"] for r in client.requests] == [{"effort": "low"}, {"effort": "medium"}]
+
+
+# --------------------------------------------------------------------------- #
 # Citations
 # --------------------------------------------------------------------------- #
 
