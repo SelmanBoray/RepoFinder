@@ -233,3 +233,26 @@ Loose (counting whole-file and whole-class hits): hit@1 0.44, hit@3 0.59, hit@8
 0.81. Flow `all@8`: 1/5. Not-in-repo pointer in the top 8: 2/3. In the baseline a
 "chunk" is just the hit's own range (whole classes included), so its
 `chunk_recall` (0.74) says little about the real chunker.
+
+## Search v2 (2026-10-09)
+
+`search_baseline.py` after the search ranking rework in `repofinder/search.py`
+(coverage-scaled name boost, owner-class match, light stemming, abbreviations,
+Turkish filler and lexicon). Report: `results/flask-search-v2-d086db8-k8.json`.
+
+| group | hit@1 | hit@3 | hit@8 | MRR |
+| --- | --- | --- | --- | --- |
+| all answerable (27) | 0.74 | 0.85 | 0.89 | 0.789 |
+| locate-symbol (12) | 1.00 | 1.00 | 1.00 | 1.000 |
+| locate-feature (10) | 0.60 | 0.70 | 0.80 | 0.648 |
+| flow (5) | 0.40 | 0.80 | 0.80 | 0.567 |
+| en (18) / tr (9) | 0.78 / 0.67 | 0.83 / 0.89 | 0.89 / 0.89 | 0.813 / 0.741 |
+
+Loose: hit@1 0.78, hit@3 0.89, hit@8 0.93. Flow `all@8`: 1/5 (unchanged).
+Not-in-repo pointer in the top 8: 2/3 (unchanged). `chunk_recall` 0.81 (from
+0.74). Two secondary numbers went down: pointer `chunk_recall` 1.00 -> 0.67 (q28)
+and flow `chunk_recall` 0.40 -> 0.20 (q25). Both come from the whole `Flask` class
+(about 1,500 lines) no longer reaching the top 8: in this report its one
+pseudo-chunk covered every location inside the class. The ranking parameters
+were tuned on these same 30 questions and there is no separate validation set
+yet, so these numbers are optimistic for unseen questions and repositories.

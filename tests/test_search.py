@@ -10,7 +10,7 @@ import pytest
 
 from repofinder.ingest import build_index
 from repofinder.models import FileRecord, RepoIndex, Symbol
-from repofinder.search import Hit, SearchIndex, tokenize
+from repofinder.search import Hit, SearchIndex, stem, tokenize
 
 FLASK_ROOT = Path(
     r"C:\Users\Selman\AppData\Local\Temp\claude\C--\2893ddbc-306e-4b5d-94d8-359c5612cb51"
@@ -81,6 +81,38 @@ def test_tokenize_keeps_stopword_parts_of_compound_identifiers() -> None:
     assert tokenize("for") == []  # alone it is a stopword
 
 
+def test_tokenize_keeps_non_ascii_words_whole() -> None:
+    # The old ASCII-only tokenizer cut "tanımlı" into "tan", "ml".
+    assert tokenize("Şablonlarda `request` tanımlı") == ["şablonlarda", "request", "tanımlı"]
+    assert tokenize("İstek") == ["istek"]  # Turkish dotted capital I
+
+
+@pytest.mark.parametrize(
+    "words, key",
+    [
+        (("sign", "signs", "signed", "signing"), "sign"),
+        (("load", "loads", "loaded", "loading"), "load"),
+        (("build", "builds", "builder", "building"), "build"),
+        (("register", "registers", "registered", "registering"), "regist"),
+        (("handle", "handler", "handlers", "handled"), "handl"),
+        (("run", "runs", "running"), "run"),
+        (("class", "classes"), "class"),
+        (("query", "queries"), "query"),
+    ],
+)
+def test_stem_maps_inflections_to_one_key(words: tuple[str, ...], key: str) -> None:
+    assert {stem(w) for w in words} == {key}
+
+
+def test_stem_leaves_short_and_special_tokens_alone() -> None:
+    assert stem("parser") == "parser"  # -er is only removed from words of 7+ letters
+    assert stem("user") == "user"
+    assert stem("status") == "status"
+    assert stem("url_for") == "url_for"
+    assert stem("utf8") == "utf8"
+    assert stem("tanımlı") == "tanımlı"
+
+
 # --------------------------------------------------------------------------- #
 # ranking and boosts
 # --------------------------------------------------------------------------- #
@@ -94,10 +126,18 @@ def test_bm25_ranks_more_specific_documents_first() -> None:
             sym("pkg/c.py", "save_data", doc="Save data rows."),
         ]
     )
-    hits = SearchIndex(index).search("configuration", k=5)
+    search = SearchIndex(index)
+    hits = search.search("configuration", k=5)
     assert hits[0].symbol_id == "pkg/a.py::load_config"
-    assert hits[0].why == "bm25: configuration"
+    # "configuration" is abbreviated "config" in identifiers: half of the name
+    # load_config is in the query, so a partial name boost fires on top of BM25.
+    assert hits[0].why.startswith("name match: load_config x")
+    assert hits[0].why.endswith(" (configuration); bm25: configuration")
     assert all(h.score > 0 for h in hits)
+    # A word that names nothing is explained by BM25 alone.
+    hits = search.search("toml", k=5)
+    assert [h.symbol_id for h in hits if h.kind == "symbol"] == ["pkg/a.py::load_config"]
+    assert hits[0].why == "bm25: toml"
 
 
 def test_name_match_boost_beats_docstring_mentions() -> None:
@@ -249,6 +289,173 @@ def test_k_limits_results(sample_index: RepoIndex) -> None:
 
 
 # --------------------------------------------------------------------------- #
+# query analysis: coverage-scaled name boost, owner, stems, kind, Turkish
+# --------------------------------------------------------------------------- #
+
+
+def test_inflections_match_through_stems_and_are_marked() -> None:
+    index = make_index(
+        [
+            sym("pkg/sessions.py", "Interface.get_signing_serializer", "method"),
+            sym("pkg/ctx.py", "Context.push", "method", doc="Bind the context."),
+        ]
+    )
+    hit = SearchIndex(index).search("how is the cookie signed")[0]
+    assert hit.symbol_id == "pkg/sessions.py::Interface.get_signing_serializer"
+    # Only the stem matched: the query word is shown with "~".
+    assert hit.why.endswith("bm25: signed~")
+    assert "name match: get_signing_serializer x" in hit.why
+
+
+def test_a_common_word_that_is_a_name_does_not_win_a_longer_question() -> None:
+    index = make_index(
+        [
+            sym("pkg/json.py", "loads", doc="Deserialize data as JSON."),
+            sym("pkg/provider.py", "Provider.loads", "method", doc="Deserialize data as JSON."),
+            sym("pkg/config.py", "Config", "class", start=1, end=100, doc="A dict that holds the app config."),
+            sym("pkg/config.py", "Config.from_pyfile", "method", start=10, end=20,
+                doc="Updates the values in the config from a Python file."),
+            sym("pkg/config.py", "Config.from_mapping", "method", start=30, end=40,
+                doc="Updates the config like update()."),
+        ]
+    )
+    hits = SearchIndex(index).search("Which method loads the app config from a Python file?")
+    assert hits[0].symbol_id == "pkg/config.py::Config.from_pyfile"
+    # "python file" joins (through the abbreviation py) into the name part "pyfile".
+    assert "name match: from_pyfile x" in hits[0].why and "python file" in hits[0].why
+    loads = next(h for h in hits if h.symbol_id == "pkg/json.py::loads")
+    assert "name match: loads x" in loads.why  # a scaled-down boost, not the full one
+    # Asked alone, the word is the whole query and gets the full boost.
+    alone = SearchIndex(index).search("loads")
+    assert alone[0].why.startswith("name match: loads; ")
+
+
+def test_a_name_made_of_query_words_beats_a_shorter_exact_name() -> None:
+    index = make_index(
+        [
+            sym("pkg/app.py", "App.app_context", "method", start=1, doc="Create an app context."),
+            sym("pkg/app.py", "App.teardown_appcontext", "method", start=10,
+                doc="Registers a function to call when the app context is popped."),
+            sym("pkg/ctx.py", "AppContext", "class", doc="The app context."),
+        ]
+    )
+    query = "Where do I register cleanup code that should run on app context teardown?"
+    hit = SearchIndex(index).search(query)[0]
+    assert hit.symbol_id == "pkg/app.py::App.teardown_appcontext"
+    assert "name match: teardown_appcontext x" in hit.why and "teardown" in hit.why
+
+
+def test_naming_the_class_too_picks_its_method() -> None:
+    index = make_index(
+        [
+            sym("pkg/helpers.py", "make_response", doc="Make a response object."),
+            sym("pkg/app.py", "Flask.make_response", "method", doc="Convert a view's return value to a response."),
+        ]
+    )
+    hits = SearchIndex(index).search("Where is make_response implemented on the Flask application object?")
+    assert hits[0].symbol_id == "pkg/app.py::Flask.make_response"
+    assert "owner match: Flask x" in hits[0].why
+    assert "owner match" not in hits[1].why
+
+
+def test_which_class_prefers_classes() -> None:
+    index = make_index(
+        [
+            sym("pkg/app.py", "Flask.test_client", "method", doc="Create a test client for the app."),
+            sym("pkg/testing.py", "FlaskClient", "class",
+                doc="Works like a regular test client. Created by app.test_client()."),
+        ]
+    )
+    search = SearchIndex(index)
+    top = search.search("Which class implements the test client?")[0]
+    assert top.symbol_id == "pkg/testing.py::FlaskClient"
+    assert "class asked x3" in top.why
+    # Without the question for a class, the method named like the query wins.
+    assert search.search("test client")[0].symbol_id == "pkg/app.py::Flask.test_client"
+    # "class-based" is not a question for a class.
+    assert search.search("class-based test client")[0].symbol_id == "pkg/app.py::Flask.test_client"
+
+
+def test_test_word_inside_a_joined_identifier_keeps_the_test_penalty() -> None:
+    index = make_index(
+        [
+            sym("pkg/app.py", "App.test_client", "method", doc="Create a client."),
+            sym("tests/conftest.py", "client", doc="A client fixture."),
+        ]
+    )
+    search = SearchIndex(index)
+    by_path = {h.path: h for h in search.search("test client")}
+    assert "test file x0.5" in by_path["tests/conftest.py"].why  # "test client" -> test_client
+    by_path = {h.path: h for h in search.search("tests for the test client")}
+    assert "test file" not in by_path["tests/conftest.py"].why
+
+
+def test_find_is_a_content_word() -> None:
+    index = make_index(
+        [
+            sym("pkg/app.py", "App._find_error_handler", "method", start=1,
+                doc="Return a registered error handler for an exception."),
+            sym("pkg/app.py", "App.handle_exception", "method", start=10,
+                doc="Handle an exception that has no error handler."),
+        ]
+    )
+    hit = SearchIndex(index).search("How does the app find the error handler for an exception?")[0]
+    assert hit.symbol_id == "pkg/app.py::App._find_error_handler"
+
+
+def test_turkish_filler_is_dropped_so_the_identifier_is_the_whole_query() -> None:
+    index = make_index(
+        [sym("pkg/helpers.py", "abort"), sym("pkg/app.py", "App.make_aborter", "method", doc="Create the abort object.")]
+    )
+    hit = SearchIndex(index).search("`abort` fonksiyonu nerede tanımlı?")[0]
+    assert hit.symbol_id == "pkg/helpers.py::abort"
+    assert hit.why == "name match: abort; bm25: abort"
+
+
+def test_turkish_words_are_translated() -> None:
+    index = make_index(
+        [
+            sym("pkg/app.py", "App.register_blueprint", "method", doc="Register a blueprint on the application."),
+            sym("pkg/blueprints.py", "Blueprint", "class", doc="Represents a blueprint."),
+            sym("pkg/wrappers.py", "Request.blueprint", "method", doc="The name of the current blueprint."),
+        ]
+    )
+    hit = SearchIndex(index).search("Blueprint'ler uygulamaya nasıl kaydediliyor?")[0]
+    assert hit.symbol_id == "pkg/app.py::App.register_blueprint"
+    assert "kaydediliyor" in hit.why  # the Turkish word the name covers
+
+
+def test_words_in_the_index_are_never_translated() -> None:
+    index = make_index(
+        [
+            sym("pkg/config.py", "from_file", signature="def from_file(filename, silent=False)"),
+            sym("pkg/store.py", "delete_entry"),
+        ]
+    )
+    search = SearchIndex(index)
+    # "silent" starts with the Turkish stem "sil" (delete) but is an index word.
+    assert ids(search.search("silent")) == ["pkg/config.py::from_file"]
+    # "silinir" is not: it is translated to delete/remove.
+    assert search.search("kayıt nasıl silinir")[0].symbol_id == "pkg/store.py::delete_entry"
+
+
+def test_only_turkish_looking_queries_are_translated() -> None:
+    index = make_index(
+        [
+            sym("pkg/app.py", "App.route", "method", doc="Register a URL rule."),
+            sym("pkg/wrappers.py", "Request", "class", doc="The request object."),
+        ]
+    )
+    search = SearchIndex(index)
+    # An English query: "rotation" is not read as the Turkish "rota" (route).
+    assert search.search("image rotation") == []
+    # "nerede" marks the query as Turkish.
+    assert search.search("rota nerede")[0].symbol_id == "pkg/app.py::App.route"
+    # Softened final consonant: istek -> isteği.
+    assert search.search("isteği nerede")[0].symbol_id == "pkg/wrappers.py::Request"
+
+
+# --------------------------------------------------------------------------- #
 # Flask integration
 # --------------------------------------------------------------------------- #
 
@@ -280,6 +487,24 @@ def test_flask_route_decorator(flask_index: RepoIndex, query: str) -> None:
 def test_flask_dotted_identifier(flask_index: RepoIndex) -> None:
     hits = SearchIndex(flask_index).search("Flask.run", k=5)
     assert hits[0].symbol_id == "src/flask/app.py::Flask.run"
+
+
+@needs_flask
+@pytest.mark.parametrize(
+    "query, expected",
+    [
+        ("Which method loads the app config from a Python file?", "src/flask/config.py::Config.from_pyfile"),
+        ("Where is make_response implemented on the Flask application object?",
+         "src/flask/app.py::Flask.make_response"),
+        ("Where do I register cleanup code that should run on app context teardown?",
+         "src/flask/sansio/app.py::App.teardown_appcontext"),
+        ("Which class implements the test client?", "src/flask/testing.py::FlaskClient"),
+        ("`abort` fonksiyonu nerede tanımlı?", "src/flask/helpers.py::abort"),
+        ("Blueprint'ler uygulamaya nasıl kaydediliyor?", "src/flask/sansio/app.py::App.register_blueprint"),
+    ],
+)
+def test_flask_question_top_hit(flask_index: RepoIndex, query: str, expected: str) -> None:
+    assert SearchIndex(flask_index).search(query, k=1)[0].symbol_id == expected
 
 
 @needs_flask

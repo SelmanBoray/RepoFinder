@@ -111,13 +111,18 @@ the output.
 Tree-sitter parses every Python file into classes, functions, methods and
 imports, which are stored in a SQLite database together with an import graph
 (fan-in, fan-out, entry points). A question is answered by a lexical search
-(BM25 over symbol names, signatures, docstrings, paths and file summaries, with
-boosts for exact name matches) that returns the best symbols and files; their
-exact source lines become excerpts (whole functions and classes, long ones in
-windows of about 100 lines, the class header for methods), about 36,000
-characters in all. Claude answers from those excerpts only and cites
-`path:start-end`; the Sources list keeps only citations that fall inside the
-excerpts.
+(BM25 over symbol names, signatures, docstrings, paths and file summaries) that
+returns the best symbols and files. A symbol's name boost is scaled by how much
+of the question its name covers, so a common word that happens to be a name
+does not outrank the real answer; a method also gains when the question names
+its class. Words are matched through a light English stem and common
+identifier abbreviations ("python file" finds `from_pyfile`), and Turkish
+questions are supported by dropping Turkish filler words and translating the
+rest through a small lexicon. The selected symbols' exact source lines become
+excerpts (whole functions and classes, long ones in windows of about 100 lines,
+the class header for methods), about 36,000 characters in all. Claude answers
+from those excerpts only and cites `path:start-end`; the Sources list keeps
+only citations that fall inside the excerpts.
 
 ## Limitations
 
@@ -126,6 +131,9 @@ excerpts.
   the code (identifiers, docstrings, file names). If the answer looks wrong,
   `repofinder search` shows what was retrieved; rephrasing with the names you
   expect, or asking in English, usually helps.
+- Turkish support is limited to a small built-in lexicon of common code words;
+  Turkish written without Turkish letters ("nasil", "kaydediliyor" typed as
+  ASCII) only partly works.
 - The answer only knows the retrieved excerpts. It says so when they do not
   contain the answer, and suggests where to look next.
 - Two repositories with the same name share a data directory; opening one
