@@ -322,3 +322,41 @@ made on Flask: B's full boost only for a single identifier (a full boost for
 every identifier sends Flask q20 from 1 to 3, a share of 1/n of it to 2;
 requests has no question with several identifiers), and rejecting a "best form, not sum" BM25 variant for a
 word's synonyms (Flask hit@3 0.85 -> 0.81; not run on requests).
+
+## Jev rerank (2026-10-10)
+
+`jev_rerank.py` gives the top 8 candidates of search v3 to TypeSafe's Jev
+decision model (`~typesafe/jev-latest` through OpenRouter). One `choice`
+question picks the best candidate and the list is re-sorted by the returned
+probabilities. One call per question. Reports:
+`results/flask-jev-rerank-searchv3-d086db8-k8.json`,
+`results/requests-jev-rerank-searchv3-611c6162-k8.json`.
+
+Strict, search v3 -> Jev:
+
+| set | hit@1 | hit@3 | hit@8 | MRR |
+| --- | --- | --- | --- | --- |
+| Flask (27 answerable) | 0.67 -> 0.85 | 0.85 -> 0.89 | 0.89 -> 0.89 | 0.752 -> 0.870 |
+| Flask locate-feature (10) | 0.40 -> 0.70 | 0.70 -> 0.80 | 0.80 -> 0.80 | 0.548 -> 0.750 |
+| Flask flow (5) | 0.40 -> 0.80 | 0.80 -> 0.80 | 0.80 -> 0.80 | 0.567 -> 0.800 |
+| requests (17 answerable) | 0.59 -> 0.82 | 0.65 -> 0.82 | 0.82 -> 0.82 | 0.642 -> 0.824 |
+| requests locate-feature (6) | 0.33 -> 0.83 | 0.33 -> 0.83 | 0.83 -> 0.83 | 0.402 -> 0.833 |
+| requests flow (3) | 0.33 -> 0.33 | 0.33 -> 0.33 | 0.33 -> 0.33 | 0.333 -> 0.333 |
+
+hit@8 cannot change (the reranker never leaves the top 8), so the whole gain
+is ordering inside the top 8. requests was never tuned for Jev, so the gain
+carries over to a set it did not see.
+
+Cost and speed: Flask, 30 questions, $0.0041 in total (mean $0.00014 per
+question, ~3,150 input tokens; `usage.cost` came back 30/30); requests, 20
+questions, $0.0025. Mean 0.5 s per question (max 0.9 s). 50 of 50 calls
+succeeded.
+
+Limit: questions whose answer is not in the top 8 at all (Flask q15, q21, q23;
+requests q15, q17) did not change; those are the search's job.
+
+Run (`OPENROUTER_API_KEY` set; `--dry-run` works without a key):
+
+```
+.venv\Scripts\python -I eval\jev_rerank.py eval\golden\flask.json --source PATH
+```

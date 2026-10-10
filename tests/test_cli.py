@@ -324,6 +324,7 @@ def test_chat_json_lines(home: Path, fake: FakeBackend, chat_stub):
     assert turn["answer"].startswith("The engine runs in")
     assert turn["citations"] == [{"path": "mypkg/core.py", "start_line": 13, "end_line": 30}]
     assert turn["reused_context"] is False and turn["widened"] is False
+    assert "context_probability" in turn and turn["context_probability"] is None   # no follow-up check
     assert turn["usage"] == {"input_tokens": 1234, "output_tokens": 56, "cache_read_tokens": 7}
     assert turn["decisions"] == {"name": "rules", "calls": 0, "cost_usd": 0.0, "errors": []}
     assert turn["chunks"] and set(turn["chunks"][0]) == {"path", "start_line", "end_line", "label"}
@@ -331,6 +332,16 @@ def test_chat_json_lines(home: Path, fake: FakeBackend, chat_stub):
     assert route["command"] == "route" and route["route"] == "locate"
     assert context["command"] == "context" and context["question"] == "How does the engine run?"
     assert "you> " not in result.stdout and "you> " not in result.stderr   # piped: no prompt
+
+
+def test_chat_json_followup_reports_context_probability(home: Path, fake: FakeBackend, chat_stub):
+    chat_stub("locate", "followup")
+    result = _chat(home, "How does the engine run?\nand how often does it retry?\n", "--json")
+    assert result.exit_code == 0, result.output
+    first, second = (json.loads(line) for line in result.stdout.splitlines())
+    assert first["context_probability"] is None
+    assert second["route"] == "followup" and second["reused_context"] is True
+    assert second["context_probability"] == 0.8
 
 
 @pytest.mark.parametrize("tty", [False, True])

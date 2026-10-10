@@ -442,6 +442,7 @@ def _turn_payload(session: "ChatSession", result: "TurnResult") -> dict[str, Any
         "reused_context": result.reused_context,
         "widened": result.widened,
         "off_target": result.off_target,
+        "context_probability": result.context_probability,
         "chunks": _chunk_rows(result.chunks),
         "model": answer.model,
         "usage": {"input_tokens": answer.input_tokens, "output_tokens": answer.output_tokens,
