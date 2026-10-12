@@ -12,6 +12,7 @@ from typer.testing import CliRunner
 
 from repofinder import cli, pipeline, prompts
 from repofinder.backends import BackendUnavailable, Completion
+from repofinder.decisions import ENV_DECISIONS, OPENROUTER_KEY_ENV, TYPESAFE_KEY_ENV
 from repofinder.llm import LLM
 
 SAMPLE_REPO = Path(__file__).parent / "fixtures" / "sample_repo"
@@ -44,6 +45,18 @@ class NoBackendLLM(LLM):
     @property
     def backend_name(self) -> str:  # type: ignore[override]
         raise BackendUnavailable("RepoFinder needs access to Claude. Choose one of these options: ...")
+
+
+@pytest.fixture(autouse=True)
+def no_jev_key(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """No Jev key, no REPOFINDER_DECISIONS and no .env in the working directory:
+    the commands detect the local rules unless a test sets a key or replaces
+    ``cli._make_decisions``. Setting before deleting makes monkeypatch also
+    remove what a .env load adds."""
+    for name in (ENV_DECISIONS, OPENROUTER_KEY_ENV, TYPESAFE_KEY_ENV):
+        monkeypatch.setenv(name, "x")
+        monkeypatch.delenv(name)
+    monkeypatch.chdir(tmp_path)
 
 
 @pytest.fixture
@@ -423,7 +436,7 @@ def test_chat_decisions_config_error_exits_2(home: Path, monkeypatch: pytest.Mon
 # ask with a decision layer
 # --------------------------------------------------------------------------- #
 
-from repofinder.decisions import ENV_DECISIONS, NONE_LABEL, Choice, DecisionsConfigError, FakeDecisions  # noqa: E402
+from repofinder.decisions import NONE_LABEL, Choice, DecisionsConfigError, FakeDecisions  # noqa: E402
 
 RERANK_Q = "engine user model"   # search: User, User.Meta, models.py, Engine, ...
 
@@ -551,3 +564,121 @@ def test_ask_without_decisions_behaves_as_before(home: Path, fake: FakeBackend, 
     last = result.stdout.strip().splitlines()[-1]
     assert "decisions" not in last and "reranked" not in last and "off-target" not in last
     assert last.endswith("7 cache read")
+
+
+# --------------------------------------------------------------------------- #
+# search and status with a decision layer
+# --------------------------------------------------------------------------- #
+
+_RANK_LINE = re.compile(r"^\s*\d+\.\s+-?\d+\.\d\d\s+\w+\s+(\S+:\d+-\d+)\s+(\S+)(?:\s+p=(\d\.\d\d))?$")
+
+
+def _ranked(stdout: str) -> list[tuple[str, str, Optional[str]]]:
+    """``(path:start-end, name, p)`` of each ranked hit line printed by ``search``."""
+    return [m.groups() for m in map(_RANK_LINE.match, stdout.splitlines()) if m]
+
+
+def _index_order(home: Path, query: str, k: int) -> list[str]:
+    """``path:start-end`` of the raw index search hits, in search order."""
+    with pipeline.open_workspace(str(SAMPLE_REPO), data_dir=home) as ws:
+        return [f"{h.path}:{h.start_line}-{h.end_line}" for h in ws.search_index().search(query, k=k)]
+
+
+class _FakeJev(FakeDecisions):
+    """Scripted answers under Jev's name."""
+    name = "jev"
+
+
+def test_search_help_lists_the_decision_options():
+    result = _run("search", "--help")
+    assert result.exit_code == 0
+    for option in ("--decisions", "--candidates", "--top-k", "--data-dir"):
+        assert option in result.stdout
+
+
+def test_search_rules_keeps_the_index_order(home: Path):
+    result = _run("search", str(SAMPLE_REPO), RERANK_Q, "-k", "5", "--decisions", "rules", "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    ranked = _ranked(result.stdout)
+    assert [loc for loc, _name, _p in ranked] == _index_order(home, RERANK_Q, 5)
+    assert all(p is None for _loc, _name, p in ranked)
+    assert len(result.stdout.splitlines()) == 2 * 5               # two lines per hit, no decisions line
+    default = _run("search", str(SAMPLE_REPO), RERANK_Q, "-k", "5", "--data-dir", str(home))   # no key: rules
+    assert default.exit_code == 0, default.output
+    assert default.stdout == result.stdout
+
+
+def test_search_prints_the_reranked_order_and_the_decisions_line(home: Path, ask_decisions):
+    probs = {"A": 0.15, "B": 0.0, "C": 0.05, "D": 0.8, NONE_LABEL: 0.0}
+    decisions = _FakeJev(choices=[Choice("D", probs, 0.8, 0.00031, 400)])
+    preferred = ask_decisions(decisions)
+    result = _run("search", str(SAMPLE_REPO), RERANK_Q, "-k", "3", "--candidates", "4", "--decisions", "jev",
+                  "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    assert preferred == ["jev"]
+    assert len(decisions.calls) == 1 and len(decisions.calls[0].options) == 5   # four cards and NONE
+    searched = _index_order(home, RERANK_Q, 4)
+    ranked = _ranked(result.stdout)
+    assert [loc for loc, _name, _p in ranked] == [searched[i] for i in (3, 0, 2)]  # the pick, then by probability
+    assert ranked[0][1] == "Engine"
+    assert [p for _loc, _name, p in ranked] == ["0.80", "0.15", "0.05"]
+    assert result.stdout.splitlines()[-1] == "decisions: jev (1 call, $0.000310) · reranked"
+    assert result.stderr.count("Decision layer failed") == 0
+
+
+@pytest.mark.parametrize("script, note", [
+    ([NONE_LABEL], "decisions: jev (1 call, $0.000000) · off-target"),
+    ([], "decisions: jev (0 calls, $0.000000)"),                   # nothing scripted: the call fails
+])
+def test_search_keeps_the_index_order_when_jev_does_not_rerank(home: Path, ask_decisions, script: list[str],
+                                                               note: str):
+    ask_decisions(_FakeJev(choices=script))
+    result = _run("search", str(SAMPLE_REPO), RERANK_Q, "-k", "3", "--candidates", "4", "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    assert [loc for loc, _name, _p in _ranked(result.stdout)] == _index_order(home, RERANK_Q, 4)[:3]
+    assert result.stdout.splitlines()[-1] == note
+    assert ("Decision layer failed, the search order was kept: DecisionsError" in result.stderr) is (not script)
+
+
+def test_search_decisions_config_errors_exit_2(home: Path, ask_decisions):
+    class Rejected(_FakeJev):
+        def choose(self, state, instructions, options):
+            raise DecisionsConfigError("Jev rejected the API key (401)")
+
+    ask_decisions(Rejected())
+    result = _run("search", str(SAMPLE_REPO), RERANK_Q, "--data-dir", str(home))
+    assert result.exit_code == 2
+    assert "Jev rejected the API key (401)" in result.stderr and result.stdout == ""
+
+
+@pytest.mark.parametrize("env, expected", [
+    ({}, "rules (no OPENROUTER_API_KEY / TYPESAFE_API_KEY; set one in .env to enable Jev)"),
+    ({OPENROUTER_KEY_ENV: "sk-or-v1-test"}, "jev (OPENROUTER_API_KEY set)"),
+    ({TYPESAFE_KEY_ENV: "ts-test"}, "jev (TYPESAFE_API_KEY set)"),
+    ({OPENROUTER_KEY_ENV: "sk-or-v1-test", TYPESAFE_KEY_ENV: "ts-test"}, "jev (OPENROUTER_API_KEY set)"),
+    ({OPENROUTER_KEY_ENV: "sk-or-v1-test", ENV_DECISIONS: "rules"}, "rules (REPOFINDER_DECISIONS=rules)"),
+    ({ENV_DECISIONS: "bogus"}, "none (Unknown decisions backend 'bogus': use 'auto', 'jev', 'rules' or 'off'.)"),
+])
+def test_status_reports_the_decision_layer(home: Path, monkeypatch: pytest.MonkeyPatch, env: dict[str, str],
+                                           expected: str):
+    for name, value in env.items():
+        monkeypatch.setenv(name, value)
+    result = _run("status", str(SAMPLE_REPO), "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    assert re.search(rf"^Decisions\s+{re.escape(expected)}$", result.stdout, re.M), result.stdout
+
+
+def test_status_reads_the_key_from_a_dotenv_file(home: Path, tmp_path: Path):
+    (tmp_path / ".env").write_text("OPENROUTER_API_KEY=sk-or-v1-dotenv\n", encoding="utf-8")   # cwd is tmp_path
+    result = _run("status", str(SAMPLE_REPO), "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    assert re.search(r"^Decisions\s+jev \(OPENROUTER_API_KEY set\)$", result.stdout, re.M), result.stdout
+
+
+def test_status_with_a_key_but_a_broken_sdk(home: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv(OPENROUTER_KEY_ENV, "sk-or-v1-test")
+    monkeypatch.setitem(sys.modules, "typesafe_sdk", None)          # makes `import typesafe_sdk` fail
+    result = _run("status", str(SAMPLE_REPO), "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    assert re.search(r"^Decisions\s+rules \(OPENROUTER_API_KEY is set, but typesafe-sdk could not be imported;"
+                     r" reinstall RepoFinder\)$", result.stdout, re.M), result.stdout

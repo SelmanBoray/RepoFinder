@@ -725,8 +725,8 @@ def main(argv: Optional[list[str]] = None, client: Any = None) -> int:
             print(f"error: {exc}", file=sys.stderr)
             return 1
         except ImportError as exc:
-            print(f"error: typesafe-sdk is not installed ({exc});"
-                  r" run .venv\Scripts\pip install typesafe-sdk, or use --dry-run", file=sys.stderr)
+            print(f"error: typesafe-sdk could not be imported ({exc});"
+                  " typesafe-sdk is installed with RepoFinder; reinstall RepoFinder, or use --dry-run", file=sys.stderr)
             return 1
         print(f"jev: route={route} model={model}", file=sys.stderr)
 

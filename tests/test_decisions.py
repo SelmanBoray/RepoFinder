@@ -622,7 +622,8 @@ def test_jev_without_a_key_explains_the_setup(clean_env: pytest.MonkeyPatch,
     with pytest.raises(DecisionsConfigError) as info:
         JevDecisions().choose("s", "pick", {"a": "A"})
     message = str(info.value)
-    assert "OPENROUTER_API_KEY" in message and "TYPESAFE_API_KEY" in message and "pip install" in message
+    assert "OPENROUTER_API_KEY" in message and "TYPESAFE_API_KEY" in message and ".env" in message
+    assert "pip install" not in message                                # the sdk is a core dependency now
     assert fake_sdk == []
 
 
@@ -631,7 +632,7 @@ def test_jev_without_the_sdk_explains_the_install(clean_env: pytest.MonkeyPatch)
     clean_env.setenv(dec.OPENROUTER_KEY_ENV, "sk-or-v1-abc")
     with pytest.raises(DecisionsConfigError, match="typesafe-sdk is not installed") as info:
         JevDecisions().choose("s", "pick", {"a": "A"})
-    assert 'pip install "repofinder[jev]"' in str(info.value)
+    assert "reinstall RepoFinder" in str(info.value) and "[jev]" not in str(info.value)
 
 
 def test_jev_client_creation_errors_are_config_errors(clean_env: pytest.MonkeyPatch,
@@ -706,7 +707,7 @@ def test_detect_decisions_jev_without_a_key(clean_env: pytest.MonkeyPatch) -> No
     message = str(info.value)
     assert "REPOFINDER_DECISIONS=jev" in message
     assert "neither OPENROUTER_API_KEY nor TYPESAFE_API_KEY is set" in message
-    assert "pip install" in message
+    assert ".env" in message and "pip install" not in message
 
 
 def test_detect_decisions_jev_without_the_sdk(clean_env: pytest.MonkeyPatch) -> None:

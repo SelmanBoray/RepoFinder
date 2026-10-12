@@ -14,7 +14,7 @@ Three backends implement :class:`Decisions`:
   heuristics, no network, no cost. It never answers ``outside`` (rules cannot
   know what a repository delegates elsewhere) and never reorders search hits.
 * :class:`JevDecisions`: TypeSafe's "System One" model Jev, through the
-  optional ``typesafe-sdk`` package (``pip install "repofinder[jev]"``). Jev
+  ``typesafe-sdk`` package (a RepoFinder dependency, installed with it). Jev
   returns typed answers (a choice with per-option probabilities, a yes/no
   probability), not text. Input costs about $0.042 per million tokens, output
   is free, and one request (state plus questions) must fit in 32k tokens.
@@ -105,18 +105,24 @@ SUFFICES_YES = 0.8
 SUFFICES_NO = 0.3
 
 JEV_SETUP_HELP = """\
-Jev (TypeSafe's decision model) can make RepoFinder's chat decisions. It needs:
+Jev (TypeSafe's decision model) can make RepoFinder's decisions: it reranks the search hits
+of ask and search, and routes chat messages. It needs an API key, one of
 
-  1. The typesafe-sdk package:   pip install "repofinder[jev]"   (or: pip install typesafe-sdk)
-  2. An API key, one of
-       OPENROUTER_API_KEY=sk-or-...   through OpenRouter (model ~typesafe/jev-latest)
-       TYPESAFE_API_KEY=...           TypeSafe's own API (api.typesafe.ai)
-     in the environment or in a .env file in the directory you run RepoFinder from.
+  OPENROUTER_API_KEY=sk-or-...   through OpenRouter (model ~typesafe/jev-latest)
+  TYPESAFE_API_KEY=...           TypeSafe's own API (api.typesafe.ai)
 
-By default (REPOFINDER_DECISIONS unset or "auto") Jev is used when a key and the sdk are
-present, and the built-in rules otherwise. Set REPOFINDER_DECISIONS=rules (or off) to force
-the rules, which need neither, even with a key present; REPOFINDER_DECISIONS=jev requires
-Jev and fails when the key or the sdk is missing."""
+in the environment or in a .env file in the directory you run RepoFinder from.
+
+By default (REPOFINDER_DECISIONS unset or "auto") Jev is used when a key is set, and the
+built-in rules otherwise. Set REPOFINDER_DECISIONS=rules (or off) to force the rules, which
+need no key, even with a key present; REPOFINDER_DECISIONS=jev requires Jev and fails when
+no key is set."""
+
+# typesafe-sdk is a core dependency, but a broken installation is still possible.
+SDK_REINSTALL_HELP = (
+    "typesafe-sdk is a RepoFinder dependency, so the installation looks broken: reinstall RepoFinder"
+    ' (pip install -e . in its checkout) or run: pip install "typesafe-sdk>=0.7,<1"'
+)
 
 ROUTE_INSTRUCTIONS = (
     "Classify the new user message in this conversation with RepoFinder, an assistant that answers"
@@ -662,7 +668,7 @@ def _import_sdk() -> Any:
     try:
         import typesafe_sdk
     except ImportError as exc:
-        raise DecisionsConfigError(f"typesafe-sdk is not installed ({exc}).\n\n" + JEV_SETUP_HELP) from exc
+        raise DecisionsConfigError(f"typesafe-sdk is not installed ({exc}). {SDK_REINSTALL_HELP}.") from exc
     return typesafe_sdk
 
 

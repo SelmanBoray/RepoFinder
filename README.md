@@ -23,7 +23,8 @@ activate the environment or call it by that path.
 
 ## LLM access: two options
 
-`index`, `map` and `search` work offline. `ask`, `chat` and `summarize` need Claude,
+`index`, `map` and `search` work offline (unless Jev is set up, in which case `search`
+makes one Jev call to rerank; see the Decisions section). `ask`, `chat` and `summarize` need Claude,
 which RepoFinder can reach in two ways. Pick one.
 
 **A. Anthropic API key** (pay as you go). Create a key at
@@ -66,25 +67,25 @@ hit answers the question. Built-in English and Turkish rules can make these
 decisions, offline and free; the rules never reorder search results.
 TypeSafe's Jev model, which returns typed choices with probabilities rather
 than text, makes them when it is set up, and it is what you get by default once
-it is:
+it is. The Jev SDK (`typesafe-sdk`) ships with RepoFinder, so only an API
+key is needed:
 
 ```powershell
-.venv\Scripts\python -m pip install -e ".[jev]"     # installs typesafe-sdk
 $env:OPENROUTER_API_KEY = "sk-or-..."               # through OpenRouter, or
 $env:TYPESAFE_API_KEY = "..."                       # through TypeSafe's own API
 $env:REPOFINDER_DECISIONS = "auto"                  # optional; see below
 ```
 
 `REPOFINDER_DECISIONS` unset (or `auto`) uses Jev when `OPENROUTER_API_KEY` (or
-`TYPESAFE_API_KEY`) is set and `typesafe-sdk` is installed, and otherwise the
-built-in rules, silently. `rules` (or `off`) forces the rules even with a key;
-`jev` requires Jev. This applies to both `ask` and `chat`.
+`TYPESAFE_API_KEY`) is set, and otherwise the built-in
+rules, silently. `rules` (or `off`) forces the rules even with a key;
+`jev` requires Jev. This applies to `ask`, `chat` and `search`.
 
 The keys can also go in the `.env` file. When both are set, the OpenRouter key
 is used (model `~typesafe/jev-latest`). Jev bills input only (about $0.042 per
 million tokens; output is free), and each request is kept under its 32k-token
-context. Forcing `REPOFINDER_DECISIONS=jev` without a key or without `typesafe-sdk` is
-a configuration error that prints these setup steps.
+context. Forcing `REPOFINDER_DECISIONS=jev` without a key is a configuration
+error that prints these setup steps.
 
 ## Quick start (Flask)
 
@@ -129,8 +130,8 @@ one model call per file (about 80 for Flask), so try `--limit 10` first.
 | `repofinder ask <source> "question" [-k N] [--show-context] [--decisions jev\|rules] [--candidates N] [--json]` | Answer with citations. `-k` sets how many search hits become context (default 8); `--show-context` lists the excerpts sent to Claude; `--decisions` picks the decision layer for this run (default: Jev when set up, else the rules); with Jev, one call reranks the first `--candidates` hits (default 16, at most 16) before the top `-k` become context; `--json` prints `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage`, `elapsed_s`, `decisions` (`name`, `calls`, `cost_usd`, `reranked`, `off_target`, `error`), `candidates` and `probabilities` (`path:start-end` to p). |
 | `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | A conversation about the code, one message per line from stdin (see [Chat mode](#chat-mode)). `-k` sets the search hits per search (default 8); `--decisions` picks the decision layer for this run. `/context` lists the excerpts of the last search, `/route` shows how the last message was routed, `/help` lists the commands, `/quit` or the end of input leaves. `--json` prints one JSON object per line for every turn (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). The `you>` prompt is shown only when you type in a terminal, so piped output stays clean. |
 | `repofinder summarize <source> [--limit N] [--all]` | Per-file summaries, then the repository overview. Only files without a summary are done unless `--all`. Stops after 3 failures in a row (usually a usage limit); finished work is kept. |
-| `repofinder status <source>` | Counts of files, symbols and imports, summaries, overview present, files changed since indexing, LLM backend, data directory. |
-| `repofinder search <source> "query" [-k N]` | The raw search hits with their scores and why they matched. No LLM; useful when an answer misses something. |
+| `repofinder status <source>` | Counts of files, symbols and imports, summaries, overview present, files changed since indexing, LLM backend, decision layer, data directory. The `Decisions` line reads `jev (OPENROUTER_API_KEY set)`, or `rules (no OPENROUTER_API_KEY / TYPESAFE_API_KEY; set one in .env to enable Jev)`, with variants for `REPOFINDER_DECISIONS=rules` and for an SDK import failure. |
+| `repofinder search <source> "query" [-k N] [--decisions jev\|rules] [--candidates N]` | The search hits with their scores and why they matched, in Jev's order when Jev is the decision layer (no answer; useful when an answer misses something). With Jev, it searches `max(-k, --candidates)` hits (`--candidates` default 16), reranks the first `--candidates` in one call, prints the top `-k` in Jev's order with a probability such as `p=0.80` after each card shown to Jev, and ends with a line like `decisions: jev (1 call, $0.000165) · reranked`. With the rules (no key) the output is the plain search hits and no such line is printed. |
 
 Every command accepts `--data-dir PATH`. Indexes live in `~/.repofinder` by
 default (or in `$REPOFINDER_HOME`): `repos/<name>/index.db`, plus

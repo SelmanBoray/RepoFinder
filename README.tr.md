@@ -23,7 +23,8 @@ etkinleştirin ya da komutu bu yolla çağırın.
 
 ## LLM erişimi: iki seçenek
 
-`index`, `map` ve `search` çevrimdışı çalışır. `ask`, `chat` ve `summarize` ise
+`index`, `map` ve `search` çevrimdışı çalışır (Jev kurulmuşsa `search`, yeniden sıralamak
+için bir Jev çağrısı yapar; bkz. Kararlar bölümü). `ask`, `chat` ve `summarize` ise
 Claude'a ihtiyaç duyar; RepoFinder Claude'a iki yolla ulaşabilir. Birini seçin.
 
 **A. Anthropic API anahtarı** (kullandıkça öde). <https://console.anthropic.com>
@@ -67,26 +68,26 @@ yerleşik İngilizce ve Türkçe kurallar çevrimdışı ve ücretsiz olarak ver
 kurallar arama sonuçlarının sırasını asla değiştirmez. Metin yerine
 olasılıklarla birlikte tipli seçenekler döndüren TypeSafe'in Jev modeli de
 kurulduğunda bu kararları verir; kurulduktan sonra varsayılan olarak Jev
-kullanılır:
+kullanılır. Jev SDK'sı (`typesafe-sdk`) RepoFinder ile birlikte gelir; yalnızca
+bir API anahtarı gerekir:
 
 ```powershell
-.venv\Scripts\python -m pip install -e ".[jev]"     # typesafe-sdk paketini kurar
 $env:OPENROUTER_API_KEY = "sk-or-..."               # OpenRouter üzerinden ya da
 $env:TYPESAFE_API_KEY = "..."                       # TypeSafe'in kendi API'si üzerinden
 $env:REPOFINDER_DECISIONS = "auto"                  # isteğe bağlı; aşağıya bakın
 ```
 
 `REPOFINDER_DECISIONS` ayarlanmamışsa (ya da `auto` ise), `OPENROUTER_API_KEY`
-(ya da `TYPESAFE_API_KEY`) ayarlı ve `typesafe-sdk` kuruluysa Jev, değilse
+(ya da `TYPESAFE_API_KEY`) ayarlıysa Jev, değilse
 sessizce yerleşik kurallar kullanılır. `rules` (ya da `off`) anahtar olsa bile
-kuralları zorlar; `jev` ise Jev'i zorunlu kılar. Bu hem `ask` hem `chat` için
+kuralları zorlar; `jev` ise Jev'i zorunlu kılar. Bu `ask`, `chat` ve `search` için
 geçerlidir.
 
 Anahtarlar `.env` dosyasına da yazılabilir. İkisi birden ayarlıysa OpenRouter
 anahtarı kullanılır (model `~typesafe/jev-latest`). Jev yalnızca girdiyi
 ücretlendirir (milyon token başına yaklaşık $0.042; çıktı ücretsizdir) ve her
-istek modelin 32k token'lık bağlamının altında tutulur. Anahtar ya da
-`typesafe-sdk` olmadan `REPOFINDER_DECISIONS=jev` zorlamak bir yapılandırma
+istek modelin 32k token'lık bağlamının altında tutulur. Anahtar olmadan
+`REPOFINDER_DECISIONS=jev` zorlamak bir yapılandırma
 hatasıdır ve bu kurulum adımlarını yazdırır.
 
 ## Hızlı başlangıç (Flask)
@@ -134,8 +135,8 @@ yaklaşık 80), bu yüzden önce `--limit 10` ile deneyin.
 | `repofinder ask <source> "question" [-k N] [--show-context] [--decisions jev\|rules] [--candidates N] [--json]` | Alıntılarla yanıt verir. `-k` kaç arama sonucunun bağlama gireceğini belirler (varsayılan 8); `--show-context` Claude'a gönderilen kesitleri listeler; `--decisions` bu çalıştırma için karar katmanını seçer (varsayılan: kuruluysa Jev, değilse kurallar); Jev ile, en üstteki `-k` sonuç bağlama girmeden önce tek bir çağrı ilk `--candidates` sonucu yeniden sıralar (varsayılan 16, en fazla 16); `--json` şunları yazdırır: `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage`, `elapsed_s`, `decisions` (`name`, `calls`, `cost_usd`, `reranked`, `off_target`, `error`), `candidates` ve `probabilities` (`path:start-end`'den p'ye). |
 | `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | Kod hakkında bir sohbet; stdin'den her satırda bir mesaj okunur (bkz. [Sohbet modu](#sohbet-modu)). `-k` arama başına sonuç sayısını belirler (varsayılan 8); `--decisions` bu çalıştırma için karar katmanını seçer. `/context` son aramanın kesitlerini listeler, `/route` son mesajın nasıl yönlendirildiğini gösterir, `/help` komutları listeler, `/quit` ya da girdinin sonu sohbetten çıkarır. `--json` her tur için satır başına bir JSON nesnesi yazdırır (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). `you>` istemi yalnızca terminalde yazarken gösterilir; böylece pipe ile aktarılan çıktı temiz kalır. |
 | `repofinder summarize <source> [--limit N] [--all]` | Önce dosya başına özetler, ardından deponun genel bakışı. `--all` verilmedikçe yalnızca özeti olmayan dosyalar işlenir. Art arda 3 hatadan sonra durur (genellikle bir kullanım limiti); tamamlanan iş korunur. |
-| `repofinder status <source>` | Dosya, sembol ve import sayıları, özetler, genel bakışın olup olmadığı, indekslemeden bu yana değişen dosyalar, LLM backend'i, veri dizini. |
-| `repofinder search <source> "query" [-k N]` | Ham arama sonuçları, puanları ve neden eşleştikleriyle birlikte. LLM kullanmaz; bir yanıt bir şeyi kaçırdığında işe yarar. |
+| `repofinder status <source>` | Dosya, sembol ve import sayıları, özetler, genel bakışın olup olmadığı, indekslemeden bu yana değişen dosyalar, LLM backend'i, karar katmanı, veri dizini. `Decisions` satırı `jev (OPENROUTER_API_KEY set)` ya da `rules (no OPENROUTER_API_KEY / TYPESAFE_API_KEY; set one in .env to enable Jev)` olarak görünür; `REPOFINDER_DECISIONS=rules` ayarı ve SDK import hatası için ayrı varyantlar vardır. |
+| `repofinder search <source> "query" [-k N] [--decisions jev\|rules] [--candidates N]` | Arama sonuçları, puanları ve neden eşleştikleriyle birlikte; karar katmanı Jev ise Jev'in sırasıyla (yanıt yok; bir yanıt bir şeyi kaçırdığında işe yarar). Jev ile `max(-k, --candidates)` sonuç aranır (`--candidates` varsayılanı 16), ilk `--candidates` tanesi tek çağrıda yeniden sıralanır, ilk `-k` Jev'in sırasıyla yazdırılır, Jev'e gösterilen her kartın ardından `p=0.80` gibi bir olasılık gelir ve son satır `decisions: jev (1 call, $0.000165) · reranked` biçimindedir. Kurallarla (anahtar yok) çıktı düz arama sonuçlarıdır ve böyle bir satır yazdırılmaz. |
 
 Her komut `--data-dir PATH` kabul eder. İndeksler varsayılan olarak
 `~/.repofinder` altında (ya da `$REPOFINDER_HOME` içinde) tutulur:

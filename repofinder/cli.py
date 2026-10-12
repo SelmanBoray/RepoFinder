@@ -9,6 +9,7 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
+import os
 import re
 import sys
 import time
@@ -59,7 +60,7 @@ def _make_llm() -> LLM:
 
 
 def _make_decisions(preferred: Optional[str]) -> Any:
-    """The decision layer used by ``ask`` and ``chat`` (tests replace this)."""
+    """The decision layer used by ``ask``, ``chat``, ``search`` and ``status`` (tests replace this)."""
     from . import decisions
 
     return decisions.detect_decisions(preferred)
@@ -161,18 +162,25 @@ def _print_sources(out: Console, citations: list[Citation]) -> None:
         out.print("  (the answer cites no lines from the excerpts)", markup=False)
 
 
-def _decisions_suffix(name: str, result: "pipeline.AskResult") -> str:
-    """`` · decisions: <name> (<n> calls, $<cost>)`` plus `` · reranked`` or
-    `` · off-target``, for a decision layer that is not local; else ""."""
+def _decisions_note(name: str, result: Any) -> str:
+    """``decisions: <name> (<n> calls, $<cost>)`` plus `` · reranked`` or
+    `` · off-target``, for a decision layer that is not local; else "".
+    ``result`` is a ``pipeline.AskResult`` or a ``pipeline.Retrieval``."""
     if name in pipeline.LOCAL_DECISIONS:
         return ""
     calls = result.decision_calls
-    text = f" · decisions: {name} ({calls} call{'' if calls == 1 else 's'}, ${result.decision_cost_usd:.6f})"
+    text = f"decisions: {name} ({calls} call{'' if calls == 1 else 's'}, ${result.decision_cost_usd:.6f})"
     if result.reranked:
         text += " · reranked"
     elif result.off_target:
         text += " · off-target"
     return text
+
+
+def _decisions_suffix(name: str, result: Any) -> str:
+    """`` · `` and :func:`_decisions_note` (for the end of a usage line), or ""."""
+    note = _decisions_note(name, result)
+    return f" · {note}" if note else ""
 
 
 def _usage_line(llm: LLM, elapsed_s: Optional[float] = None) -> str:
@@ -577,9 +585,38 @@ def summarize(
             raise typer.Exit(1)
 
 
+def _first_line(exc: BaseException) -> str:
+    lines = str(exc).strip().splitlines()
+    return lines[0] if lines else type(exc).__name__
+
+
+def _decisions_status() -> str:
+    """The ``Decisions`` row of ``status``: the layer ``ask``, ``chat`` and
+    ``search`` use without ``--decisions``, and why. A configuration error
+    (e.g. an unknown ``REPOFINDER_DECISIONS``) is shown, not raised."""
+    from . import decisions as dec
+
+    try:
+        layer = _make_decisions(None)
+    except dec.DecisionsError as exc:
+        return f"none ({_first_line(exc)})"
+    name = str(getattr(layer, "name", "unknown"))
+    keys = [env for env in (dec.OPENROUTER_KEY_ENV, dec.TYPESAFE_KEY_ENV) if (os.environ.get(env) or "").strip()]
+    if name == dec.DECISIONS_JEV:
+        return f"jev ({keys[0]} set)" if keys else name
+    if name not in pipeline.LOCAL_DECISIONS:
+        return name
+    if not keys:
+        return f"rules (no {dec.OPENROUTER_KEY_ENV} / {dec.TYPESAFE_KEY_ENV}; set one in .env to enable Jev)"
+    forced = (os.environ.get(dec.ENV_DECISIONS) or "").strip()
+    if forced.lower() in pipeline.LOCAL_DECISIONS:
+        return f"rules ({dec.ENV_DECISIONS}={forced})"
+    return f"rules ({keys[0]} is set, but typesafe-sdk could not be imported; reinstall RepoFinder)"
+
+
 @app.command()
 def status(source: SourceArg, data_dir: DataDirOpt = None) -> None:
-    """Show what is indexed and summarized, and which LLM backend would be used."""
+    """Show what is indexed and summarized, and which LLM backend and decision layer would be used."""
     with _errors():
         with _open(source, data_dir) as ws:
             n_files = len(ws.index.files)
@@ -594,6 +631,7 @@ def status(source: SourceArg, data_dir: DataDirOpt = None) -> None:
             backend = LLM().backend_name
         except LLMConfigError as exc:
             backend = f"none ({str(exc).splitlines()[0]})"
+        decisions = _decisions_status()
 
     rows = [
         ("Repository", name),
@@ -606,6 +644,7 @@ def status(source: SourceArg, data_dir: DataDirOpt = None) -> None:
         ("Summaries", f"{usable} of {_plural(n_files, 'file')}" + (f" ({failed} failed)" if failed else "")),
         ("Overview", "yes" if overview else "no (run `repofinder summarize`)"),
         ("Backend", backend),
+        ("Decisions", decisions),
     ]
     out = _out()
     width = max(len(label) for label, _ in rows)
@@ -618,22 +657,41 @@ def search(
     source: SourceArg,
     query: Annotated[str, typer.Argument(help="Search words or a question.")],
     k: Annotated[int, typer.Option("-k", "--top-k", min=1, help="Number of hits.")] = 10,
+    decisions_name: Annotated[Optional[str], typer.Option(
+        "--decisions", help="Decision layer: jev or rules (default: $REPOFINDER_DECISIONS, else detected).",
+    )] = None,
+    candidates: Annotated[int, typer.Option(
+        "--candidates", min=1, help="Search hits shown to the decision layer before the top-k are kept",
+    )] = pipeline.DEFAULT_CANDIDATES,
     data_dir: DataDirOpt = None,
 ) -> None:
-    """Show the raw search hits for a query (no LLM; for debugging retrieval)."""
+    """Show the search hits for a query, in Jev's order when Jev is the decision layer (no answer; for debugging)."""
     with _errors():
+        decisions = _make_decisions(decisions_name)
+        decisions_label = str(getattr(decisions, "name", "unknown"))
         with _open(source, data_dir) as ws:
-            hits = ws.search_index().search(query, k=k)
+            busy = (contextlib.nullcontext() if decisions_label in pipeline.LOCAL_DECISIONS
+                    else _err().status("Searching and reranking…", spinner="dots"))
+            with busy:
+                found = pipeline.rerank_retrieve(ws, query, k=k, decisions=decisions, candidates=candidates)
+    if found.decision_error:
+        _err().print(f"Decision layer failed, the search order was kept: {found.decision_error}",
+                     markup=False, style="yellow")
     out = _out()
+    hits = found.hits[:k]          # a reranking layer searched max(k, candidates) hits
     if not hits:
         out.print("No hits.", markup=False)
-        return
     width = len(str(len(hits)))
     for rank, hit in enumerate(hits, start=1):
         name = hit.symbol_id.split("::", 1)[-1] if hit.symbol_id else "(file)"
-        out.print(f"{rank:>{width}}. {hit.score:7.2f}  {hit.kind:<6}  {hit.path}:{hit.start_line}-{hit.end_line}"
-                  f"  {name}", markup=False)
+        location = f"{hit.path}:{hit.start_line}-{hit.end_line}"
+        p = found.probabilities.get(location)     # only hits shown to a non-local layer have one
+        out.print(f"{rank:>{width}}. {hit.score:7.2f}  {hit.kind:<6}  {location}  {name}"
+                  + (f"  p={p:.2f}" if p is not None else ""), markup=False)
         out.print(f"{'':>{width}}  {'':7}  {hit.why}", markup=False, style="dim")
+    note = _decisions_note(decisions_label, found)
+    if note:
+        out.print(note, markup=False, style="dim")
 
 
 def main() -> None:
