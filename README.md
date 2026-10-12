@@ -1,4 +1,5 @@
 # RepoFinder
+*[Türkçe](README.tr.md)*
 
 RepoFinder helps you find your way around a large open-source project before
 you contribute to it. Give it a GitHub repository and it draws an architecture
