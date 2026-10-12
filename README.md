@@ -241,4 +241,4 @@ Notes for contributors:
 
 ## License
 
-MIT © Selman Boray Asiltürk (license file to be added).
+MIT © Selman Boray Asiltürk, see [LICENSE](LICENSE).
