@@ -120,13 +120,33 @@ class StubPipeline:
             raise RuntimeError("boom")
         return self.retrieval.get(question, ([], []))
 
-    def ask(self, ws: str, question: str, k: int = 8) -> SimpleNamespace:
-        self.calls.append(("ask", ws, question, k))
+    DEFAULT_CANDIDATES = 16
+
+    def _decision_fields(self, question: str) -> dict[str, Any]:
+        return dict(self.decision_fields.get(question, {}))
+
+    decision_fields: dict[str, dict[str, Any]] = {}
+
+    def rerank_retrieve(self, ws: str, question: str, k: int = 8, decisions: Any = None,
+                        candidates: int = 16) -> SimpleNamespace:
+        self.calls.append(("rerank_retrieve", ws, question, k, decisions, candidates))
         if question in self.fail:
             raise RuntimeError("boom")
         chunks, hits = self.retrieval.get(question, ([], []))
+        return SimpleNamespace(chunks=chunks, hits=hits, **self._decision_fields(question))
+
+    def ask(self, ws: str, question: str, k: int = 8, decisions: Any = None,
+            candidates: Optional[int] = None) -> SimpleNamespace:
+        if decisions is None and candidates is None:
+            self.calls.append(("ask", ws, question, k))
+        else:
+            self.calls.append(("ask", ws, question, k, decisions, candidates))
+        if question in self.fail:
+            raise RuntimeError("boom")
+        chunks, hits = self.retrieval.get(question, ([], []))
+        extra = self._decision_fields(question) if decisions is not None else {}
         return SimpleNamespace(answer=self.answers.get(question, answer("", [])),
-                               hits=hits, chunks=chunks, elapsed_s=0.25)
+                               hits=hits, chunks=chunks, elapsed_s=0.25, **extra)
 
 
 # --------------------------------------------------------------------------- #
@@ -502,6 +522,140 @@ def test_render_markdown_table_and_summary():
     assert "| q1 | locate-symbol | en | 1 | 1 | 1 | 1 | 0 |" in md
     assert "admit=1 ptr_cited=1" in md
     assert "MRR" in md and "category: flow" in md and "lang: tr" in md
+
+
+# --------------------------------------------------------------------------- #
+# Decision layer (Jev rerank)
+# --------------------------------------------------------------------------- #
+
+def _decision_stub() -> tuple[dict, StubPipeline]:
+    g, stub = _stub_golden()
+    stub.decision_fields = {
+        "Where is run?": dict(reranked=True, off_target=False, decision_calls=1,
+                              decision_cost_usd=0.000004, decision_error=None),
+        "How does a request flow?": dict(reranked=False, off_target=True, decision_calls=1,
+                                         decision_cost_usd=0.000006, decision_error=None),
+        "How is URL matching done?": dict(reranked=False, off_target=False, decision_calls=0,
+                                          decision_cost_usd=0.0, decision_error="DecisionsError: x"),
+    }
+    return g, stub
+
+
+def test_decisions_retrieval_mode_calls_rerank_retrieve():
+    from repofinder.decisions import FakeDecisions
+
+    g, stub = _decision_stub()
+    dec = FakeDecisions()
+    report = run_eval.run_eval(g, "SRC", "retrieval", 5, stub, decisions=dec, candidates=12)
+    calls = stub.calls[1:]
+    assert [c[0] for c in calls] == ["rerank_retrieve"] * 3
+    assert all(c[3] == 5 and c[4] is dec and c[5] == 12 for c in calls)
+    rows = {r["id"]: r for r in report["questions"]}
+    assert rows["q1"]["retrieval"]["hit@1"] is True
+    assert rows["q1"]["decision"] == {"calls": 1, "cost_usd": 0.000004, "reranked": True,
+                                      "off_target": False, "error": None}
+    assert report["meta"]["decisions"] == "fake" and report["meta"]["candidates"] == 12
+
+
+def test_decisions_candidates_default_comes_from_the_pipeline():
+    from repofinder.decisions import FakeDecisions
+
+    g, stub = _decision_stub()
+    stub.DEFAULT_CANDIDATES = 7
+    report = run_eval.run_eval(g, "SRC", "retrieval", 5, stub, decisions=FakeDecisions())
+    assert all(c[5] == 7 for c in stub.calls[1:]) and report["meta"]["candidates"] == 7
+
+
+def test_decisions_both_mode_passes_them_to_ask():
+    from repofinder.decisions import FakeDecisions
+
+    g, stub = _decision_stub()
+    dec = FakeDecisions()
+    report = run_eval.run_eval(g, "SRC", "both", 8, stub, decisions=dec, candidates=9)
+    calls = stub.calls[1:]
+    assert [c[0] for c in calls] == ["ask"] * 3
+    assert all(c[4] is dec and c[5] == 9 for c in calls)
+    rows = {r["id"]: r for r in report["questions"]}
+    assert rows["q2"]["decision"]["off_target"] is True
+    assert rows["q3"]["decision"]["error"] == "DecisionsError: x"
+    assert rows["q1"]["answer"]["cited_correct"] is True and rows["q1"]["retrieval"]["hit@1"] is True
+
+
+def test_decisions_summary_sums_and_counts():
+    from repofinder.decisions import FakeDecisions
+
+    g, stub = _decision_stub()
+    report = run_eval.run_eval(g, "SRC", "retrieval", 8, stub, decisions=FakeDecisions())
+    s = report["summary"]["overall"]
+    assert s["decision_calls"] == 2 and s["decision_cost_usd"] == pytest.approx(0.00001)
+    assert (s["reranked"], s["off_target"], s["decision_errors"]) == (1, 1, 1)
+    assert report["summary"]["by_category"]["flow"]["off_target"] == 1
+    md = run_eval.render_markdown(report)
+    assert "decisions: fake, 2 calls, $1e-05, reranked 1/3, off-target 1, errors 1" in md
+
+
+def test_decisions_failing_question_still_gets_a_decision_block():
+    from repofinder.decisions import FakeDecisions
+
+    g, stub = _decision_stub()
+    stub.fail = frozenset({"Where is run?"})
+    report = run_eval.run_eval(g, "SRC", "retrieval", 8, stub, decisions=FakeDecisions())
+    row = report["questions"][0]
+    assert row["error"] == "RuntimeError: boom" and row["decision"]["error"] == row["error"]
+
+
+def test_short_status_marks_the_decision_outcome():
+    import io
+
+    from repofinder.decisions import FakeDecisions
+
+    g, stub = _decision_stub()
+    log = io.StringIO()
+    run_eval.run_eval(g, "SRC", "retrieval", 8, stub, decisions=FakeDecisions(), log=log)
+    lines = log.getvalue().splitlines()
+    assert lines[0].endswith("[rerank]") and lines[1].endswith("[none]") and lines[2].endswith("[dec-err]")
+
+
+def test_without_decisions_nothing_changes():
+    g, stub = _decision_stub()
+    report = run_eval.run_eval(g, "SRC", "retrieval", 5, stub)
+    assert [c for c in stub.calls[1:]] == [("retrieve", "WS", q["question"], 5) for q in g["questions"]]
+    assert all("decision" not in r for r in report["questions"])
+    assert "decisions" not in report["meta"] and "decision_calls" not in report["summary"]["overall"]
+    assert "decisions:" not in run_eval.render_markdown(report)
+    stub.calls.clear()
+    run_eval.run_eval(g, "SRC", "both", 5, stub)
+    assert all(c == ("ask", "WS", c[2], 5) for c in stub.calls[1:])
+
+
+def test_main_decisions_and_candidates_flags(tmp_path, monkeypatch):
+    import repofinder.decisions as decisions_mod
+
+    g, stub = _decision_stub()
+    fake = decisions_mod.FakeDecisions()
+    asked: list = []
+    monkeypatch.setattr(decisions_mod, "detect_decisions", lambda name=None: asked.append(name) or fake)
+    code = run_eval.main([str(_write_golden(tmp_path, g)), "--source", "SRC", "--decisions", "jev",
+                          "--candidates", "12", "--out", str(tmp_path / "r.json")], pipeline=stub)
+    assert code == 0 and asked == ["jev"]
+    assert all(c[0] == "rerank_retrieve" and c[4] is fake and c[5] == 12 for c in stub.calls[1:])
+    report = json.loads((tmp_path / "r.json").read_text(encoding="utf-8"))
+    assert report["meta"]["decisions"] == "fake" and report["summary"]["overall"]["decision_calls"] == 2
+
+
+def test_main_decisions_config_error_exits_2(tmp_path, monkeypatch, capsys):
+    import repofinder.decisions as decisions_mod
+
+    def broken(name=None):
+        raise decisions_mod.DecisionsConfigError("no OPENROUTER_API_KEY")
+
+    monkeypatch.setattr(decisions_mod, "detect_decisions", broken)
+    g, stub = _decision_stub()
+    assert run_eval.main([str(_write_golden(tmp_path, g)), "--source", "SRC", "--decisions", "jev"],
+                         pipeline=stub) == 2
+    assert "no OPENROUTER_API_KEY" in capsys.readouterr().err
+    assert run_eval.main([str(_write_golden(tmp_path, g)), "--source", "SRC", "--decisions", "rules",
+                          "--candidates", "0"], pipeline=stub) == 2
 
 
 # --------------------------------------------------------------------------- #

@@ -26,7 +26,7 @@ from .ingest import IngestError
 from .llm import LLM, Citation, LLMConfigError, LLMError
 from .store import StoreError
 
-if TYPE_CHECKING:  # chat and decisions are imported lazily, by the chat command only
+if TYPE_CHECKING:  # chat and decisions are imported lazily, by the commands that use them
     from .chat import ChatSession, TurnResult
 
 app = typer.Typer(
@@ -59,7 +59,7 @@ def _make_llm() -> LLM:
 
 
 def _make_decisions(preferred: Optional[str]) -> Any:
-    """The decision layer used by ``chat`` (tests replace this)."""
+    """The decision layer used by ``ask`` and ``chat`` (tests replace this)."""
     from . import decisions
 
     return decisions.detect_decisions(preferred)
@@ -161,6 +161,20 @@ def _print_sources(out: Console, citations: list[Citation]) -> None:
         out.print("  (the answer cites no lines from the excerpts)", markup=False)
 
 
+def _decisions_suffix(name: str, result: "pipeline.AskResult") -> str:
+    """`` · decisions: <name> (<n> calls, $<cost>)`` plus `` · reranked`` or
+    `` · off-target``, for a decision layer that is not local; else ""."""
+    if name in pipeline.LOCAL_DECISIONS:
+        return ""
+    calls = result.decision_calls
+    text = f" · decisions: {name} ({calls} call{'' if calls == 1 else 's'}, ${result.decision_cost_usd:.6f})"
+    if result.reranked:
+        text += " · reranked"
+    elif result.off_target:
+        text += " · off-target"
+    return text
+
+
 def _usage_line(llm: LLM, elapsed_s: Optional[float] = None) -> str:
     u = llm.usage
     parts = []
@@ -236,6 +250,12 @@ def ask(
     source: SourceArg,
     question: Annotated[str, typer.Argument(help="Your question, in any language.")],
     k: Annotated[int, typer.Option("-k", "--top-k", min=1, help="Search hits turned into context.")] = pipeline.DEFAULT_K,
+    decisions_name: Annotated[Optional[str], typer.Option(
+        "--decisions", help="Decision layer: jev or rules (default: $REPOFINDER_DECISIONS, else detected).",
+    )] = None,
+    candidates: Annotated[int, typer.Option(
+        "--candidates", min=1, help="Search hits shown to the decision layer before the top-k are kept",
+    )] = pipeline.DEFAULT_CANDIDATES,
     show_context: Annotated[bool, typer.Option("--show-context", help="List the code excerpts sent to the model.")] = False,
     as_json: Annotated[bool, typer.Option("--json", help="Print one JSON object instead of formatted text.")] = False,
     data_dir: DataDirOpt = None,
@@ -247,14 +267,18 @@ def ask(
     with _errors():
         llm = _make_llm()
         backend = _backend(llm)
+        decisions = _make_decisions(decisions_name)
+        decisions_label = str(getattr(decisions, "name", "unknown"))
         with _open(source, data_dir, quiet=as_json) as ws:
             if as_json:
-                result = pipeline.ask(ws, question, llm=llm, k=k)
+                result = pipeline.ask(ws, question, llm=llm, k=k, decisions=decisions, candidates=candidates)
             else:
                 out = _out()
-                out.print(f"Backend: {backend} · model {llm.smart_model}", markup=False, style="dim")
+                out.print(f"Backend: {backend} · model {llm.smart_model} · decisions: {decisions_label}",
+                          markup=False, style="dim")
                 with _err().status("Searching and asking Claude…", spinner="dots"):
-                    result = pipeline.ask(ws, question, llm=llm, k=k)
+                    result = pipeline.ask(ws, question, llm=llm, k=k, decisions=decisions,
+                                          candidates=candidates)
             repo = ws.name
 
     if as_json:
@@ -269,10 +293,19 @@ def ask(
             "model": result.answer.model,
             "backend": backend,
             "usage": asdict(llm.usage),
+            "decisions": {"name": decisions_label, "calls": result.decision_calls,
+                          "cost_usd": result.decision_cost_usd, "reranked": result.reranked,
+                          "off_target": result.off_target, "error": result.decision_error},
+            "candidates": candidates,
+            "probabilities": result.probabilities,
             "elapsed_s": round(result.elapsed_s, 3),
         }
         typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
         return
+
+    if result.decision_error:
+        _err().print(f"Decision layer failed, the search order was kept: {result.decision_error}",
+                     markup=False, style="yellow")
 
     if show_context:
         total = sum(len(c.text) for c in result.chunks)
@@ -285,7 +318,8 @@ def ask(
     out.print()
     _print_sources(out, result.answer.citations)
     out.print()
-    out.print(_usage_line(llm, result.elapsed_s), markup=False, style="dim")
+    out.print(_usage_line(llm, result.elapsed_s) + _decisions_suffix(decisions_label, result),
+              markup=False, style="dim")
 
 
 CHAT_COMMANDS_HELP = """\

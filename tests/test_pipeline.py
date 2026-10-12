@@ -14,18 +14,30 @@ import pytest
 
 from repofinder import pipeline, prompts
 from repofinder.backends import BackendError, Completion, LLMConfigError
-from repofinder.chunker import split_lines
+from repofinder.chunker import build_chunks, split_lines
+from repofinder.decisions import (
+    CARD_LABELS,
+    NONE_LABEL,
+    Choice,
+    DecisionsConfigError,
+    FakeDecisions,
+    RulesDecisions,
+)
 from repofinder.llm import FAILED_SUMMARY_PREFIX, LLM, REPO_SUMMARY_META_KEY
 from repofinder.pipeline import (
     AskResult,
+    Retrieval,
     SummarizeResult,
     Workspace,
     ask,
+    candidate_cards,
     open_workspace,
+    rerank_retrieve,
     retrieve,
     summarize,
     summary_order,
 )
+from repofinder.search import Hit
 
 SAMPLE_REPO = Path(__file__).parent / "fixtures" / "sample_repo"
 _FILE_PATH_RE = re.compile(r'<file path="([^"]+)">')
@@ -380,3 +392,170 @@ def test_stale_files(make_repo, home: Path):
         (root / "m.py").write_text("def f():\n    return 12345\n", encoding="utf-8")
         (root / "n.py").unlink()
         assert pipeline.stale_files(ws) == ["m.py", "n.py"]
+
+
+# --------------------------------------------------------------------------- #
+# rerank_retrieve / ask with a decision layer
+# --------------------------------------------------------------------------- #
+
+RERANK_Q = "engine user model"   # User (models.py) first; Engine (core.py) further down
+
+
+def _key(hit: Hit) -> str:
+    return f"{hit.path}:{hit.start_line}-{hit.end_line}"
+
+
+def _spans(chunks) -> list[tuple[str, int, int]]:
+    return [(c.path, c.start_line, c.end_line) for c in chunks]
+
+
+def _named(name: str, *choices) -> FakeDecisions:
+    fake = FakeDecisions(choices=list(choices))
+    fake.name = name
+    return fake
+
+
+class _BrokenDecisions:
+    """A non-local layer whose every decision raises ``error``."""
+
+    name = "jev"
+
+    def __init__(self, error: Exception) -> None:
+        self.error = error
+        self.calls = 0
+
+    def choose(self, state, instructions, options):
+        self.calls += 1
+        raise self.error
+
+    def yes_no(self, state, question):
+        raise self.error
+
+
+def test_rerank_retrieve_reorders_hits_and_chunks(ws: Workspace):
+    search = ws.search_index().search(RERANK_Q, k=pipeline.DEFAULT_CANDIDATES)
+    engine = next(i for i, h in enumerate(search) if h.symbol_id == "mypkg/core.py::Engine")
+    assert engine >= 2 and len(search) <= 16
+    pick = CARD_LABELS[engine]
+    probs = {label: 0.0 for label in CARD_LABELS[: len(search)]}
+    probs.update({pick: 0.7, "A": 0.2, NONE_LABEL: 0.1})
+    fake = FakeDecisions(choices=[Choice(pick, probs, 0.7, 0.00002, 900)])
+
+    res = rerank_retrieve(ws, RERANK_Q, k=2, decisions=fake)
+
+    assert isinstance(res, Retrieval)
+    assert (res.reranked, res.off_target, res.decision_error) == (True, False, None)
+    assert res.decision_calls == 1 and res.decision_cost_usd == pytest.approx(0.00002)
+    assert len(fake.calls) == 1
+    call = fake.calls[0]
+    assert set(call.options) == set(CARD_LABELS[: len(search)]) | {NONE_LABEL}
+    assert "mypkg/core.py:33-63 | class Engine" in call.state          # the hit's own lines, kind + qualname
+    # The pick first, then the shown cards by probability (A), then search order.
+    assert res.hits == [search[engine], search[0]] + [h for i, h in enumerate(search) if i not in (0, engine)]
+    assert res.chunks == build_chunks(ws.root, ws.index, res.hits[:2], pipeline.DEFAULT_MAX_CHARS)
+    assert _spans(res.chunks)[0] == ("mypkg/core.py", 33, 63)
+    plain_chunks, _ = retrieve(ws, RERANK_Q, k=2)
+    assert all(c.path == "mypkg/sub/models.py" for c in plain_chunks)  # without the layer: no Engine
+    assert res.probabilities[_key(search[engine])] == pytest.approx(0.7)
+    assert res.probabilities[_key(search[0])] == pytest.approx(0.2)
+    assert set(res.probabilities) == {_key(h) for h in search}
+    assert all(re.fullmatch(r".+:\d+-\d+", key) for key in res.probabilities)
+
+
+def test_rerank_retrieve_none_keeps_the_search_order(ws: Workspace):
+    plain_chunks, plain_hits = retrieve(ws, RERANK_Q, k=3)
+    fake = FakeDecisions(choices=[NONE_LABEL])
+    res = rerank_retrieve(ws, RERANK_Q, k=3, decisions=fake, candidates=4)
+    assert (res.reranked, res.off_target, res.decision_error) == (False, True, None)
+    assert res.decision_calls == 1
+    assert set(fake.calls[0].options) == {"A", "B", "C", "D", NONE_LABEL}
+    assert res.hits == ws.search_index().search(RERANK_Q, k=4)
+    assert res.hits[:3] == plain_hits and res.chunks == plain_chunks
+    assert len(res.probabilities) == 4 and set(res.probabilities.values()) == {0.0}
+
+
+def test_rerank_retrieve_keeps_the_search_order_when_the_layer_fails(ws: Workspace):
+    plain_chunks, _ = retrieve(ws, RERANK_Q, k=3)
+    fake = FakeDecisions()   # no scripted answer: DecisionsError
+    res = rerank_retrieve(ws, RERANK_Q, k=3, decisions=fake, candidates=5)
+    assert res.decision_error is not None and res.decision_error.startswith("DecisionsError: FakeDecisions")
+    assert (res.reranked, res.off_target, res.decision_calls, res.decision_cost_usd) == (False, False, 0, 0.0)
+    assert res.hits == ws.search_index().search(RERANK_Q, k=5)
+    assert res.chunks == plain_chunks and res.probabilities == {}
+
+
+def test_rerank_retrieve_raises_config_errors(ws: Workspace):
+    broken = _BrokenDecisions(DecisionsConfigError("no Jev API key"))
+    with pytest.raises(DecisionsConfigError, match="no Jev API key"):
+        rerank_retrieve(ws, RERANK_Q, decisions=broken)
+    assert broken.calls == 1
+    backend = FakeBackend()
+    with pytest.raises(DecisionsConfigError):
+        ask(ws, RERANK_Q, llm=LLM(backend=backend), decisions=broken)
+    assert backend.calls == []           # no answer is written without the decision
+
+
+@pytest.mark.parametrize("make", [lambda: None, RulesDecisions, lambda: _named("rules", "B"),
+                                  lambda: _named("off", "B")], ids=["none", "rules", "fake-rules", "off"])
+def test_rerank_retrieve_without_a_remote_layer_is_retrieve(ws: Workspace, make):
+    decisions = make()
+    chunks, hits = retrieve(ws, RERANK_Q, k=3)
+    res = rerank_retrieve(ws, RERANK_Q, k=3, decisions=decisions, candidates=8)
+    assert res == Retrieval(chunks=chunks, hits=hits)          # exactly retrieve: top-k, no decision fields
+    assert len(res.hits) == 3
+    if isinstance(decisions, FakeDecisions):
+        assert decisions.calls == []
+    if isinstance(decisions, RulesDecisions):
+        assert decisions.usage.calls == 0
+
+
+def test_rerank_retrieve_with_k_above_candidates(ws: Workspace):
+    search = ws.search_index().search(RERANK_Q, k=5)
+    fake = FakeDecisions(choices=["B"])
+    res = rerank_retrieve(ws, RERANK_Q, k=5, decisions=fake, candidates=2)
+    assert set(fake.calls[0].options) == {"A", "B", NONE_LABEL}   # only two cards shown
+    assert res.reranked and res.hits == [search[1], search[0]] + search[2:]
+    assert res.chunks == build_chunks(ws.root, ws.index, res.hits[:5], pipeline.DEFAULT_MAX_CHARS)
+    assert set(res.probabilities) == {_key(search[0]), _key(search[1])}
+
+
+def test_rerank_retrieve_shows_at_most_sixteen_cards(ws: Workspace):
+    fake = FakeDecisions(choices=["A"])
+    res = rerank_retrieve(ws, RERANK_Q, k=2, decisions=fake, candidates=40)
+    assert res.reranked and len(fake.calls[0].options) <= len(CARD_LABELS) + 1
+    assert res.hits == ws.search_index().search(RERANK_Q, k=40)
+
+
+def test_candidate_cards(ws: Workspace):
+    hits = [
+        Hit("mypkg/core.py", "mypkg/core.py::run_engine", 13, 30, 1.0, "symbol", ""),
+        Hit("mypkg/core.py", None, 1, 63, 1.0, "file", ""),
+        Hit("mypkg/missing.py", "mypkg/missing.py::gone", 3, 9, 1.0, "symbol", ""),
+    ]
+    run_engine, module, missing = candidate_cards(ws, hits)
+    lines = split_lines((ws.root / "mypkg/core.py").read_text(encoding="utf-8"))
+    assert run_engine == prompts.render_card("mypkg/core.py", 13, 30, "\n".join(lines[12:30]),
+                                             "function run_engine", max_lines=pipeline.CARD_LINES)
+    assert module == prompts.render_card("mypkg/core.py", 1, 63, "\n".join(lines),
+                                         "module head", max_lines=pipeline.CARD_LINES)
+    assert "more lines (to line 63)" in module                   # 63 lines cut to CARD_LINES
+    assert missing == prompts.render_card("mypkg/missing.py", 3, 9, "", "gone", max_lines=pipeline.CARD_LINES)
+
+
+def test_ask_with_decisions_reports_the_rerank(ws: Workspace):
+    backend = FakeBackend(lambda m, s, u: "Answer.")
+    search = ws.search_index().search(RERANK_Q, k=4)
+    fake = FakeDecisions(choices=[Choice("D", {"A": 0.1, "B": 0.0, "C": 0.0, "D": 0.9, NONE_LABEL: 0.0},
+                                         0.9, 0.0005, 100)])
+    result = ask(ws, RERANK_Q, llm=LLM(backend=backend), k=2, decisions=fake, candidates=4)
+    assert result.reranked and not result.off_target and result.decision_error is None
+    assert (result.decision_calls, result.decision_cost_usd) == (1, pytest.approx(0.0005))
+    assert result.hits[0] == search[3] and len(result.hits) == 4
+    assert result.chunks[0].path == "mypkg/core.py"
+    assert result.probabilities[_key(search[3])] == pytest.approx(0.9)
+    assert "mypkg/core.py" in backend.calls[0]["user"]
+
+    plain = ask(ws, RERANK_Q, llm=LLM(backend=backend), k=2)
+    assert (plain.reranked, plain.off_target, plain.decision_calls, plain.decision_cost_usd,
+            plain.decision_error, plain.probabilities) == (False, False, 0, 0.0, None, {})
+    assert (plain.chunks, plain.hits) == retrieve(ws, RERANK_Q, k=2)

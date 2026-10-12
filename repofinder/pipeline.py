@@ -20,9 +20,10 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
-from .chunker import build_chunks, split_lines
+from . import prompts
+from .chunker import MODULE_HEAD_LABEL, build_chunks, split_lines
 from .graph import ModuleGraph, build_graph
 from .ingest import _parse_github, build_index, fetch_repo, repo_name_from_source
 from .llm import (
@@ -39,6 +40,9 @@ from .models import RepoIndex
 from .search import Hit, SearchIndex
 from .store import META_INDEX_SOURCE, Store
 
+if TYPE_CHECKING:  # the decision layer is imported lazily, only when one is used
+    from .decisions import Decisions
+
 log = logging.getLogger(__name__)
 
 DEFAULT_DATA_DIR = Path.home() / ".repofinder"
@@ -50,7 +54,12 @@ META_BUILT_AT = "index.built_at"
 
 DEFAULT_K = 8
 DEFAULT_MAX_CHARS = 36_000
+DEFAULT_CANDIDATES = 16        # search hits shown to the decision layer (at most decisions.MAX_CARDS)
+CARD_LINES = 40                # source lines per candidate card
 MAX_CONSECUTIVE_FAILURES = 3
+
+# Decision backends that run locally and never reorder search hits.
+LOCAL_DECISIONS = frozenset({"rules", "off"})
 
 ProgressCallback = Callable[[int, int, str], None]
 
@@ -187,22 +196,167 @@ def retrieve(ws: Workspace, question: str, k: int = DEFAULT_K,
 
 
 @dataclass
+class Retrieval:
+    """What :func:`rerank_retrieve` found."""
+
+    chunks: list[ContextChunk]
+    hits: list[Hit]                 # all searched hits, in the final order (reranked candidates first,
+                                    # then the rest in search order)
+    reranked: bool = False          # the decision layer's order was applied (its pick may be the first hit)
+    off_target: bool = False        # it selected NONE: the search order was kept
+    decision_calls: int = 0
+    decision_cost_usd: float = 0.0
+    decision_error: Optional[str] = None   # "ExcType: message" when the call failed and search order was kept
+    probabilities: dict[str, float] = field(default_factory=dict)  # "path:start-end" -> p, shown candidates
+
+
+def rerank_retrieve(ws: Workspace, question: str, k: int = DEFAULT_K, max_chars: int = DEFAULT_MAX_CHARS,
+                    decisions: Optional["Decisions"] = None,
+                    candidates: int = DEFAULT_CANDIDATES) -> Retrieval:
+    """:func:`retrieve`, with the search hits reordered by a decision layer.
+
+    Without ``decisions``, or with a local one (``rules``/``off``), this is
+    exactly :func:`retrieve` (top-``k`` hits, no decision call). Otherwise
+    ``max(k, candidates)`` hits are searched, the first ``candidates`` (at most
+    ``decisions.MAX_CARDS``) are shown to the layer as cards (see
+    :func:`candidate_cards`) in one ``rerank_cards`` call, and the chunks are
+    built from the first ``k`` hits of the resulting order. When the layer
+    selects none of them, or its call fails (``decision_error``), the search
+    order is kept. :class:`~repofinder.decisions.DecisionsConfigError`
+    propagates. Nothing is searched a second time.
+    """
+    if decisions is None or getattr(decisions, "name", "") in LOCAL_DECISIONS:
+        chunks, hits = retrieve(ws, question, k=k, max_chars=max_chars)
+        return Retrieval(chunks=chunks, hits=hits)
+
+    from . import decisions as _decisions
+
+    candidates = max(1, int(candidates))
+    hits = ws.search_index().search(question, k=max(k, candidates))
+    shown = hits[: min(candidates, _decisions.MAX_CARDS)]
+    found = Retrieval(chunks=[], hits=list(hits))
+    if shown:
+        try:
+            result = _decisions.rerank_cards(decisions, question, candidate_cards(ws, shown), allow_none=True)
+        except _decisions.DecisionsConfigError:
+            raise
+        except _decisions.DecisionsError as exc:
+            log.warning("rerank failed, keeping the search order: %s", exc)
+            found.decision_error = f"{type(exc).__name__}: {exc}"
+        else:
+            found.decision_calls = 1
+            found.decision_cost_usd = float(result.cost_usd or 0.0)
+            found.probabilities = _hit_probabilities(shown, result.probabilities, _decisions.CARD_LABELS)
+            if result.none_selected:
+                found.off_target = True
+            else:
+                found.hits = _apply_order(hits, result.order, len(shown))
+                found.reranked = True
+    found.chunks = build_chunks(ws.root, ws.index, found.hits[:k], max_chars)
+    return found
+
+
+def candidate_cards(ws: Workspace, hits: list[Hit]) -> list[str]:
+    """One card per hit for the decision layer (:func:`prompts.render_card`):
+    ``path:start-end | label`` and the first :data:`CARD_LINES` of the hit's own
+    source lines. The label is ``<kind> <qualname>`` for a symbol (the qualname
+    alone when the index does not know it) and ``module head`` for a file hit,
+    as the chunker labels it. A file that cannot be read gives an empty body."""
+    wanted = {h.symbol_id for h in hits if h.kind == "symbol" and h.symbol_id}
+    symbols: dict[Any, Any] = {}
+    for sym in ws.index.symbols:
+        if sym.id in wanted:
+            symbols.setdefault((sym.id, sym.start_line), sym)
+            symbols.setdefault(sym.id, sym)
+    sources: dict[str, Optional[list[str]]] = {}
+    cards: list[str] = []
+    for hit in hits:
+        if hit.path not in sources:
+            sources[hit.path] = _source_lines(ws.root, hit.path)
+        lines = sources[hit.path]
+        text = "\n".join(lines[max(hit.start_line, 1) - 1: hit.end_line]) if lines else ""
+        if hit.kind != "symbol" or not hit.symbol_id:
+            label = MODULE_HEAD_LABEL
+        else:
+            sym = symbols.get((hit.symbol_id, hit.start_line)) or symbols.get(hit.symbol_id)
+            label = f"{sym.kind} {sym.qualname}" if sym is not None else hit.symbol_id.split("::", 1)[-1]
+        cards.append(prompts.render_card(hit.path, hit.start_line, hit.end_line, text, label,
+                                         max_lines=CARD_LINES))
+    return cards
+
+
+def _source_lines(root: Path, path: str) -> Optional[list[str]]:
+    """The lines of ``root / path`` (as the indexer counts them), or None when
+    it cannot be read or lies outside the checkout."""
+    base = Path(root).resolve()
+    full = (base / path).resolve()
+    if not full.is_relative_to(base):
+        return None
+    try:
+        return split_lines(full.read_bytes().decode("utf-8", errors="replace"))
+    except OSError:
+        return None
+
+
+def _hit_probabilities(hits: list[Hit], probabilities: dict[str, float],
+                       labels: tuple[str, ...]) -> dict[str, float]:
+    """The layer's per-label probabilities keyed by the shown hits'
+    ``path:start-end`` (the larger one when two hits share a range)."""
+    out: dict[str, float] = {}
+    for label, hit in zip(labels, hits):
+        if label in probabilities:
+            key = f"{hit.path}:{hit.start_line}-{hit.end_line}"
+            out[key] = max(float(probabilities[label]), out.get(key, 0.0))
+    return out
+
+
+def _apply_order(items: list[Any], order: list[int], n_shown: int) -> list[Any]:
+    """``items`` with the first ``n_shown`` reordered by ``order`` (0-based
+    indices; invalid and repeated ones are ignored). Shown items missing from
+    ``order`` follow in their old order, then the items that were not shown.
+    (A copy of ``chat.apply_order``.)"""
+    seen: set[int] = set()
+    out: list[Any] = []
+    for i in order or []:
+        if isinstance(i, int) and not isinstance(i, bool) and 0 <= i < min(n_shown, len(items)) \
+                and i not in seen:
+            seen.add(i)
+            out.append(items[i])
+    out.extend(item for i, item in enumerate(items) if i not in seen)
+    return out
+
+
+@dataclass
 class AskResult:
     answer: Answer
     hits: list[Hit]
     chunks: list[ContextChunk]
-    elapsed_s: float      # retrieval plus the model call
+    elapsed_s: float      # retrieval (with the decision call) plus the model call
+    reranked: bool = False
+    off_target: bool = False
+    decision_calls: int = 0
+    decision_cost_usd: float = 0.0
+    decision_error: Optional[str] = None
+    probabilities: dict[str, float] = field(default_factory=dict)
 
 
-def ask(ws: Workspace, question: str, llm: Optional[LLM] = None, k: int = DEFAULT_K) -> AskResult:
-    """Answer ``question`` about the repository with ``path:start-end`` citations."""
+def ask(ws: Workspace, question: str, llm: Optional[LLM] = None, k: int = DEFAULT_K,
+        decisions: Optional["Decisions"] = None, candidates: int = DEFAULT_CANDIDATES) -> AskResult:
+    """Answer ``question`` about the repository with ``path:start-end`` citations.
+
+    With a (non-local) ``decisions`` layer the context comes from
+    :func:`rerank_retrieve`; without one, from :func:`retrieve` as before."""
     if not question or not question.strip():
         raise ValueError("question must not be empty")
     started = time.perf_counter()
-    chunks, hits = retrieve(ws, question, k=k)
+    found = rerank_retrieve(ws, question, k=k, decisions=decisions, candidates=candidates)
     llm = llm if llm is not None else LLM()
-    answer = llm.answer(question, chunks, ws.name, repo_summary=ws.repo_summary())
-    return AskResult(answer=answer, hits=hits, chunks=chunks, elapsed_s=time.perf_counter() - started)
+    answer = llm.answer(question, found.chunks, ws.name, repo_summary=ws.repo_summary())
+    return AskResult(answer=answer, hits=found.hits, chunks=found.chunks,
+                     elapsed_s=time.perf_counter() - started, reranked=found.reranked,
+                     off_target=found.off_target, decision_calls=found.decision_calls,
+                     decision_cost_usd=found.decision_cost_usd, decision_error=found.decision_error,
+                     probabilities=dict(found.probabilities))
 
 
 def architecture_map(ws: Workspace, max_modules: int = 40) -> str:

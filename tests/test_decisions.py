@@ -666,6 +666,40 @@ def test_detect_decisions_jev(clean_env: pytest.MonkeyPatch, fake_sdk: list[dict
     assert fake_sdk == []                                              # the client is still created lazily
 
 
+@pytest.mark.parametrize("env", [None, "auto", " AUTO "])
+def test_detect_decisions_auto_with_key_and_sdk(clean_env: pytest.MonkeyPatch, fake_sdk: list[dict[str, Any]],
+                                                env: Optional[str]) -> None:
+    if env is not None:
+        clean_env.setenv(dec.ENV_DECISIONS, env)
+    clean_env.setenv(dec.OPENROUTER_KEY_ENV, "sk-or-v1-abc")
+    backend = detect_decisions()
+    assert isinstance(backend, JevDecisions) and backend.name == "jev"
+
+
+@pytest.mark.parametrize("env", [None, "auto"])
+def test_detect_decisions_auto_without_a_key_uses_rules(clean_env: pytest.MonkeyPatch,
+                                                        fake_sdk: list[dict[str, Any]],
+                                                        env: Optional[str]) -> None:
+    if env is not None:
+        clean_env.setenv(dec.ENV_DECISIONS, env)
+    assert type(detect_decisions()) is RulesDecisions
+
+
+@pytest.mark.parametrize("env", [None, "auto"])
+def test_detect_decisions_auto_without_the_sdk_uses_rules(clean_env: pytest.MonkeyPatch, env: Optional[str]) -> None:
+    if env is not None:
+        clean_env.setenv(dec.ENV_DECISIONS, env)
+    clean_env.setenv(dec.TYPESAFE_KEY_ENV, "ts-key")
+    clean_env.setitem(sys.modules, "typesafe_sdk", None)
+    assert type(detect_decisions()) is RulesDecisions
+
+
+def test_detect_decisions_rules_wins_over_a_key(clean_env: pytest.MonkeyPatch, fake_sdk: list[dict[str, Any]]) -> None:
+    clean_env.setenv(dec.OPENROUTER_KEY_ENV, "sk-or-v1-abc")
+    clean_env.setenv(dec.ENV_DECISIONS, "rules")
+    assert type(detect_decisions()) is RulesDecisions
+
+
 def test_detect_decisions_jev_without_a_key(clean_env: pytest.MonkeyPatch) -> None:
     with pytest.raises(DecisionsConfigError) as info:
         detect_decisions("jev")

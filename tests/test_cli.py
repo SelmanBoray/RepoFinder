@@ -417,3 +417,137 @@ def test_chat_decisions_config_error_exits_2(home: Path, monkeypatch: pytest.Mon
     assert result.exit_code == 2
     assert "unknown decision layer: bogus" in result.stderr
     assert fake.calls == []
+
+
+# --------------------------------------------------------------------------- #
+# ask with a decision layer
+# --------------------------------------------------------------------------- #
+
+from repofinder.decisions import ENV_DECISIONS, NONE_LABEL, Choice, DecisionsConfigError, FakeDecisions  # noqa: E402
+
+RERANK_Q = "engine user model"   # search: User, User.Meta, models.py, Engine, ...
+
+
+@pytest.fixture
+def ask_decisions(monkeypatch: pytest.MonkeyPatch):
+    """Replace ``cli._make_decisions`` with one returning ``decisions``;
+    the ``--decisions`` values it was called with are collected."""
+    def install(decisions) -> list[Optional[str]]:
+        preferred: list[Optional[str]] = []
+
+        def make(name: Optional[str]):
+            preferred.append(name)
+            return decisions
+
+        monkeypatch.setattr(cli, "_make_decisions", make)
+        return preferred
+
+    return install
+
+
+def test_ask_help_lists_the_decision_options():
+    result = _run("ask", "--help")
+    assert result.exit_code == 0
+    for option in ("--decisions", "--candidates", "--top-k", "--json"):
+        assert option in result.stdout
+
+
+def test_ask_json_shows_the_decisions_block(home: Path, fake: FakeBackend, ask_decisions):
+    probs = {"A": 0.15, "B": 0.0, "C": 0.05, "D": 0.8, NONE_LABEL: 0.0}
+    decisions = FakeDecisions(choices=[Choice("D", probs, 0.8, 0.00031, 400)])
+    preferred = ask_decisions(decisions)
+    result = _run("ask", str(SAMPLE_REPO), RERANK_Q, "--json", "-k", "2", "--decisions", "jev",
+                  "--candidates", "4", "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.stdout)
+    assert preferred == ["jev"]
+    assert payload["decisions"] == {"name": "fake", "calls": 1, "cost_usd": pytest.approx(0.00031),
+                                    "reranked": True, "off_target": False, "error": None}
+    assert payload["candidates"] == 4
+    assert len(payload["hits"]) == 4 and payload["hits"][0]["symbol_id"] == "mypkg/core.py::Engine"
+    assert payload["chunks"][0]["path"] == "mypkg/core.py"
+    assert payload["probabilities"]["mypkg/core.py:33-63"] == pytest.approx(0.8)
+    assert len(payload["probabilities"]) == 4
+    assert all(re.fullmatch(r".+:\d+-\d+", key) for key in payload["probabilities"])
+    assert len(decisions.calls) == 1 and len(fake.calls) == 1
+
+
+@pytest.mark.parametrize("pick, flag", [("D", "· reranked"), (NONE_LABEL, "· off-target")])
+def test_ask_text_reports_the_decisions(home: Path, fake: FakeBackend, ask_decisions, pick: str, flag: str):
+    ask_decisions(FakeDecisions(choices=[pick]))
+    result = _run("ask", str(SAMPLE_REPO), RERANK_Q, "-k", "2", "--candidates", "4", "--show-context",
+                  "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    out = result.stdout
+    assert f"Backend: fake · model {LLM().smart_model} · decisions: fake" in out
+    assert "Context:" in out
+    last = out.strip().splitlines()[-1]
+    assert last.endswith(f"· decisions: fake (1 call, $0.000000) {flag}")
+    assert "1 call · 1,234 input + 56 output tokens" in last
+
+
+def test_ask_text_warns_when_the_layer_fails(home: Path, fake: FakeBackend, ask_decisions):
+    ask_decisions(FakeDecisions())          # no scripted answer: the search order is kept
+    result = _run("ask", str(SAMPLE_REPO), RERANK_Q, "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    assert "Decision layer failed, the search order was kept: DecisionsError" in result.stderr
+    last = result.stdout.strip().splitlines()[-1]
+    assert last.endswith("· decisions: fake (0 calls, $0.000000)")
+    assert len(fake.calls) == 1
+
+
+def test_ask_decisions_config_errors_exit_2(home: Path, fake: FakeBackend, monkeypatch: pytest.MonkeyPatch,
+                                            ask_decisions):
+    def no_decisions(preferred: Optional[str]):
+        raise DecisionsConfigError(f"unknown decision layer: {preferred}")
+
+    monkeypatch.setattr(cli, "_make_decisions", no_decisions)
+    result = _run("ask", str(SAMPLE_REPO), "engine", "--decisions", "bogus", "--data-dir", str(home))
+    assert result.exit_code == 2
+    assert "unknown decision layer: bogus" in result.stderr
+
+    class Rejected(FakeDecisions):
+        name = "jev"
+
+        def choose(self, state, instructions, options):
+            raise DecisionsConfigError("Jev rejected the API key (401)")
+
+    ask_decisions(Rejected())
+    result = _run("ask", str(SAMPLE_REPO), "engine", "--json", "--data-dir", str(home))
+    assert result.exit_code == 2
+    assert "Jev rejected the API key (401)" in result.stderr
+    assert fake.calls == []
+
+
+def test_ask_without_decisions_behaves_as_before(home: Path, fake: FakeBackend, tmp_path: Path,
+                                                 monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv(ENV_DECISIONS, raising=False)
+    monkeypatch.chdir(tmp_path)              # no .env file to pick a layer from
+    calls: list[dict] = []
+    real = pipeline.ask
+
+    def spy(*args, **kwargs):
+        result = real(*args, **kwargs)
+        calls.append(kwargs)
+        return result
+
+    monkeypatch.setattr(pipeline, "ask", spy)
+    result = _run("ask", str(SAMPLE_REPO), RERANK_Q, "--json", "-k", "3", "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.stdout)
+    assert payload["decisions"] == {"name": "rules", "calls": 0, "cost_usd": 0.0, "reranked": False,
+                                    "off_target": False, "error": None}
+    assert payload["candidates"] == pipeline.DEFAULT_CANDIDATES and payload["probabilities"] == {}
+    with pipeline.open_workspace(str(SAMPLE_REPO), data_dir=home) as ws:
+        chunks, hits = pipeline.retrieve(ws, RERANK_Q, k=3)
+    assert [h["symbol_id"] for h in payload["hits"]] == [h.symbol_id for h in hits]
+    assert [(c["path"], c["start_line"], c["end_line"]) for c in payload["chunks"]] == \
+        [(c.path, c.start_line, c.end_line) for c in chunks]
+    assert calls[0]["decisions"].name == "rules"
+
+    result = _run("ask", str(SAMPLE_REPO), RERANK_Q, "--data-dir", str(home))
+    assert result.exit_code == 0, result.output
+    assert f"Backend: fake · model {LLM().smart_model} · decisions: rules" in result.stdout
+    last = result.stdout.strip().splitlines()[-1]
+    assert "decisions" not in last and "reranked" not in last and "off-target" not in last
+    assert last.endswith("7 cache read")

@@ -687,6 +687,13 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "output_tokens": sum(a.get("output_tokens", 0) for _r, a in ans),
             "cache_read_tokens": sum(a.get("cache_read_tokens", 0) for _r, a in ans),
         }
+    decs = [r["decision"] for r in rows if r.get("decision")]
+    if decs:
+        s["decision_calls"] = sum(int(d.get("calls") or 0) for d in decs)
+        s["decision_cost_usd"] = round(sum(float(d.get("cost_usd") or 0.0) for d in decs), 6)
+        s["reranked"] = sum(1 for d in decs if d.get("reranked"))
+        s["off_target"] = sum(1 for d in decs if d.get("off_target"))
+        s["decision_errors"] = sum(1 for d in decs if d.get("error"))
     elapsed = [r["elapsed_s"] for r in rows if r.get("elapsed_s") is not None]
     if elapsed:
         s["elapsed_s"] = {
@@ -740,6 +747,8 @@ def run_eval(
     ids: Optional[Iterable[str]] = None,
     data_dir: Optional[str] = None,
     log: Any = None,
+    decisions: Any = None,
+    candidates: Optional[int] = None,
 ) -> dict[str, Any]:
     """Run the golden questions through ``pipeline`` and score them.
 
@@ -753,6 +762,11 @@ def run_eval(
     If the workspace has a ``root`` (the checkout), its git commit is compared
     with ``repo.commit`` (``meta.checkout``; a warning goes to ``log`` on a
     mismatch). If it has a ``close()``, it is closed at the end.
+
+    With ``decisions`` (a decision layer such as Jev) retrieval mode calls
+    ``pipeline.rerank_retrieve`` and answer/both modes pass ``decisions`` and
+    ``candidates`` to ``ask``; each row then carries a ``decision`` block.
+    Without it the calls are exactly ``retrieve(ws, q, k=k)`` / ``ask(ws, q, k=k)``.
     """
     if mode not in MODES:
         raise ValueError(f"mode must be one of {', '.join(MODES)}, got {mode!r}")
@@ -761,6 +775,11 @@ def run_eval(
     if pipeline is None:
         pipeline = import_pipeline()
     questions = select_questions(golden, ids)
+    if decisions is not None:
+        if candidates is None:
+            candidates = int(getattr(pipeline, "DEFAULT_CANDIDATES", 16))
+        if candidates < 1:
+            raise ValueError("candidates must be >= 1")
 
     started = time.time()
     t0 = time.perf_counter()
@@ -779,14 +798,18 @@ def run_eval(
                 file=log,
                 flush=True,
             )
-        results = _run_questions(pipeline, ws, questions, mode, k, log)
+        results = _run_questions(pipeline, ws, questions, mode, k, log, decisions, candidates)
     finally:
         close = getattr(ws, "close", None)
         if callable(close):
             close()
 
+    meta_extra: dict[str, Any] = {}
+    if decisions is not None:
+        meta_extra = {"decisions": getattr(decisions, "name", None), "candidates": candidates}
     return {
         "meta": {
+            **meta_extra,
             "repo": golden.get("repo"),
             "source": source,
             "checkout": checkout,
@@ -821,8 +844,19 @@ def checkout_info(ws: Any, golden: dict[str, Any]) -> dict[str, Any]:
     return info
 
 
+def _decision_block(result: Any) -> dict[str, Any]:
+    return {
+        "calls": int(getattr(result, "decision_calls", 0) or 0),
+        "cost_usd": float(getattr(result, "decision_cost_usd", 0.0) or 0.0),
+        "reranked": bool(getattr(result, "reranked", False)),
+        "off_target": bool(getattr(result, "off_target", False)),
+        "error": getattr(result, "decision_error", None),
+    }
+
+
 def _run_questions(pipeline: Any, ws: Any, questions: list[dict[str, Any]], mode: str, k: int,
-                   log: Any) -> list[dict[str, Any]]:
+                   log: Any, decisions: Any = None, candidates: Optional[int] = None
+                   ) -> list[dict[str, Any]]:
     results: list[dict[str, Any]] = []
     for q in questions:
         row: dict[str, Any] = {
@@ -838,11 +872,24 @@ def _run_questions(pipeline: Any, ws: Any, questions: list[dict[str, Any]], mode
         t = time.perf_counter()
         try:
             if mode == "retrieval":
-                chunks, hits = pipeline.retrieve(ws, q["question"], k=k)
+                if decisions is None:
+                    chunks, hits = pipeline.retrieve(ws, q["question"], k=k)
+                else:
+                    res = pipeline.rerank_retrieve(
+                        ws, q["question"], k=k, decisions=decisions, candidates=candidates
+                    )
+                    chunks, hits = res.chunks, res.hits
+                    row["decision"] = _decision_block(res)
                 row["elapsed_s"] = round(time.perf_counter() - t, 4)
                 row["retrieval"] = score_retrieval(q, hits, chunks, k)
             else:
-                result = pipeline.ask(ws, q["question"], k=k)
+                if decisions is None:
+                    result = pipeline.ask(ws, q["question"], k=k)
+                else:
+                    result = pipeline.ask(
+                        ws, q["question"], k=k, decisions=decisions, candidates=candidates
+                    )
+                    row["decision"] = _decision_block(result)
                 row["elapsed_s"] = round(time.perf_counter() - t, 4)
                 row["pipeline_elapsed_s"] = getattr(result, "elapsed_s", None)
                 row["answer"] = score_answer(q, result.answer)
@@ -853,6 +900,9 @@ def _run_questions(pipeline: Any, ws: Any, questions: list[dict[str, Any]], mode
         except Exception as exc:  # noqa: BLE001 - a failing question is a data point
             row["elapsed_s"] = round(time.perf_counter() - t, 4)
             row["error"] = f"{type(exc).__name__}: {exc}"
+            if decisions is not None and "decision" not in row:
+                row["decision"] = {"calls": 0, "cost_usd": 0.0, "reranked": False,
+                                   "off_target": False, "error": row["error"]}
             if mode in ("retrieval", "both"):
                 row["retrieval"] = score_retrieval(q, [], [], k)
             if mode in ("answer", "both"):
@@ -872,6 +922,9 @@ def _short_status(row: dict[str, Any]) -> str:
     ans = row.get("answer")
     if ans:
         parts.append(f"cited_correct={ans['cited_correct']} cited_wrong={ans['cited_wrong']}")
+    dec = row.get("decision")
+    if dec:
+        parts.append("[dec-err]" if dec.get("error") else "[rerank]" if dec.get("reranked") else "[none]")
     return " ".join(parts)
 
 
@@ -946,7 +999,7 @@ def render_markdown(report: dict[str, Any]) -> str:
 
     summary = report["summary"]
     out += ["", "## Summary", ""]
-    out += summary_lines(summary["overall"], k)
+    out += summary_lines(summary["overall"], k, meta.get("decisions"))
     out += [
         "",
         "| group | n | hit@1 | hit@3 | hit@k | MRR | chunk_recall | cited_correct | cited_wrong mean |",
@@ -964,7 +1017,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     return "\n".join(out) + "\n"
 
 
-def summary_lines(s: dict[str, Any], k: int) -> list[str]:
+def summary_lines(s: dict[str, Any], k: int, decisions_name: Optional[str] = None) -> list[str]:
     """Bullet lines for one :func:`summarize` result."""
     lines = [f"- questions: {s['n']}, errors: {s['errors']}"]
     ret = s.get("retrieval")
@@ -999,6 +1052,12 @@ def summary_lines(s: dict[str, Any], k: int) -> list[str]:
             f"- tokens: input {ans['input_tokens']}, output {ans['output_tokens']},"
             f" cache_read {ans['cache_read_tokens']}"
         )
+    if "decision_calls" in s:
+        lines.append(
+            f"- decisions: {decisions_name or '?'}, {s['decision_calls']} calls,"
+            f" ${s['decision_cost_usd']}, reranked {s['reranked']}/{s['n']},"
+            f" off-target {s['off_target']}, errors {s['decision_errors']}"
+        )
     el = s.get("elapsed_s")
     if el:
         lines.append(
@@ -1032,6 +1091,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--ids", help="comma-separated question ids, e.g. q01,q05")
     p.add_argument("--out", help="JSON report path (default: eval/results/<golden>-<mode>-<timestamp>.json)")
     p.add_argument("--data-dir", help="passed to open_workspace(data_dir=...)")
+    p.add_argument("--decisions", choices=("jev", "rules"),
+                   help="decision layer for the pipeline's own rerank (jev needs OPENROUTER_API_KEY)")
+    p.add_argument("--candidates", type=int,
+                   help="candidates handed to the decision layer (default: the pipeline's DEFAULT_CANDIDATES)")
     p.add_argument("--list", action="store_true", help="validate, print the questions and exit")
     return p
 
@@ -1073,11 +1136,25 @@ def main(argv: Optional[list[str]] = None, pipeline: Any = None) -> int:
         print("error: --k must be >= 1", file=sys.stderr)
         return 2
 
+    if args.candidates is not None and args.candidates < 1:
+        print("error: --candidates must be >= 1", file=sys.stderr)
+        return 2
+    decisions = None
+    if args.decisions:
+        from repofinder import decisions as decisions_mod
+
+        try:
+            decisions = decisions_mod.detect_decisions(args.decisions)
+        except decisions_mod.DecisionsConfigError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
+
     try:
         if pipeline is None:
             pipeline = import_pipeline()
         report = run_eval(golden, source, args.mode, args.k, pipeline,
-                          ids=ids, data_dir=args.data_dir, log=sys.stderr)
+                          ids=ids, data_dir=args.data_dir, log=sys.stderr,
+                          decisions=decisions, candidates=args.candidates)
     except Exception as exc:  # noqa: BLE001 - a setup failure, not a measurement
         print(f"error: could not run the pipeline: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 1

@@ -10,7 +10,7 @@ reply, from what these decisions selected.
 
 Three backends implement :class:`Decisions`:
 
-* :class:`RulesDecisions` (the default): deterministic English and Turkish
+* :class:`RulesDecisions`: deterministic English and Turkish
   heuristics, no network, no cost. It never answers ``outside`` (rules cannot
   know what a repository delegates elsewhere) and never reorders search hits.
 * :class:`JevDecisions`: TypeSafe's "System One" model Jev, through the
@@ -20,8 +20,11 @@ Three backends implement :class:`Decisions`:
   is free, and one request (state plus questions) must fit in 32k tokens.
 * :class:`FakeDecisions`: scripted answers for tests.
 
-:func:`detect_decisions` picks one from ``REPOFINDER_DECISIONS`` (``jev``,
-``rules`` or ``off``; unset means rules). Jev needs ``OPENROUTER_API_KEY``
+:func:`detect_decisions` picks one from ``REPOFINDER_DECISIONS``. The default
+(unset, or ``auto``) is Jev when an API key is set and ``typesafe-sdk`` is
+installed, and the local rules otherwise, without any error. Set ``rules`` or
+``off`` to force the local rules even with a key present, or ``jev`` to
+require Jev (an error when the key or the sdk is missing). Jev needs ``OPENROUTER_API_KEY``
 (through OpenRouter) or ``TYPESAFE_API_KEY`` (TypeSafe's own API).
 
 The chat layer calls :func:`route_message`, :func:`rerank_cards` and
@@ -58,7 +61,8 @@ ROUTE_CHAT = "chat"          # greetings, thanks, meta questions about RepoFinde
 ROUTE_OUTSIDE = "outside"    # asks about something this repository delegates elsewhere -> no search, say so
 ROUTES = (ROUTE_LOCATE, ROUTE_EXPLAIN, ROUTE_FOLLOWUP, ROUTE_CHAT, ROUTE_OUTSIDE)
 
-ENV_DECISIONS = "REPOFINDER_DECISIONS"          # "jev" | "rules" | "off"  (off == rules, kept for clarity)
+ENV_DECISIONS = "REPOFINDER_DECISIONS"          # "auto" (default) | "jev" | "rules" | "off"  (off == rules)
+DECISIONS_AUTO = "auto"
 DECISIONS_JEV = "jev"
 DECISIONS_RULES = "rules"
 DECISIONS_OFF = "off"
@@ -109,7 +113,10 @@ Jev (TypeSafe's decision model) can make RepoFinder's chat decisions. It needs:
        TYPESAFE_API_KEY=...           TypeSafe's own API (api.typesafe.ai)
      in the environment or in a .env file in the directory you run RepoFinder from.
 
-The built-in rules need neither: unset REPOFINDER_DECISIONS or set it to "rules"."""
+By default (REPOFINDER_DECISIONS unset or "auto") Jev is used when a key and the sdk are
+present, and the built-in rules otherwise. Set REPOFINDER_DECISIONS=rules (or off) to force
+the rules, which need neither, even with a key present; REPOFINDER_DECISIONS=jev requires
+Jev and fails when the key or the sdk is missing."""
 
 ROUTE_INSTRUCTIONS = (
     "Classify the new user message in this conversation with RepoFinder, an assistant that answers"
@@ -764,10 +771,16 @@ def _one_hot(label: str, keys: Union[Sequence[str], Mapping[str, str]]) -> dict[
 # Detection
 # --------------------------------------------------------------------------- #
 
+def _has_key() -> bool:
+    return any((os.environ.get(name) or "").strip() for name in (OPENROUTER_KEY_ENV, TYPESAFE_KEY_ENV))
+
+
 def detect_decisions(preferred: Optional[str] = None) -> Decisions:
     """The decisions backend for ``preferred`` or ``REPOFINDER_DECISIONS``.
 
-    ``None``, ``"rules"`` and ``"off"`` give :class:`RulesDecisions`.
+    ``"rules"`` and ``"off"`` give :class:`RulesDecisions`. ``None``/empty
+    and ``"auto"`` give :class:`JevDecisions` when a key is set and
+    ``typesafe-sdk`` imports, else :class:`RulesDecisions`; they never raise.
     ``"jev"`` gives :class:`JevDecisions` when ``OPENROUTER_API_KEY`` or
     ``TYPESAFE_API_KEY`` is set and ``typesafe-sdk`` imports; otherwise, and
     for an unknown name, :class:`DecisionsConfigError` with setup help. A
@@ -779,17 +792,25 @@ def detect_decisions(preferred: Optional[str] = None) -> Decisions:
     load_dotenv()
     raw = preferred or os.environ.get(ENV_DECISIONS)
     choice = (raw or "").strip().lower() or None
-    if choice in (None, DECISIONS_RULES, DECISIONS_OFF):
+    if choice in (DECISIONS_RULES, DECISIONS_OFF):
         return RulesDecisions()
+    if choice in (None, DECISIONS_AUTO):
+        if not _has_key():
+            return RulesDecisions()
+        try:
+            _import_sdk()
+        except DecisionsConfigError:
+            return RulesDecisions()
+        return JevDecisions()
     if choice == DECISIONS_JEV:
-        if not any((os.environ.get(name) or "").strip() for name in (OPENROUTER_KEY_ENV, TYPESAFE_KEY_ENV)):
+        if not _has_key():
             raise DecisionsConfigError(
                 f"Jev decisions were requested ({ENV_DECISIONS}=jev), but neither {OPENROUTER_KEY_ENV}"
                 f" nor {TYPESAFE_KEY_ENV} is set.\n\n" + JEV_SETUP_HELP)
         _import_sdk()
         return JevDecisions()
     raise DecisionsConfigError(
-        f"Unknown decisions backend {raw!r}: use 'jev', 'rules' or 'off'.\n\n" + JEV_SETUP_HELP)
+        f"Unknown decisions backend {raw!r}: use 'auto', 'jev', 'rules' or 'off'.\n\n" + JEV_SETUP_HELP)
 
 
 # --------------------------------------------------------------------------- #

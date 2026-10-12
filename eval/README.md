@@ -360,3 +360,50 @@ Run (`OPENROUTER_API_KEY` set; `--dry-run` works without a key):
 ```
 .venv\Scripts\python -I eval\jev_rerank.py eval\golden\flask.json --source PATH
 ```
+
+## Jev in the pipeline (2026-10-12)
+
+The Jev rerank is now part of `pipeline.rerank_retrieve` (used by `ask`, `chat`
+and `run_eval.py`), so it is measured through the real pipeline instead of the
+experiment script. Search fetches `max(k, candidates)` hits; the first
+`candidates` (default 16, cap 16) are rendered as cards (`path:start-end`, kind,
+qualname, first 40 lines) and sent to Jev in one call with a NONE option. The
+chosen order is applied and the top k become the context; NONE keeps the search
+order and sets `off_target`; a failed call keeps the search order and records
+`decision_error`.
+
+Strict, k=8, search v3, local checkouts at the golden commits:
+
+| set | layer | hit@1 | hit@3 | hit@8 | MRR | cost / run | mean s / q |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Flask (27 scored of 30) | none (search v3) | 0.67 | 0.85 | 0.89 | 0.752 | 0 | 0.006 |
+| Flask | Jev, 8 candidates | 0.89 | 0.89 | 0.89 | 0.889 | $0.0035 | 0.46 |
+| Flask | Jev, 16 candidates | 0.89 | 0.89 | 0.89 | 0.889 | $0.0060 | 0.46 |
+| requests (17 of 20) | none | 0.59 | 0.65 | 0.82 | 0.642 | 0 | 0.006 |
+| requests | Jev, 8 candidates | 0.82 | 0.82 | 0.82 | 0.824 | $0.0022 | 0.47 |
+| requests | Jev, 16 candidates | 0.88 | 0.88 | 0.88 | 0.882 | $0.0038 | 0.41 |
+
+Reports: `results/flask-pipeline-jev-c8-searchv3-d086db8-k8.json`,
+`results/flask-pipeline-jev-c16-searchv3-d086db8-k8.json`,
+`results/requests-pipeline-jev-c8-searchv3-611c6162-k8.json`,
+`results/requests-pipeline-jev-c16-searchv3-611c6162-k8.json`.
+
+Every question Jev moved went to rank 1: Flask q16 2->1, q18 2->1, q19 7->1,
+q22 3->1, q24 2->1, q26 3->1; requests q05 2->1, q09 7->1, q12 7->1, q14 8->1,
+and with 16 candidates q13 10->1. No question got worse. hit@1 = hit@3 = hit@8
+after the rerank: whenever the answer was among the candidates, Jev put it
+first. NONE was chosen only for real misses (Flask q15; requests q13 with 8
+candidates) and for questions whose answer is not in the repository (Flask q28,
+q29; requests q20 with 8 candidates). The remaining misses (Flask q15, q21,
+q23; requests q15, q17) are not in the top 16 at all, so they stay a search
+problem. The pipeline cards did slightly better than the experiment script
+cards: Flask hit@1 0.85 -> 0.89 with the same 8 candidates.
+
+Why 16 is the default: the same hit@1 on Flask, one more question on requests
+(q13), and a cost still under 0.02 cents per question.
+
+Run: `run_eval.py ... --decisions jev|rules --candidates N`. Rows get a
+`decision` block; the summary gets `decision_calls`, `decision_cost_usd`,
+`reranked`, `off_target` and `decision_errors`; the markdown report gets a
+`decisions:` line; the per-question log marks `[rerank]`, `[none]` or
+`[dec-err]`.

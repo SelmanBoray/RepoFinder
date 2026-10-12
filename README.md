@@ -60,22 +60,29 @@ Models default to `claude-sonnet-5-5` for per-file summaries and
 Chat mode makes a few small decisions on every turn before Claude writes the
 reply: what kind of message it is (a "where is" question, an explanation, a
 follow-up, small talk), which search hit answers it, and whether the excerpts
-already shown cover a follow-up. By default built-in English and Turkish rules
-make them, offline and free; the rules never reorder search results.
+already shown cover a follow-up. The one-shot `ask` makes one of them, which
+hit answers the question. Built-in English and Turkish rules can make these
+decisions, offline and free; the rules never reorder search results.
 TypeSafe's Jev model, which returns typed choices with probabilities rather
-than text, can make them instead:
+than text, makes them when it is set up, and it is what you get by default once
+it is:
 
 ```powershell
 .venv\Scripts\python -m pip install -e ".[jev]"     # installs typesafe-sdk
 $env:OPENROUTER_API_KEY = "sk-or-..."               # through OpenRouter, or
 $env:TYPESAFE_API_KEY = "..."                       # through TypeSafe's own API
-$env:REPOFINDER_DECISIONS = "jev"                   # "rules" or "off" (the default) use the rules
+$env:REPOFINDER_DECISIONS = "auto"                  # optional; see below
 ```
+
+`REPOFINDER_DECISIONS` unset (or `auto`) uses Jev when `OPENROUTER_API_KEY` (or
+`TYPESAFE_API_KEY`) is set and `typesafe-sdk` is installed, and otherwise the
+built-in rules, silently. `rules` (or `off`) forces the rules even with a key;
+`jev` requires Jev. This applies to both `ask` and `chat`.
 
 The keys can also go in the `.env` file. When both are set, the OpenRouter key
 is used (model `~typesafe/jev-latest`). Jev bills input only (about $0.042 per
 million tokens; output is free), and each request is kept under its 32k-token
-context. `REPOFINDER_DECISIONS=jev` without a key or without `typesafe-sdk` is
+context. Forcing `REPOFINDER_DECISIONS=jev` without a key or without `typesafe-sdk` is
 a configuration error that prints these setup steps.
 
 ## Quick start (Flask)
@@ -118,7 +125,7 @@ one model call per file (about 80 for Flask), so try `--limit 10` first.
 | --- | --- |
 | `repofinder index <source> [--refresh]` | Clone (for a URL) and index. `--refresh` rebuilds an existing index and keeps the summaries of files that still exist. |
 | `repofinder map <source> [--out FILE] [--max-modules N]` | Architecture map in Markdown: entry points, core modules by fan-in, package layout, hot spots and where to start. |
-| `repofinder ask <source> "question" [-k N] [--show-context] [--json]` | Answer with citations. `-k` sets how many search hits become context (default 8); `--show-context` lists the excerpts sent to Claude; `--json` prints `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage` and `elapsed_s`. |
+| `repofinder ask <source> "question" [-k N] [--show-context] [--decisions jev\|rules] [--candidates N] [--json]` | Answer with citations. `-k` sets how many search hits become context (default 8); `--show-context` lists the excerpts sent to Claude; `--decisions` picks the decision layer for this run (default: Jev when set up, else the rules); with Jev, one call reranks the first `--candidates` hits (default 16, at most 16) before the top `-k` become context; `--json` prints `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage`, `elapsed_s`, `decisions` (`name`, `calls`, `cost_usd`, `reranked`, `off_target`, `error`), `candidates` and `probabilities` (`path:start-end` to p). |
 | `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | A conversation about the code, one message per line from stdin (see [Chat mode](#chat-mode)). `-k` sets the search hits per search (default 8); `--decisions` picks the decision layer for this run. `/context` lists the excerpts of the last search, `/route` shows how the last message was routed, `/help` lists the commands, `/quit` or the end of input leaves. `--json` prints one JSON object per line for every turn (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). The `you>` prompt is shown only when you type in a terminal, so piped output stays clean. |
 | `repofinder summarize <source> [--limit N] [--all]` | Per-file summaries, then the repository overview. Only files without a summary are done unless `--all`. Stops after 3 failures in a row (usually a usage limit); finished work is kept. |
 | `repofinder status <source>` | Counts of files, symbols and imports, summaries, overview present, files changed since indexing, LLM backend, data directory. |
@@ -147,9 +154,25 @@ messages of the conversation. After each reply a dim line shows the route,
 whether the excerpts were reused or the search was widened, the time, the
 tokens and the decision calls.
 
-The decisions are made by the built-in rules unless Jev is set up, as described
-in [Decisions (optional, Jev)](#decisions-optional-jev); with the rules, chat
-makes no model calls besides Claude's reply.
+The decisions are made by Jev when it is set up and by the built-in rules
+otherwise, as described in [Decisions (optional, Jev)](#decisions-optional-jev);
+with the rules, chat makes no model calls besides Claude's reply.
+
+### Ask with Jev
+
+`ask` shows `decisions: <name>` on its Backend line. When Jev runs, the usage
+line adds `decisions: jev (1 call, $0.000xxx) · reranked` (or `· off-target`).
+Search fetches `max(k, candidates)` hits; the first `candidates` (default 16,
+never more than 16) become cards (`path:start-end`, a label and the first 40
+lines) and go to Jev in one call together with a NONE option. The chosen order
+is applied and the top `k` become the context. If Jev picks NONE, the search
+order is kept and the answer is marked off-target. If the call fails, the search
+order is kept and the error is reported (`decisions.error` in `--json`); a
+configuration error, such as a forced `jev` without a key, aborts instead.
+`pipeline.retrieve` stays deterministic and unchanged; `pipeline.rerank_retrieve`
+adds the layer, and `pipeline.ask` uses it. On the golden sets Jev with 16
+candidates moves Flask hit@1 from 0.67 to 0.89 and requests from 0.59 to 0.88
+for under 0.02 cents per question ([details](eval/README.md#jev-in-the-pipeline-2026-10-12)).
 
 ## How it works
 
@@ -199,8 +222,9 @@ error).
 The code is in `repofinder/`: `ingest` and `parser` (clone, walk, tree-sitter),
 `store` (SQLite), `search` (BM25), `graph` and `mapper` (import graph, map),
 `llm`, `prompts` and `backends` (Claude), `chunker` (hits to excerpts),
-`pipeline` (the API the CLI and the evaluation call), `chat` and `decisions`
-(conversation mode and its routing choices) and `cli`.
+`pipeline` (the API the CLI and the evaluation call; `retrieve` is the
+deterministic search, `rerank_retrieve` adds the decision layer), `chat` and
+`decisions` (conversation mode and its routing choices) and `cli`.
 
 Notes for contributors:
 
