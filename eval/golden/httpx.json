@@ -1,0 +1,345 @@
+{
+  "repo": {"name": "httpx", "source": "https://github.com/encode/httpx", "commit": "b5addb6"},
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Where is `Client.send` implemented, the method that sends a Request object I built myself?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "httpx/_client.py", "symbol": "Client.send", "start_line": 879, "end_line": 928}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_client.py", "symbol": "AsyncClient.send", "start_line": 1594, "end_line": 1643},
+        {"path": "httpx/_client.py", "symbol": "Client.request", "start_line": 771, "end_line": 825},
+        {"path": "httpx/_client.py", "symbol": "Client._send_single_request", "start_line": 1001, "end_line": 1034}
+      ],
+      "notes": "Exact identifier; 'send' collides with AsyncClient.send, the ASGI send() closure and generator .send() calls. Client.send refuses a closed client, resolves follow_redirects, applies _set_timeout and _build_request_auth, calls _send_handling_auth with an empty history and reads the body unless stream=True (_client.py:900-928). Wrong but plausible: AsyncClient.send (the async twin), Client.request (builds the request, then calls send), Client._send_single_request (the actual transport call)."
+    },
+    {
+      "id": "q02",
+      "question": "Where is an error message like \"Client error '404 Not Found' for url ...\" put together?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "httpx/_models.py", "symbol": "Response.raise_for_status", "start_line": 794, "end_line": 829}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_exceptions.py", "symbol": "HTTPStatusError", "start_line": 258, "end_line": 268},
+        {"path": "httpx/_status_codes.py", "symbol": "codes.get_reason_phrase", "start_line": 39, "end_line": 43},
+        {"path": "httpx/_models.py", "symbol": "Response.is_error", "start_line": 765, "end_line": 769}
+      ],
+      "notes": "The phrase never appears literally: raise_for_status formats \"{error_type} '{0.status_code} {0.reason_phrase}' for url '{0.url}'\", picks error_type from a dict keyed by status_code // 100 ('Client error' for 4xx) and raises HTTPStatusError (_models.py:808-829). Wrong but plausible: HTTPStatusError (only stores request and response), codes.get_reason_phrase (supplies 'Not Found' through Response.reason_phrase), Response.is_error / is_client_error (booleans, no message)."
+    },
+    {
+      "id": "q03",
+      "question": "When a server answers with a relative `Location: /login` header, which method works out the absolute URL to follow next?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "httpx/_client.py", "symbol": "BaseClient._redirect_url", "start_line": 517, "end_line": 544}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_urls.py", "symbol": "URL.join", "start_line": 354, "end_line": 366},
+        {"path": "httpx/_client.py", "symbol": "BaseClient._build_redirect_request", "start_line": 475, "end_line": 492},
+        {"path": "httpx/_client.py", "symbol": "BaseClient._merge_url", "start_line": 391, "end_line": 411}
+      ],
+      "notes": "_redirect_url parses response.headers['Location'] (RemoteProtocolError on an invalid URL), fills in the host for scheme-only absolute forms, resolves relative locations with request.url.join(url) and carries over the original fragment (_client.py:521-544); _build_redirect_request calls it (related). Wrong but plausible: URL.join (the urljoin helper it delegates to), BaseClient._merge_url (joins with base_url, not with Location), Response.has_redirect_location (only checks the status code and that Location exists)."
+    },
+    {
+      "id": "q04",
+      "question": "Testlerde gerçek ağa çıkmadan, gelen her isteğe benim yazdığım bir Python fonksiyonuyla cevap veren transport hangisi?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "httpx/_transports/mock.py", "symbol": "MockTransport", "start_line": 15, "end_line": 43}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_transports/wsgi.py", "symbol": "WSGITransport", "start_line": 44, "end_line": 149},
+        {"path": "httpx/_auth.py", "symbol": "FunctionAuth", "start_line": 113, "end_line": 123}
+      ],
+      "notes": "Describes one class in Turkish. MockTransport(handler) implements both handle_request and handle_async_request: it reads the request body and returns handler(request), awaiting the result when the handler is a coroutine function (mock.py:19-43). Wrong but plausible: WSGITransport / ASGITransport (call a WSGI/ASGI application, not a plain function), FunctionAuth (also wraps a plain callable, but for auth), BaseTransport (the interface only)."
+    },
+    {
+      "id": "q05",
+      "question": "Which class decides whether a request URL matches a mount key such as \"all://*example.org\" or \"https://example.com:1234\", and makes more specific keys win over general ones?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "httpx/_utils.py", "symbol": "URLPattern", "start_line": 120, "end_line": 226}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_client.py", "symbol": "Client._transport_for_url", "start_line": 760, "end_line": 769},
+        {"path": "httpx/_utils.py", "symbol": "get_environment_proxies", "start_line": 30, "end_line": 76},
+        {"path": "httpx/_client.py", "symbol": "BaseClient._get_proxy_map", "start_line": 239, "end_line": 251}
+      ],
+      "notes": "URLPattern parses the key into scheme/host/port, compiles a host regex for the 'example.com', '*example.com' and '*.example.com' forms, matches() compares them, and priority/__lt__ sort port-specific, longer-host and longer-scheme keys first (_utils.py:162-223); Client.__init__ sorts self._mounts with it (_client.py:716). Wrong but plausible: Client._transport_for_url (loops over the already sorted patterns), get_environment_proxies and _get_proxy_map (produce the keys, do not match them)."
+    },
+    {
+      "id": "q06",
+      "question": "httpcore'un fırlattığı hatalar `httpx.ReadTimeout` ya da `httpx.ConnectError` gibi httpx istisnalarına nerede dönüştürülüyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "httpx/_transports/default.py", "symbol": "map_httpcore_exceptions", "start_line": 96, "end_line": 118},
+        {"path": "httpx/_transports/default.py", "symbol": "_load_httpcore_exceptions", "start_line": 74, "end_line": 92}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_exceptions.py", "symbol": "request_context", "start_line": 365, "end_line": 377},
+        {"path": "httpx/_transports/default.py", "symbol": "ResponseStream.__iter__", "start_line": 125, "end_line": 128},
+        {"path": "httpx/_exceptions.py", "symbol": "ReadTimeout", "start_line": 146, "end_line": 149}
+      ],
+      "notes": "_load_httpcore_exceptions builds the httpcore -> httpx class map (default.py:74-92); the map_httpcore_exceptions context manager catches the exception, picks the most specific matching httpx class and re-raises it from the original (96-118). It wraps the pool calls and the response stream iteration. Wrong but plausible: request_context (only attaches .request to an exception that is already an httpx RequestError), the exception classes in _exceptions.py, ResponseStream.__iter__ (a caller)."
+    },
+    {
+      "id": "q07",
+      "question": "404 gibi bir durum kodunu 'Not Found' aciklamasina ceviren yapi nerede tanimli?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "httpx/_status_codes.py", "symbol": "codes", "start_line": 8, "end_line": 157},
+        {"path": "httpx/_status_codes.py", "symbol": "codes.get_reason_phrase", "start_line": 39, "end_line": 43}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_models.py", "symbol": "Response.reason_phrase", "start_line": 620, "end_line": 626},
+        {"path": "httpx/_models.py", "symbol": "Response.raise_for_status", "start_line": 794, "end_line": 829}
+      ],
+      "notes": "Turkish without Turkish letters ('404 gibi bir durum kodunu Not Found açıklamasına çeviren yapı nerede tanımlı'). codes is an IntEnum whose members are (value, phrase) pairs; __new__ stores the phrase and get_reason_phrase returns codes(value).phrase or '' (_status_codes.py:28-43). Response.reason_phrase falls back to it when the transport gave no reason_phrase extension (related). Wrong but plausible: Response.raise_for_status (uses the phrase), the codes.is_* classmethods."
+    },
+    {
+      "id": "q08",
+      "question": "İstek nesnesi oluşturulurken `Host` başlığı ve gövdesiz POST için `Content-Length: 0` otomatik olarak nerede ekleniyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "httpx/_models.py", "symbol": "Request._prepare", "start_line": 441, "end_line": 460}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_models.py", "symbol": "Request.__init__", "start_line": 383, "end_line": 439},
+        {"path": "httpx/_content.py", "symbol": "encode_request", "start_line": 186, "end_line": 218},
+        {"path": "httpx/_models.py", "symbol": "Response._prepare", "start_line": 571, "end_line": 576}
+      ],
+      "notes": "Request._prepare first setdefaults the content headers returned by encode_request (skipping Transfer-Encoding when Content-Length is set), then prepends Host from url.netloc and Content-Length: 0 for POST/PUT/PATCH without a length header (_models.py:441-460). Request.__init__ calls it (419, related). Wrong but plausible: Response._prepare (same name, content headers only), encode_request / encode_content (compute the length of a real body), the client default headers (Accept, User-Agent) in the BaseClient.headers setter."
+    },
+    {
+      "id": "q09",
+      "question": "With `base_url=\"https://api.example.com/v1\"`, a request to \"/users\" ends up at /v1/users and not at /users. Where is the URL merged like that?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "httpx/_client.py", "symbol": "BaseClient._merge_url", "start_line": 391, "end_line": 411},
+        {"path": "httpx/_client.py", "symbol": "BaseClient._enforce_trailing_slash", "start_line": 234, "end_line": 237}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_urls.py", "symbol": "URL.join", "start_line": 354, "end_line": 366},
+        {"path": "httpx/_client.py", "symbol": "BaseClient.build_request", "start_line": 340, "end_line": 389}
+      ],
+      "notes": "The client stores base_url with a forced trailing '/' (_enforce_trailing_slash, used in __init__ and the base_url setter), and _merge_url appends a relative URL's raw_path, with its leading '/' stripped, to base_url.raw_path (_client.py:396-411), so '/users' does not reset the path as RFC 3986 joining would. build_request calls _merge_url (366, related). Wrong but plausible: URL.join (urljoin semantics, used for redirects; it would give /users), QueryParams.merge."
+    },
+    {
+      "id": "q10",
+      "question": "Where are the callables registered in `event_hooks` actually invoked for each request and response?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "httpx/_client.py", "symbol": "Client._send_handling_redirects", "start_line": 964, "end_line": 999},
+        {"path": "httpx/_client.py", "symbol": "AsyncClient._send_handling_redirects", "start_line": 1679, "end_line": 1715}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_client.py", "symbol": "BaseClient.__init__", "start_line": 189, "end_line": 221},
+        {"path": "httpx/_client.py", "symbol": "Client._send_single_request", "start_line": 1001, "end_line": 1034}
+      ],
+      "notes": "Hooks are only stored in _event_hooks by BaseClient.__init__ and the event_hooks setter (related). They run inside the redirect loop: every request hook before _send_single_request and every response hook right after it, so they fire once per redirect hop (_client.py:976-982; awaited in the async twin, 1691-1697); either method answers. Wrong but plausible: the event_hooks property/setter (storage only), Client.send, Auth.auth_flow (a different per-request extension point)."
+    },
+    {
+      "id": "q11",
+      "question": "After a response sets cookies with Set-Cookie, where does the client store them so that later requests send them back?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "httpx/_client.py", "symbol": "Client._send_single_request", "start_line": 1001, "end_line": 1034},
+        {"path": "httpx/_client.py", "symbol": "AsyncClient._send_single_request", "start_line": 1717, "end_line": 1749},
+        {"path": "httpx/_models.py", "symbol": "Cookies.extract_cookies", "start_line": 1101, "end_line": 1108}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_models.py", "symbol": "Response.cookies", "start_line": 835, "end_line": 839},
+        {"path": "httpx/_client.py", "symbol": "BaseClient._merge_cookies", "start_line": 413, "end_line": 422},
+        {"path": "httpx/_models.py", "symbol": "Cookies.set_cookie_header", "start_line": 1110, "end_line": 1115}
+      ],
+      "notes": "_send_single_request calls self.cookies.extract_cookies(response) for every response, redirect hops included (_client.py:1022, async 1737); Cookies.extract_cookies feeds the headers to the stdlib CookieJar through _CookieCompatResponse / _CookieCompatRequest (_models.py:1101-1108). On the way out, build_request merges the client jar via _merge_cookies and Request.__init__ writes the Cookie header with set_cookie_header (related). Wrong but plausible: Response.cookies (a fresh per-response jar that is not persisted), the deprecated per-request cookies= argument in Client.request."
+    },
+    {
+      "id": "q12",
+      "question": "HTTP_PROXY ve HTTPS_PROXY ortam degiskenleri nerede okunuyor, NO_PROXY'deki hostlar proxy disinda nasil birakiliyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "httpx/_utils.py", "symbol": "get_environment_proxies", "start_line": 30, "end_line": 76},
+        {"path": "httpx/_client.py", "symbol": "BaseClient._get_proxy_map", "start_line": 239, "end_line": 251}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_utils.py", "symbol": "URLPattern", "start_line": 120, "end_line": 226},
+        {"path": "httpx/_config.py", "symbol": "Proxy.__init__", "start_line": 202, "end_line": 224},
+        {"path": "httpx/_transports/default.py", "symbol": "HTTPTransport.__init__", "start_line": 136, "end_line": 215}
+      ],
+      "notes": "Turkish without Turkish letters ('... ortam değişkenleri nerede okunuyor, NO_PROXY'deki hostlar proxy dışında nasıl bırakılıyor'). get_environment_proxies turns urllib's getproxies() into 'http://', 'https://', 'all://' keys and maps each NO_PROXY entry to a key with value None ('*' disables all proxies, domains become 'all://*domain', IPs and localhost exact keys) (_utils.py:37-76). _get_proxy_map uses it only when proxy is None, trust_env is on and no custom transport is given (_client.py:239-251, 685-686); a None mount means the default transport. Wrong but plausible: Proxy (validates one proxy URL), URLPattern (matches the keys), HTTPTransport.__init__ (builds httpcore.HTTPProxy)."
+    },
+    {
+      "id": "q13",
+      "question": "Yanıt `Content-Encoding: gzip, br` başlığıyla geldiğinde gövde hangi sırayla ve hangi kodla açılıyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "httpx/_models.py", "symbol": "Response._get_content_decoder", "start_line": 699, "end_line": 722},
+        {"path": "httpx/_decoders.py", "symbol": "MultiDecoder", "start_line": 203, "end_line": 225}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_decoders.py", "symbol": "GZipDecoder", "start_line": 85, "end_line": 105},
+        {"path": "httpx/_decoders.py", "symbol": "BrotliDecoder", "start_line": 108, "end_line": 158},
+        {"path": "httpx/_models.py", "symbol": "Response.iter_bytes", "start_line": 884, "end_line": 905}
+      ],
+      "notes": "_get_content_decoder splits the Content-Encoding values (get_list with split_commas), looks each up in SUPPORTED_DECODERS (unknown ones skipped) and wraps more than one in MultiDecoder (_models.py:704-722); MultiDecoder reverses the list so the last applied encoding (br) is undone first (_decoders.py:208-219). iter_bytes runs the decoder over the raw chunks (related). Wrong but plausible: GZipDecoder / BrotliDecoder alone (one codec each), TextDecoder (charset, not Content-Encoding), ACCEPT_ENCODING in _client.py:120-122."
+    },
+    {
+      "id": "q14",
+      "question": "How is the multipart boundary chosen for file uploads, and how can I force my own boundary?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "httpx/_multipart.py", "symbol": "MultipartStream.__init__", "start_line": 229, "end_line": 242},
+        {"path": "httpx/_multipart.py", "symbol": "get_multipart_boundary_from_content_type", "start_line": 56, "end_line": 67}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_content.py", "symbol": "encode_multipart_data", "start_line": 152, "end_line": 157},
+        {"path": "httpx/_models.py", "symbol": "Request.__init__", "start_line": 383, "end_line": 439},
+        {"path": "httpx/_multipart.py", "symbol": "MultipartStream.iter_chunks", "start_line": 258, "end_line": 263}
+      ],
+      "notes": "Without a boundary, MultipartStream.__init__ uses os.urandom(16).hex() and builds the 'multipart/form-data; boundary=...' content type (_multipart.py:235-242). To force one, send a 'Content-Type: multipart/form-data; boundary=...' header: Request.__init__ extracts it with get_multipart_boundary_from_content_type and passes it to encode_request (_models.py:407-418; _multipart.py:56-67). Wrong but plausible: encode_multipart_data (only forwards the boundary), iter_chunks (writes the boundary lines), encode_urlencoded_data (form data without files)."
+    },
+    {
+      "id": "q15",
+      "question": "How does a `timeout=` passed to `client.get()` reach the layer that actually enforces it?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "httpx/_client.py", "symbol": "BaseClient.build_request", "start_line": 340, "end_line": 389},
+        {"path": "httpx/_client.py", "symbol": "BaseClient._set_timeout", "start_line": 584, "end_line": 591},
+        {"path": "httpx/_transports/default.py", "symbol": "HTTPTransport.handle_request", "start_line": 230, "end_line": 259}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_config.py", "symbol": "Timeout.__init__", "start_line": 86, "end_line": 130},
+        {"path": "httpx/_client.py", "symbol": "Client.request", "start_line": 771, "end_line": 825},
+        {"path": "httpx/_transports/default.py", "symbol": "map_httpcore_exceptions", "start_line": 96, "end_line": 118}
+      ],
+      "notes": "Client.get -> Client.request forwards timeout to build_request, which wraps it in Timeout (or keeps the client default for USE_CLIENT_DEFAULT) and stores timeout.as_dict() in request.extensions['timeout'] (_client.py:370-377); Client.send calls _set_timeout, which fills the same key only for a hand-built Request (584-591). HTTPTransport.handle_request copies request.extensions into httpcore.Request (default.py:237-248) and httpcore enforces connect/read/write/pool. Wrong but plausible: Timeout.__init__ (normalizes a float or tuple, not the path), Client.request (only forwards), map_httpcore_exceptions (maps timeout errors back)."
+    },
+    {
+      "id": "q16",
+      "question": "Kendi Auth sinifimda auth_flow icinde yield ettigim istekler nasil gonderiliyor, gelen yanit generator'a nasil geri veriliyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "httpx/_client.py", "symbol": "Client._send_handling_auth", "start_line": 930, "end_line": 962},
+        {"path": "httpx/_client.py", "symbol": "AsyncClient._send_handling_auth", "start_line": 1645, "end_line": 1677},
+        {"path": "httpx/_auth.py", "symbol": "Auth.sync_auth_flow", "start_line": 62, "end_line": 85},
+        {"path": "httpx/_client.py", "symbol": "BaseClient._build_request_auth", "start_line": 457, "end_line": 473}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_auth.py", "symbol": "DigestAuth.auth_flow", "start_line": 193, "end_line": 222},
+        {"path": "httpx/_auth.py", "symbol": "Auth.auth_flow", "start_line": 38, "end_line": 60},
+        {"path": "httpx/_client.py", "symbol": "Client._send_handling_redirects", "start_line": 964, "end_line": 999}
+      ],
+      "notes": "Turkish without Turkish letters ('Kendi Auth sınıfımda auth_flow içinde yield ettiğim istekler nasıl gönderiliyor, gelen yanıt generator'a nasıl geri veriliyor'). Client.send picks the Auth with _build_request_auth (explicit, client, URL userinfo -> BasicAuth, else a no-op Auth; _client.py:462-473), then _send_handling_auth takes the first request with next(), sends it through _send_handling_redirects, returns the response with auth_flow.send(response) and loops while new requests are yielded, building history (930-962; async twin 1645-1677). Auth.sync_auth_flow wraps the user's auth_flow and reads bodies when requires_request_body / requires_response_body are set (_auth.py:62-85). Wrong but plausible: DigestAuth.auth_flow (one concrete flow), Auth.auth_flow (the default single yield), _send_handling_redirects (sends, but knows nothing about auth)."
+    },
+    {
+      "id": "q17",
+      "question": "When I loop over `iter_bytes()` inside `with client.stream(\"GET\", url) as r:`, how do the bytes get from the transport to my loop, and when is the connection released?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "httpx/_client.py", "symbol": "Client.stream", "start_line": 828, "end_line": 877},
+        {"path": "httpx/_models.py", "symbol": "Response.iter_bytes", "start_line": 884, "end_line": 905},
+        {"path": "httpx/_models.py", "symbol": "Response.iter_raw", "start_line": 935, "end_line": 959},
+        {"path": "httpx/_models.py", "symbol": "Response.close", "start_line": 961, "end_line": 972}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "httpx/_client.py", "symbol": "BoundSyncStream", "start_line": 139, "end_line": 159},
+        {"path": "httpx/_transports/default.py", "symbol": "ResponseStream", "start_line": 121, "end_line": 132},
+        {"path": "httpx/_models.py", "symbol": "Response.read", "start_line": 876, "end_line": 882}
+      ],
+      "notes": "Client.stream builds the request, calls send(..., stream=True) so the body is not read, yields the response and always calls response.close() in finally (_client.py:855-877). iter_bytes runs the content decoder and a ByteChunker over iter_raw (_models.py:884-905); iter_raw marks the stream consumed, iterates response.stream (a BoundSyncStream around the transport's ResponseStream over httpcore's stream), counts bytes and calls close() at the end (935-959). Response.close closes that stream, which records elapsed and releases the httpcore connection (961-972). Wrong but plausible: Response.read (loads the whole body, the non-streaming path), _api.stream (the module-level wrapper)."
+    },
+    {
+      "id": "q18",
+      "question": "Where is the keep-alive connection pool implemented, the code that picks an idle connection to a host or opens a new one up to max_connections?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "httpx/_transports/default.py", "symbol": "HTTPTransport.__init__", "start_line": 136, "end_line": 215},
+        {"path": "httpx/_config.py", "symbol": "Limits", "start_line": 159, "end_line": 198}
+      ],
+      "related": [
+        {"path": "httpx/_transports/default.py", "symbol": "HTTPTransport.handle_request", "start_line": 230, "end_line": 259},
+        {"path": "httpx/_client.py", "symbol": "Client._transport_for_url", "start_line": 760, "end_line": 769},
+        {"path": "httpx/_exceptions.py", "symbol": "PoolTimeout", "start_line": 158, "end_line": 161}
+      ],
+      "notes": "Pooling is httpcore's ConnectionPool (or HTTPProxy / SOCKSProxy). httpx only builds it in HTTPTransport.__init__ from Limits(max_connections, max_keepalive_connections, keepalive_expiry) (default.py:155-167; _config.py:159-198, DEFAULT_LIMITS at 247) and hands each request to self._pool.handle_request (250). Correct behaviour: say the pool logic is not in the repo and cite the pointer. Wrong but plausible: Client._transport_for_url (chooses a transport, not a connection, although its docstring says 'connection pool'), PoolTimeout (only the exception class)."
+    },
+    {
+      "id": "q19",
+      "question": "HTTP/2 frame'leri ve ayni baglanti uzerinde stream coklama (multiplexing) nerede isleniyor?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "httpx/_transports/default.py", "symbol": "HTTPTransport.__init__", "start_line": 136, "end_line": 215},
+        {"path": "httpx/_transports/default.py", "symbol": "AsyncHTTPTransport.__init__", "start_line": 280, "end_line": 359},
+        {"path": "httpx/_client.py", "symbol": "Client.__init__", "start_line": 639, "end_line": 716},
+        {"path": "httpx/_client.py", "symbol": "AsyncClient.__init__", "start_line": 1353, "end_line": 1430}
+      ],
+      "related": [
+        {"path": "httpx/_models.py", "symbol": "Response.http_version", "start_line": 611, "end_line": 617},
+        {"path": "httpx/_transports/default.py", "symbol": "HTTPTransport.handle_request", "start_line": 230, "end_line": 259}
+      ],
+      "notes": "Turkish without Turkish letters ('HTTP/2 frame'leri ve aynı bağlantı üzerinde stream çoklama nerede işleniyor'). Framing and multiplexing are done by the h2 package inside httpcore's HTTP/2 connection; httpx only checks that h2 is importable when http2=True (Client.__init__, _client.py:676-683; async 1390-1397) and passes http1/http2 to httpcore.ConnectionPool (default.py:161-162; async 305-306). Correct behaviour: say it is not in the repo and cite the pointer. Wrong but plausible: Response.http_version (reads the negotiated version from extensions), HTTPTransport.handle_request."
+    },
+    {
+      "id": "q20",
+      "question": "Does httpx automatically retry a request after a 503 or a dropped connection? Where is the retry loop with backoff?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "httpx/_transports/default.py", "symbol": "HTTPTransport.__init__", "start_line": 136, "end_line": 215},
+        {"path": "httpx/_transports/default.py", "symbol": "AsyncHTTPTransport.__init__", "start_line": 280, "end_line": 359}
+      ],
+      "related": [
+        {"path": "httpx/_transports/default.py", "start_line": 18, "end_line": 20},
+        {"path": "httpx/_client.py", "symbol": "Client._send_handling_redirects", "start_line": 964, "end_line": 999},
+        {"path": "httpx/_transports/default.py", "symbol": "map_httpcore_exceptions", "start_line": 96, "end_line": 118}
+      ],
+      "notes": "httpx has no HTTP-level retry: no retry on 5xx and no backoff. The only knob is HTTPTransport(retries=N), default 0, passed straight to httpcore.ConnectionPool (default.py:147, 165; async 291, 309), where httpcore retries failed connection attempts; the module docstring shows HTTPTransport(retries=1) (18-20). Correct behaviour: say the retry loop is not in the repo (and that nothing is retried by default) and cite the pointer. Wrong but plausible: Client._send_handling_redirects / _send_handling_auth (loops that resend, but for redirects and auth), map_httpcore_exceptions."
+    }
+  ]
+}

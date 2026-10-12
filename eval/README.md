@@ -7,6 +7,7 @@ their exact answer locations, and a runner that scores the product against it.
 | File | What it is |
 | --- | --- |
 | `golden/flask.json` | 30 questions about Flask at commit `d086db8`, every location checked by reading the file |
+| `golden/httpx.json` | 20 questions about httpx at commit `b5addb6`, written blind (first held-out set), every location checked with `ast` |
 | `run_eval.py` | The runner: validates the golden set, calls the pipeline, scores, writes a report |
 | `search_baseline.py` | The same scoring with `repofinder.search` alone (no pipeline, no LLM) |
 | `results/` | JSON reports. `flask-search-baseline-d086db8-k8.json` is the search-only baseline |
@@ -407,3 +408,86 @@ Run: `run_eval.py ... --decisions jev|rules --candidates N`. Rows get a
 `reranked`, `off_target` and `decision_errors`; the markdown report gets a
 `decisions:` line; the per-question log marks `[rerank]`, `[none]` or
 `[dec-err]`.
+
+## httpx test set (2026-10-12)
+
+The third golden set: `golden/httpx.json`, encode/httpx at `b5addb6`, 20
+questions (8 locate-symbol, 6 locate-feature, 3 flow, 3 not-in-repo; 12 en, 8
+tr, of which 4 ASCII-only Turkish). It was written blind: the author did not
+open `search.py`, `decisions.py`, `eval/README.md`, `eval/results` or
+`tests/test_search.py`, only the httpx source. All 97 location entries were
+verified with `ast` against the commit. This is the first clean held-out set:
+Flask is the tuning set, requests is validation (semi-tainted, because the v3
+phrase additions were made while looking at it).
+
+Rule: no search parameter or lexicon change may be made from httpx errors. If
+that ever happens it must be said here, and httpx is validation from then on.
+
+Strict, k=8, local checkout at `b5addb6`:
+
+| group | layer | hit@1 | hit@3 | hit@8 | MRR |
+| --- | --- | --- | --- | --- | --- |
+| all answerable (17) | search v3 | 0.29 | 0.35 | 0.53 | 0.345 |
+| | Jev, 16 candidates | 0.65 | 0.77 | 0.77 | 0.706 |
+| locate-symbol (8) | search v3 | 0.25 | 0.38 | 0.62 | |
+| | Jev | 0.50 | 0.62 | 0.62 | |
+| locate-feature (6) | search v3 | 0.33 | 0.33 | 0.50 | |
+| | Jev | 0.83 | 0.83 | 0.83 | |
+| flow (3) | search v3 | 0.33 | 0.33 | 0.33 | |
+| | Jev | 0.67 | 1.00 | 1.00 | |
+| en (hit@1) | search v3 -> Jev | 0.40 -> 0.60 | | | |
+| tr (hit@1) | search v3 -> Jev | 0.14 -> 0.71 | | | |
+
+Other numbers. Search v3: loose hit@8 0.82, chunk_recall 0.47, not-in-repo
+pointer@8 0.33 (1/3). Jev: loose hit@1 0.77, loose hit@8 0.88, chunk_recall
+0.77, pointer@8 unchanged 0.33. Jev made 20 calls for $0.003419 in total
+(about 0.017 cents per question), reranked 16 of 20, chose NONE 4 times, had 0
+errors, and took 0.48 s per question on average.
+
+Reports: `results/httpx-search-v3-b5addb6-k8.json`,
+`results/httpx-pipeline-jev-c16-searchv3-b5addb6-k8.json`.
+
+Rank of the expected location, search v3 -> Jev (none = not in the top 8 for
+search, not chosen for Jev):
+
+| q | search -> Jev | q | search -> Jev |
+| --- | --- | --- | --- |
+| q01 | 1 -> 1 | q11 | 7 -> 1 |
+| q02 | none -> none | q12 | 1 -> 1 |
+| q03 | none -> none | q13 | none -> 1 |
+| q04 | 7 -> 2 | q14 | 1 -> 1 |
+| q05 | 1 -> 1 | q15 | none -> 1 |
+| q06 | 3 -> 1 | q16 | none -> 1 |
+| q07 | 4 -> 1 | q17 | 1 -> 2 |
+| q08 | none -> none | q18-q20 | not in repo (pointer only: q18 at 1) |
+| q09 | none -> 1 | | |
+| q10 | none -> none | | |
+
+Comparison across the three sets, strict hit@1 / hit@8, search v3 alone, then
+with Jev (16 candidates):
+
+| set | search v3 | + Jev c16 |
+| --- | --- | --- |
+| Flask | 0.67 / 0.89 | 0.89 / 0.89 |
+| requests | 0.59 / 0.82 | 0.88 / 0.88 |
+| httpx | 0.29 / 0.53 | 0.65 / 0.77 |
+
+Reading. On a repository the search was never tuned on, the lexical layer is
+much weaker than on Flask (hit@1 0.29 vs 0.67), and Turkish questions suffer
+most (0.14). Jev recovers most of it, because the right answer is usually
+within the first 16 hits (13 of 17), and it lifts Turkish to 0.71. The four
+remaining misses are retrieval failures: the answer was not in the top 16 at
+all.
+
+- q02 `Response.raise_for_status` (`_models.py:794-829`): the search surfaces
+  the exception classes.
+- q03 `BaseClient._redirect_url` (`_client.py:517-544`): URL helpers win.
+- q08 `Request._prepare` (`_models.py:441-460`): Host / Content-Length are not
+  in the symbol name.
+- q10 `Client._send_handling_redirects` (`_client.py:964-999`): the
+  `event_hooks` property wins over the place that calls the hooks.
+
+Honesty: one run each, no reruns. The golden set was written by a model agent
+under the blindness rule above. The flow questions use `accept_any=true`,
+unlike `requests.json` (`false`), so flow numbers across sets are not directly
+comparable.
