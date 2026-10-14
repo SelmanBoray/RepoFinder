@@ -8,7 +8,9 @@ their exact answer locations, and a runner that scores the product against it.
 | --- | --- |
 | `golden/flask.json` | 30 questions about Flask at commit `d086db8`, every location checked by reading the file |
 | `golden/httpx.json` | 20 questions about httpx at commit `b5addb6`, written blind (first held-out set), every location checked with `ast` |
+| `golden/chat_routes.json` | 24 conversations, 73 user turns, each turn labelled with its route (locate, followup, explain, chat, outside); written blind to the routing code |
 | `run_eval.py` | The runner: validates the golden set, calls the pipeline, scores, writes a report |
+| `route_eval.py` | Routing runner: feeds each turn the previous turns as history, calls `decisions.route_message` (`--decisions jev\|rules`), scores the route per turn |
 | `search_baseline.py` | The same scoring with `repofinder.search` alone (no pipeline, no LLM) |
 | `results/` | JSON reports. `flask-search-baseline-d086db8-k8.json` is the search-only baseline |
 
@@ -577,3 +579,68 @@ read as 4/27 under the judge; the phrase-heuristic admit metric over-counted by
 Honesty: the hand labels were made by the same person who wrote
 `ADMIT_QUESTION`'s criteria, after seeing the heuristic's output. One run; 30
 answers from one model on one repository.
+
+## Chat routing set (2026-10-14)
+
+The chat router (`decisions.route_message`) picks one of five routes for each
+user message: locate, followup, explain, chat, outside. `golden/chat_routes.json`
+checks it; `route_eval.py GOLDEN [--decisions jev|rules] [--ids] [--out]` runs
+it. Reports: `results/chat-routes-rules-v1.json`, `results/chat-routes-jev-v1.json`.
+
+The set: 24 conversations (flask 12, requests 12), 73 user turns. Routes by
+turn: locate 19, followup 21, explain 12, chat 11, outside 10. Languages by
+turn: en 41, tr 15, tr-ascii 17 (6 conversations are ASCII-only Turkish). It was
+written blind to `decisions.py`, `chat.py`, `prompts.py` and the tests. Each
+conversation has an English `notes` field naming the hard case it carries: a
+Turkish follow-up with no shared word after an English question, "it" / "bu" /
+"onu" follow-ups, a fresh locate right after an answer, questions about
+RepoFinder itself, "thanks, one more: where is X", outside questions phrased
+like locate, explain/locate boundary pairs, Turkish greetings, a one-word
+"neden?", long messages. The assistant replies in the set are short synthetic
+lines that only serve as history. The runner feeds each turn the previous turns
+as history.
+
+| route | rules precision / recall | Jev precision / recall |
+| --- | --- | --- |
+| locate | 0.55 / 0.90 | 0.70 / 1.00 |
+| explain | 0.64 / 0.75 | 0.91 / 0.83 |
+| followup | 0.75 / 0.71 | 1.00 / 0.91 |
+| chat | 0.88 / 0.64 | 1.00 / 1.00 |
+| outside | - / 0.00 | 0.80 / 0.40 |
+
+| | rules (offline) | Jev |
+| --- | --- | --- |
+| accuracy | 0.66 (48/73) | 0.86 (63/73) |
+| en / tr / tr-ascii | 0.61 / 0.67 / 0.77 | 0.85 / 0.93 / 0.82 |
+
+The rules never answer outside by design, hence outside recall 0.00. Their main
+confusion cells (expected -> predicted): outside -> locate 5, explain 3,
+followup 2; chat -> locate 4; followup -> locate 3, explain 2.
+
+Jev: mean p(expected) 0.88 on correct turns, 0.21 on wrong turns. Cost: 73
+calls, $0.001937 total (0.0027 cents per turn), 0.37 s per turn, 0 errors.
+
+Jev's 10 errors:
+- outside -> locate (six): c04 Werkzeug URL matching (0.72 locate); c11 flaskr
+  password hashing (0.77); c15 TLS certificate verification (0.61) and
+  connection pool (0.86); c19 requests retry loop (0.71); c24 ssl handshake
+  (0.99).
+- explain -> outside (one): c07, a long message about before_request.
+- followup -> locate / explain (two): c02 "and after_request?" (0.64 locate);
+  c13 "proxies parametresiyle ne yapiyo" (0.74 explain).
+- explain -> locate (one): c24 custom CA bundle via env var (0.36 vs 0.32).
+
+Reading: the route state (`decisions._route_state`) shows only the recent
+conversation and the new message. It does not say which repository this is or
+what it delegates, so Jev cannot know that Werkzeug, urllib3 or the ssl module
+are outside Flask or requests, and it reads "where is X" literally. Adding the
+repository name and a one-line description (the overview's first lines) to the
+route state is the obvious next change; when it is tried it must be reported
+as tuned on this set, since this is the only routing set. The rules' weak spot
+is different: no outside at all, and "where" questions about RepoFinder itself
+go to locate.
+
+Honesty: one run each. The set was written by a model agent and the labels were
+not independently reviewed turn by turn (the orchestrator spot-checked five
+conversations). Some labels are debatable by nature (c24 turn 3 is explain vs
+followup).

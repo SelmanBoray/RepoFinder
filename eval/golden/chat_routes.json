@@ -1,0 +1,348 @@
+{
+  "version": 1,
+  "description": "Golden set for chat-message routing. Each user turn carries the expected route (locate, explain, followup, chat, outside). Assistant replies are plausible history for the next turn and are not judged. In conversations marked ascii, the user turns are ASCII-only Turkish; assistant replies stay in normal Turkish.",
+  "conversations": [
+    {
+      "id": "c01",
+      "repo": "flask",
+      "lang": "en",
+      "notes": "Baseline: a locate question followed by two pronoun-only follow-ups ('who calls it?', 'show me the test for that') that cannot be resolved without the previous answer. The last turn has no assistant reply.",
+      "turns": [
+        {"user": "Where is the route decorator defined?", "route": "locate",
+         "assistant": "Scaffold.route in src/flask/sansio/scaffold.py:343-373; it pops the endpoint from the options and registers the rule via self.add_url_rule."},
+        {"user": "who calls it?", "route": "followup",
+         "assistant": "Nothing inside Flask calls route directly; users apply it as @app.route or @bp.route, and the actual registration happens in App.add_url_rule (src/flask/sansio/app.py:605-662)."},
+        {"user": "show me the test for that", "route": "followup"}
+      ]
+    },
+    {
+      "id": "c02",
+      "repo": "flask",
+      "lang": "en",
+      "notes": "Hard case: turn 2 is a fresh, fully specified locate question asked right after an answer on a neighbouring topic; it must NOT be routed as followup. Turn 3 is an elliptical 'and X?' follow-up that only makes sense against turn 2. Light typo in turn 1.",
+      "turns": [
+        {"user": "where's jsonify defnied", "route": "locate",
+         "assistant": "jsonify is in src/flask/json/__init__.py:138-170; it forwards to current_app.json.response()."},
+        {"user": "Where is the before_request decorator defined?", "route": "locate",
+         "assistant": "Scaffold.before_request in src/flask/sansio/scaffold.py:467-492; it appends the function to before_request_funcs[None]."},
+        {"user": "and after_request?", "route": "followup",
+         "assistant": "Right below it: Scaffold.after_request in src/flask/sansio/scaffold.py:494-513, which appends to after_request_funcs."}
+      ]
+    },
+    {
+      "id": "c03",
+      "repo": "flask",
+      "lang": "en",
+      "notes": "Explain vs locate boundary on one topic: 'How is the session cookie signed?' asks for a mechanism (explain); 'Which method signs the session cookie?' asks for a symbol (locate) and is a fresh self-contained question even though it follows an answer on the same subject. Turn 3 uses 'it' and depends on turn 2 (followup).",
+      "turns": [
+        {"user": "How is the session cookie signed?", "route": "explain",
+         "assistant": "SecureCookieSessionInterface.get_signing_serializer (src/flask/sessions.py:303-321) builds an itsdangerous URLSafeTimedSerializer from secret_key with the 'cookie-session' salt and HMAC-SHA1; save_session (337-385) dumps the session through it into the cookie."},
+        {"user": "Which method signs the session cookie?", "route": "locate",
+         "assistant": "SecureCookieSessionInterface.save_session in src/flask/sessions.py:337-385 calls the serializer's dumps; the signer itself comes from get_signing_serializer (303-321)."},
+        {"user": "does it also accept cookies signed with an old key?", "route": "followup",
+         "assistant": "Yes: get_signing_serializer puts SECRET_KEY_FALLBACKS in front of the current key (src/flask/sessions.py:309-312), so old signatures still verify while new cookies are signed with secret_key."}
+      ]
+    },
+    {
+      "id": "c04",
+      "repo": "flask",
+      "lang": "en",
+      "notes": "Hard case: turn 1 is an outside question phrased exactly like a locate question; URL rule matching lives in Werkzeug (werkzeug.routing), not in Flask. Turn 2 starts with 'OK, and' but is a self-contained locate question about Flask's own hand-off code (contrast with turn 1), not a followup. Turn 3 is a plain thanks (chat).",
+      "turns": [
+        {"user": "Where does Werkzeug match the URL rule for an incoming request?", "route": "outside",
+         "assistant": "The matching itself is werkzeug.routing's MapAdapter.match, which is not in this repository; Flask only calls url_adapter.match(return_rule=True) in AppContext.match_request (src/flask/ctx.py:405-414)."},
+        {"user": "OK, and where does Flask bind the url_map to the request environ?", "route": "locate",
+         "assistant": "Flask.create_url_adapter in src/flask/app.py:507-558 calls self.url_map.bind_to_environ (546-548)."},
+        {"user": "cool, thanks", "route": "chat",
+         "assistant": "You're welcome!"}
+      ]
+    },
+    {
+      "id": "c05",
+      "repo": "flask",
+      "lang": "tr",
+      "notes": "Turkish greeting with diacritics (chat), a self-contained explain question, then the one-word 'neden?' right after the explanation: a followup that is meaningless without the history. Ends with a Turkish thank-you (chat).",
+      "turns": [
+        {"user": "Merhaba!", "route": "chat",
+         "assistant": "Merhaba! Flask deposunda bir şeyin nerede olduğunu ya da nasıl çalıştığını sorabilirsin."},
+        {"user": "register_blueprint ile bir blueprint eklediğimde arka planda ne oluyor?", "route": "explain",
+         "assistant": "App.register_blueprint (src/flask/sansio/app.py:570-596) blueprint'in register metodunu çağırıyor; Blueprint.register (src/flask/sansio/blueprints.py:273-377) route'ları hemen eklemiyor, deferred_functions listesinde bekleyen fonksiyonları çalıştırıyor (334)."},
+        {"user": "neden?", "route": "followup",
+         "assistant": "Çünkü blueprint uygulamayı tanımadan oluşturuluyor; @bp.route çağrıları Blueprint.record ile (src/flask/sansio/blueprints.py:224-230) kaydediliyor ve ancak hangi uygulamaya, hangi url_prefix ile eklendiği belli olunca uygulanabiliyor."},
+        {"user": "Teşekkürler, çok işime yaradı.", "route": "chat",
+         "assistant": "Rica ederim, kolay gelsin!"}
+      ]
+    },
+    {
+      "id": "c06",
+      "repo": "flask",
+      "lang": "tr",
+      "ascii": true,
+      "notes": "ASCII-only Turkish user turns with colloquial spelling ('yapabiliyosun', 'nerde'). Turn 1 is a greeting plus a meta question about RepoFinder itself (chat). Turn 2 starts with 'tamam o zaman' but is a fresh, self-contained locate question, not a followup.",
+      "turns": [
+        {"user": "selam, tam olarak ne yapabiliyosun", "route": "chat",
+         "assistant": "Selam! Flask kodunda bir şeyin nerede tanımlandığını bulup path:satır atıflarıyla gösterebilir, nasıl çalıştığını anlatabilirim."},
+        {"user": "tamam o zaman, test bitince app context acik kalirsa testi patlatan fixture nerde", "route": "locate",
+         "assistant": "tests/conftest.py:67-79'daki leak_detector fixture'ı; test bittiğinde hâlâ itilmiş bir context varsa testi düşürüyor."}
+      ]
+    },
+    {
+      "id": "c07",
+      "repo": "flask",
+      "lang": "en",
+      "notes": "Long multi-sentence message with a debugging backstory; the actual request is an explain question (request lifecycle). Turn 2 ('the part that skips the view') points into the previous answer (followup). Turn 3 is the classic elliptical 'and the async version?' followup.",
+      "turns": [
+        {"user": "I'm pretty new to Flask internals and I'm debugging something weird in our app. My before_request hook runs, but then the view is never called and the client still gets a response from somewhere. I don't really understand the order of things. What exactly happens between receiving a request and calling the view function?", "route": "explain",
+         "assistant": "Flask.wsgi_app (src/flask/app.py:1566-1616) pushes the context and calls full_dispatch_request (992-1019), which runs preprocess_request first; if any before_request hook returns a non-None value, that value becomes the response and dispatch_request (966-990) is never reached."},
+        {"user": "where's the part that skips the view?", "route": "followup",
+         "assistant": "In Flask.full_dispatch_request, src/flask/app.py:1014-1016: rv = self.preprocess_request(ctx), and only if rv is None does it call self.dispatch_request(ctx); the hook loop itself is preprocess_request (1366-1392)."},
+        {"user": "and the async version?", "route": "followup",
+         "assistant": "Async views and hooks go through the same path; Flask.ensure_sync (src/flask/app.py:1065-1077) wraps coroutine functions with async_to_sync (1079-1100), which uses asgiref."}
+      ]
+    },
+    {
+      "id": "c08",
+      "repo": "flask",
+      "lang": "en",
+      "notes": "Two outside questions (Jinja template compilation; pip dependency resolution, typed without the apostrophe) followed by a locate question on the part of the topic Flask does own (creating the Jinja environment). Checks that the word 'Jinja' alone does not imply outside.",
+      "turns": [
+        {"user": "How does Jinja compile templates into Python code?", "route": "outside",
+         "assistant": "Compilation (lexer, parser, code generator) is inside Jinja2, not Flask; Flask hands off in render_template (src/flask/templating.py:136-148), which calls jinja_env.get_or_select_template."},
+        {"user": "how does pip decide which versions of flasks dependencies to install?", "route": "outside",
+         "assistant": "That's pip's resolver, outside this repository; Flask only declares its requirements in pyproject.toml."},
+        {"user": "Where does Flask create its Jinja environment?", "route": "locate",
+         "assistant": "Flask.create_jinja_environment in src/flask/app.py:467-505; it builds the templating.Environment subclass and adds url_for, get_flashed_messages and config to its globals."}
+      ]
+    },
+    {
+      "id": "c09",
+      "repo": "flask",
+      "lang": "tr",
+      "ascii": true,
+      "notes": "Hard case, code-switching: turn 1 is English; turn 2 is an ASCII Turkish followup ('peki bunu kim cagiriyor?') that shares no word with the English question and resolves only through 'bunu'. Turn 3 is another ASCII Turkish followup with an elided subject. Dominant language Turkish (2 of 3 user turns); the Turkish user turns are ASCII-only.",
+      "turns": [
+        {"user": "Where is make_response implemented on the Flask app object?", "route": "locate",
+         "assistant": "Flask.make_response in src/flask/app.py:1224-1364; it converts a view's return value into an instance of response_class."},
+        {"user": "peki bunu kim cagiriyor?", "route": "followup",
+         "assistant": "Flask.finalize_request (src/flask/app.py:1021-1051) view'in döndürdüğü değerle self.make_response(rv) çağırıyor, ardından process_response geliyor."},
+        {"user": "tuple donerse ne oluyo", "route": "followup",
+         "assistant": "Tuple (body, status), (body, headers) ya da (body, status, headers) olarak açılıyor; make_response gövdeden response oluşturup durum kodunu ve başlıkları ayrı ayrı uyguluyor (src/flask/app.py:1224-1364)."}
+      ]
+    },
+    {
+      "id": "c10",
+      "repo": "flask",
+      "lang": "tr",
+      "notes": "Turn 1 is explain (how FLASK_-prefixed environment variables reach the config). Turn 2 is a fresh locate question about the same Config class asked right after the answer; it is self-contained and must not be followup. Turn 3 ('Bunu nerede test ediyorlar?') looks like a fresh 'where' question but 'Bunu' points to turn 2, so it is followup.",
+      "turns": [
+        {"user": "FLASK_ önekli ortam değişkenleri config'e nasıl aktarılıyor?", "route": "explain",
+         "assistant": "Config.from_prefixed_env (src/flask/config.py:126-185) FLASK_ ile başlayan değişkenleri geziyor, değeri önce json.loads ile çözmeyi deniyor, olmazsa string bırakıyor; '__' içeren anahtarlar iç içe sözlüklere yazılıyor."},
+        {"user": "Config'i bir Python dosyasından yükleyen metot hangisi?", "route": "locate",
+         "assistant": "Config.from_pyfile, src/flask/config.py:187-216; dosyayı derleyip çalıştırıyor ve from_object ile büyük harfli adları alıyor."},
+        {"user": "Bunu nerede test ediyorlar?", "route": "followup",
+         "assistant": "tests/test_config.py:20-23'teki test_config_from_pyfile; farklı dosya kodlamaları için test_from_pyfile_weird_encoding de aynı dosyada (244)."}
+      ]
+    },
+    {
+      "id": "c11",
+      "repo": "flask",
+      "lang": "en",
+      "notes": "Turn 2 ('Where does it build the request?') looks like a fresh locate question but 'it' refers to the test client from turn 1, so it is followup. Turn 3 is 'thanks, one more: where is X': the question dominates, so locate, not chat. Turn 4 is an outside question phrased like locate: the flaskr tutorial only imports Werkzeug's password hashing (werkzeug.security).",
+      "turns": [
+        {"user": "Which class implements the test client?", "route": "locate",
+         "assistant": "FlaskClient in src/flask/testing.py:109-262, a subclass of Werkzeug's test Client."},
+        {"user": "Where does it build the request?", "route": "followup",
+         "assistant": "FlaskClient._request_from_builder_args (src/flask/testing.py:193-202) creates an EnvironBuilder (49-86), and FlaskClient.open (204-247) runs the request through it."},
+        {"user": "thanks, one more: where is the `flask run` command defined?", "route": "locate",
+         "assistant": "run_command in src/flask/cli.py:881-992."},
+        {"user": "last thing - where is the password hashing algorithm that the flaskr tutorial uses implemented?", "route": "outside",
+         "assistant": "The algorithm is Werkzeug's (werkzeug.security), not in this repository; the tutorial imports generate_password_hash and check_password_hash in examples/tutorial/flaskr/auth.py:11-12."}
+      ]
+    },
+    {
+      "id": "c12",
+      "repo": "flask",
+      "lang": "en",
+      "notes": "Two chat turns: a generic 'what can you do?' and a meta question about RepoFinder's index that mentions a repository folder ('docs/') but is about the tool, not the code. Turn 3 is outside (stdlib json internals) right before turn 4, an explain question about Flask's side of the same topic.",
+      "turns": [
+        {"user": "hey, what can you do?", "route": "chat",
+         "assistant": "I answer questions about the Flask repository: where something is implemented and how it works, with path:start-end citations into the code."},
+        {"user": "nice. does your search cover the docs/ folder too, or only code?", "route": "chat",
+         "assistant": "Mostly code: source files, tests and examples; I may miss things that only appear in the prose docs."},
+        {"user": "How does Python's stdlib json module escape non-ASCII characters?", "route": "outside",
+         "assistant": "That happens inside the standard library's json encoder, not in Flask; DefaultJSONProvider.dumps only passes ensure_ascii through to json.dumps (src/flask/json/provider.py:166-179)."},
+        {"user": "How are datetime objects turned into strings in Flask's JSON responses?", "route": "explain",
+         "assistant": "DefaultJSONProvider uses _default (src/flask/json/provider.py:108-121) as the json default hook; it formats date objects with http_date, so they become RFC 822 strings."}
+      ]
+    },
+    {
+      "id": "c13",
+      "repo": "requests",
+      "lang": "tr",
+      "ascii": true,
+      "notes": "Short ASCII-only Turkish conversation: a locate question without a question mark, then a followup with an elided subject ('proxies parametresiyle ne yapiyo') that cannot be understood without turn 1.",
+      "turns": [
+        {"user": "Session.request nerde tanimli", "route": "locate",
+         "assistant": "src/requests/sessions.py:557-653; Request nesnesini kurup prepare_request ile hazırlıyor, sonra self.send'e veriyor."},
+        {"user": "proxies parametresiyle ne yapiyo", "route": "followup",
+         "assistant": "merge_environment_settings ile (src/requests/sessions.py:831-868) ortam değişkenlerindeki proxy ayarlarıyla birleştirip send'e geçiriyor."}
+      ]
+    },
+    {
+      "id": "c14",
+      "repo": "requests",
+      "lang": "tr",
+      "notes": "Turkish small-talk greeting (chat) before a locate question; turn 3 ('401 gelince ne yapıyor?') has no subject and refers to the class found in turn 2, so it is followup.",
+      "turns": [
+        {"user": "Selamlar, nasılsın?", "route": "chat",
+         "assistant": "İyiyim, teşekkürler! requests deposunda neye bakalım?"},
+        {"user": "Digest kimlik doğrulaması hangi sınıfta yapılıyor?", "route": "locate",
+         "assistant": "HTTPDigestAuth, src/requests/auth.py:124-354."},
+        {"user": "401 gelince ne yapıyor?", "route": "followup",
+         "assistant": "HTTPDigestAuth.handle_401 (src/requests/auth.py:273-319) WWW-Authenticate başlığındaki challenge'ı okuyup Digest başlığını hesaplıyor ve isteği bir kez yeniden gönderiyor."}
+      ]
+    },
+    {
+      "id": "c15",
+      "repo": "requests",
+      "lang": "en",
+      "notes": "Two outside questions phrased like locate questions: TLS certificate verification during the handshake (urllib3 + stdlib ssl) and the connection pool implementation (urllib3), the second prefixed with 'ok so ... then' yet self-contained. Turn 3 is the contrast: a locate question about requests' own code (adapter selection).",
+      "turns": [
+        {"user": "Where does requests verify the server certificate during the TLS handshake?", "route": "outside",
+         "assistant": "The handshake and certificate verification happen in urllib3 and Python's ssl module, not in requests; requests only passes cert_reqs and ca_certs down, e.g. in HTTPAdapter.cert_verify (src/requests/adapters.py:307-363)."},
+        {"user": "ok so where's the connection pool implemented then", "route": "outside",
+         "assistant": "Also in urllib3 (PoolManager, HTTPConnectionPool); requests only creates the PoolManager in HTTPAdapter.init_poolmanager (src/requests/adapters.py:239-267)."},
+        {"user": "Which method picks the transport adapter for a given URL?", "route": "locate",
+         "assistant": "Session.get_adapter in src/requests/sessions.py:870-881; it returns the mounted adapter with the longest matching prefix (adapters are registered via Session.mount, 888-897)."}
+      ]
+    },
+    {
+      "id": "c16",
+      "repo": "requests",
+      "lang": "tr",
+      "ascii": true,
+      "notes": "ASCII-only Turkish user turns. Turn 2 continues the topic of turn 1 (POST) but is self-contained ('json= verildiginde ...'), so it is explain, not followup. Turn 3 ('kodunu atar misin') only makes sense with the previous answer: followup. Last turn has no assistant reply.",
+      "turns": [
+        {"user": "post istegi gonderen fonksiyon nerde tanimli", "route": "locate",
+         "assistant": "requests.post src/requests/api.py:117-134'te; Session.post da src/requests/sessions.py:695-712'de."},
+        {"user": "json= verildiginde govde nasil olusturuluyo?", "route": "explain",
+         "assistant": "PreparedRequest.prepare_body (src/requests/models.py:576-652) data yoksa json'u complexjson.dumps ile serileştiriyor (594) ve Content-Type'ı application/json yapıyor (591)."},
+        {"user": "kodunu atar misin", "route": "followup"}
+      ]
+    },
+    {
+      "id": "c17",
+      "repo": "requests",
+      "lang": "en",
+      "notes": "Long multi-sentence message (corporate proxy story) whose request is explain. Turn 2 names a symbol that appeared in the previous answer but is fully self-contained ('where is should_bypass_proxies?'), so it is locate, not followup. Turn 3 ('does that function ...') depends on turn 2: followup.",
+      "turns": [
+        {"user": "We run requests behind a corporate proxy and set HTTPS_PROXY in the environment. Some internal hosts are supposed to skip it, so NO_PROXY is set as well, but every now and then traffic to those hosts still goes through the proxy and I can't figure out why. How does requests decide which proxy to use for a given URL?", "route": "explain",
+         "assistant": "resolve_proxies (src/requests/utils.py:911-939) first checks should_bypass_proxies against no_proxy and, if the host is not bypassed, takes the environment proxies; select_proxy (885-908) then picks the most specific key (scheme://host, scheme, all://host, all)."},
+        {"user": "where is should_bypass_proxies?", "route": "locate",
+         "assistant": "src/requests/utils.py:810-870."},
+        {"user": "does that function handle CIDR ranges too?", "route": "followup",
+         "assistant": "Yes: for IP hosts it checks each no_proxy entry with is_valid_cidr and address_in_network (src/requests/utils.py:841-842)."}
+      ]
+    },
+    {
+      "id": "c18",
+      "repo": "requests",
+      "lang": "en",
+      "notes": "Turn 1 is the RepoFinder-capability question 'can you search tests too?' (chat, no search, even though it mentions tests). Turn 2 is a locate question. Turn 3 ('is there a test for it?') uses 'it' for the code found in turn 2: followup.",
+      "turns": [
+        {"user": "can you search tests too?", "route": "chat",
+         "assistant": "Yes, the tests/ directory is indexed together with src/, so I can point you at test functions and fixtures too."},
+        {"user": "When a redirect goes to a different host, where is the Authorization header removed?", "route": "locate",
+         "assistant": "SessionRedirectMixin.rebuild_auth in src/requests/sessions.py:309-332 deletes it when should_strip_auth (154-184) reports a host change."},
+        {"user": "is there a test for it?", "route": "followup",
+         "assistant": "Yes, tests/test_requests.py:1940-1944 (test_should_strip_auth_host_change), with neighbours for HTTP downgrade, port change and default port at 1946-1986."}
+      ]
+    },
+    {
+      "id": "c19",
+      "repo": "requests",
+      "lang": "tr",
+      "notes": "Two outside questions in Turkish: the retry loop (urllib3's Retry) and urllib3's backoff computation. Turn 2 starts with 'Peki' but names urllib3 explicitly and is self-contained, so it is outside, not followup. Turn 3 is an explain question about requests' own handling of MaxRetryError.",
+      "turns": [
+        {"user": "İstek başarısız olunca requests kendisi tekrar deniyor mu? Tekrar deneme döngüsü hangi dosyada?", "route": "outside",
+         "assistant": "Tekrar deneme döngüsü urllib3'ün Retry sınıfında, bu depoda değil; requests varsayılan olarak hiç denemiyor: HTTPAdapter.__init__ max_retries'ı Retry(0, read=False) yapıyor (src/requests/adapters.py:201-221)."},
+        {"user": "Peki urllib3'teki Retry, backoff süresini nasıl hesaplıyor?", "route": "outside",
+         "assistant": "Backoff hesabı urllib3'ün Retry sınıfında; requests bu hesaba karışmıyor, yalnızca Retry nesnesini conn.urlopen'a geçiriyor."},
+        {"user": "Anladım. MaxRetryError requests tarafında nasıl ele alınıyor?", "route": "explain",
+         "assistant": "HTTPAdapter.send (src/requests/adapters.py:634-748) MaxRetryError'ı yakalayıp nedenine göre ConnectTimeout, RetryError, ProxyError, SSLError ya da ConnectionError'a çeviriyor (713-729)."}
+      ]
+    },
+    {
+      "id": "c20",
+      "repo": "requests",
+      "lang": "tr",
+      "ascii": true,
+      "notes": "ASCII-only Turkish user turns with slang and typos. 'selamm' is a greeting (chat). Turn 2 is an explain question with no punctuation and a broken possessive ('response un'). Turn 3 ('bunun testi var mi') depends on 'bunun': followup.",
+      "turns": [
+        {"user": "selamm", "route": "chat",
+         "assistant": "Selam! requests hakkında ne bakalım?"},
+        {"user": "charset yoksa response un text encodingi nasil tahmin ediliyo", "route": "explain",
+         "assistant": "Response.text (src/requests/models.py:1053-1089) encoding None ise apparent_encoding'e (896-904) düşüyor, o da charset_normalizer ya da chardet ile tahmin yapıyor; başlıktaki charset get_encoding_from_headers (src/requests/utils.py:569-591) ile okunuyor."},
+        {"user": "bunun testi var mi", "route": "followup",
+         "assistant": "tests/test_utils.py:639-655'teki test_get_encoding_from_headers başlıktan okumayı test ediyor; içerikten algılama için TestContentEncodingDetection (376-405) var."}
+      ]
+    },
+    {
+      "id": "c21",
+      "repo": "requests",
+      "lang": "en",
+      "notes": "Turn 2 is 'great, thanks! one more: where is X': despite the thanks, the question dominates, so locate, not chat and not followup. Turn 3 ('what does it pass for allow_redirects?') uses 'it' for requests.get: followup.",
+      "turns": [
+        {"user": "Which method raises an exception when the response is a 4xx or 5xx?", "route": "locate",
+         "assistant": "Response.raise_for_status in src/requests/models.py:1144-1171; it raises HTTPError for 4xx and 5xx status codes."},
+        {"user": "great, thanks! one more: where's the top-level requests.get defined?", "route": "locate",
+         "assistant": "src/requests/api.py:74-87; it just calls request('get', url, params=params, **kwargs)."},
+        {"user": "what does it pass for allow_redirects?", "route": "followup",
+         "assistant": "Nothing explicitly; it forwards kwargs, and Session.request defaults allow_redirects=True (src/requests/sessions.py:557-653)."}
+      ]
+    },
+    {
+      "id": "c22",
+      "repo": "requests",
+      "lang": "en",
+      "notes": "An explain question, a short 'what if I pass None?' followup, then a meta question about how RepoFinder works ('is there some kind of index?'), which is chat even though it follows technical turns and talks about reading the repo.",
+      "turns": [
+        {"user": "How is a timeout handled when it's a single number vs a (connect, read) tuple?", "route": "explain",
+         "assistant": "HTTPAdapter.send (src/requests/adapters.py:634-748) unpacks a tuple into TimeoutSauce(connect=..., read=...) (681-684) and uses a single number for both connect and read (693)."},
+        {"user": "what if I pass None?", "route": "followup",
+         "assistant": "None means no timeout at all: it becomes TimeoutSauce(connect=None, read=None); tests/test_requests.py:2555-2566 (test_none_timeout) covers it."},
+        {"user": "btw do you read the whole repo every time or is there some kind of index?", "route": "chat",
+         "assistant": "There is an index built once per repository; each question searches it instead of re-reading the files."}
+      ]
+    },
+    {
+      "id": "c23",
+      "repo": "requests",
+      "lang": "tr",
+      "notes": "Long multi-sentence Turkish message with a backstory; the actual request is explain (how request cookies and session cookies are merged). Turn 2 has no explicit subject ('Aynı isimde iki cookie olursa hangisi kazanıyor?') and depends on the merge described in turn 1: followup.",
+      "turns": [
+        {"user": "Selam, kafama takılan bir şey var. Session nesnesine cookie ekliyorum, bir de bazı isteklerde ayrıca cookies= veriyorum. Sunucu loglarına bakınca bazen ikisi birden geliyor, bazen biri ezilmiş gibi görünüyor. İsteğe verilen cookie'ler session cookie'leriyle nasıl birleştirilip Cookie başlığına yazılıyor?", "route": "explain",
+         "assistant": "Session.prepare_request (src/requests/sessions.py:511-555) önce session cookie'lerini, sonra isteğe verilenleri merge_cookies ile tek bir jar'da birleştiriyor (531-532); PreparedRequest.prepare_cookies (src/requests/models.py:699-720) bu jar'dan Cookie başlığını üretiyor."},
+        {"user": "Aynı isimde iki cookie olursa hangisi kazanıyor?", "route": "followup",
+         "assistant": "İsteğe verilen kazanıyor: istek cookie'leri session cookie'lerinden sonra birleştirildiği için aynı isimli değerin üstüne yazıyor (merge_cookies, src/requests/cookies.py:604-625)."}
+      ]
+    },
+    {
+      "id": "c24",
+      "repo": "requests",
+      "lang": "tr",
+      "ascii": true,
+      "notes": "ASCII-only Turkish user turns. Greeting (chat), then an outside question phrased as 'where' (TLS handshake and certificate verification are in urllib3 and stdlib ssl). Turn 3 starts with 'peki' but is a self-contained explain question about requests' own env-var handling. Turn 4 ('onu hangi satirda okuyor') depends on 'onu': followup.",
+      "turns": [
+        {"user": "merhaba", "route": "chat",
+         "assistant": "Merhaba! requests deposu hakkında ne sormak istersin?"},
+        {"user": "ssl handshake kodu nerde, sertifika dogrulama hangi dosyada yapiliyo", "route": "outside",
+         "assistant": "El sıkışma ve sertifika doğrulama urllib3 ile Python'un ssl modülünde, bu depoda değil; requests sadece ayarları geçiriyor (HTTPAdapter.cert_verify, src/requests/adapters.py:307-363)."},
+        {"user": "peki ozel CA bundle yolunu env degiskeniyle nasil veriyorum", "route": "explain",
+         "assistant": "Session.merge_environment_settings (src/requests/sessions.py:831-868) verify True ise REQUESTS_CA_BUNDLE, yoksa CURL_CA_BUNDLE ortam değişkenini okuyup verify'a koyuyor."},
+        {"user": "onu hangi satirda okuyor", "route": "followup",
+         "assistant": "src/requests/sessions.py:857-858: os.environ.get('REQUESTS_CA_BUNDLE') or os.environ.get('CURL_CA_BUNDLE')."}
+      ]
+    }
+  ]
+}
