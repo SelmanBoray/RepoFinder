@@ -5,6 +5,7 @@ No network and no real model: the LLM runs on a fake backend.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 from pathlib import Path
@@ -18,9 +19,11 @@ from repofinder.chunker import build_chunks, split_lines
 from repofinder.decisions import (
     CARD_LABELS,
     NONE_LABEL,
+    REPO_DESCRIPTION_CHARS,
     Choice,
     DecisionsConfigError,
     FakeDecisions,
+    RepoInfo,
     RulesDecisions,
 )
 from repofinder.llm import FAILED_SUMMARY_PREFIX, LLM, REPO_SUMMARY_META_KEY
@@ -32,6 +35,7 @@ from repofinder.pipeline import (
     ask,
     candidate_cards,
     open_workspace,
+    readme_intro,
     rerank_retrieve,
     retrieve,
     summarize,
@@ -40,6 +44,7 @@ from repofinder.pipeline import (
 from repofinder.search import Hit
 
 SAMPLE_REPO = Path(__file__).parent / "fixtures" / "sample_repo"
+CHAT_ROUTES = Path(__file__).resolve().parents[1] / "eval" / "golden" / "chat_routes.json"
 _FILE_PATH_RE = re.compile(r'<file path="([^"]+)">')
 
 
@@ -559,3 +564,130 @@ def test_ask_with_decisions_reports_the_rerank(ws: Workspace):
     assert (plain.reranked, plain.off_target, plain.decision_calls, plain.decision_cost_usd,
             plain.decision_error, plain.probabilities) == (False, False, 0, 0.0, None, {})
     assert (plain.chunks, plain.hits) == retrieve(ws, RERANK_Q, k=2)
+
+
+# --------------------------------------------------------------------------- #
+# readme_intro / Workspace.repo_info
+# --------------------------------------------------------------------------- #
+
+def test_readme_intro_markdown_skips_badges_code_and_headings(tmp_path: Path):
+    (tmp_path / "README.md").write_text(
+        '<div align="center"><img src="logo.svg" alt=""></div>\n'
+        "\n"
+        "# Demo\n"
+        "\n"
+        "[![CI](https://ci.example/badge.svg)](https://ci.example)\n"
+        "![logo](logo.png)\n"
+        "\n"
+        "```sh\n"
+        "pip install demo\n"
+        "```\n"
+        "\n"
+        "**Demo** is a small [WSGI](https://wsgi.example) toolkit built on\n"
+        "[Werkzeug] and [Jinja][jinja].\n"
+        "\n"
+        "A second paragraph.\n"
+        "\n"
+        "[Werkzeug]: https://werkzeug.example\n",
+        encoding="utf-8")
+    assert readme_intro(tmp_path) == "Demo is a small WSGI toolkit built on Werkzeug and Jinja."
+
+
+def test_readme_intro_rst_skips_the_title_underline_and_directives(tmp_path: Path):
+    (tmp_path / "README.rst").write_text(
+        "====\n"
+        "Demo\n"
+        "====\n"
+        "\n"
+        ".. image:: https://img.shields.io/pypi/v/demo.svg\n"
+        "    :target: https://pypi.org/project/demo/\n"
+        "\n"
+        "|build| |docs|\n"
+        "\n"
+        "Demo parses things\n"
+        "quickly.\n"
+        "\n"
+        "Usage\n"
+        "-----\n",
+        encoding="utf-8")
+    assert readme_intro(tmp_path) == "Demo parses things quickly."
+
+
+def test_readme_intro_setext_heading_is_not_the_intro(tmp_path: Path):
+    (tmp_path / "readme").write_text("Demo\n====\nThe tool.\n", encoding="utf-8")
+    assert readme_intro(tmp_path) == "The tool."
+
+
+def test_readme_intro_none(tmp_path: Path):
+    assert readme_intro(tmp_path) is None                                  # no README
+    assert readme_intro(tmp_path / "missing") is None                      # no directory
+    (tmp_path / "README.md").write_text("# Demo\n\n![logo](x.png)\n\n```\ncode only\n```\n", encoding="utf-8")
+    assert readme_intro(tmp_path) is None                                  # nothing that is prose
+
+
+def test_readme_intro_picks_md_first_ignores_case_and_clips(tmp_path: Path):
+    (tmp_path / "README.rst").write_text("From the rst.\n", encoding="utf-8")
+    (tmp_path / "readme.MD").write_text("From the md. " + "word " * 200, encoding="utf-8")
+    text = readme_intro(tmp_path, max_chars=60)
+    assert text is not None and text.startswith("From the md. word")
+    assert len(text) <= 60 and text.endswith("...") and not text.endswith(" ...")
+    assert readme_intro(tmp_path, max_chars=2000) == ("From the md. " + "word " * 200).strip()
+
+
+def test_readme_intro_reproduces_the_golden_route_descriptions(tmp_path: Path):
+    """The ``repos`` descriptions in chat_routes.json are what readme_intro reads
+    from the README heads of the pinned flask and requests commits."""
+    repos = json.loads(CHAT_ROUTES.read_text(encoding="utf-8"))["repos"]
+    heads = {
+        "flask": (
+            '<div align="center"><img src="https://raw.githubusercontent.com/pallets/flask/refs/heads/stable/'
+            'docs/_static/flask-name.svg" alt="" height="150"></div>\n'
+            "\n"
+            "# Flask\n"
+            "\n"
+            "Flask is a lightweight [WSGI] web application framework. It is designed\n"
+            "to make getting started quick and easy, with the ability to scale up to\n"
+            "complex applications. It began as a simple wrapper around [Werkzeug]\n"
+            "and [Jinja], and has become one of the most popular Python web\n"
+            "application frameworks.\n"
+            "\n"
+            "Flask offers suggestions, but doesn't enforce any dependencies or\n"
+            "project layout.\n"
+            "\n"
+            "[WSGI]: https://wsgi.readthedocs.io/\n"
+        ),
+        "requests": (
+            "# Requests\n"
+            "\n"
+            "[![Version](https://img.shields.io/pypi/v/requests.svg?maxAge=86400)]"
+            "(https://pypi.org/project/requests/)\n"
+            "[![Downloads](https://static.pepy.tech/badge/requests/month)](https://pepy.tech/project/requests)\n"
+            "\n"
+            "**Requests** is a simple, yet elegant, HTTP library.\n"
+            "\n"
+            "```python\n"
+            ">>> import requests\n"
+            "```\n"
+        ),
+    }
+    for name, head in heads.items():
+        root = tmp_path / name
+        root.mkdir()
+        (root / "README.md").write_text(head, encoding="utf-8")
+        assert readme_intro(root) == repos[name]["description"]
+
+
+def test_repo_info_without_readme_or_overview(ws: Workspace):
+    assert ws.repo_info() == RepoInfo("sample_repo", None)
+
+
+def test_repo_info_prefers_the_overview_then_the_readme(make_repo, home: Path):
+    root = make_repo({"m.py": "x = 1\n", "README.md": "# Demo\n\nDemo does one thing.\n"})
+    with open_workspace(str(root), data_dir=home) as ws:
+        assert ws.repo_info() == RepoInfo("repo", "Demo does one thing.")
+        overview = "The repository has one module, `m.py`.\n\nIt defines `x`. " + "More prose. " * 80
+        ws.store.set_meta(REPO_SUMMARY_META_KEY, overview)
+        info = ws.repo_info()
+    assert info.name == "repo" and info.description is not None
+    assert info.description.startswith("The repository has one module, `m.py`. It defines `x`. More prose.")
+    assert len(info.description) <= REPO_DESCRIPTION_CHARS and info.description.endswith("...")

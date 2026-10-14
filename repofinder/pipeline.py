@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -41,7 +42,7 @@ from .search import Hit, SearchIndex
 from .store import META_INDEX_SOURCE, Store
 
 if TYPE_CHECKING:  # the decision layer is imported lazily, only when one is used
-    from .decisions import Decisions
+    from .decisions import Decisions, RepoInfo
 
 log = logging.getLogger(__name__)
 
@@ -92,6 +93,105 @@ def _now() -> str:
 
 
 # --------------------------------------------------------------------------- #
+# Repository description
+# --------------------------------------------------------------------------- #
+
+README_NAMES = ("readme.md", "readme.rst", "readme")   # tried in this order, ignoring case
+README_INTRO_CHARS = 400
+
+_MD_IMAGE_RE = re.compile(r"!\[[^\]\n]*\]\([^)\n]*\)")          # ![alt](src): dropped
+_MD_LINK_RE = re.compile(r"\[([^\]\n]+)\](?:\([^)\n]*\)|\[[^\]\n]*\])?")  # [text](url), [text][ref], [text]
+_MD_LINK_DEF_RE = re.compile(r"^\[[^\]\n]+\]:\s")                  # [label]: url
+_MD_STRONG_RE = re.compile(r"\*\*([^*\n]+)\*\*")                    # **text**
+_NOT_PROSE_PREFIXES = ("!", "<", "[![", "..", "|", "#")
+_FENCES = ("```", "~~~")
+
+
+def _is_adornment(line: str) -> bool:
+    """A heading underline or overline (``=====``, ``-----``, ``~~~~``) or a rule."""
+    return len(line) >= 2 and len(set(line)) == 1 and not line[0].isalnum() and not line[0].isspace()
+
+
+def _clip_prose(text: str, max_chars: int) -> str:
+    """``text`` on one line, cut at a word boundary to at most ``max_chars``
+    characters (an ``...`` marker included) when it is longer."""
+    text = " ".join(text.split())
+    if len(text) <= max_chars:
+        return text
+    room = max(0, max_chars - 3)
+    cut = text[:room]
+    space = cut.rfind(" ")
+    if space > room * 0.6:
+        cut = cut[:space]
+    return cut.rstrip(" ,;:") + "..."
+
+
+def readme_intro(root: Path, max_chars: int = README_INTRO_CHARS) -> Optional[str]:
+    """The first prose paragraph of the README directly under ``root``, or None.
+
+    The README is the first of ``README.md``, ``README.rst`` and ``README``
+    found (names compared ignoring case). Blank lines, headings (``#`` lines and
+    the title above an ``=``/``-`` underline), adornment lines, badges, images,
+    HTML (lines starting with ``!``, ``<``, ``[![``, ``..``, ``|``), link
+    definitions, indented blocks and fenced code are skipped; the first run of
+    consecutive prose lines is joined with spaces, with Markdown links
+    (``[text](url)``, ``[text][ref]``, ``[text]``) and ``**strong**`` reduced to
+    their text, and clipped to ``max_chars`` characters.
+    """
+    try:
+        entries = {p.name.lower(): p for p in sorted(Path(root).iterdir()) if p.is_file()}
+    except OSError:
+        return None
+    path = next((entries[n] for n in README_NAMES if n in entries), None)
+    if path is None:
+        return None
+    try:
+        text = path.read_bytes().decode("utf-8-sig", errors="replace")
+    except OSError:
+        return None
+
+    run: list[str] = []
+    fence: Optional[str] = None
+    in_comment = False
+    for raw in text.splitlines():
+        line = raw.strip()
+        if fence is not None:                  # inside fenced code
+            if line.startswith(fence):
+                fence = None
+            continue
+        if in_comment:                         # inside a multi-line <!-- ... -->
+            in_comment = "-->" not in line
+            continue
+        if not line:
+            if run:
+                break
+            continue
+        opens = next((f for f in _FENCES if line.startswith(f)), None)
+        if opens is not None:
+            if run:
+                break
+            fence = opens
+            continue
+        if _is_adornment(line):                # an underline: the run was a heading
+            run = []
+            continue
+        if line.startswith("<!--") and "-->" not in line:
+            in_comment = True
+        if (line.startswith(_NOT_PROSE_PREFIXES) or _MD_LINK_DEF_RE.match(line)
+                or (not run and raw[:1].isspace())):
+            if run:
+                break
+            continue
+        run.append(line)
+    if not run:
+        return None
+    prose = _MD_IMAGE_RE.sub("", " ".join(run))
+    prose = _MD_STRONG_RE.sub(r"\1", _MD_LINK_RE.sub(r"\1", prose))
+    prose = _clip_prose(prose, max_chars)
+    return prose or None
+
+
+# --------------------------------------------------------------------------- #
 # Workspace
 # --------------------------------------------------------------------------- #
 
@@ -121,6 +221,20 @@ class Workspace:
     def repo_summary(self) -> Optional[str]:
         text = self.store.get_meta(REPO_SUMMARY_META_KEY)
         return text if text and text.strip() else None
+
+    def repo_info(self) -> "RepoInfo":
+        """The repository as the chat router sees it: its name and a short
+        description, the stored overview (:meth:`repo_summary`) when there is
+        one, else the README's first paragraph (:func:`readme_intro`), each
+        clipped to ``decisions.REPO_DESCRIPTION_CHARS``; None when neither exists."""
+        from .decisions import REPO_DESCRIPTION_CHARS, RepoInfo
+
+        summary = self.repo_summary()
+        if summary:
+            description: Optional[str] = _clip_prose(summary, REPO_DESCRIPTION_CHARS) or None
+        else:
+            description = readme_intro(self.root, REPO_DESCRIPTION_CHARS)
+        return RepoInfo(self.name, description)
 
     def search_index(self) -> SearchIndex:
         """Search index over the symbols, files and file summaries (cached)."""

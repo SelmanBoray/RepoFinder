@@ -243,7 +243,7 @@ class _ChatDecisions:
         self.routes = list(routes)
         self.preferred: list[Optional[str]] = []
 
-    def route_message(self, decisions, message, history):
+    def route_message(self, decisions, message, history, repo=None):
         route = self.routes.pop(0) if self.routes else "locate"
         runner_up = "locate" if route == "chat" else "chat"
         return SimpleNamespace(route=route, probabilities={route: 0.75, runner_up: 0.25}, cost_usd=0.0)

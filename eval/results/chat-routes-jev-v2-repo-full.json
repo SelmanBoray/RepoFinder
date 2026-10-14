@@ -1,0 +1,1712 @@
+{
+  "meta": {
+    "golden": "eval/golden/chat_routes.json",
+    "decisions": "jev",
+    "decisions_model": "~typesafe/jev-latest",
+    "repo_info": "full",
+    "ids": [
+      "c01",
+      "c02",
+      "c03",
+      "c04",
+      "c05",
+      "c06",
+      "c07",
+      "c08",
+      "c09",
+      "c10",
+      "c11",
+      "c12",
+      "c13",
+      "c14",
+      "c15",
+      "c16",
+      "c17",
+      "c18",
+      "c19",
+      "c20",
+      "c21",
+      "c22",
+      "c23",
+      "c24"
+    ],
+    "started": "2026-10-14T11:30:00",
+    "totals": {
+      "conversations": 24,
+      "turns": 73,
+      "correct": 65,
+      "accuracy": 0.89,
+      "errors": 0,
+      "calls": 73,
+      "cost_usd": 0.002166,
+      "elapsed_s": 27.058
+    },
+    "constants": {
+      "ROUTES": [
+        "locate",
+        "explain",
+        "followup",
+        "chat",
+        "outside"
+      ],
+      "HISTORY_EXCHANGES": 3,
+      "HISTORY_TEXT_CHARS": 600,
+      "MESSAGE_CHARS": 2000,
+      "REPO_DESCRIPTION_CHARS": 400
+    },
+    "validation_warnings": []
+  },
+  "summary": {
+    "n": 73,
+    "errors": 0,
+    "accuracy": {
+      "n": 73,
+      "correct": 65,
+      "rate": 0.89
+    },
+    "per_route": {
+      "locate": {
+        "support": 19,
+        "predicted": 26,
+        "correct": 19,
+        "precision": 0.731,
+        "recall": 1.0
+      },
+      "explain": {
+        "support": 12,
+        "predicted": 13,
+        "correct": 12,
+        "precision": 0.923,
+        "recall": 1.0
+      },
+      "followup": {
+        "support": 21,
+        "predicted": 19,
+        "correct": 19,
+        "precision": 1.0,
+        "recall": 0.905
+      },
+      "chat": {
+        "support": 11,
+        "predicted": 11,
+        "correct": 11,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "outside": {
+        "support": 10,
+        "predicted": 4,
+        "correct": 4,
+        "precision": 1.0,
+        "recall": 0.4
+      }
+    },
+    "per_lang": {
+      "en": {
+        "n": 41,
+        "correct": 36,
+        "rate": 0.878
+      },
+      "tr": {
+        "n": 15,
+        "correct": 14,
+        "rate": 0.933
+      },
+      "tr-ascii": {
+        "n": 17,
+        "correct": 15,
+        "rate": 0.882
+      }
+    },
+    "confusion": {
+      "locate": {
+        "locate": 19,
+        "explain": 0,
+        "followup": 0,
+        "chat": 0,
+        "outside": 0
+      },
+      "explain": {
+        "locate": 0,
+        "explain": 12,
+        "followup": 0,
+        "chat": 0,
+        "outside": 0
+      },
+      "followup": {
+        "locate": 1,
+        "explain": 1,
+        "followup": 19,
+        "chat": 0,
+        "outside": 0
+      },
+      "chat": {
+        "locate": 0,
+        "explain": 0,
+        "followup": 0,
+        "chat": 11,
+        "outside": 0
+      },
+      "outside": {
+        "locate": 6,
+        "explain": 0,
+        "followup": 0,
+        "chat": 0,
+        "outside": 4
+      }
+    },
+    "errors_by_expected": {
+      "locate": 0,
+      "explain": 0,
+      "followup": 0,
+      "chat": 0,
+      "outside": 0
+    },
+    "p_expected": {
+      "correct_mean": 0.912,
+      "correct_n": 65,
+      "wrong_mean": 0.22,
+      "wrong_n": 8
+    },
+    "cost_usd": 0.002166,
+    "elapsed_s": {
+      "total": 27.055,
+      "mean": 0.3706
+    }
+  },
+  "turns": [
+    {
+      "id": "c01",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where is the route decorator defined?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.7468e-05,
+      "elapsed_s": 0.5657,
+      "error": null
+    },
+    {
+      "id": "c01",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "who calls it?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.01,
+        "explain": 0.0,
+        "followup": 0.99,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.99,
+      "cost_usd": 2.9274e-05,
+      "elapsed_s": 0.4361,
+      "error": null
+    },
+    {
+      "id": "c01",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "show me the test for that",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.08,
+        "explain": 0.0,
+        "followup": 0.92,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.92,
+      "cost_usd": 3.171e-05,
+      "elapsed_s": 0.3519,
+      "error": null
+    },
+    {
+      "id": "c02",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "where's jsonify defnied",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.98,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.02
+      },
+      "p_expected": 0.98,
+      "cost_usd": 2.7468e-05,
+      "elapsed_s": 0.3867,
+      "error": null
+    },
+    {
+      "id": "c02",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where is the before_request decorator defined?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.898e-05,
+      "elapsed_s": 0.4058,
+      "error": null
+    },
+    {
+      "id": "c02",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "and after_request?",
+      "expected": "followup",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.56,
+        "explain": 0.0,
+        "followup": 0.44,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.44,
+      "cost_usd": 3.0786e-05,
+      "elapsed_s": 0.341,
+      "error": null
+    },
+    {
+      "id": "c03",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "How is the session cookie signed?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.02,
+        "explain": 0.95,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.03
+      },
+      "p_expected": 0.95,
+      "cost_usd": 2.7468e-05,
+      "elapsed_s": 0.3258,
+      "error": null
+    },
+    {
+      "id": "c03",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "Which method signs the session cookie?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.54,
+        "explain": 0.1,
+        "followup": 0.36,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.54,
+      "cost_usd": 3.1206e-05,
+      "elapsed_s": 1.9914,
+      "error": null
+    },
+    {
+      "id": "c03",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "does it also accept cookies signed with an old key?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.01,
+        "explain": 0.16,
+        "followup": 0.82,
+        "chat": 0.0,
+        "outside": 0.01
+      },
+      "p_expected": 0.82,
+      "cost_usd": 3.4062e-05,
+      "elapsed_s": 0.4353,
+      "error": null
+    },
+    {
+      "id": "c04",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where does Werkzeug match the URL rule for an incoming request?",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.55,
+        "explain": 0.04,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.41
+      },
+      "p_expected": 0.41,
+      "cost_usd": 2.7678e-05,
+      "elapsed_s": 0.3559,
+      "error": null
+    },
+    {
+      "id": "c04",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "OK, and where does Flask bind the url_map to the request environ?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.78,
+        "explain": 0.01,
+        "followup": 0.21,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.78,
+      "cost_usd": 3.0534e-05,
+      "elapsed_s": 0.3728,
+      "error": null
+    },
+    {
+      "id": "c04",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "cool, thanks",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 3.2382e-05,
+      "elapsed_s": 0.3212,
+      "error": null
+    },
+    {
+      "id": "c05",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Merhaba!",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.73e-05,
+      "elapsed_s": 0.3352,
+      "error": null
+    },
+    {
+      "id": "c05",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "register_blueprint ile bir blueprint eklediğimde arka planda ne oluyor?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.9316e-05,
+      "elapsed_s": 0.329,
+      "error": null
+    },
+    {
+      "id": "c05",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "neden?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.09,
+        "followup": 0.91,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.91,
+      "cost_usd": 3.3474e-05,
+      "elapsed_s": 0.3714,
+      "error": null
+    },
+    {
+      "id": "c05",
+      "turn": 4,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Teşekkürler, çok işime yaradı.",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 3.7296e-05,
+      "elapsed_s": 0.517,
+      "error": null
+    },
+    {
+      "id": "c06",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "selam, tam olarak ne yapabiliyosun",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.01,
+        "followup": 0.0,
+        "chat": 0.98,
+        "outside": 0.01
+      },
+      "p_expected": 0.98,
+      "cost_usd": 2.7636e-05,
+      "elapsed_s": 0.3451,
+      "error": null
+    },
+    {
+      "id": "c06",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "tamam o zaman, test bitince app context acik kalirsa testi patlatan fixture nerde",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.97,
+        "explain": 0.01,
+        "followup": 0.02,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.97,
+      "cost_usd": 3.0786e-05,
+      "elapsed_s": 0.3477,
+      "error": null
+    },
+    {
+      "id": "c07",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "I'm pretty new to Flask internals and I'm debugging something weird in our app. My before_request hook runs, but then the view is never called and the client still gets a response from somewhere. I don't really understand the order of things. What exactly happens between receiving a request and calling the view function?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.9904e-05,
+      "elapsed_s": 0.3341,
+      "error": null
+    },
+    {
+      "id": "c07",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "where's the part that skips the view?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.42,
+        "explain": 0.01,
+        "followup": 0.57,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.57,
+      "cost_usd": 3.3558e-05,
+      "elapsed_s": 0.3523,
+      "error": null
+    },
+    {
+      "id": "c07",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "and the async version?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.07,
+        "explain": 0.06,
+        "followup": 0.87,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.87,
+      "cost_usd": 3.6582e-05,
+      "elapsed_s": 0.3283,
+      "error": null
+    },
+    {
+      "id": "c08",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "How does Jinja compile templates into Python code?",
+      "expected": "outside",
+      "predicted": "outside",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.08,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.92
+      },
+      "p_expected": 0.92,
+      "cost_usd": 2.7594e-05,
+      "elapsed_s": 0.3936,
+      "error": null
+    },
+    {
+      "id": "c08",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "how does pip decide which versions of flasks dependencies to install?",
+      "expected": "outside",
+      "predicted": "outside",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 1.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 3.0282e-05,
+      "elapsed_s": 0.3399,
+      "error": null
+    },
+    {
+      "id": "c08",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where does Flask create its Jinja environment?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.99,
+        "explain": 0.01,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.99,
+      "cost_usd": 3.1752e-05,
+      "elapsed_s": 0.3218,
+      "error": null
+    },
+    {
+      "id": "c09",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "Where is make_response implemented on the Flask app object?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.99,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.01
+      },
+      "p_expected": 0.99,
+      "cost_usd": 2.7636e-05,
+      "elapsed_s": 0.3086,
+      "error": null
+    },
+    {
+      "id": "c09",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "peki bunu kim cagiriyor?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.02,
+        "explain": 0.0,
+        "followup": 0.98,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.98,
+      "cost_usd": 2.9442e-05,
+      "elapsed_s": 0.4514,
+      "error": null
+    },
+    {
+      "id": "c09",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": true,
+      "message": "tuple donerse ne oluyo",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.48,
+        "followup": 0.52,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.52,
+      "cost_usd": 3.2088e-05,
+      "elapsed_s": 0.3418,
+      "error": null
+    },
+    {
+      "id": "c10",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "FLASK_ önekli ortam değişkenleri config'e nasıl aktarılıyor?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.06,
+        "explain": 0.93,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.01
+      },
+      "p_expected": 0.93,
+      "cost_usd": 2.8056e-05,
+      "elapsed_s": 0.3271,
+      "error": null
+    },
+    {
+      "id": "c10",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Config'i bir Python dosyasından yükleyen metot hangisi?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.97,
+        "explain": 0.0,
+        "followup": 0.03,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.97,
+      "cost_usd": 3.2172e-05,
+      "elapsed_s": 0.3971,
+      "error": null
+    },
+    {
+      "id": "c10",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Bunu nerede test ediyorlar?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.15,
+        "explain": 0.0,
+        "followup": 0.85,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.85,
+      "cost_usd": 3.4734e-05,
+      "elapsed_s": 0.336,
+      "error": null
+    },
+    {
+      "id": "c11",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Which class implements the test client?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.7468e-05,
+      "elapsed_s": 0.3722,
+      "error": null
+    },
+    {
+      "id": "c11",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where does it build the request?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.16,
+        "explain": 0.01,
+        "followup": 0.83,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.83,
+      "cost_usd": 2.8896e-05,
+      "elapsed_s": 0.3714,
+      "error": null
+    },
+    {
+      "id": "c11",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "thanks, one more: where is the `flask run` command defined?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 3.2256e-05,
+      "elapsed_s": 0.313,
+      "error": null
+    },
+    {
+      "id": "c11",
+      "turn": 4,
+      "lang": "en",
+      "ascii": false,
+      "message": "last thing - where is the password hashing algorithm that the flaskr tutorial uses implemented?",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.54,
+        "explain": 0.0,
+        "followup": 0.01,
+        "chat": 0.0,
+        "outside": 0.45
+      },
+      "p_expected": 0.45,
+      "cost_usd": 3.3936e-05,
+      "elapsed_s": 0.3395,
+      "error": null
+    },
+    {
+      "id": "c12",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "hey, what can you do?",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.7468e-05,
+      "elapsed_s": 0.3082,
+      "error": null
+    },
+    {
+      "id": "c12",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "nice. does your search cover the docs/ folder too, or only code?",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.11,
+        "chat": 0.89,
+        "outside": 0.0
+      },
+      "p_expected": 0.89,
+      "cost_usd": 2.9232e-05,
+      "elapsed_s": 0.307,
+      "error": null
+    },
+    {
+      "id": "c12",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "How does Python's stdlib json module escape non-ASCII characters?",
+      "expected": "outside",
+      "predicted": "outside",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 1.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 3.0954e-05,
+      "elapsed_s": 0.3301,
+      "error": null
+    },
+    {
+      "id": "c12",
+      "turn": 4,
+      "lang": "en",
+      "ascii": false,
+      "message": "How are datetime objects turned into strings in Flask's JSON responses?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.01,
+        "explain": 0.98,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.01
+      },
+      "p_expected": 0.98,
+      "cost_usd": 3.3558e-05,
+      "elapsed_s": 0.318,
+      "error": null
+    },
+    {
+      "id": "c13",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "Session.request nerde tanimli",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.98,
+        "explain": 0.02,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.98,
+      "cost_usd": 2.5578e-05,
+      "elapsed_s": 0.3195,
+      "error": null
+    },
+    {
+      "id": "c13",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "proxies parametresiyle ne yapiyo",
+      "expected": "followup",
+      "predicted": "explain",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.01,
+        "explain": 0.75,
+        "followup": 0.24,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.24,
+      "cost_usd": 2.7678e-05,
+      "elapsed_s": 0.3121,
+      "error": null
+    },
+    {
+      "id": "c14",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Selamlar, nasılsın?",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.562e-05,
+      "elapsed_s": 0.3206,
+      "error": null
+    },
+    {
+      "id": "c14",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Digest kimlik doğrulaması hangi sınıfta yapılıyor?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.73e-05,
+      "elapsed_s": 0.3096,
+      "error": null
+    },
+    {
+      "id": "c14",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "401 gelince ne yapıyor?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.3,
+        "followup": 0.7,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.7,
+      "cost_usd": 2.8728e-05,
+      "elapsed_s": 0.3066,
+      "error": null
+    },
+    {
+      "id": "c15",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where does requests verify the server certificate during the TLS handshake?",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.86,
+        "explain": 0.06,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.08
+      },
+      "p_expected": 0.08,
+      "cost_usd": 2.5746e-05,
+      "elapsed_s": 0.435,
+      "error": null
+    },
+    {
+      "id": "c15",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "ok so where's the connection pool implemented then",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.85,
+        "explain": 0.0,
+        "followup": 0.02,
+        "chat": 0.0,
+        "outside": 0.13
+      },
+      "p_expected": 0.13,
+      "cost_usd": 2.856e-05,
+      "elapsed_s": 0.3506,
+      "error": null
+    },
+    {
+      "id": "c15",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "Which method picks the transport adapter for a given URL?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.95,
+        "explain": 0.04,
+        "followup": 0.01,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.95,
+      "cost_usd": 3.1374e-05,
+      "elapsed_s": 0.3216,
+      "error": null
+    },
+    {
+      "id": "c16",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "post istegi gonderen fonksiyon nerde tanimli",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.5914e-05,
+      "elapsed_s": 0.3581,
+      "error": null
+    },
+    {
+      "id": "c16",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "json= verildiginde govde nasil olusturuluyo?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.02,
+        "explain": 0.9,
+        "followup": 0.08,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.9,
+      "cost_usd": 2.8182e-05,
+      "elapsed_s": 0.3071,
+      "error": null
+    },
+    {
+      "id": "c16",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": true,
+      "message": "kodunu atar misin",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.01,
+        "explain": 0.01,
+        "followup": 0.98,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.98,
+      "cost_usd": 3.108e-05,
+      "elapsed_s": 0.3103,
+      "error": null
+    },
+    {
+      "id": "c17",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "We run requests behind a corporate proxy and set HTTPS_PROXY in the environment. Some internal hosts are supposed to skip it, so NO_PROXY is set as well, but every now and then traffic to those hosts still goes through the proxy and I can't figure out why. How does requests decide which proxy to use for a given URL?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.8056e-05,
+      "elapsed_s": 0.3844,
+      "error": null
+    },
+    {
+      "id": "c17",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "where is should_bypass_proxies?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.75,
+        "explain": 0.0,
+        "followup": 0.25,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.75,
+      "cost_usd": 3.1584e-05,
+      "elapsed_s": 0.3164,
+      "error": null
+    },
+    {
+      "id": "c17",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "does that function handle CIDR ranges too?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.09,
+        "followup": 0.9,
+        "chat": 0.0,
+        "outside": 0.01
+      },
+      "p_expected": 0.9,
+      "cost_usd": 3.2718e-05,
+      "elapsed_s": 0.3906,
+      "error": null
+    },
+    {
+      "id": "c18",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "can you search tests too?",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.04,
+        "explain": 0.0,
+        "followup": 0.02,
+        "chat": 0.93,
+        "outside": 0.0
+      },
+      "p_expected": 0.93,
+      "cost_usd": 2.5494e-05,
+      "elapsed_s": 0.3157,
+      "error": null
+    },
+    {
+      "id": "c18",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "When a redirect goes to a different host, where is the Authorization header removed?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.95,
+        "explain": 0.05,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.95,
+      "cost_usd": 2.7174e-05,
+      "elapsed_s": 0.3598,
+      "error": null
+    },
+    {
+      "id": "c18",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "is there a test for it?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.05,
+        "explain": 0.0,
+        "followup": 0.95,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.95,
+      "cost_usd": 2.9652e-05,
+      "elapsed_s": 0.3145,
+      "error": null
+    },
+    {
+      "id": "c19",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "İstek başarısız olunca requests kendisi tekrar deniyor mu? Tekrar deneme döngüsü hangi dosyada?",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.81,
+        "explain": 0.19,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 2.6586e-05,
+      "elapsed_s": 0.33,
+      "error": null
+    },
+    {
+      "id": "c19",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Peki urllib3'teki Retry, backoff süresini nasıl hesaplıyor?",
+      "expected": "outside",
+      "predicted": "outside",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.01,
+        "chat": 0.0,
+        "outside": 0.99
+      },
+      "p_expected": 0.99,
+      "cost_usd": 3.0618e-05,
+      "elapsed_s": 0.3198,
+      "error": null
+    },
+    {
+      "id": "c19",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Anladım. MaxRetryError requests tarafında nasıl ele alınıyor?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.07,
+        "explain": 0.73,
+        "followup": 0.13,
+        "chat": 0.0,
+        "outside": 0.07
+      },
+      "p_expected": 0.73,
+      "cost_usd": 3.36e-05,
+      "elapsed_s": 0.3245,
+      "error": null
+    },
+    {
+      "id": "c20",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "selamm",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.5368e-05,
+      "elapsed_s": 0.3585,
+      "error": null
+    },
+    {
+      "id": "c20",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "charset yoksa response un text encodingi nasil tahmin ediliyo",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.01,
+        "explain": 0.98,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.01
+      },
+      "p_expected": 0.98,
+      "cost_usd": 2.646e-05,
+      "elapsed_s": 0.3188,
+      "error": null
+    },
+    {
+      "id": "c20",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": true,
+      "message": "bunun testi var mi",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.02,
+        "explain": 0.0,
+        "followup": 0.98,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.98,
+      "cost_usd": 3.066e-05,
+      "elapsed_s": 0.3241,
+      "error": null
+    },
+    {
+      "id": "c21",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Which method raises an exception when the response is a 4xx or 5xx?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.72,
+        "explain": 0.28,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.72,
+      "cost_usd": 2.5998e-05,
+      "elapsed_s": 0.3157,
+      "error": null
+    },
+    {
+      "id": "c21",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "great, thanks! one more: where's the top-level requests.get defined?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.8308e-05,
+      "elapsed_s": 0.3258,
+      "error": null
+    },
+    {
+      "id": "c21",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "what does it pass for allow_redirects?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.02,
+        "explain": 0.07,
+        "followup": 0.91,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.91,
+      "cost_usd": 3.003e-05,
+      "elapsed_s": 0.4098,
+      "error": null
+    },
+    {
+      "id": "c22",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "How is a timeout handled when it's a single number vs a (connect, read) tuple?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.6082e-05,
+      "elapsed_s": 0.3323,
+      "error": null
+    },
+    {
+      "id": "c22",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "what if I pass None?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.15,
+        "followup": 0.85,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.85,
+      "cost_usd": 2.8854e-05,
+      "elapsed_s": 0.3225,
+      "error": null
+    },
+    {
+      "id": "c22",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "btw do you read the whole repo every time or is there some kind of index?",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 3.15e-05,
+      "elapsed_s": 0.3048,
+      "error": null
+    },
+    {
+      "id": "c23",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Selam, kafama takılan bir şey var. Session nesnesine cookie ekliyorum, bir de bazı isteklerde ayrıca cookies= veriyorum. Sunucu loglarına bakınca bazen ikisi birden geliyor, bazen biri ezilmiş gibi görünüyor. İsteğe verilen cookie'ler session cookie'leriyle nasıl birleştirilip Cookie başlığına yazılıyor?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.9358e-05,
+      "elapsed_s": 0.3237,
+      "error": null
+    },
+    {
+      "id": "c23",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Aynı isimde iki cookie olursa hangisi kazanıyor?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.01,
+        "explain": 0.23,
+        "followup": 0.76,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.76,
+      "cost_usd": 3.4062e-05,
+      "elapsed_s": 0.3368,
+      "error": null
+    },
+    {
+      "id": "c24",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "merhaba",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 2.5368e-05,
+      "elapsed_s": 0.3132,
+      "error": null
+    },
+    {
+      "id": "c24",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "ssl handshake kodu nerde, sertifika dogrulama hangi dosyada yapiliyo",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.99,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.01
+      },
+      "p_expected": 0.01,
+      "cost_usd": 2.6922e-05,
+      "elapsed_s": 0.3195,
+      "error": null
+    },
+    {
+      "id": "c24",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": true,
+      "message": "peki ozel CA bundle yolunu env degiskeniyle nasil veriyorum",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.32,
+        "explain": 0.42,
+        "followup": 0.21,
+        "chat": 0.0,
+        "outside": 0.05
+      },
+      "p_expected": 0.42,
+      "cost_usd": 3.0576e-05,
+      "elapsed_s": 0.3073,
+      "error": null
+    },
+    {
+      "id": "c24",
+      "turn": 4,
+      "lang": "tr",
+      "ascii": true,
+      "message": "onu hangi satirda okuyor",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.18,
+        "explain": 0.0,
+        "followup": 0.82,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.82,
+      "cost_usd": 3.3306e-05,
+      "elapsed_s": 0.3093,
+      "error": null
+    }
+  ]
+}

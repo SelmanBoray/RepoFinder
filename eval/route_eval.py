@@ -5,12 +5,14 @@ Usage (from the repository root)::
     .venv\\Scripts\\python eval/route_eval.py eval/golden/chat_routes.json --list
     .venv\\Scripts\\python eval/route_eval.py eval/golden/chat_routes.json --decisions rules
     .venv\\Scripts\\python eval/route_eval.py eval/golden/chat_routes.json --decisions jev --ids c01,c02 --out r.json
+    .venv\\Scripts\\python eval/route_eval.py eval/golden/chat_routes.json --decisions jev --repo-info none
 
 The golden file holds conversations; each turn is a user message with its
 expected route (one of ``repofinder.decisions.ROUTES``) and, except perhaps on
 the last turn, the assistant reply that followed it::
 
     {"version": 1,
+     "repos": {"flask": {"description": "Flask is a lightweight WSGI web application framework. ..."}},
      "conversations": [
        {"id": "c01", "repo": "flask", "lang": "en", "ascii": false, "notes": "...",
         "turns": [{"user": "Where is ...?", "route": "locate", "assistant": "..."},
@@ -24,6 +26,15 @@ conversation before it, ``[("user", u1), ("assistant", a1), ...]`` oldest first
 so a wrong or failed route does not change the turns after it.
 ``route_message`` itself shows a model backend only the last
 ``HISTORY_EXCHANGES`` exchanges, each message cut to ``HISTORY_TEXT_CHARS``.
+
+The optional top-level ``repos`` maps a conversation's ``repo`` to a
+``description`` of that repository. ``--repo-info`` says what the route state
+tells the layer about the repository (``route_message(..., repo=RepoInfo(...))``):
+``full`` (the default) its name and the description from ``repos`` (the name
+only when there is none), ``name`` its name only, ``none`` nothing (the state
+without the repository block, for the ablation). A conversation without
+``repo`` gets no repository block in any mode. The mode is recorded in
+``meta.repo_info``.
 
 The layer comes from ``detect_decisions(--decisions)``: ``rules`` is offline
 and free; ``jev`` makes one paid call per turn; without the flag it is Jev when
@@ -56,7 +67,13 @@ LANGS = ("en", "tr")
 LANG_GROUPS = ("en", "tr", "tr-ascii")
 SNIPPET_CHARS = 70
 
-_TOP_KEYS = frozenset({"version", "conversations", "notes", "description"})
+REPO_INFO_FULL = "full"      # name + description
+REPO_INFO_NAME = "name"      # name only
+REPO_INFO_NONE = "none"      # no repository block (the state before RepoInfo)
+REPO_INFO_MODES = (REPO_INFO_FULL, REPO_INFO_NAME, REPO_INFO_NONE)
+
+_TOP_KEYS = frozenset({"version", "conversations", "notes", "description", "repos"})
+_REPO_KEYS = frozenset({"description"})
 _CONVERSATION_KEYS = frozenset({"id", "repo", "lang", "ascii", "notes", "turns"})
 _TURN_KEYS = frozenset({"user", "route", "assistant", "notes"})
 
@@ -87,12 +104,14 @@ def load_golden(path: str | Path) -> dict[str, Any]:
 def validate_golden(golden: dict[str, Any]) -> tuple[list[str], list[str]]:
     """Check a chat-routes golden set. Returns ``(errors, warnings)``; any error makes it invalid.
 
-    Errors: a version other than 1, no conversations, a missing or duplicate
-    conversation id, a ``lang`` other than en/tr, a non-boolean ``ascii``, no
-    turns, an empty user message, a route outside ``ROUTES``, an ``assistant``
-    that is not a string. Warnings: no version, unknown keys, ``ascii`` on an
-    English conversation, an empty assistant reply before the last turn (the
-    history then lacks it).
+    Errors: a version other than 1, ``repos`` that is not an object of objects
+    or a ``description`` there that is not a string, no conversations, a
+    missing or duplicate conversation id, a ``lang`` other than en/tr, a
+    non-boolean ``ascii``, no turns, an empty user message, a route outside
+    ``ROUTES``, an ``assistant`` that is not a string. Warnings: no version,
+    unknown keys, a conversation ``repo`` missing from ``repos`` (when
+    ``repos`` is given), ``ascii`` on an English conversation, an empty
+    assistant reply before the last turn (the history then lacks it).
     """
     errors: list[str] = []
     warnings: list[str] = []
@@ -103,6 +122,18 @@ def validate_golden(golden: dict[str, Any]) -> tuple[list[str], list[str]]:
         errors.append(f"unsupported version {version!r} (expected {GOLDEN_VERSION})")
     for key in sorted(set(golden) - _TOP_KEYS):
         warnings.append(f"unknown top-level key {key!r}")
+    repos = golden.get("repos")
+    if repos is not None and not isinstance(repos, dict):
+        errors.append("'repos' must be an object mapping repository names to objects")
+        repos = None
+    for name, entry in (repos or {}).items():
+        if not isinstance(entry, dict):
+            errors.append(f"repos.{name}: must be an object")
+            continue
+        for key in sorted(set(entry) - _REPO_KEYS):
+            warnings.append(f"repos.{name}: unknown key {key!r}")
+        if "description" in entry and not isinstance(entry["description"], str):
+            errors.append(f"repos.{name}: 'description' must be a string when given")
 
     conversations = golden.get("conversations")
     if not isinstance(conversations, list) or not conversations:
@@ -127,6 +158,8 @@ def validate_golden(golden: dict[str, Any]) -> tuple[list[str], list[str]]:
             warnings.append(f"{where}: unknown key {key!r}")
         if "repo" in conv and not isinstance(conv["repo"], str):
             errors.append(f"{where}: 'repo' must be a string")
+        elif repos is not None and isinstance(conv.get("repo"), str) and conv["repo"] not in repos:
+            warnings.append(f"{where}: repo {conv['repo']!r} has no entry in 'repos' (its state shows the name only)")
         lang = conv.get("lang")
         if lang not in LANGS:
             errors.append(f"{where}: 'lang' must be one of {', '.join(LANGS)}, got {lang!r}")
@@ -194,19 +227,41 @@ def history_before(turns: list[dict[str, Any]], index: int) -> list[tuple[str, s
     return history
 
 
+def repo_info_for(conv: dict[str, Any], repos: Any,
+                  mode: str = REPO_INFO_FULL) -> Optional[_decisions.RepoInfo]:
+    """The ``RepoInfo`` that ``route_message`` gets for the turns of ``conv``:
+    None in mode ``none`` or when the conversation names no repo; else its
+    name, with ``repos[repo]["description"]`` in mode ``full`` (None when missing)."""
+    if mode not in REPO_INFO_MODES:
+        raise ValueError(f"unknown repo-info mode {mode!r}: use one of {', '.join(REPO_INFO_MODES)}")
+    name = conv.get("repo")
+    if mode == REPO_INFO_NONE or not isinstance(name, str) or not name.strip():
+        return None
+    if mode == REPO_INFO_NAME:
+        return _decisions.RepoInfo(name)
+    entry = repos.get(name) if isinstance(repos, dict) else None
+    description = entry.get("description") if isinstance(entry, dict) else None
+    return _decisions.RepoInfo(name, description if isinstance(description, str) and description.strip() else None)
+
+
 # =============================================================================== #
 # Running
 # =============================================================================== #
 
 def run_routes(golden: dict[str, Any], decisions: Any, *, ids: Optional[Iterable[str]] = None,
-               golden_path: Optional[str | Path] = None, log: Any = None) -> dict[str, Any]:
+               golden_path: Optional[str | Path] = None, log: Any = None,
+               repo_info: str = REPO_INFO_FULL) -> dict[str, Any]:
     """Route every turn of the selected conversations with ``decisions`` and score it.
 
+    ``repo_info`` (one of :data:`REPO_INFO_MODES`) says what the route state
+    tells about the repository; see :func:`repo_info_for`.
     Returns ``{"meta", "summary", "turns"}``. A :class:`DecisionsError` on a turn
     is recorded in that turn (no prediction, counted as wrong) and the run goes
     on; :class:`DecisionsConfigError` propagates. ``meta.totals.calls`` is the
     growth of ``decisions.usage.calls`` (cached Jev answers are not calls).
     """
+    if repo_info not in REPO_INFO_MODES:
+        raise ValueError(f"unknown repo-info mode {repo_info!r}: use one of {', '.join(REPO_INFO_MODES)}")
     conversations = select_conversations(golden, ids)
     usage = getattr(decisions, "usage", None)
     calls_before = int(getattr(usage, "calls", 0) or 0)
@@ -215,8 +270,9 @@ def run_routes(golden: dict[str, Any], decisions: Any, *, ids: Optional[Iterable
     rows: list[dict[str, Any]] = []
     for conv in conversations:
         turns = conv["turns"]
+        repo = repo_info_for(conv, golden.get("repos"), repo_info)
         for i in range(len(turns)):
-            rows.append(_route_turn(decisions, conv, turns, i, log))
+            rows.append(_route_turn(decisions, conv, turns, i, repo, log))
     calls = int(getattr(usage, "calls", 0) or 0) - calls_before if usage is not None else len(rows)
     summary = summarize(rows)
     return {
@@ -224,6 +280,7 @@ def run_routes(golden: dict[str, Any], decisions: Any, *, ids: Optional[Iterable
             "golden": str(golden_path) if golden_path is not None else None,
             "decisions": getattr(decisions, "name", None),
             "decisions_model": getattr(decisions, "model", None),
+            "repo_info": repo_info,
             "ids": [c["id"] for c in conversations],
             "started": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(started)),
             "totals": {
@@ -241,6 +298,7 @@ def run_routes(golden: dict[str, Any], decisions: Any, *, ids: Optional[Iterable
                 "HISTORY_EXCHANGES": _decisions.HISTORY_EXCHANGES,
                 "HISTORY_TEXT_CHARS": _decisions.HISTORY_TEXT_CHARS,
                 "MESSAGE_CHARS": _decisions.MESSAGE_CHARS,
+                "REPO_DESCRIPTION_CHARS": _decisions.REPO_DESCRIPTION_CHARS,
             },
         },
         "summary": summary,
@@ -249,7 +307,7 @@ def run_routes(golden: dict[str, Any], decisions: Any, *, ids: Optional[Iterable
 
 
 def _route_turn(decisions: Any, conv: dict[str, Any], turns: list[dict[str, Any]], i: int,
-                log: Any) -> dict[str, Any]:
+                repo: Optional[_decisions.RepoInfo], log: Any) -> dict[str, Any]:
     turn = turns[i]
     expected = turn["route"]
     row: dict[str, Any] = {
@@ -270,7 +328,7 @@ def _route_turn(decisions: Any, conv: dict[str, Any], turns: list[dict[str, Any]
     history = history_before(turns, i)
     t = time.perf_counter()
     try:
-        result = _decisions.route_message(decisions, turn["user"], history)
+        result = _decisions.route_message(decisions, turn["user"], history, repo=repo)
     except _decisions.DecisionsConfigError:
         raise
     except _decisions.DecisionsError as exc:
@@ -418,6 +476,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f" wrong turns {_fmt(pe['wrong_mean'])} (n={pe['wrong_n']})",
         f"- decisions: {meta.get('decisions') or '?'}{model}, {totals['calls']} calls,"
         f" total cost ${s['cost_usd']}, mean elapsed per turn {_fmt(mean_s, 4)}s",
+        f"- repository in the route state (--repo-info): {meta.get('repo_info') or '?'}",
         "",
         "| route | support | predicted | correct | precision | recall |",
         "|---|---|---|---|---|---|",
@@ -470,6 +529,9 @@ def build_parser() -> argparse.ArgumentParser:
                    help="decision layer (default: Jev when OPENROUTER_API_KEY or TYPESAFE_API_KEY is set,"
                         " else the rules); jev makes one paid call per turn")
     p.add_argument("--ids", help="comma-separated conversation ids, e.g. c01,c02")
+    p.add_argument("--repo-info", choices=REPO_INFO_MODES, default=REPO_INFO_FULL,
+                   help="what the route state says about the repository: full = name + the 'repos'"
+                        " description (default), name = name only, none = nothing (the ablation)")
     p.add_argument("--out", help="also write the JSON report here (default: Markdown on stdout only)")
     p.add_argument("--list", action="store_true", help="validate, print the conversations and exit")
     return p
@@ -508,7 +570,8 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     try:
         decisions = _decisions.detect_decisions(args.decisions)
-        report = run_routes(golden, decisions, ids=ids, golden_path=args.golden, log=sys.stderr)
+        report = run_routes(golden, decisions, ids=ids, golden_path=args.golden, log=sys.stderr,
+                            repo_info=args.repo_info)
     except _decisions.DecisionsConfigError as exc:
         print(f"error: the decision layer cannot be used: {exc}", file=sys.stderr)
         if _decisions.JEV_SETUP_HELP not in str(exc):

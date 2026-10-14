@@ -25,6 +25,7 @@ from repofinder.decisions import (
     DecisionsConfigError,
     FakeDecisions,
     JEV_SETUP_HELP,
+    RepoInfo,
     RouteResult,
     RulesDecisions,
 )
@@ -113,7 +114,7 @@ def use_layer(monkeypatch: pytest.MonkeyPatch, layer: Any) -> list[Any]:
 def test_history_for_turn_3_is_exactly_the_previous_two_exchanges(monkeypatch: pytest.MonkeyPatch) -> None:
     seen: list[tuple[str, list[tuple[str, str]]]] = []
 
-    def spy(decisions: Any, message: str, history: list[tuple[str, str]]) -> RouteResult:
+    def spy(decisions: Any, message: str, history: list[tuple[str, str]], repo: Any = None) -> RouteResult:
         seen.append((message, list(history)))
         return RouteResult("locate", {"locate": 1.0}, 0.0)
 
@@ -138,7 +139,7 @@ def test_a_missing_assistant_reply_is_left_out_of_the_history(monkeypatch: pytes
 
     seen: list[list[tuple[str, str]]] = []
 
-    def spy(decisions: Any, message: str, history: list[tuple[str, str]]) -> RouteResult:
+    def spy(decisions: Any, message: str, history: list[tuple[str, str]], repo: Any = None) -> RouteResult:
         seen.append(list(history))
         return RouteResult("chat", {"chat": 1.0}, 0.0)
 
@@ -154,6 +155,120 @@ def test_a_model_backend_sees_the_previous_exchanges_in_its_state() -> None:
     assert f"user: {U1}\nassistant: {A1}\nuser: {U2}\nassistant: {A2}" in state
     assert state.rstrip().endswith(f"New user message:\n{U3}")
     assert "none, this is the first message" in fake.calls[0].state
+
+
+# --------------------------------------------------------------------------- #
+# Repository block (--repo-info)
+# --------------------------------------------------------------------------- #
+
+FLASK_ABOUT = "Flask is a lightweight WSGI web application framework."
+
+
+def golden_with_repos() -> dict[str, Any]:
+    """golden_set() plus ``repos`` for flask, a requests conversation without a
+    ``repos`` entry and a conversation without a repo."""
+    golden = golden_set()
+    golden["repos"] = {"flask": {"description": FLASK_ABOUT}}
+    golden["conversations"] += [
+        {"id": "c04", "repo": "requests", "lang": "en", "turns": [{"user": "Where is the retry loop?",
+                                                                   "route": "outside"}]},
+        {"id": "c05", "lang": "en", "turns": [{"user": "hello", "route": "chat"}]},
+    ]
+    return golden
+
+
+def spy_repos(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, Any]]:
+    """Replace route_message; returns the (conversation message, repo) it receives."""
+    seen: list[tuple[str, Any]] = []
+
+    def spy(decisions: Any, message: str, history: list[tuple[str, str]], repo: Any = None) -> RouteResult:
+        seen.append((message, repo))
+        return RouteResult("chat", {"chat": 1.0}, 0.0)
+
+    monkeypatch.setattr(route_eval._decisions, "route_message", spy)
+    return seen
+
+
+@pytest.mark.parametrize("mode, flask, requests", [
+    ("full", RepoInfo("flask", FLASK_ABOUT), RepoInfo("requests", None)),
+    ("name", RepoInfo("flask"), RepoInfo("requests")),
+    ("none", None, None),
+])
+def test_repo_info_modes_decide_what_route_message_receives(monkeypatch: pytest.MonkeyPatch, mode: str,
+                                                            flask: Any, requests: Any) -> None:
+    seen = spy_repos(monkeypatch)
+    report = route_eval.run_routes(golden_with_repos(), RulesDecisions(), repo_info=mode)
+    assert [repo for _m, repo in seen] == [flask] * 6 + [requests, None]   # c05 names no repo
+    assert report["meta"]["repo_info"] == mode
+    assert report["meta"]["constants"]["REPO_DESCRIPTION_CHARS"] == decisions_mod.REPO_DESCRIPTION_CHARS
+    assert f"- repository in the route state (--repo-info): {mode}" in route_eval.render_markdown(report)
+
+
+def test_the_default_mode_is_full_and_unknown_modes_are_refused(monkeypatch: pytest.MonkeyPatch) -> None:
+    seen = spy_repos(monkeypatch)
+    report = route_eval.run_routes(golden_with_repos(), RulesDecisions(), ids=["c01"])
+    assert report["meta"]["repo_info"] == "full" and seen[0][1] == RepoInfo("flask", FLASK_ABOUT)
+    with pytest.raises(ValueError, match="unknown repo-info mode"):
+        route_eval.run_routes(golden_with_repos(), RulesDecisions(), repo_info="both")
+
+
+@pytest.mark.parametrize("mode, head", [
+    ("full", f"Repository: flask\nAbout it: {FLASK_ABOUT}\n\nRecent conversation: none"),
+    ("name", "Repository: flask\n\nRecent conversation: none"),
+    ("none", "Recent conversation: none"),
+])
+def test_the_cli_flag_sets_the_state_a_model_backend_sees(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+                                                          capsys: pytest.CaptureFixture[str],
+                                                          mode: str, head: str) -> None:
+    fake = FakeDecisions(choices=["locate"])
+    use_layer(monkeypatch, fake)
+    path = write_golden(tmp_path, golden_with_repos())
+    out = tmp_path / "r.json"
+    assert route_eval.main([str(path), "--ids", "c03", "--repo-info", mode, "--out", str(out)]) == 0
+    assert fake.calls[0].state.startswith(head)
+    assert json.loads(out.read_text(encoding="utf-8"))["meta"]["repo_info"] == mode
+    capsys.readouterr()
+
+
+def test_the_rules_score_the_same_in_every_mode() -> None:
+    reports = [route_eval.run_routes(golden_with_repos(), RulesDecisions(), repo_info=m)
+               for m in route_eval.REPO_INFO_MODES]
+    predicted = [[t["predicted"] for t in r["turns"]] for r in reports]
+    assert predicted[0] == predicted[1] == predicted[2]
+
+
+def _repos_not_object(g: dict[str, Any]) -> None:
+    g["repos"] = ["flask"]
+
+
+def _repo_entry_not_object(g: dict[str, Any]) -> None:
+    g["repos"] = {"flask": "a framework"}
+
+
+def _description_not_text(g: dict[str, Any]) -> None:
+    g["repos"] = {"flask": {"description": 3}}
+
+
+@pytest.mark.parametrize("break_it, message", [
+    (_repos_not_object, "'repos' must be an object mapping repository names to objects"),
+    (_repo_entry_not_object, "repos.flask: must be an object"),
+    (_description_not_text, "repos.flask: 'description' must be a string when given"),
+])
+def test_invalid_repos_are_errors(break_it: Any, message: str) -> None:
+    golden = golden_set()
+    break_it(golden)
+    errors, _warnings = route_eval.validate_golden(golden)
+    assert errors == [message]
+
+
+def test_repos_warnings() -> None:
+    golden = golden_with_repos()
+    golden["repos"]["flask"]["commit"] = "d086db8"
+    errors, warnings = route_eval.validate_golden(golden)
+    assert errors == []
+    assert warnings == ["repos.flask: unknown key 'commit'",
+                        "c04: repo 'requests' has no entry in 'repos' (its state shows the name only)"]
+    assert route_eval.validate_golden(golden_set()) == ([], [])          # no repos, no repo warnings
 
 
 # --------------------------------------------------------------------------- #

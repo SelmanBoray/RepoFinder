@@ -20,9 +20,10 @@ LLM (:meth:`repofinder.llm.LLM.chat`) writes the reply:
    :data:`LIGHT_EFFORT`.
 
 The conversation so far (the last ``history_turns`` messages, each shortened)
-goes to both the router and the LLM. A failing decision call (other than a
-configuration error) does not end the turn: the step falls back to the
-search-only behaviour and the failure is listed in
+goes to both the router and the LLM; the router is also told which repository
+this is (``Workspace.repo_info``: its name and a short description). A failing
+decision call (other than a configuration error) does not end the turn: the
+step falls back to the search-only behaviour and the failure is listed in
 :attr:`TurnResult.decision_errors`.
 """
 
@@ -122,6 +123,7 @@ class ChatSession:
         self.last_question: Optional[str] = None      # the query that found them
         self.last_result: Optional[TurnResult] = None
         self._repo_summary = ws.repo_summary()
+        self._repo_info = ws.repo_info()
 
     @property
     def decisions_name(self) -> str:
@@ -218,7 +220,7 @@ class ChatSession:
     def _route(self, message: str, history: list[tuple[str, str]],
                ledger: _Ledger) -> tuple[str, dict[str, float]]:
         try:
-            result = _decisions.route_message(self.decisions, message, history)
+            result = _decisions.route_message(self.decisions, message, history, repo=self._repo_info)
         except _decisions.DecisionsConfigError:
             raise
         except _decisions.DecisionsError as exc:

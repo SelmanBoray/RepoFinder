@@ -100,6 +100,7 @@ NONE_LABEL = "NONE"
 HISTORY_EXCHANGES = 3                # user/assistant pairs shown to the router
 HISTORY_TEXT_CHARS = 600             # per history message
 MESSAGE_CHARS = 2_000                # the new message / the question
+REPO_DESCRIPTION_CHARS = 400         # the repository description shown to the router
 ANSWER_CHARS = 12_000                # an answer judged by answer_admits_missing
 OPTION_CHARS = 200                   # a card's first line used as its option description
 
@@ -132,6 +133,8 @@ SDK_REINSTALL_HELP = (
 ROUTE_INSTRUCTIONS = (
     "Classify the new user message in this conversation with RepoFinder, an assistant that answers"
     " questions about one code repository by searching its source code. Pick how it should be handled."
+    " When the state starts with a Repository block, that block names the repository being searched"
+    " and says what it is."
 )
 ROUTE_OPTIONS: dict[str, str] = {
     ROUTE_LOCATE: "The user asks where something is in the repository's code: which file, class,"
@@ -143,9 +146,9 @@ ROUTE_OPTIONS: dict[str, str] = {
                     " without the conversation.",
     ROUTE_CHAT: "A greeting, thanks, small talk, or a question about RepoFinder itself (what it can do,"
                 " how it works); no code search is needed.",
-    ROUTE_OUTSIDE: "The user asks about code or behaviour that this repository does not contain because it"
-                   " is delegated to another library, service or repository, so searching this repository"
-                   " cannot answer it.",
+    ROUTE_OUTSIDE: "The user asks about code or behaviour that belongs to a dependency or another project"
+                   " (a library the repository imports, the standard library, a service) rather than to this"
+                   " repository, so searching this repository cannot answer it.",
 }
 RERANK_INSTRUCTIONS = (
     "Which candidate contains the code that answers the question?"
@@ -203,6 +206,14 @@ class Decisions(Protocol):
     def choose(self, state: str, instructions: str, options: dict[str, str]) -> Choice: ...
 
     def yes_no(self, state: str, question: str) -> YesNo: ...
+
+
+@dataclass(frozen=True)
+class RepoInfo:
+    """What the router is told about the repository: its name and, when known,
+    a short description of what it is (see ``Workspace.repo_info``)."""
+    name: str
+    description: Optional[str] = None
 
 
 @dataclass
@@ -864,13 +875,21 @@ def _one_line(text: str, limit: int) -> str:
     return _clip(" ".join((text or "").split()), limit)
 
 
-def _route_state(message: str, history: Sequence[tuple[str, str]]) -> str:
+def _route_state(message: str, history: Sequence[tuple[str, str]],
+                 repo: Optional[RepoInfo] = None) -> str:
+    lines: list[str] = []
+    if repo is not None:
+        lines.append(f"Repository: {' '.join((repo.name or '').split())}")
+        about = _one_line(repo.description or "", REPO_DESCRIPTION_CHARS)
+        if about:
+            lines.append(f"About it: {about}")
+        lines.append("")
     recent = list(history)[-2 * HISTORY_EXCHANGES:]
     if recent:
-        lines = ["Recent conversation (oldest first):"]
+        lines.append("Recent conversation (oldest first):")
         lines += [f"{role}: {_one_line(text, HISTORY_TEXT_CHARS)}" for role, text in recent]
     else:
-        lines = ["Recent conversation: none, this is the first message."]
+        lines.append("Recent conversation: none, this is the first message.")
     lines += ["", "New user message:", _clip((message or "").strip(), MESSAGE_CHARS)]
     return "\n".join(lines) + "\n"
 
@@ -882,18 +901,23 @@ def _checked(choice: Choice, options: Mapping[str, str], decisions: Decisions) -
     return choice
 
 
-def route_message(decisions: Decisions, message: str, history: list[tuple[str, str]]) -> RouteResult:
+def route_message(decisions: Decisions, message: str, history: list[tuple[str, str]],
+                  repo: Optional[RepoInfo] = None) -> RouteResult:
     """Route ``message``: a :class:`RouteResult` whose ``route`` is one of :data:`ROUTES`.
 
     ``history`` is ``[(role, text), ...]``, oldest first, role "user" or
-    "assistant"; it may be empty. The state shows the last
+    "assistant"; it may be empty. With ``repo``, the state opens with a
+    repository block (``Repository: <name>``, then ``About it: <description>``
+    on one line of at most :data:`REPO_DESCRIPTION_CHARS` characters, left out
+    when there is no description). Then it shows the last
     :data:`HISTORY_EXCHANGES` exchanges, each message on one line of at most
-    :data:`HISTORY_TEXT_CHARS` characters, then the new message.
+    :data:`HISTORY_TEXT_CHARS` characters, then the new message. The rules
+    ignore ``repo``.
     """
     if isinstance(decisions, RulesDecisions):
         choice = decisions.route(message, history)
     else:
-        choice = _checked(decisions.choose(_route_state(message, history), ROUTE_INSTRUCTIONS,
+        choice = _checked(decisions.choose(_route_state(message, history, repo), ROUTE_INSTRUCTIONS,
                                            dict(ROUTE_OPTIONS)), ROUTE_OPTIONS, decisions)
     return RouteResult(choice.label, dict(choice.probabilities), choice.cost_usd)
 

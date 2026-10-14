@@ -9,6 +9,8 @@ under that name so that ``repofinder.chat`` can be imported.
 
 from __future__ import annotations
 
+import importlib
+import shutil
 import sys
 import types
 from dataclasses import dataclass, field
@@ -101,8 +103,9 @@ class _StubDecisions:
         return [args for name, args in self.log if name == step]
 
 
-def route_message(decisions: _StubDecisions, message: str, history: list[tuple[str, str]]) -> RouteResult:
-    decisions.log.append(("route", {"message": message, "history": list(history)}))
+def route_message(decisions: _StubDecisions, message: str, history: list[tuple[str, str]],
+                  repo: Any = None) -> RouteResult:
+    decisions.log.append(("route", {"message": message, "history": list(history), "repo": repo}))
     route = decisions.take(decisions.routes, "locate")
     runner_up = "locate" if route == "chat" else "chat"
     return RouteResult(route, {route: 0.9, runner_up: 0.1}, decisions.cost_usd)
@@ -502,6 +505,49 @@ def test_decision_calls_and_cost(ws):
     result = session.turn(ENGINE_Q)
     assert result.decision_calls == 0 and result.decision_cost_usd == 0.0
     assert len(local.log) == 2   # the helpers still ran
+
+
+# --------------------------------------------------------------------------- #
+# Repository identity in the route state
+# --------------------------------------------------------------------------- #
+
+def test_the_router_gets_the_repo_info_computed_once(ws, monkeypatch):
+    real_repo_info = ws.repo_info
+    computed: list[Any] = []
+
+    def counting() -> Any:
+        computed.append(real_repo_info())
+        return computed[-1]
+
+    monkeypatch.setattr(ws, "repo_info", counting)
+    decisions = _StubDecisions(routes=["chat", "chat"])
+    session, _ = make_session(ws, decisions, "a", "b")
+    session.turn("hello")
+    session.turn("thanks")
+
+    first, second = (step["repo"] for step in decisions.steps("route"))
+    assert len(computed) == 1 and first is second is computed[0]
+    assert (first.name, first.description) == ("sample_repo", None)   # the fixture repo has no README
+
+
+def test_the_route_state_names_the_repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    real = importlib.import_module("repofinder.decisions")
+    monkeypatch.setattr(chat, "_decisions", real)
+    root = tmp_path / "demo_repo"
+    shutil.copytree(SAMPLE_REPO, root)
+    (root / "README.md").write_text("# Demo\n\n[![CI](https://ci/b.svg)](https://ci)\n\n"
+                                    "Demo runs a **tiny** engine.\n", encoding="utf-8")
+    with pipeline.open_workspace(str(root), data_dir=tmp_path / "home") as workspace:
+        fake = real.FakeDecisions(choices=["chat", "chat"])
+        session, _ = make_session(workspace, fake, "Hi!", "Bye!")
+        session.turn("hello")
+        session.turn("bye")
+
+    first, second = fake.calls
+    assert first.state.startswith("Repository: demo_repo\nAbout it: Demo runs a tiny engine.\n\n"
+                                  "Recent conversation: none, this is the first message.")
+    assert second.state.startswith("Repository: demo_repo\nAbout it: Demo runs a tiny engine.\n\n"
+                                   "Recent conversation (oldest first):\nuser: hello\nassistant: Hi!")
 
 
 def test_join_query_and_clip_text():

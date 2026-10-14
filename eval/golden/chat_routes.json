@@ -1,6 +1,10 @@
 {
   "version": 1,
   "description": "Golden set for chat-message routing. Each user turn carries the expected route (locate, explain, followup, chat, outside). Assistant replies are plausible history for the next turn and are not judged. In conversations marked ascii, the user turns are ASCII-only Turkish; assistant replies stay in normal Turkish.",
+  "repos": {
+    "flask": {"description": "Flask is a lightweight WSGI web application framework. It is designed to make getting started quick and easy, with the ability to scale up to complex applications. It began as a simple wrapper around Werkzeug and Jinja, and has become one of the most popular Python web application frameworks."},
+    "requests": {"description": "Requests is a simple, yet elegant, HTTP library."}
+  },
   "conversations": [
     {
       "id": "c01",

@@ -636,7 +636,8 @@ what it delegates, so Jev cannot know that Werkzeug, urllib3 or the ssl module
 are outside Flask or requests, and it reads "where is X" literally. Adding the
 repository name and a one-line description (the overview's first lines) to the
 route state is the obvious next change; when it is tried it must be reported
-as tuned on this set, since this is the only routing set. The rules' weak spot
+as tuned on this set, since this is the only routing set. Tried below: it did not
+move `outside` recall. The rules' weak spot
 is different: no outside at all, and "where" questions about RepoFinder itself
 go to locate.
 
@@ -644,3 +645,57 @@ Honesty: one run each. The set was written by a model agent and the labels were
 not independently reviewed turn by turn (the orchestrator spot-checked five
 conversations). Some labels are debatable by nature (c24 turn 3 is explain vs
 followup).
+
+### Repository identity in the route state (2026-10-14, tuned on this set)
+
+What changed: `decisions.route_message(..., repo=RepoInfo(name, description))` puts a
+`Repository: <name>` / `About it: <description, 400 chars>` block at the top of the
+route state, one sentence was added to ROUTE_INSTRUCTIONS, and the `outside` option
+text was rewritten to say "code that belongs to a dependency or another project (a
+library the repository imports, the standard library, a service) rather than to this
+repository". The wording changes apply in every mode, so `none` is not the old prompt;
+the old prompt's result is the v1 run (0.86). The golden file now has a top-level
+`repos` map with each repository's first README paragraph as description, and
+`route_eval.py --repo-info none|name|full` selects the mode. The product does the same
+through `Workspace.repo_info()`: the stored repo summary when present, else
+`pipeline.readme_intro` of the checkout.
+
+Results (Jev, 73 turns, one run each; reports
+`eval/results/chat-routes-jev-v2-repo-{none,name,full}.json`):
+
+| mode | accuracy | outside recall | outside precision |
+|------|----------|----------------|-------------------|
+| v1 (old prompt) | 0.86 | 0.40 (4/10) | 0.80 |
+| none | 0.85 (62/73) | 0.40 (4/10) | 0.67 |
+| name | 0.89 (65/73) | 0.40 (4/10) | 1.00 |
+| full | 0.89 (65/73) | 0.40 (4/10) | 1.00 |
+
+Per language in `full`: en 0.88, tr 0.93, tr-ascii 0.88. The three turns that changed
+between modes are all expected `explain`: c07 turn 1 (v1 outside, none outside, full
+explain), c20 turn 2 (v1 explain, none outside, full explain), c24 turn 3 (v1 locate,
+none locate, full explain).
+
+The `outside` turns in `full`: correct with high confidence when the message names the
+external project (c08 Jinja compile 0.92, c08 pip 1.00, c12 stdlib json 1.00, c19
+urllib3 Retry 0.99). Wrong when the message names the repository itself or no library:
+c15 "where does requests verify the server certificate" p(locate) 0.86, c15 connection
+pool 0.85, c19 "requests kendisi tekrar deniyor mu" 0.81, c24 ssl handshake 0.99, c04
+Werkzeug URL matching 0.55 vs 0.41 outside (borderline; Flask's description says it
+"began as a simple wrapper around Werkzeug", which may read as Werkzeug being inside),
+c11 flaskr password hashing 0.54 vs 0.45.
+
+Reading: the hypothesis (Jev lacked the repository identity) was wrong for `outside`
+recall. Jev already knows Jinja, pip and urllib3 are external; the misses are questions
+that attribute the behaviour to the repository itself, which only the search can
+refute. In the product those go locate, search, Jev rerank picks NONE, widened search,
+and the answer says what the excerpts show, so the cost of this error is one search,
+not a wrong answer. The gain is elsewhere: no false `outside` left (the harmful
+direction, since `outside` skips the search) and three hedged `explain` turns fixed,
++3 turns overall. `full` and `name` are tied; `full` is kept as the default because the
+product has the description anyway and the token cost difference is about 50 tokens
+per call.
+
+Honesty: the wording and the block were changed after reading this set's errors, so
+0.89 is a tuned number; a fresh routing set is needed to confirm it. One run per mode;
+Jev's run-to-run variation on this set is unmeasured (v1 and none differ on two turns
+with the same state content except wording).

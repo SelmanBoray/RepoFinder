@@ -24,6 +24,7 @@ from repofinder.decisions import (
     MESSAGE_CHARS,
     NONE_LABEL,
     QUESTION_NAME,
+    REPO_DESCRIPTION_CHARS,
     ROUTE_CHAT,
     ROUTE_EXPLAIN,
     ROUTE_FOLLOWUP,
@@ -38,6 +39,7 @@ from repofinder.decisions import (
     DecisionsError,
     FakeDecisions,
     JevDecisions,
+    RepoInfo,
     RulesDecisions,
     YesNo,
     answer_admits_missing,
@@ -200,6 +202,72 @@ def test_route_message_passes_scripted_probabilities_through() -> None:
 def test_route_message_rejects_a_label_outside_the_routes() -> None:
     with pytest.raises(DecisionsError, match="not one of"):
         route_message(FakeDecisions(choices=["search"]), "where is x?", [])
+
+
+# --------------------------------------------------------------------------- #
+# The repository block of the route state
+# --------------------------------------------------------------------------- #
+
+FLASK_ABOUT = ("Flask is a lightweight WSGI web application framework. It began as a simple wrapper"
+               " around Werkzeug and Jinja.")
+
+
+def test_route_state_opens_with_the_repository_block() -> None:
+    fake = FakeDecisions(choices=[ROUTE_OUTSIDE])
+    route_message(fake, "where does Werkzeug match the URL rule?", H, repo=RepoInfo("flask", FLASK_ABOUT))
+    lines = fake.calls[0].state.splitlines()
+    assert lines[:4] == ["Repository: flask", f"About it: {FLASK_ABOUT}", "",
+                         "Recent conversation (oldest first):"]
+    assert fake.calls[0].state.rstrip().endswith("New user message:\nwhere does Werkzeug match the URL rule?")
+
+
+def test_route_state_without_a_description_has_no_about_line() -> None:
+    for description in (None, "", "  \n "):
+        fake = FakeDecisions(choices=[ROUTE_CHAT])
+        route_message(fake, "hello", [], repo=RepoInfo("requests", description))
+        assert fake.calls[0].state.startswith(
+            "Repository: requests\n\nRecent conversation: none, this is the first message.\n")
+        assert "About it" not in fake.calls[0].state
+
+
+def test_route_state_description_is_one_line_clipped() -> None:
+    fake = FakeDecisions(choices=[ROUTE_CHAT])
+    long = "First line\nsecond   line " + "word " * 300
+    route_message(fake, "hello", [], repo=RepoInfo("flask", long))
+    about = fake.calls[0].state.splitlines()[1]
+    assert about.startswith("About it: First line second line word")
+    assert len(about) == len("About it: ") + REPO_DESCRIPTION_CHARS and about.endswith("...")
+
+
+def test_route_state_without_repo_is_the_old_state() -> None:
+    fake = FakeDecisions(choices=[ROUTE_CHAT, ROUTE_CHAT])
+    route_message(fake, "and the tests?", H)
+    route_message(fake, "and the tests?", H, repo=None)
+    old = ("Recent conversation (oldest first):\n"
+           "user: Where is url_for defined?\nassistant: In src/flask/helpers.py:200-260.\n"
+           "\nNew user message:\nand the tests?\n")
+    assert fake.calls[0].state == fake.calls[1].state == old
+
+
+def test_rules_ignore_the_repository() -> None:
+    repo = RepoInfo("flask", FLASK_ABOUT)
+    for message, history, _expected in ROUTE_CASES:
+        plain = route_message(RulesDecisions(), message, history)
+        with_repo = route_message(RulesDecisions(), message, history, repo=repo)
+        assert with_repo == plain
+    assert route_message(RulesDecisions(), "where does Werkzeug match the URL rule?", [],
+                         repo=repo).route == ROUTE_LOCATE
+
+
+def test_repo_info_is_frozen_and_the_prompt_explains_it() -> None:
+    repo = RepoInfo("flask")
+    assert repo.description is None
+    with pytest.raises(AttributeError):
+        repo.name = "other"  # type: ignore[misc]
+    assert "Repository block" in ROUTE_INSTRUCTIONS
+    outside = ROUTE_OPTIONS[ROUTE_OUTSIDE]
+    assert "dependency or another project" in outside and "the standard library" in outside
+    assert "rather than to this repository" in outside
 
 
 # --------------------------------------------------------------------------- #
