@@ -20,21 +20,24 @@ This is a measurement, not a gate: the exit code is 0 whatever the scores are.
 It is 2 when the golden file is invalid and 1 when the pipeline cannot be set up
 (import error, ``open_workspace`` failure). See ``eval/README.md``.
 
-Standard library only.
+Standard library plus ``repofinder.admit`` (itself standard library only); the
+pipeline and the decisions layer are imported only when a run needs them.
 """
 
 from __future__ import annotations
 
 import argparse
+import copy
 import importlib
 import json
 import re
 import statistics
 import sys
 import time
-import unicodedata
 from pathlib import Path
 from typing import Any, Iterable, Optional
+
+from repofinder.admit import ADMIT_NO, ADMIT_PHRASES, ADMIT_YES, admits_missing  # noqa: F401 - re-exported
 
 CATEGORIES = ("locate-symbol", "locate-feature", "flow", "config", "not-in-repo")
 LANGS = ("en", "tr")
@@ -57,63 +60,12 @@ _MATCH_ORDER = ("symbol", "overlap", "broad", "file")
 # chunks' line ranges on that path contains at least this fraction of its lines.
 CHUNK_COVER_MIN = 0.5
 
-# --- not-in-repo heuristic -------------------------------------------------------
-# HEURISTIC: an answer "admits the answer is missing" when its text contains one of
-# these phrases (compared after _normalize_text: case-folded, accents and the
-# Turkish dotted/dotless i folded to plain "i", curly apostrophes made straight).
-# It can give false positives ("... is not shown here, but X does ...") and false
-# negatives (other wordings). Read the stored answer texts before trusting the
-# number, and extend the list when a correct admission is missed.
-ADMIT_PHRASES: dict[str, tuple[str, ...]] = {
-    "en": (
-        "not in the excerpts",
-        "not in these excerpts",
-        "not in the provided excerpts",
-        "not in the provided code",
-        "excerpts do not",
-        "excerpts don't",
-        "excerpts does not",
-        "not shown",
-        "not included",
-        "not contained",
-        "not present in",
-        "do not contain",
-        "does not contain",
-        "don't contain",
-        "doesn't contain",
-        "do not include",
-        "does not include",
-        "do not show",
-        "does not show",
-        "don't show",
-        "doesn't show",
-        "not part of this repo",
-        "not part of the repo",
-        "not implemented in this repo",
-        "not implemented in flask",
-        "outside this repo",
-        "outside the repo",
-        "not in this repo",
-        "not in the repo",
-    ),
-    "tr": (
-        "alıntılarda yok",
-        "alıntılarda bulunmuyor",
-        "alıntılarda görünmüyor",
-        "alıntılarda yer almıyor",
-        "alıntılar içermiyor",
-        "görünmüyor",
-        "yer almıyor",
-        "bulunmuyor",
-        "içermiyor",
-        "gösterilmiyor",
-        "bu depoda değil",
-        "depoda yok",
-        "bu repoda değil",
-        "repoda yok",
-        "kod tabanında yok",
-    ),
-}
+# --- not-in-repo verdict -------------------------------------------------------
+# Whether an answer "admits the answer is missing": the phrase heuristic lives in
+# repofinder.admit (re-exported here: ADMIT_PHRASES, admits_missing), the Jev judge
+# in repofinder.decisions.answer_admits_missing. With a decisions layer every
+# answer is judged by it; the verdict is P(admits) >= ADMIT_THRESHOLD. See judge_admits.
+ADMIT_THRESHOLD = 0.5
 
 _LOCATION_KEYS = frozenset({"path", "start_line", "end_line", "symbol"})
 _QUESTION_KEYS = frozenset(
@@ -464,29 +416,6 @@ def chunks_cover(chunks: list[Any], locs: list[dict[str, Any]], accept_any: bool
     return any(covered) if accept_any else all(covered)
 
 
-def _normalize_text(text: str) -> str:
-    text = text.replace("İ", "i").replace("I", "i").replace("ı", "i")
-    text = unicodedata.normalize("NFKD", text.casefold())
-    text = "".join(ch for ch in text if not unicodedata.combining(ch))
-    for curly in ("’", "‘", "ʼ"):
-        text = text.replace(curly, "'")
-    return re.sub(r"\s+", " ", text)
-
-
-_ADMIT_NORMALIZED = tuple(
-    (phrase, _normalize_text(phrase)) for phrases in ADMIT_PHRASES.values() for phrase in phrases
-)
-
-
-def admits_missing(text: str) -> Optional[str]:
-    """The first :data:`ADMIT_PHRASES` entry found in ``text``, else None. A heuristic."""
-    norm = _normalize_text(text or "")
-    for phrase, needle in _ADMIT_NORMALIZED:
-        if needle in norm:
-            return phrase
-    return None
-
-
 # =============================================================================== #
 # Scoring
 # =============================================================================== #
@@ -570,14 +499,68 @@ def _hit_record(hit: Any, locs: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def score_answer(question: dict[str, Any], answer: Any) -> dict[str, Any]:
+def judge_admits(text: str, question: str = "", decisions: Any = None, *,
+                 strict: bool = False) -> dict[str, Any]:
+    """The admit fields of an answer record: does ``text`` admit that what
+    ``question`` asks about is missing?
+
+    ``admits_phrase`` / ``admits_heuristic`` always come from the phrase
+    heuristic (:func:`admits_missing`). Without ``decisions`` the verdict is the
+    heuristic's (judge ``rules``, probability ``ADMIT_YES``/``ADMIT_NO``, no
+    call). With a layer it is
+    :func:`repofinder.decisions.answer_admits_missing` at
+    :data:`ADMIT_THRESHOLD` (judge: the layer's name), and ``admits_calls`` /
+    ``admits_cost_usd`` are what the judgement cost. When the layer raises
+    ``DecisionsError`` the heuristic's verdict is kept and the error is recorded
+    in ``admits_judge_error``; with ``strict`` a ``DecisionsConfigError`` (no
+    key, rejected key, no credit) propagates instead.
+    """
+    text = text or ""
+    phrase = admits_missing(text)
+    fields: dict[str, Any] = {
+        "admits_missing": phrase is not None,
+        "admits_judge": "rules",
+        "admits_probability": ADMIT_YES if phrase is not None else ADMIT_NO,
+        "admits_phrase": phrase,
+        "admits_heuristic": phrase is not None,
+        "admits_calls": 0,
+        "admits_cost_usd": 0.0,
+    }
+    if decisions is None:
+        return fields
+    from repofinder import decisions as decisions_mod
+
+    usage = getattr(decisions, "usage", None)
+    calls_before = int(getattr(usage, "calls", 0) or 0)
+    try:
+        verdict = decisions_mod.answer_admits_missing(decisions, question or "", text)
+    except decisions_mod.DecisionsError as exc:
+        if strict and isinstance(exc, decisions_mod.DecisionsConfigError):
+            raise
+        fields["admits_judge_error"] = f"{type(exc).__name__}: {exc}"
+        return fields
+    p = float(verdict.probability)
+    calls = int(getattr(usage, "calls", 0) or 0) - calls_before if usage is not None else 1
+    fields.update(
+        admits_missing=p >= ADMIT_THRESHOLD,
+        admits_judge=str(getattr(decisions, "name", None) or "?"),
+        admits_probability=round(p, 4),
+        admits_calls=max(0, calls),
+        admits_cost_usd=float(verdict.cost_usd or 0.0),
+    )
+    return fields
+
+
+def score_answer(question: dict[str, Any], answer: Any, decisions: Any = None) -> dict[str, Any]:
     """Answer metrics for one question from an ``Answer`` (text, citations, tokens).
 
     * ``cited_correct``: a citation strictly matches an expected location;
     * ``cited_wrong``: citations that overlap no expected, pointer or related location;
     * ``all_required`` (accept_any=false): every expected location is cited;
-    * ``admits_missing``: :func:`admits_missing` found a phrase (all questions;
-      on answerable questions it is a false admission);
+    * ``admits_missing``: the answer says that what was asked is not in the code
+      (all questions; on answerable questions it is a false admission). The
+      verdict comes from ``decisions`` (the Jev judge) when given, else from the
+      phrase heuristic; see :func:`judge_admits` for the other ``admits_*`` fields;
     * ``pointer_cited`` (not-in-repo): a citation strictly matches a pointer.
     """
     expected = question.get("expected") or []
@@ -613,15 +596,13 @@ def score_answer(question: dict[str, Any], answer: Any) -> dict[str, Any]:
         )
 
     text = getattr(answer, "text", "") or ""
-    phrase = admits_missing(text)
     return {
         "n_citations": len(citations),
         "citations": records,
         "cited_correct": any(cited(loc) for loc in expected) if expected else None,
         "cited_wrong": n_wrong,
         "all_required": all(cited(loc) for loc in expected) if expected and not accept_any else None,
-        "admits_missing": phrase is not None,
-        "admits_phrase": phrase,
+        **judge_admits(text, question.get("question", ""), decisions),
         "pointer_cited": any(cited(loc) for loc in pointer) if pointer else None,
         "model": getattr(answer, "model", None),
         "input_tokens": int(getattr(answer, "input_tokens", 0) or 0),
@@ -687,10 +668,25 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "output_tokens": sum(a.get("output_tokens", 0) for _r, a in ans),
             "cache_read_tokens": sum(a.get("cache_read_tokens", 0) for _r, a in ans),
         }
+        judges: dict[str, int] = {}
+        for _r, a in ans:
+            if a.get("admits_judge"):
+                judges[a["admits_judge"]] = judges.get(a["admits_judge"], 0) + 1
+        compared = [a for _r, a in ans if a.get("admits_heuristic") is not None]
+        s["answer"]["admits_judge"] = dict(sorted(judges.items()))
+        s["answer"]["admit_judge_vs_heuristic"] = {
+            "n": len(compared),
+            "differ": sum(1 for a in compared if bool(a.get("admits_missing")) != bool(a["admits_heuristic"])),
+        }
     decs = [r["decision"] for r in rows if r.get("decision")]
+    judge_calls = sum(int(a.get("admits_calls") or 0) for _r, a in ans)
+    judge_cost = sum(float(a.get("admits_cost_usd") or 0.0) for _r, a in ans)
+    if decs or judge_calls:
+        s["decision_calls"] = sum(int(d.get("calls") or 0) for d in decs) + judge_calls
+        s["decision_cost_usd"] = round(sum(float(d.get("cost_usd") or 0.0) for d in decs) + judge_cost, 6)
+        s["admit_judge_calls"] = judge_calls
+        s["admit_judge_cost_usd"] = round(judge_cost, 6)
     if decs:
-        s["decision_calls"] = sum(int(d.get("calls") or 0) for d in decs)
-        s["decision_cost_usd"] = round(sum(float(d.get("cost_usd") or 0.0) for d in decs), 6)
         s["reranked"] = sum(1 for d in decs if d.get("reranked"))
         s["off_target"] = sum(1 for d in decs if d.get("off_target"))
         s["decision_errors"] = sum(1 for d in decs if d.get("error"))
@@ -892,7 +888,7 @@ def _run_questions(pipeline: Any, ws: Any, questions: list[dict[str, Any]], mode
                     row["decision"] = _decision_block(result)
                 row["elapsed_s"] = round(time.perf_counter() - t, 4)
                 row["pipeline_elapsed_s"] = getattr(result, "elapsed_s", None)
-                row["answer"] = score_answer(q, result.answer)
+                row["answer"] = score_answer(q, result.answer, decisions)
                 if mode == "both":
                     row["retrieval"] = score_retrieval(
                         q, list(result.hits or []), list(result.chunks or []), k
@@ -906,7 +902,7 @@ def _run_questions(pipeline: Any, ws: Any, questions: list[dict[str, Any]], mode
             if mode in ("retrieval", "both"):
                 row["retrieval"] = score_retrieval(q, [], [], k)
             if mode in ("answer", "both"):
-                row["answer"] = score_answer(q, _NoAnswer())
+                row["answer"] = score_answer(q, _NoAnswer(), decisions)
         if log is not None:
             status = f"ERROR {row['error']}" if row["error"] else _short_status(row)
             print(f"[{q['id']}] {row['elapsed_s']:.2f}s {status}", file=log, flush=True)
@@ -999,7 +995,7 @@ def render_markdown(report: dict[str, Any]) -> str:
 
     summary = report["summary"]
     out += ["", "## Summary", ""]
-    out += summary_lines(summary["overall"], k, meta.get("decisions"))
+    out += summary_lines(summary["overall"], k, meta.get("decisions") or meta.get("judge"))
     out += [
         "",
         "| group | n | hit@1 | hit@3 | hit@k | MRR | chunk_recall | cited_correct | cited_wrong mean |",
@@ -1044,20 +1040,26 @@ def summary_lines(s: dict[str, Any], k: int, decisions_name: Optional[str] = Non
             f" all_required {_fmt_rate(ans['all_required'])}"
         )
         lines.append(
-            f"- not-in-repo: admits_missing {_fmt_rate(ans['admits_missing'])} (phrase heuristic),"
+            f"- not-in-repo: admits_missing {_fmt_rate(ans['admits_missing'])}"
+            f" ({_judge_label(ans.get('admits_judge'))}),"
             f" pointer_cited {_fmt_rate(ans['pointer_cited'])};"
             f" false admits on answerable questions {_fmt_rate(ans['false_admits'])}"
         )
+        vs = ans.get("admit_judge_vs_heuristic")
+        if vs and vs.get("n"):
+            lines.append(f"- admit judge vs phrase heuristic: {vs['differ']}/{vs['n']} differ")
         lines.append(
             f"- tokens: input {ans['input_tokens']}, output {ans['output_tokens']},"
             f" cache_read {ans['cache_read_tokens']}"
         )
     if "decision_calls" in s:
-        lines.append(
-            f"- decisions: {decisions_name or '?'}, {s['decision_calls']} calls,"
-            f" ${s['decision_cost_usd']}, reranked {s['reranked']}/{s['n']},"
-            f" off-target {s['off_target']}, errors {s['decision_errors']}"
-        )
+        judged = int(s.get("admit_judge_calls") or 0)
+        calls = f"{s['decision_calls']} calls" + (f" ({judged} admit judge)" if judged else "")
+        line = f"- decisions: {decisions_name or '?'}, {calls}, ${s['decision_cost_usd']}"
+        if "reranked" in s:
+            line += (f", reranked {s['reranked']}/{s['n']},"
+                     f" off-target {s['off_target']}, errors {s['decision_errors']}")
+        lines.append(line)
     el = s.get("elapsed_s")
     if el:
         lines.append(
@@ -1067,11 +1069,97 @@ def summary_lines(s: dict[str, Any], k: int, decisions_name: Optional[str] = Non
     return lines
 
 
+def _judge_label(judges: Optional[dict[str, int]]) -> str:
+    """``judge: jev`` / ``judge: jev 28, rules 2``; reports without the field
+    were scored by the phrase heuristic."""
+    if not judges:
+        return "phrase heuristic"
+    names = {"rules": "rules (phrase heuristic)"}
+    if len(judges) == 1:
+        return f"judge: {names.get(next(iter(judges)), next(iter(judges)))}"
+    return "judge: " + ", ".join(f"{name} {n}" for name, n in judges.items())
+
+
 def list_questions(golden: dict[str, Any], ids: Optional[Iterable[str]] = None) -> str:
     rows = select_questions(golden, ids)
     lines = [f"{q['id']:<5} {q['category']:<15} {q['lang']:<3} {q['question']}" for q in rows]
     lines.append(f"{len(rows)} questions")
     return "\n".join(lines) + "\n"
+
+
+# =============================================================================== #
+# Rejudging a stored report
+# =============================================================================== #
+
+def rejudge_report(report: dict[str, Any], decisions: Any, *, source: Optional[str | Path] = None,
+                   log: Any = None) -> dict[str, Any]:
+    """A copy of an answer-mode ``report`` whose answers are judged again.
+
+    Every row with an ``answer`` gets its admit fields rewritten by
+    :func:`judge_admits` with ``decisions`` (from the stored ``answer_text``
+    and question; an empty text makes no call), then the summary is computed
+    again. ``meta`` gains ``rejudged_from``, ``judge`` and ``rejudged_at``.
+    No pipeline or LLM is called. Raises ``ValueError`` for a report without
+    answers (before any judge call) and lets ``DecisionsConfigError`` through.
+    """
+    rows = report.get("questions") if isinstance(report, dict) else None
+    if not isinstance(rows, list) or not isinstance(report.get("meta"), dict):
+        raise ValueError("not a run_eval report: 'meta' and 'questions' are missing")
+    if not any(isinstance(r, dict) and isinstance(r.get("answer"), dict) for r in rows):
+        raise ValueError("the report has no answers: rejudging needs a report run with --mode answer or both")
+    new = copy.deepcopy(report)
+    for row in new["questions"]:
+        ans = row.get("answer")
+        if not isinstance(ans, dict):
+            continue
+        fields = judge_admits(ans.get("answer_text") or "", row.get("question") or "", decisions, strict=True)
+        ans.pop("admits_judge_error", None)
+        ans.update(fields)
+        if log is not None:
+            print(f"[{row.get('id')}] judge {fields['admits_judge']} p={fields['admits_probability']:.2f}"
+                  f" admit={_yn(fields['admits_missing'])} heuristic={_yn(fields['admits_heuristic'])}",
+                  file=log, flush=True)
+    new["summary"] = aggregate(new["questions"])
+    new["meta"] = {
+        **new["meta"],
+        "rejudged_from": str(source) if source is not None else None,
+        "judge": getattr(decisions, "name", None),
+        "rejudged_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    }
+    return new
+
+
+def _snippet(text: str, limit: int = 90) -> str:
+    return " ".join((text or "").split())[:limit].replace("|", "\\|")
+
+
+def render_rejudge_table(report: dict[str, Any]) -> str:
+    """Per question: the phrase heuristic's verdict and phrase next to the
+    judge's probability and verdict, ``DIFF`` where they disagree, and the
+    start of the answer."""
+    rows = [r for r in report["questions"] if isinstance(r.get("answer"), dict)]
+    judge = report["meta"].get("judge") or "?"
+    out = [
+        f"## Admit judge ({judge}) vs phrase heuristic",
+        "",
+        "| id | category | heuristic | phrase | judge p | judge | diff | answer (first 90 chars) |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    differ = 0
+    for r in rows:
+        a = r["answer"]
+        verdict, heuristic = bool(a.get("admits_missing")), bool(a.get("admits_heuristic"))
+        differ += verdict != heuristic
+        judged = _yn(verdict) + (" (rules fallback)" if a.get("admits_judge_error") else "")
+        p = a.get("admits_probability")
+        out.append("| " + " | ".join([
+            str(r.get("id")), str(r.get("category")), _yn(heuristic),
+            (a.get("admits_phrase") or "-").replace("|", "\\|"),
+            "-" if p is None else f"{float(p):.2f}", judged, "DIFF" if verdict != heuristic else "",
+            _snippet(a.get("answer_text") or ""),
+        ]) + " |")
+    out += ["", f"{differ}/{len(rows)} verdicts differ."]
+    return "\n".join(out) + "\n"
 
 
 # =============================================================================== #
@@ -1083,16 +1171,22 @@ def build_parser() -> argparse.ArgumentParser:
         prog="run_eval.py",
         description="Measure RepoFinder retrieval and answer quality on a golden set.",
     )
-    p.add_argument("golden", help="golden set JSON, e.g. eval/golden/flask.json")
+    p.add_argument("golden", nargs="?",
+                   help="golden set JSON, e.g. eval/golden/flask.json (not with --rejudge)")
     p.add_argument("--source", help="repository URL or local checkout (default: repo.source of the golden file)")
     p.add_argument("--k", type=int, default=DEFAULT_K, help=f"hits/chunks per question (default {DEFAULT_K})")
-    p.add_argument("--mode", choices=MODES, default="retrieval",
+    p.add_argument("--mode", choices=MODES,
                    help="retrieval (no LLM; the default), answer (one LLM call per question) or both")
     p.add_argument("--ids", help="comma-separated question ids, e.g. q01,q05")
     p.add_argument("--out", help="JSON report path (default: eval/results/<golden>-<mode>-<timestamp>.json)")
     p.add_argument("--data-dir", help="passed to open_workspace(data_dir=...)")
     p.add_argument("--decisions", choices=("jev", "rules"),
-                   help="decision layer for the pipeline's own rerank (jev needs OPENROUTER_API_KEY)")
+                   help="decision layer for the pipeline's own rerank and the admit judge of the answers"
+                        " (jev needs OPENROUTER_API_KEY)")
+    p.add_argument("--rejudge", metavar="REPORT",
+                   help="judge the answers of a stored answer/both-mode report again (no pipeline, no LLM"
+                        " answer calls) with --decisions, or the detected layer (Jev when a key is set,"
+                        " else the rules), and write a new report to --out")
     p.add_argument("--candidates", type=int,
                    help="candidates handed to the decision layer (default: the pipeline's DEFAULT_CANDIDATES)")
     p.add_argument("--list", action="store_true", help="validate, print the questions and exit")
@@ -1105,7 +1199,19 @@ def main(argv: Optional[list[str]] = None, pipeline: Any = None) -> int:
             sys.stdout.reconfigure(errors="replace")
         except (ValueError, OSError):
             pass
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if args.rejudge:
+        clash = [flag for flag, value in (("a golden file", args.golden), ("--list", args.list),
+                                          ("--source", args.source), ("--mode", args.mode),
+                                          ("--ids", args.ids), ("--data-dir", args.data_dir),
+                                          ("--candidates", args.candidates)) if value]
+        if clash:
+            parser.error(f"--rejudge does not run the pipeline: drop {', '.join(clash)}")
+        return main_rejudge(args)
+    if not args.golden:
+        parser.error("the golden file is required (or --rejudge REPORT)")
+    mode = args.mode or "retrieval"
     try:
         golden = load_golden(args.golden)
     except GoldenError as exc:
@@ -1152,7 +1258,7 @@ def main(argv: Optional[list[str]] = None, pipeline: Any = None) -> int:
     try:
         if pipeline is None:
             pipeline = import_pipeline()
-        report = run_eval(golden, source, args.mode, args.k, pipeline,
+        report = run_eval(golden, source, mode, args.k, pipeline,
                           ids=ids, data_dir=args.data_dir, log=sys.stderr,
                           decisions=decisions, candidates=args.candidates)
     except Exception as exc:  # noqa: BLE001 - a setup failure, not a measurement
@@ -1161,10 +1267,47 @@ def main(argv: Optional[list[str]] = None, pipeline: Any = None) -> int:
 
     report["meta"]["golden"] = str(args.golden)
     report["meta"]["validation_warnings"] = warnings
-    out = Path(args.out) if args.out else default_out_path(args.golden, args.mode)
+    out = Path(args.out) if args.out else default_out_path(args.golden, mode)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     sys.stdout.write(render_markdown(report))
+    print(f"\nJSON report: {out}")
+    return 0
+
+
+def main_rejudge(args: argparse.Namespace) -> int:
+    """``--rejudge REPORT``: judge the stored answers again and write a new report."""
+    src = Path(args.rejudge)
+    try:
+        report = json.loads(src.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        print(f"error: cannot read the report {src}: {exc}", file=sys.stderr)
+        return 2
+    from repofinder import decisions as decisions_mod
+
+    try:
+        decisions = decisions_mod.detect_decisions(args.decisions)
+    except decisions_mod.DecisionsConfigError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    judge = getattr(decisions, "name", None) or "judge"
+    out = Path(args.out) if args.out else src.with_name(
+        f"{src.stem}-rejudged-{judge}-{time.strftime('%Y%m%d-%H%M%S')}.json")
+    if out.resolve() == src.resolve():
+        print("error: --out must not overwrite the report being rejudged", file=sys.stderr)
+        return 2
+    try:
+        new = rejudge_report(report, decisions, source=args.rejudge, log=sys.stderr)
+    except ValueError as exc:
+        print(f"error: {src}: {exc}", file=sys.stderr)
+        return 2
+    except decisions_mod.DecisionsError as exc:
+        print(f"error: the admit judge failed: {exc}", file=sys.stderr)
+        return 1
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(new, ensure_ascii=False, indent=2), encoding="utf-8")
+    sys.stdout.write(render_markdown(new))
+    sys.stdout.write("\n" + render_rejudge_table(new))
     print(f"\nJSON report: {out}")
     return 0
 

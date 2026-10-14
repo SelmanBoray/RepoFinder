@@ -15,10 +15,13 @@ from typing import Any, Callable, Optional
 import pytest
 
 from repofinder import decisions as dec
+from repofinder.admit import ADMIT_NO, ADMIT_YES
 from repofinder.decisions import (
+    ADMIT_QUESTION,
     CARD_LABELS,
     CONTEXT_QUESTION,
     MAX_REQUEST_TOKENS,
+    MESSAGE_CHARS,
     NONE_LABEL,
     QUESTION_NAME,
     ROUTE_CHAT,
@@ -37,6 +40,7 @@ from repofinder.decisions import (
     JevDecisions,
     RulesDecisions,
     YesNo,
+    answer_admits_missing,
     context_suffices,
     detect_decisions,
     rerank_cards,
@@ -352,6 +356,69 @@ def test_context_suffices_leaves_out_cards_over_the_budget() -> None:
     state = fake.calls[0].state
     assert "[1]\n" in state and "[3]\n" not in state
     assert dec.request_tokens(state, {"type": "noul", "instructions": CONTEXT_QUESTION}) <= MAX_REQUEST_TOKENS
+
+
+# --------------------------------------------------------------------------- #
+# answer_admits_missing
+# --------------------------------------------------------------------------- #
+
+LOCATED = "The route decorator is `Scaffold.route` in src/flask/sansio/scaffold.py:336-365."
+ADMITTED = "The excerpts don't show where the URL rule is matched; that code is in Werkzeug."
+
+
+@pytest.mark.parametrize("text, expected", [
+    (ADMITTED, ADMIT_YES),                                                      # English phrase
+    (LOCATED, ADMIT_NO),                                                        # no phrase
+    ("Parola özetleme kodu bu depoda değil, Werkzeug'da.", ADMIT_YES),          # Turkish phrase
+    ("Jinja derleyicisi alıntılarda YER ALMIYOR.", ADMIT_YES),                  # Turkish, upper case
+    ("`abort` fonksiyonu src/flask/helpers.py:281-301 içinde tanımlı.", ADMIT_NO),
+])
+def test_answer_admits_missing_with_rules(text: str, expected: float) -> None:
+    rules = RulesDecisions()
+    assert answer_admits_missing(rules, "where is it?", text) == YesNo(expected, 0.0, 0)
+    assert rules.usage.calls == 1
+
+
+@pytest.mark.parametrize("text", ["", "   \n", None])
+def test_answer_admits_missing_empty_answer_makes_no_call(text: Optional[str]) -> None:
+    rules, fake = RulesDecisions(), FakeDecisions(yes_no=[0.99])
+    assert answer_admits_missing(rules, "where?", text) == YesNo(ADMIT_NO, 0.0, 0)  # type: ignore[arg-type]
+    assert answer_admits_missing(fake, "where?", text) == YesNo(ADMIT_NO, 0.0, 0)  # type: ignore[arg-type]
+    assert rules.usage.calls == 0 and fake.calls == []
+
+
+def test_answer_admits_missing_asks_the_backend() -> None:
+    fake = FakeDecisions(yes_no=[0.2, 1.3])
+    # the backend decides, not the phrases: this answer contains one but gives the location
+    answer = answer_admits_missing(fake, "Where is the route decorator?", LOCATED + " add_url_rule is not shown.")
+    assert answer == YesNo(0.2, 0.0, 0)
+    (call,) = fake.calls
+    assert call.kind == "yes_no" and call.prompt == ADMIT_QUESTION
+    assert "Where is the route decorator?" in call.state and LOCATED in call.state
+    assert answer_admits_missing(fake, "q", ADMITTED).probability == 1.0          # clamped
+
+
+def test_answer_admits_missing_clips_a_long_answer_and_calls_once() -> None:
+    fake = FakeDecisions(yes_no=[0.7])
+    question, text = "q" * (MESSAGE_CHARS + 500), "The excerpts do not show it. " + "x" * 200_000
+    assert answer_admits_missing(fake, question, text).probability == 0.7
+    (call,) = fake.calls
+    assert len(call.state) < 30_000 and "q" * (MESSAGE_CHARS + 1) not in call.state
+    assert call.state.startswith("Question about the repository:") and "The excerpts do not show it." in call.state
+    assert dec.request_tokens(call.state, {"type": "noul", "instructions": ADMIT_QUESTION}) <= MAX_REQUEST_TOKENS
+
+
+def test_answer_admits_missing_through_jev_reports_cost() -> None:
+    client = FakeClient(lambda s, q: jev_response("nouls", SimpleNamespace(type="noul", noul=0.91)))
+    jev = JevDecisions(client=client)
+    assert answer_admits_missing(jev, "Where are passwords hashed?", ADMITTED) == YesNo(0.91, 5.04e-06, 120)
+    ((state, questions),) = client.calls
+    assert questions == {QUESTION_NAME: {"type": "noul", "instructions": ADMIT_QUESTION}}
+    assert ADMITTED in state and jev.usage.calls == 1
+
+
+def test_admit_question_says_when_to_answer_yes_and_no() -> None:
+    assert "YES only when" in ADMIT_QUESTION and "NO when the answer gives the location" in ADMIT_QUESTION
 
 
 # --------------------------------------------------------------------------- #

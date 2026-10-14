@@ -775,6 +775,184 @@ def test_git_head_reads_refs_packed_refs_and_detached(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
+# Admit judge (does an answer admit that the asked-about code is missing?)
+# --------------------------------------------------------------------------- #
+
+ADMIT_FIELDS = ("admits_missing", "admits_judge", "admits_probability", "admits_phrase", "admits_heuristic")
+
+
+def test_score_answer_without_decisions_uses_the_phrase_heuristic():
+    r = run_eval.score_answer(question("q1"), answer("The excerpts do not show it.", []))
+    assert {k: r[k] for k in ADMIT_FIELDS} == {
+        "admits_missing": True, "admits_judge": "rules", "admits_probability": 0.9,
+        "admits_phrase": "excerpts do not", "admits_heuristic": True}
+    assert r["admits_calls"] == 0 and "admits_judge_error" not in r
+
+
+def test_score_answer_with_a_fake_judge():
+    from repofinder.decisions import ADMIT_QUESTION, FakeDecisions
+
+    fake = FakeDecisions(yes_no=[0.2])
+    text = "`A.run` is in `pkg/a.py:10-20`; its caller is not shown."   # a phrase, but a location
+    r = run_eval.score_answer(question("q1", "Where is A.run?"), answer(text, [("pkg/a.py", 10, 20)]), fake)
+    assert {k: r[k] for k in ADMIT_FIELDS} == {
+        "admits_missing": False, "admits_judge": "fake", "admits_probability": 0.2,
+        "admits_phrase": "not shown", "admits_heuristic": True}
+    assert r["admits_calls"] == 1 and r["admits_cost_usd"] == 0.0 and r["cited_correct"] is True
+    (call,) = fake.calls
+    assert call.prompt == ADMIT_QUESTION and "Where is A.run?" in call.state and text in call.state
+
+
+def test_score_answer_with_the_rules_layer_equals_the_heuristic():
+    from repofinder.decisions import RulesDecisions
+
+    for text in ("The excerpts do not show it.", "It is in pkg/a.py:10-20.", ""):
+        plain = run_eval.score_answer(question("q1"), answer(text, []))
+        ruled = run_eval.score_answer(question("q1"), answer(text, []), RulesDecisions())
+        assert {k: ruled[k] for k in ADMIT_FIELDS} == {k: plain[k] for k in ADMIT_FIELDS}
+
+
+def test_score_answer_falls_back_to_the_heuristic_when_the_judge_fails():
+    from repofinder.decisions import FakeDecisions
+
+    r = run_eval.score_answer(question("q1"), answer("Alıntılarda yok.", []), FakeDecisions())  # nothing scripted
+    assert r["admits_missing"] is True and r["admits_judge"] == "rules" and r["admits_calls"] == 0
+    assert r["admits_judge_error"].startswith("DecisionsError: FakeDecisions")
+
+
+def test_run_eval_judges_every_answer_and_counts_the_judge_calls():
+    from repofinder.decisions import FakeDecisions
+
+    g, stub = _decision_stub()
+    fake = FakeDecisions(yes_no=[0.1, 0.8, 0.95])         # q1, q2, q3 in order
+    report = run_eval.run_eval(g, "SRC", "both", 8, stub, decisions=fake)
+    rows = {r["id"]: r["answer"] for r in report["questions"]}
+    assert [rows[q]["admits_missing"] for q in ("q1", "q2", "q3")] == [False, True, True]
+    assert [rows[q]["admits_heuristic"] for q in ("q1", "q2", "q3")] == [False, False, True]
+    assert all(rows[q]["admits_judge"] == "fake" and rows[q]["admits_calls"] == 1 for q in rows)
+    s = report["summary"]["overall"]
+    assert s["answer"]["admits_judge"] == {"fake": 3}
+    assert s["answer"]["admit_judge_vs_heuristic"] == {"n": 3, "differ": 1}
+    assert s["answer"]["false_admits"] == {"n": 2, "yes": 1, "rate": 0.5}
+    assert s["decision_calls"] == 2 + 3 and s["admit_judge_calls"] == 3      # rerank calls + judge calls
+    md = run_eval.render_markdown(report)
+    assert "admits_missing 1.00 (1/1) (judge: fake)" in md
+    assert "- admit judge vs phrase heuristic: 1/3 differ" in md
+    assert "decisions: fake, 5 calls (3 admit judge), $1e-05, reranked 1/3" in md
+    assert "| q2 | flow |" in md and "false-admit" in md.split("| q2 | flow |")[1].splitlines()[0]
+
+
+def test_summary_of_an_old_report_names_the_phrase_heuristic():
+    rows = [{"id": "q1", "category": "not-in-repo", "lang": "en",
+             "answer": {"admits_missing": True, "admits_phrase": "not shown", "cited_wrong": 0}}]
+    s = run_eval.summarize(rows)
+    assert s["answer"]["admits_judge"] == {} and s["answer"]["admit_judge_vs_heuristic"]["n"] == 0
+    lines = "\n".join(run_eval.summary_lines(s, 8))
+    assert "(phrase heuristic)" in lines and "differ" not in lines and "decisions:" not in lines
+
+
+def _answer_record(text: str, phrase: Optional[str]) -> dict[str, Any]:
+    return {"n_citations": 0, "citations": [], "cited_correct": None, "cited_wrong": 0,
+            "all_required": None, "admits_missing": phrase is not None, "admits_phrase": phrase,
+            "pointer_cited": None, "model": "m", "input_tokens": 10, "output_tokens": 2,
+            "cache_read_tokens": 0, "answer_text": text}
+
+
+def _write_report(tmp_path: Path) -> Path:
+    """A tiny answer-mode report as an older run_eval wrote it (heuristic fields only)."""
+    texts = [("q1", "locate-symbol", "Where is run?", "In `src/app.py:100-130`; the caller is not shown.",
+              "not shown"),
+             ("q2", "flow", "How does a request flow?", "It goes through wsgi_app | full_dispatch_request.", None),
+             ("q3", "not-in-repo", "URL eşleştirme nasıl yapılıyor?", "Bu kod depoda yok, Werkzeug'da.",
+              "depoda yok"),
+             ("q4", "locate-symbol", "Where is push?", "", None)]          # an errored question: no text
+    rows = [{"id": qid, "category": cat, "lang": "en", "question": q, "error": None, "elapsed_s": 1.0,
+             "answer": _answer_record(text, phrase)} for qid, cat, q, text, phrase in texts]
+    report = {"meta": {"repo": {"name": "demo"}, "mode": "answer", "k": 8}, "summary": {}, "questions": rows}
+    path = tmp_path / "old.json"
+    path.write_text(json.dumps(report, ensure_ascii=False), encoding="utf-8")
+    return path
+
+
+def test_main_rejudge_rewrites_the_admit_fields(tmp_path, monkeypatch, capsys):
+    import repofinder.decisions as decisions_mod
+
+    src = _write_report(tmp_path)
+    before = src.read_text(encoding="utf-8")
+    fake = decisions_mod.FakeDecisions(yes_no=[0.05, 0.6, 0.97])     # q4 (no text) makes no call
+    asked: list = []
+    monkeypatch.setattr(decisions_mod, "detect_decisions", lambda name=None: asked.append(name) or fake)
+    stub = StubPipeline()
+    out = tmp_path / "new.json"
+    assert run_eval.main(["--rejudge", str(src), "--out", str(out)], pipeline=stub) == 0
+    assert asked == [None] and stub.calls == [] and len(fake.calls) == 3
+    assert src.read_text(encoding="utf-8") == before
+    new = json.loads(out.read_text(encoding="utf-8"))
+    assert new["meta"]["rejudged_from"] == str(src) and new["meta"]["judge"] == "fake"
+    assert new["meta"]["rejudged_at"] and new["meta"]["mode"] == "answer"
+    rows = {r["id"]: r["answer"] for r in new["questions"]}
+    assert [rows[q]["admits_missing"] for q in ("q1", "q2", "q3", "q4")] == [False, True, True, False]
+    assert [rows[q]["admits_heuristic"] for q in ("q1", "q2", "q3", "q4")] == [True, False, True, False]
+    assert rows["q1"]["admits_phrase"] == "not shown" and rows["q2"]["admits_probability"] == 0.6
+    ans = new["summary"]["overall"]["answer"]
+    assert ans["admits_missing"] == {"n": 1, "yes": 1, "rate": 1.0}
+    assert ans["false_admits"] == {"n": 3, "yes": 1, "rate": 0.333}
+    assert ans["admit_judge_vs_heuristic"] == {"n": 4, "differ": 2}
+    assert new["summary"]["overall"]["admit_judge_calls"] == 3
+    stdout = capsys.readouterr().out
+    assert "admits_missing 1.00 (1/1) (judge: fake)" in stdout
+    assert "## Admit judge (fake) vs phrase heuristic" in stdout
+    assert "| q1 | locate-symbol | 1 | not shown | 0.05 | 0 | DIFF | In `src/app.py:100-130`;" in stdout
+    assert "| q3 | not-in-repo | 1 | depoda yok | 0.97 | 1 |  | Bu kod depoda yok" in stdout
+    assert "| DIFF | It goes through wsgi_app \\| full_dispatch_request. |" in stdout      # pipes escaped
+    assert "2/4 verdicts differ." in stdout and "JSON report:" in stdout
+
+
+def test_main_rejudge_with_the_rules_reproduces_the_stored_verdicts(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)                       # detect_decisions reads ./.env
+    src = _write_report(tmp_path)
+    out = tmp_path / "rules.json"
+    assert run_eval.main(["--rejudge", str(src), "--decisions", "rules", "--out", str(out)]) == 0
+    old = json.loads(src.read_text(encoding="utf-8"))["questions"]
+    new = json.loads(out.read_text(encoding="utf-8"))["questions"]
+    assert [r["answer"]["admits_missing"] for r in new] == [r["answer"]["admits_missing"] for r in old]
+    assert all(r["answer"]["admits_judge"] == "rules" for r in new)
+    assert "0/4 verdicts differ." in capsys.readouterr().out
+
+
+def test_main_rejudge_refuses_bad_input(tmp_path, monkeypatch, capsys):
+    import repofinder.decisions as decisions_mod
+
+    monkeypatch.chdir(tmp_path)                       # detect_decisions reads ./.env
+    src = _write_report(tmp_path)
+    for argv in (["--rejudge", str(src), str(_write_golden(tmp_path, _stub_golden()[0]))],
+                 ["--rejudge", str(src), "--mode", "both"], []):
+        with pytest.raises(SystemExit) as exc:
+            run_eval.main(argv)
+        assert exc.value.code == 2
+    assert run_eval.main(["--rejudge", str(tmp_path / "missing.json"), "--decisions", "rules"]) == 2
+    no_answers = tmp_path / "retrieval.json"
+    no_answers.write_text(json.dumps({"meta": {"k": 8}, "questions": [{"id": "q1", "retrieval": {}}]}),
+                          encoding="utf-8")
+    assert run_eval.main(["--rejudge", str(no_answers), "--decisions", "rules",
+                          "--out", str(tmp_path / "x.json")]) == 2
+    assert run_eval.main(["--rejudge", str(src), "--decisions", "rules", "--out", str(src)]) == 2
+    err = capsys.readouterr().err
+    assert "cannot read the report" in err and "no answers" in err and "must not overwrite" in err
+
+    class NoKey:
+        name = "jev"
+
+        def yes_no(self, state, question):
+            raise decisions_mod.DecisionsConfigError("no OPENROUTER_API_KEY")
+
+    monkeypatch.setattr(decisions_mod, "detect_decisions", lambda name=None: NoKey())
+    assert run_eval.main(["--rejudge", str(src), "--out", str(tmp_path / "y.json")]) == 1
+    assert "the admit judge failed: no OPENROUTER_API_KEY" in capsys.readouterr().err
+    assert not (tmp_path / "y.json").exists()
+
+
+# --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
 

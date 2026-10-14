@@ -29,9 +29,11 @@ require Jev (an error when the key or the sdk is missing). Jev needs ``OPENROUTE
 
 The chat layer calls :func:`route_message`, :func:`rerank_cards` and
 :func:`context_suffices`, which work with any backend: they render the state
-text, ask the backend, and check its answer. ``RulesDecisions`` is the one
+text, ask the backend, and check its answer. The eval judges its answers with
+:func:`answer_admits_missing` (does an answer say that what was asked is not in
+the code?). ``RulesDecisions`` is the one
 special case: rules read the structured inputs (the message, the history, the
-cards) rather than the rendered state, so the helpers apply them directly.
+cards, the answer text) rather than the rendered state, so the helpers apply them directly.
 Backend failures raise :class:`DecisionsError`; a caller that wants to carry
 on can repeat the decision with ``RulesDecisions()``.
 """
@@ -47,6 +49,8 @@ import re
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Any, Mapping, NamedTuple, Optional, Protocol, Sequence, Union, runtime_checkable
+
+from .admit import ADMIT_NO, ADMIT_YES, admits_missing
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +100,7 @@ NONE_LABEL = "NONE"
 HISTORY_EXCHANGES = 3                # user/assistant pairs shown to the router
 HISTORY_TEXT_CHARS = 600             # per history message
 MESSAGE_CHARS = 2_000                # the new message / the question
+ANSWER_CHARS = 12_000                # an answer judged by answer_admits_missing
 OPTION_CHARS = 200                   # a card's first line used as its option description
 
 # Rule constants.
@@ -151,6 +156,14 @@ NONE_DESCRIPTION = "None of the candidates contains code that answers the questi
 CONTEXT_QUESTION = (
     "Do the code excerpts above already contain everything needed to answer the follow-up message,"
     " so that no new code search is needed?"
+)
+ADMIT_QUESTION = (
+    "Does the answer above say that the code the question asks about is missing, i.e. not in the"
+    " provided code excerpts or not in this repository? Answer YES only when that is the answer's"
+    " main claim, or when the answer only describes what the excerpts do not show without saying"
+    " where the asked-about code is. Answer NO when the answer gives the location of the asked-about"
+    " code (a file path, with or without line numbers), even if it also remarks that some neighbouring"
+    " detail is not in the excerpts."
 )
 
 
@@ -454,10 +467,12 @@ class RulesDecisions:
     """Deterministic English and Turkish rules; no network, no cost.
 
     The helpers (:func:`route_message`, :func:`rerank_cards`,
-    :func:`context_suffices`) apply :func:`rule_route`, the search order and
-    :func:`rule_context_suffices` through :meth:`route`, :meth:`rerank` and
-    :meth:`suffices`. :meth:`choose` and :meth:`yes_no` on free text have no
-    rule to apply: they return the first option and 0.5 (undecided).
+    :func:`context_suffices`, :func:`answer_admits_missing`) apply
+    :func:`rule_route`, the search order, :func:`rule_context_suffices` and
+    the phrase heuristic :func:`repofinder.admit.admits_missing` through
+    :meth:`route`, :meth:`rerank`, :meth:`suffices` and :meth:`admits`.
+    :meth:`choose` and :meth:`yes_no` on free text have no rule to apply: they
+    return the first option and 0.5 (undecided).
     """
 
     name = DECISIONS_RULES
@@ -484,6 +499,13 @@ class RulesDecisions:
     def suffices(self, message: str, previous_question: str, cards: Sequence[str]) -> YesNo:
         self.usage.calls += 1
         return YesNo(rule_context_suffices(message, previous_question, cards), 0.0, 0)
+
+    def admits(self, question: str, answer_text: str) -> YesNo:
+        """:data:`~repofinder.admit.ADMIT_YES` (0.9) when ``answer_text``
+        contains one of the admission phrases, else ``ADMIT_NO`` (0.1). The
+        question is not used: the heuristic reads only the answer."""
+        self.usage.calls += 1
+        return YesNo(ADMIT_YES if admits_missing(answer_text or "") else ADMIT_NO, 0.0, 0)
 
     def _choice(self, label: str, keys: Sequence[str] | Mapping[str, str]) -> Choice:
         self.usage.calls += 1
@@ -973,4 +995,34 @@ def context_suffices(decisions: Decisions, message: str, previous_question: str,
 
     _kept, (state, _question) = _fit(build, cards)
     answer = decisions.yes_no(state, CONTEXT_QUESTION)
+    return YesNo(min(1.0, max(0.0, float(answer.probability))), answer.cost_usd, answer.input_tokens)
+
+
+def answer_admits_missing(decisions: Decisions, question: str, answer_text: str) -> YesNo:
+    """P(``answer_text``, an answer to ``question``, says that what was asked
+    is not in the code excerpts it was given or not in the repository).
+
+    With :class:`RulesDecisions` this is the phrase heuristic
+    (:meth:`RulesDecisions.admits`: 0.9 or 0.1). Any other backend gets the
+    question (clipped to :data:`MESSAGE_CHARS`) and the answer (clipped to
+    :data:`ANSWER_CHARS`, and cut further if the request would exceed
+    :data:`MAX_REQUEST_TOKENS`) and :data:`ADMIT_QUESTION`, in one ``yes_no``
+    call. An empty answer admits nothing: ``ADMIT_NO`` and no call. The
+    threshold is the caller's.
+    """
+    if not (answer_text or "").strip():
+        return YesNo(ADMIT_NO, 0.0, 0)
+    if isinstance(decisions, RulesDecisions):
+        return decisions.admits(question, answer_text)
+
+    def build(shown: Sequence[str]) -> tuple[str, dict[str, Any]]:
+        state = "\n".join([
+            "Question about the repository:", _clip((question or "").strip(), MESSAGE_CHARS), "",
+            "Answer, written from code excerpts of the repository (the excerpts are not shown):", "",
+            shown[0],
+        ]) + "\n"
+        return state, {"type": "noul", "instructions": ADMIT_QUESTION}
+
+    _kept, (state, _question) = _fit(build, [_clip(answer_text.strip(), ANSWER_CHARS)])
+    answer = decisions.yes_no(state, ADMIT_QUESTION)
     return YesNo(min(1.0, max(0.0, float(answer.probability))), answer.cost_usd, answer.input_tokens)

@@ -12,7 +12,9 @@ their exact answer locations, and a runner that scores the product against it.
 | `search_baseline.py` | The same scoring with `repofinder.search` alone (no pipeline, no LLM) |
 | `results/` | JSON reports. `flask-search-baseline-d086db8-k8.json` is the search-only baseline |
 
-The runner uses the standard library only. Tests: `tests/test_eval.py`.
+The runner uses the standard library plus `repofinder.admit` (the phrase
+heuristic, itself standard library only); the pipeline and the decisions layer
+are imported only when a run needs them. Tests: `tests/test_eval.py`.
 
 ## Running
 
@@ -33,17 +35,38 @@ From the repository root (PowerShell):
 
 # search-only baseline (needs a local checkout)
 .venv\Scripts\python -I eval\search_baseline.py eval\golden\flask.json --source C:\path\to\flask
+
+# judge the answers of a stored report again (no pipeline, no LLM answer calls)
+.venv\Scripts\python eval\run_eval.py --rejudge eval\results\flask-both-haiku55-searchv2-d086db8-k8.json --decisions jev --out rejudged.json
 ```
 
 Options: `--k` (hits/chunks per question, default 8), `--ids q01,q05`,
 `--out PATH` (default `eval/results/<golden>-<mode>-<timestamp>.json`),
 `--data-dir PATH` (passed to `open_workspace`), `--source` (default: `repo.source`
-in the golden file, the GitHub URL).
+in the golden file, the GitHub URL), `--decisions jev|rules` (the decision layer:
+the pipeline's rerank and the admit judge, see `admits_missing` below),
+`--candidates N` (hits shown to the decision layer).
+
+`--rejudge REPORT` takes a stored answer- or both-mode report instead of a golden
+file and runs no pipeline and no LLM answer call. It judges every stored
+`answer_text` again with `--decisions` (without it: Jev when a key is set, else
+the rules), rewrites the `admits_*` fields of each answer, recomputes the summary
+and writes a new report to `--out` (default: next to `REPORT`, named
+`<report>-rejudged-<judge>-<timestamp>.json`; `REPORT` itself is never
+overwritten). `meta` gains `rejudged_from`, `judge` and `rejudged_at`. It prints
+the usual table and a comparison per question: id, category, the phrase
+heuristic's verdict and phrase, the judge's probability and verdict, `DIFF` where
+the two disagree, and the first 90 characters of the answer. With
+`--decisions rules` the stored heuristic verdicts come back unchanged. A golden
+file, `--list`, `--source`, `--mode`, `--ids`, `--data-dir` and `--candidates`
+cannot be combined with it.
 
 Exit codes: **0 whatever the scores are** (this is a measurement, not a gate);
-**2** if the golden file is invalid or an `--ids` entry does not exist; **1** if
+**2** if the golden file is invalid or an `--ids` entry does not exist, or the
+`--rejudge` report cannot be read or has no answers; **1** if
 the pipeline cannot be set up (`repofinder.pipeline` missing, `open_workspace`
-raised). A question whose `retrieve`/`ask` call raises is recorded with its error,
+raised), or if the admit judge fails for good during `--rejudge` (no key, a
+rejected key, no credit). A question whose `retrieve`/`ask` call raises is recorded with its error,
 scored as a miss, and the run continues.
 
 The runner calls the product only through this contract:
@@ -81,12 +104,19 @@ The Markdown table has one row per question:
 | `chunk_recall` | `1` if the retrieved chunks cover an expected location (all of them when `accept_any` is false) |
 | `cited_correct` | `1` if the answer cites an expected location (answer modes only) |
 | `cited_wrong` | citations that hit no expected, pointer or related location |
-| `extra` | `all@k` (flow: every expected location in the top k), `ptr@k` (not-in-repo: the pointer is in the top k), `all_req` (flow: every expected location cited), `admit` / `ptr_cited` (not-in-repo), `false-admit` (the answer said "not found" for an answerable question), `ERROR` |
+| `extra` | `all@k` (flow: every expected location in the top k), `ptr@k` (not-in-repo: the pointer is in the top k), `all_req` (flow: every expected location cited), `admit` / `ptr_cited` (not-in-repo), `false-admit` (the answer said "not found" for an answerable question; `admit` and `false-admit` are the `admits_missing` verdict, from the Jev judge when it is set up, else from the phrase heuristic), `ERROR` |
 | `top-1 hit` | `path:line qualname` of the first hit, `(file)` for a file-level hit |
 
 Then the summary: overall rates (as `rate (yes/n)`, only over the questions where
 the metric applies), MRR, the loose rates, token totals and timings, and a table
-per category and per language.
+per category and per language. The not-in-repo line names who gave the
+`admits_missing` verdicts, e.g. `admits_missing 0.67 (2/3) (judge: jev)` or
+`(judge: rules (phrase heuristic))` (`judge: jev 28, rules 2` when some judge
+calls failed and fell back to the heuristic; reports written before the judge
+say `(phrase heuristic)`), and the next line counts the answers where the judge
+and the phrase heuristic disagree: `admit judge vs phrase heuristic: N/M differ`.
+With a decision layer the judge calls are part of the `decisions:` line
+(`N calls (M admit judge)`).
 
 The JSON report holds everything: `meta` (source, mode, k, constants, validation
 warnings), `summary`, and per question the top hits with their match kind and the
@@ -133,13 +163,26 @@ Answers (one LLM call per question):
   (`llm.parse_citations`), so a citation to lines the model never saw is dropped
   before scoring and cannot be counted here.
 - `all_required` (`accept_any: false`): every expected location is cited.
-- `admits_missing`: **a heuristic.** The answer text contains a phrase from
-  `ADMIT_PHRASES` in `run_eval.py` (English and Turkish, e.g. "not in the
-  excerpts", "do not contain", "alıntılarda yok", "görünmüyor"), compared
-  case-insensitively with Turkish ı/İ folded to i. It is the target behaviour for
+- `admits_missing`: the answer says that what was asked is not in the code
+  excerpts it was given, or not in the repository. It is the target behaviour for
   not-in-repo questions; on answerable questions it is reported as a false
-  admission. It can misfire both ways: read the answer texts and extend the list
-  when a correct admission is missed.
+  admission. **The verdict comes from the Jev judge when Jev is set up**
+  (`--decisions jev`, or a key with the default detection):
+  `repofinder.decisions.answer_admits_missing` asks Jev a yes/no question
+  (`ADMIT_QUESTION`: YES only when the answer's main claim is that the code is
+  missing, NO when it gives the location even if it remarks that some
+  neighbouring detail is not in the excerpts), and the verdict is P(yes) >= 0.5.
+  **Otherwise it comes from the phrase heuristic**: the answer text contains a
+  phrase from `ADMIT_PHRASES` in `repofinder/admit.py` (English and Turkish,
+  e.g. "not in the excerpts", "do not contain", "alıntılarda yok",
+  "görünmüyor"), compared case-insensitively with Turkish ı/İ folded to i. The
+  heuristic misfires both ways ("X is in scaffold.py; Y is not in the excerpts"
+  counts as an admission): read the answer texts. A judge call that fails keeps
+  the heuristic's verdict for that answer. Per answer the report stores
+  `admits_missing`, `admits_judge` (`jev`, `rules`), `admits_probability`,
+  `admits_calls`, `admits_cost_usd`, and always the heuristic's
+  `admits_phrase` and `admits_heuristic` for comparison (plus
+  `admits_judge_error` after a fallback).
 - `pointer_cited` (not-in-repo): a citation strictly matches a `pointer` location.
 - Tokens (`input_tokens`, `output_tokens`, `cache_read_tokens`) and `elapsed_s`
   per question; `pipeline_elapsed_s` is what `ask` reported.
@@ -491,3 +534,46 @@ Honesty: one run each, no reruns. The golden set was written by a model agent
 under the blindness rule above. The flow questions use `accept_any=true`,
 unlike `requests.json` (`false`), so flow numbers across sets are not directly
 comparable.
+
+## Admit judge: Jev vs the phrase heuristic (2026-10-14)
+
+What was measured: whether an answer "admits the answer is missing" (its main
+claim is that what was asked is not in the excerpts / the repository), judged by
+Jev's yes/no (`decisions.answer_admits_missing`, `ADMIT_QUESTION`, threshold
+0.5) versus the phrase heuristic (`repofinder.admit.ADMIT_PHRASES`). No new LLM
+answers were generated: the 30 stored Haiku 5.5 answers on Flask (2026-10-10)
+were re-judged with `run_eval.py --rejudge
+eval/results/flask-both-haiku55-searchv2-d086db8-k8.json --decisions jev`;
+report `eval/results/flask-both-haiku55-searchv2-d086db8-k8-rejudged-jev.json`.
+
+Hand labels (reading all 30 answers): the true admissions are q15 and q23
+(answerable questions the model failed) and q28 and q29 (not-in-repo). q30 is
+borderline (it says hashing is in Werkzeug but points to the `register` view
+that calls it) and is accepted either way.
+
+Phrase heuristic: flags 15/30. Ten are false positives (q01, q03, q13, q14,
+q16, q17, q18, q21, q25, and q20 as a hedge): the answer gives the right
+location and then remarks that a neighbouring detail is not in the excerpts.
+0 misses. Reported "false admits on answerable questions": 12/27 (0.44).
+
+Jev judge: flags 6/30. q15 0.75, q23 0.60, q28 0.75, q29 0.87 (all four true
+admissions found), plus q14 0.50 (false positive, exactly at the threshold: the
+answer gives `Flask.send_static_file` and notes that the route registration is
+not shown) and q20 0.74 (ambiguous: it names `update_template_context`, then
+says it cannot be sure from these excerpts). q30 0.44 -> no. Everything else is
+<= 0.42, and most locate answers sit at 0.03-0.07; q25 0.42 and q26 0.37 are
+the other hedged answers. Reported "false admits on answerable questions": 4/27
+(0.15); not-in-repo admits_missing 2/3. Judge and heuristic differ on 9/30.
+Cost: 30 calls, $0.001008 total (0.0034 cents per answer), 0 errors.
+
+Reading: against the hand labels the heuristic is right on 20/30 and the judge
+on 28/30 (29/30 if q20 counts as an admission). The judge's probabilities also
+separate clean answers (0.03-0.07) from hedged ones (0.37-0.50), which the
+heuristic cannot. The threshold stays at 0.5: raising it to clear q14 would be
+tuning on this set. The earlier Haiku numbers (false-admit 12/27) should now be
+read as 4/27 under the judge; the phrase-heuristic admit metric over-counted by
+8.
+
+Honesty: the hand labels were made by the same person who wrote
+`ADMIT_QUESTION`'s criteria, after seeing the heuristic's output. One run; 30
+answers from one model on one repository.
