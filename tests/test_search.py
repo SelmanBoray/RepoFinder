@@ -10,13 +10,18 @@ import pytest
 
 from repofinder.ingest import build_index
 from repofinder.models import FileRecord, RepoIndex, Symbol
-from repofinder.search import Hit, SearchIndex, stem, tokenize
-
-FLASK_ROOT = Path(
-    r"C:\Users\Selman\AppData\Local\Temp\claude\C--\2893ddbc-306e-4b5d-94d8-359c5612cb51"
-    r"\scratchpad\repos\flask"
+from repofinder.search import (
+    Hit,
+    SearchIndex,
+    _abbreviations,
+    _explicit_identifiers,
+    _file_stem,
+    _path_text,
+    stem,
+    tokenize,
 )
-needs_flask = pytest.mark.skipif(not (FLASK_ROOT / "src" / "flask").is_dir(), reason="Flask checkout absent")
+
+from conftest import FLASK_ROOT, needs_flask  # noqa: E402
 
 
 # --------------------------------------------------------------------------- #
@@ -702,3 +707,63 @@ def test_flask_performance(flask_index: RepoIndex) -> None:
         queries.append(time.perf_counter() - start)
     assert min(builds) < 0.5
     assert max(queries) < 0.05
+
+
+# --------------------------------------------------------------------------- #
+# TypeScript paths
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        ("pkg/mod.py", "mod"),
+        ("pkg/sub/__init__.py", "sub"),
+        ("src/util.ts", "util"),
+        ("src/util/index.ts", "util"),       # an index file is named after its directory
+        ("src/ui/index.tsx", "ui"),
+        ("index.ts", "index"),
+        ("src/types.d.ts", "types"),
+        ("src/a.test.ts", "a.test"),
+        ("lib/Run.mts", "run"),
+    ],
+)
+def test_file_stem_strips_any_registered_extension(path: str, expected: str) -> None:
+    assert _file_stem(path) == expected
+
+
+def test_path_text_strips_typescript_extensions() -> None:
+    assert _path_text("src/flask/app.py") == "src/flask/app"
+    assert _path_text("src/util/index.ts") == "src/util/index"
+    assert _path_text("src/types.d.ts") == "src/types"
+    assert _path_text("src/View.tsx") == "src/View"
+
+
+@pytest.mark.parametrize(
+    "query",
+    ["where is foo.ts loaded", "what does index.tsx render", "main.mts", "cli.js and loader.mjs", "app.py"],
+)
+def test_file_names_are_not_explicit_identifiers(query: str) -> None:
+    assert _explicit_identifiers(query) == []
+
+
+def test_dotted_identifier_next_to_a_typescript_file_name() -> None:
+    assert _explicit_identifiers("what does Router.dispatch do in router.ts") == [("Router", "dispatch")]
+    assert _abbreviations("typescript") == ("ts",)
+
+
+def test_typescript_index_file_name_and_test_penalty() -> None:
+    index = make_index(
+        [
+            sym("src/parser/index.ts", "parseSource", signature="export function parseSource(text: string): Ast"),
+            sym("src/parser/parse.test.ts", "parseSource", signature="function parseSource(): void"),
+            sym("src/render.ts", "render", signature="export function render(ast: Ast): string"),
+        ]
+    )
+    search = SearchIndex(index)
+    hits = search.search("parseSource", k=5)
+    assert hits[0].symbol_id == "src/parser/index.ts::parseSource"
+    test_hit = next(h for h in hits if h.path == "src/parser/parse.test.ts")
+    assert "test file x0.5" in test_hit.why
+    file_hit = next(h for h in search.search("parser", k=10) if h.kind == "file" and h.path == "src/parser/index.ts")
+    assert "path match: parser" in file_hit.why

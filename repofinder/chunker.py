@@ -20,7 +20,9 @@ Rules, applied to the hits in rank order:
   directly).
 * For a method, the enclosing class header plus its docstring is prepended as a
   separate chunk, once per class, when it is shorter than
-  :data:`CLASS_HEADER_MAX_LINES` lines.
+  :data:`CLASS_HEADER_MAX_LINES` lines. Outside Python (TypeScript, ...) the
+  header runs from the class's first line to the line that opens its body
+  (``{``).
 * A file hit becomes the first :data:`MODULE_HEAD_LINES` lines of the file
   (``label="module head"``).
 * Overlapping ranges of the same file are merged into one chunk (adjacent ones
@@ -38,6 +40,7 @@ from __future__ import annotations
 
 import io
 import logging
+import re
 import tokenize
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -63,6 +66,9 @@ MAX_LABELS = 3                 # labels named on a merged chunk
 MODULE_HEAD_LABEL = "module head"
 _BOM = "\ufeff"
 _LOCALS = ".<locals>."
+_PYTHON_SUFFIXES = (".py", ".pyi")
+_CLASS_KEYWORD_RE = re.compile(r"\bclass\b")
+_COMMENT_PREFIXES = ("//", "/*", "*")
 
 
 @dataclass
@@ -197,7 +203,12 @@ def _indent(line: str) -> int:
 def class_header_end(lines: list[str], cls: Symbol) -> Optional[int]:
     """Last line of the class header (``class X(...):``) and of its docstring,
     if any. ``None`` when it cannot be found within ``HEADER_SCAN_LINES`` lines
-    (e.g. a docstring longer than that)."""
+    (e.g. a docstring longer than that).
+
+    A class outside a Python file (TypeScript, ...) is read by
+    :func:`_brace_header_end` instead: Python's tokenizer means nothing there."""
+    if not cls.path.endswith(_PYTHON_SUFFIXES):
+        return _brace_header_end(lines, cls)
     start = cls.start_line
     stop = min(cls.end_line, start + HEADER_SCAN_LINES - 1, len(lines))
     if start > stop:
@@ -226,6 +237,29 @@ def class_header_end(lines: list[str], cls: Symbol) -> Optional[int]:
     except (tokenize.TokenError, SyntaxError):
         return None
     return start + header_end - 1 if header_end is not None else None
+
+
+def _brace_header_end(lines: list[str], cls: Symbol) -> Optional[int]:
+    """The line that opens the body (``{``) of a class in a brace language:
+    the first ``{`` from the ``class`` keyword on (decorators and comment lines
+    before it are skipped). ``None`` when there is none within
+    ``HEADER_SCAN_LINES`` lines."""
+    start = cls.start_line
+    stop = min(cls.end_line, start + HEADER_SCAN_LINES - 1, len(lines))
+    seen_keyword = False
+    for number in range(start, stop + 1):
+        line = lines[number - 1]
+        if not seen_keyword:
+            if line.lstrip().startswith(_COMMENT_PREFIXES):
+                continue
+            keyword = _CLASS_KEYWORD_RE.search(line)
+            if keyword is None:
+                continue
+            seen_keyword = True
+            line = line[keyword.end():]
+        if "{" in line:
+            return number
+    return None
 
 
 # --------------------------------------------------------------------------- #

@@ -9,7 +9,7 @@ import pytest
 from repofinder import chunker
 from repofinder.chunker import build_chunks, class_header_end, split_lines, split_windows
 from repofinder.ingest import build_index
-from repofinder.models import RepoIndex, Symbol
+from repofinder.models import FileRecord, RepoIndex, Symbol
 from repofinder.search import Hit
 
 MOD = '''"""Module doc."""
@@ -316,3 +316,63 @@ def test_deterministic(repo):
     root, index = repo
     hits = [_hit(s) for s in index.symbols] + [_file_hit(index, f.path) for f in index.files]
     assert build_chunks(root, index, hits, 30_000) == build_chunks(root, index, hits, 30_000)
+
+
+# --------------------------------------------------------------------------- #
+# TypeScript
+# --------------------------------------------------------------------------- #
+
+TS_MOD = """import { Base } from "./base";
+
+/** A widget. */
+@sealed
+export class Widget extends Base {
+  #size = {
+    n: 1 };
+
+  grow(n: number): number {
+    return this.#size.n + n;
+  }
+}
+
+export function helper(a: string): string {
+  return `x${a}`;
+}
+"""
+
+
+def _ts_index(root: Path) -> tuple[RepoIndex, Symbol, Symbol, Symbol]:
+    path = "src/widget.ts"
+    widget = Symbol(f"{path}::Widget", path, "Widget", "Widget", "class", 4, 12,
+                    "export class Widget extends Base", "A widget.", None)
+    grow = Symbol(f"{path}::Widget.grow", path, "grow", "Widget.grow", "method", 9, 11,
+                  "grow(n: number): number", None, "Widget")
+    helper = Symbol(f"{path}::helper", path, "helper", "helper", "function", 14, 16,
+                    "export function helper(a: string): string", None, None)
+    index = RepoIndex("r", str(root), "r", files=[FileRecord(path, "typescript", len(TS_MOD), 16, True)],
+                      symbols=[widget, grow, helper])
+    return index, widget, grow, helper
+
+
+def test_typescript_class_header_ends_at_the_opening_brace() -> None:
+    lines = split_lines(TS_MOD)
+    _index, widget, _grow, _helper = _ts_index(Path("."))
+    assert class_header_end(lines, widget) == 5
+    multiline = split_lines("// class in a comment {\nexport class A\n  extends B\n  implements C {\n  x = 1;\n}\n")
+    a = Symbol("m.ts::A", "m.ts", "A", "A", "class", 1, 6, "export class A", None, None)
+    assert class_header_end(multiline, a) == 4
+    no_body = Symbol("m.ts::A", "m.ts", "A", "A", "class", 1, 1, "class A", None, None)
+    assert class_header_end(["export declare class A"], no_body) is None
+
+
+def test_typescript_chunks_are_sliced_by_line_range(make_repo) -> None:
+    root = make_repo({"src/widget.ts": TS_MOD})
+    index, _widget, grow, helper = _ts_index(root)
+    chunks = build_chunks(root, index, [_hit(grow), _hit(helper)], 10_000)
+    assert [(c.start_line, c.end_line, c.label) for c in chunks] == [
+        (4, 5, "Widget (class header)"),
+        (9, 11, "Widget.grow"),
+        (14, 16, "helper"),
+    ]
+    assert chunks[0].text == "@sealed\nexport class Widget extends Base {"
+    assert chunks[2].text.splitlines()[0] == "export function helper(a: string): string {"

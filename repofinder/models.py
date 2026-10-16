@@ -9,13 +9,15 @@ from dataclasses import dataclass, field
 from pathlib import Path  # noqa: F401  (part of the public contract's import surface)
 from typing import Literal, Optional
 
-SymbolKind = Literal["function", "class", "method"]
+# "interface", "type", "enum" and "namespace" come from TypeScript; Python
+# produces only the first three.
+SymbolKind = Literal["function", "class", "method", "interface", "type", "enum", "namespace"]
 
 
 @dataclass
 class FileRecord:
     path: str          # repo-relative, POSIX separators ("src/flask/app.py")
-    language: str      # "python"
+    language: str      # "python", "typescript", "tsx"
     size: int          # bytes
     n_lines: int
     parse_ok: bool     # False if tree-sitter reported errors; symbols may be partial

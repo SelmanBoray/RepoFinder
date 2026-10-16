@@ -63,7 +63,7 @@ from dataclasses import dataclass
 from itertools import product
 from typing import Callable, Optional
 
-from .graph import is_test_path, module_names
+from .graph import PATH_MODULE_EXTENSIONS, is_test_path, module_names, split_source_extension
 from .models import RepoIndex, Symbol
 
 K1 = 1.5
@@ -90,6 +90,9 @@ _BACKTICK_RE = re.compile(r"`([^`]+)`")
 _IDENTIFIER_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")
 _DOTTED_RE = re.compile(r"(?<![\w./])[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+(?![\w/])")
 _CAMEL_HUMP_RE = re.compile(r"[a-z0-9][A-Z]|[A-Z]{2}[a-z]")
+# A dotted query term ending in one of these is a file name ("app.py",
+# "index.ts"), not an identifier.
+_FILE_EXTENSION_WORDS = frozenset({"py", "pyi", *(ext[1:] for ext in PATH_MODULE_EXTENSIONS)})
 _CLASS_BASED_RE = re.compile(r"(?i)\bclass-based\b")
 
 # Dropped wherever they stand alone. Parts of a compound identifier are kept
@@ -156,7 +159,7 @@ _ABBREVIATIONS: dict[str, tuple[str, ...]] = {
     "previous": ("prev",), "source": ("src",), "destination": ("dst", "dest"),
     "length": ("len",), "index": ("idx",), "address": ("addr",), "document": ("doc",),
     "package": ("pkg",), "library": ("lib",), "value": ("val",), "command": ("cmd",),
-    "password": ("pwd",),
+    "password": ("pwd",), "typescript": ("ts",), "javascript": ("js",),
 }
 
 # Turkish. Function words are dropped outright. The lexicon maps a stem prefix
@@ -403,18 +406,30 @@ def _looks_turkish(query: str, words: list[str]) -> bool:
     return any(ch in _TR_LETTERS for ch in query) or any(_fold(w) in _TR_HINTS for w in words)
 
 
-def _path_text(path: str) -> str:
-    """Path without its extension, for tokenizing (``src/flask/app.py`` -> ``src/flask/app``)."""
+def _strip_extension(path: str) -> str:
+    """``path`` without its source extension (``.py``, ``.ts``, ``.d.ts``, ...,
+    see :func:`graph.split_source_extension`); any other extension is cut at
+    its last dot."""
+    stem, ext = split_source_extension(path)
+    if ext:
+        return stem
     head, _, tail = path.rpartition("/")
     base = tail.rsplit(".", 1)[0] if "." in tail else tail
     return f"{head}/{base}" if head else base
 
 
+def _path_text(path: str) -> str:
+    """Path without its extension, for tokenizing (``src/flask/app.py`` -> ``src/flask/app``)."""
+    return _strip_extension(path)
+
+
 def _file_stem(path: str) -> str:
-    """``pkg/mod.py`` -> ``mod``; ``pkg/sub/__init__.py`` -> ``sub``."""
-    parts = path.split("/")
-    base = parts[-1].rsplit(".", 1)[0]
-    if base == "__init__" and len(parts) > 1:
+    """``pkg/mod.py`` -> ``mod``; ``pkg/sub/__init__.py`` -> ``sub``;
+    ``src/util.ts`` -> ``util``; ``src/util/index.ts`` -> ``util`` (an
+    ``index`` file names its directory, as ``__init__.py`` does)."""
+    parts = _strip_extension(path).split("/")
+    base = parts[-1]
+    if len(parts) > 1 and (base == "__init__" or (base == "index" and path.endswith(PATH_MODULE_EXTENSIONS))):
         base = parts[-2]
     return base.lower()
 
@@ -988,7 +1003,8 @@ def _explicit_identifiers(query: str) -> list[tuple[str, ...]]:
     underscores stripped, case kept).
 
     A backticked identifier (```abort```, ```Session.request```), a dotted name
-    outside a path (``requests.get(url)``; not ``app.py`` or "e.g.") and a
+    outside a path (``requests.get(url)``; not a file name such as ``app.py``
+    or ``index.ts``, not "e.g.") and a
     snake_case or camelCase word (``url_for``, ``CaseInsensitiveDict``). Plain
     words, even backticked ones in a phrase (```flask run```), are not.
     """
@@ -1001,8 +1017,8 @@ def _explicit_identifiers(query: str) -> list[tuple[str, ...]]:
             found.append(span)
     for term in _DOTTED_RE.findall(query):
         parts = term.split(".")
-        # Not a file name ("app.py") nor an abbreviation ("e.g").
-        if parts[-1].lower() not in ("py", "pyi") and all(len(p) >= 2 for p in parts):
+        # Not a file name ("app.py", "index.ts") nor an abbreviation ("e.g").
+        if parts[-1].lower() not in _FILE_EXTENSION_WORDS and all(len(p) >= 2 for p in parts):
             found.append(term)
     for word in _WORD_RE.findall(query):
         if word.isascii() and ("_" in word.strip("_") or _CAMEL_HUMP_RE.search(word)):

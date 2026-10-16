@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import shutil
 import subprocess
 from pathlib import Path
@@ -244,3 +245,111 @@ def test_build_index_handles_undecodable_and_broken_files(make_repo) -> None:
     assert flags["ok.py"] is True
     assert flags["broken.py"] is False
     assert "binary.py" in flags
+
+
+# --------------------------------------------------------------------------- #
+# TypeScript repositories: ignore rules, default languages, size limit
+# --------------------------------------------------------------------------- #
+
+
+def _stub_language(name: str, extensions: tuple[str, ...]) -> parser.LanguageSpec:
+    """A registered language that is never parsed (these tests only walk files)."""
+    return parser.LanguageSpec(name=name, extensions=extensions, grammar=lambda: None,
+                               extractor=lambda source, tree: ([], []))
+
+
+@pytest.fixture
+def ts_registered(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(parser.LANGUAGES, "typescript", _stub_language("typescript", (".ts", ".mts", ".cts")))
+    monkeypatch.setitem(parser.LANGUAGES, "tsx", _stub_language("tsx", (".tsx",)))
+    monkeypatch.setitem(parser.LANGUAGES, "javascript", _stub_language("javascript", (".js", ".mjs", ".cjs")))
+
+
+def test_ts_repo_skip_rules(make_repo, ts_registered) -> None:
+    skipped_dirs = [
+        "node_modules", "dist", "build", "out", ".next", "coverage", "third_party", "licenses",
+        "vendor",  # next to package.json: installed dependencies
+    ]
+    files: dict[str, str | bytes] = {f"{d}/x.ts": "export const x = 1;\n" for d in skipped_dirs}
+    files.update(
+        {
+            "packages/app/node_modules/dep/index.ts": "export {};\n",   # nested skip dirs
+            "packages/app/dist/index.js": "module.exports = {};\n",
+            "src/index.ts": "export {};\n",
+            "src/view.tsx": "export const V = () => null;\n",
+            "src/lib.mts": "export {};\n",
+            "src/legacy.cts": "export {};\n",
+            "src/app.js": "export {};\n",
+            "src/bundle.min.js": "!function(){}();\n",                   # minified bundles
+            "src/vendor.min.mjs": "export{};\n",
+            "src/__tests__/app.test.ts": "test('x', () => {});\n",       # tests are kept
+            "tests/boundary/a.test.ts": "test('a', () => {});\n",
+            "website/src/main.ts": "export {};\n",                       # so are website/ and experiments/
+            "experiments/probe.mts": "export {};\n",
+            "tools/gen.py": "x = 1\n",
+            "README.md": "# readme\n",
+            "package.json": "{}\n",
+        }
+    )
+    root = make_repo(files)
+    scan = ingest.scan_source_files(root)
+    got = [p.relative_to(root).as_posix() for p in scan.files]
+    assert got == sorted(
+        [
+            "experiments/probe.mts",
+            "src/__tests__/app.test.ts",
+            "src/app.js",
+            "src/index.ts",
+            "src/legacy.cts",
+            "src/lib.mts",
+            "src/view.tsx",
+            "tests/boundary/a.test.ts",
+            "tools/gen.py",
+            "website/src/main.ts",
+        ]
+    )
+    assert scan.minified == ["src/bundle.min.js", "src/vendor.min.mjs"]
+    assert scan.too_large == []
+    assert list(iter_source_files(root)) == scan.files
+    assert {"node_modules", "dist", "build", "out", ".next", "coverage", "third_party", "licenses"} <= ingest.SKIP_DIRS
+    assert not {"tests", "website", "experiments", "src", "docs", "examples"} & ingest.SKIP_DIRS
+
+
+def test_vendor_is_skipped_only_next_to_a_package_manifest(make_repo) -> None:
+    root = make_repo(
+        {
+            "vendor/thirdparty/json/__init__.py": "",          # a Python project's vendored code: indexed
+            "web/package.json": "{}",
+            "web/vendor/dep.py": "x = 1\n",                    # npm-style dependencies: skipped
+            "svc/go.mod": "module svc\n",
+            "svc/vendor/lib/x.py": "x = 1\n",
+            "svc/tools/vendor/keep.py": "x = 1\n",            # no manifest next to this one
+        }
+    )
+    got = [p.relative_to(root).as_posix() for p in iter_source_files(root)]
+    assert got == ["svc/tools/vendor/keep.py", "vendor/thirdparty/json/__init__.py"]
+
+
+def test_default_languages_are_every_registered_language(make_repo, ts_registered) -> None:
+    root = make_repo({"a.py": "x = 1\n", "b.ts": "let b = 1;\n", "c.tsx": "", "d.md": ""})
+    assert ingest.default_languages() == tuple(parser.LANGUAGES)
+    assert {"python", "typescript", "tsx"} <= set(ingest.default_languages())
+    assert [p.name for p in iter_source_files(root)] == ["a.py", "b.ts", "c.tsx"]
+    assert [p.name for p in iter_source_files(root, languages=("python",))] == ["a.py"]
+    assert [p.name for p in iter_source_files(root, languages=("typescript",))] == ["b.ts"]
+
+
+def test_files_over_the_size_limit_are_counted_not_recorded(make_repo, caplog) -> None:
+    assert MAX_FILE_BYTES == 2 * 1024 * 1024
+    root = make_repo(
+        {
+            "big.py": b"#" * (MAX_FILE_BYTES + 1),
+            "pkg/huge.py": b"#" * (MAX_FILE_BYTES + 10),
+            "ok.py": "x = 1\n",
+        }
+    )
+    assert ingest.scan_source_files(root).too_large == ["big.py", "pkg/huge.py"]
+    with caplog.at_level(logging.WARNING, logger="repofinder.ingest"):
+        index = build_index(root, "r", str(root))
+    assert [f.path for f in index.files] == ["ok.py"]
+    assert "skipped 2 files larger than 2 MiB: big.py, pkg/huge.py" in caplog.text

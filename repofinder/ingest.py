@@ -10,6 +10,7 @@ import logging
 import os
 import re
 import subprocess
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator, Optional
 
@@ -18,24 +19,55 @@ from .models import FileRecord, ImportEdge, RepoIndex, Symbol
 
 log = logging.getLogger(__name__)
 
-MAX_FILE_BYTES = 1024 * 1024  # files larger than 1 MiB are skipped
+MAX_FILE_BYTES = 2 * 1024 * 1024
+"""Files larger than this (2 MiB) are skipped: no :class:`FileRecord`, only an
+entry in :attr:`SourceScan.too_large` and one warning from :func:`build_index`.
+Files that large are generated or bundled far more often than written by hand."""
 
 SKIP_DIRS = frozenset(
     {
+        # version control, Python environments, caches and packaging output
         ".git",
         ".venv",
         "venv",
         "env",
-        "node_modules",
         "__pycache__",
         ".tox",
         ".nox",
         ".eggs",
+        "site-packages",
+        # JavaScript/TypeScript dependencies and framework output
+        "node_modules",
+        ".next",
+        # build output and coverage reports, in any language
         "build",
         "dist",
-        "site-packages",
+        "out",
+        "coverage",
+        # vendored third-party code and license texts
+        "third_party",
+        "licenses",
     }
 )
+"""Directory names that are never descended into, at any depth.
+
+They hold dependencies, environments, generated output or vendored code, not
+the repository's own source. Every directory whose name starts with ``.`` is
+skipped as well (``.github``, ``.next``, ``.cache``, ...), and so is a
+``vendor/`` directory next to a package manifest (:data:`VENDOR_MANIFESTS`).
+Test, example, documentation, website and experiment directories are source
+and are kept.
+"""
+
+VENDOR_DIR_NAME = "vendor"
+VENDOR_MANIFESTS = frozenset({"package.json", "go.mod", "composer.json", "Gemfile"})
+"""A ``vendor/`` directory is skipped when its parent directory has one of these
+files: there it holds installed dependencies (npm, Go modules, Composer,
+Bundler). Elsewhere, e.g. in a Python project that vendors and patches code it
+imports, ``vendor/`` is indexed like any other directory."""
+
+SKIP_FILE_SUFFIXES = (".min.js", ".min.mjs", ".min.cjs")
+"""Minified bundles: never indexed, whatever languages are registered."""
 
 CLONE_TIMEOUT_SECONDS = 600
 
@@ -161,38 +193,75 @@ def _is_link(path: str) -> bool:
     return os.path.islink(path) or bool(isjunction and isjunction(path))
 
 
-def iter_source_files(root: Path, languages: tuple[str, ...] = ("python",)) -> Iterator[Path]:
-    """Yield source files under ``root`` in sorted (repo-relative POSIX) order.
+@dataclass
+class SourceScan:
+    """What :func:`scan_source_files` found under a repository root."""
 
-    Skips the directories in ``SKIP_DIRS`` and any directory starting with ``.``,
-    symlinks, and files larger than ``MAX_FILE_BYTES``. Tests are kept.
+    files: list[Path] = field(default_factory=list)      # kept, in repo-relative POSIX order
+    too_large: list[str] = field(default_factory=list)   # repo-relative paths over MAX_FILE_BYTES
+    minified: list[str] = field(default_factory=list)    # repo-relative paths matching SKIP_FILE_SUFFIXES
+
+
+def default_languages() -> tuple[str, ...]:
+    """Every language registered in :data:`parser.LANGUAGES`, in registration order."""
+    return tuple(parser.LANGUAGES)
+
+
+def scan_source_files(root: Path, languages: Optional[tuple[str, ...]] = None) -> SourceScan:
+    """Find the source files under ``root`` (the rules of :func:`iter_source_files`)
+    and record the ones skipped for their size or as minified bundles.
+
+    ``languages`` defaults to :func:`default_languages`; an unknown name raises
+    ``ValueError``.
     """
     root = Path(root)
-    extensions = parser.extensions_for(languages)
+    extensions = parser.extensions_for(default_languages() if languages is None else tuple(languages))
+    scan = SourceScan()
     found: list[tuple[str, Path]] = []
     for dirpath, dirnames, filenames in os.walk(root):
+        vendor_is_dependencies = not VENDOR_MANIFESTS.isdisjoint(filenames)
         dirnames[:] = [
             d
             for d in dirnames
             if d not in SKIP_DIRS
             and not d.startswith(".")
+            and not (d == VENDOR_DIR_NAME and vendor_is_dependencies)
             and not _is_link(os.path.join(dirpath, d))
         ]
         for filename in filenames:
             if not filename.endswith(extensions):
                 continue
             full = Path(dirpath, filename)
+            if filename.lower().endswith(SKIP_FILE_SUFFIXES):
+                scan.minified.append(full.relative_to(root).as_posix())
+                continue
             try:
                 if full.is_symlink() or not full.is_file():
                     continue
                 if full.stat().st_size > MAX_FILE_BYTES:
+                    scan.too_large.append(full.relative_to(root).as_posix())
                     continue
             except OSError:
                 continue
             found.append((full.relative_to(root).as_posix(), full))
     found.sort(key=lambda item: item[0])
-    for _rel, full in found:
-        yield full
+    scan.files = [full for _rel, full in found]
+    scan.too_large.sort()
+    scan.minified.sort()
+    return scan
+
+
+def iter_source_files(root: Path, languages: Optional[tuple[str, ...]] = None) -> Iterator[Path]:
+    """Yield source files under ``root`` in sorted (repo-relative POSIX) order.
+
+    ``languages`` defaults to every language registered in
+    :data:`parser.LANGUAGES`. Skips the directories in :data:`SKIP_DIRS`, any
+    directory starting with ``.``, a ``vendor/`` next to a package manifest
+    (:data:`VENDOR_MANIFESTS`), symlinks, minified bundles
+    (:data:`SKIP_FILE_SUFFIXES`) and files larger than :data:`MAX_FILE_BYTES`.
+    Tests are kept.
+    """
+    yield from scan_source_files(root, languages).files
 
 
 def _fallback_record(root: Path, path: Path) -> FileRecord:
@@ -212,12 +281,16 @@ def _fallback_record(root: Path, path: Path) -> FileRecord:
     )
 
 
-def build_index(root: Path, name: str, source: str) -> RepoIndex:
+def build_index(
+    root: Path, name: str, source: str, languages: Optional[tuple[str, ...]] = None
+) -> RepoIndex:
     """Parse every source file under ``root`` and resolve imports.
 
-    A file that cannot be parsed is kept with ``parse_ok=False``; this function
-    never raises because of a single bad file. Lists are sorted: files by path,
-    symbols by (path, start_line), imports by (src_path, line).
+    ``languages`` defaults to every registered language. A file that cannot be
+    parsed is kept with ``parse_ok=False``; this function never raises because
+    of a single bad file. Files over :data:`MAX_FILE_BYTES` get no record: their
+    number is logged in one warning. Lists are sorted: files by path, symbols
+    by (path, start_line), imports by (src_path, line).
     """
     root = Path(root).resolve()
     index = RepoIndex(name=name, root=str(root), source=source)
@@ -225,7 +298,13 @@ def build_index(root: Path, name: str, source: str) -> RepoIndex:
     symbols: list[Symbol] = []
     imports: list[ImportEdge] = []
 
-    for path in iter_source_files(root):
+    scan = scan_source_files(root, languages)
+    if scan.too_large:
+        n = len(scan.too_large)
+        shown = ", ".join(scan.too_large[:3]) + (", ..." if n > 3 else "")
+        log.warning("skipped %d file%s larger than %d MiB: %s",
+                    n, "" if n == 1 else "s", MAX_FILE_BYTES // (1024 * 1024), shown)
+    for path in scan.files:
         try:
             record, file_symbols, file_imports = parser.parse_file(root, path)
         except Exception as exc:  # noqa: BLE001 - one bad file must not stop the run

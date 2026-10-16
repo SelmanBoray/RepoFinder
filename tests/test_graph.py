@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Callable
 
@@ -14,15 +15,13 @@ from repofinder.graph import (
     entry_point_reasons,
     is_test_path,
     module_names,
+    path_module_name,
+    split_source_extension,
 )
 from repofinder.ingest import build_index
 from repofinder.models import FileRecord, ImportEdge, RepoIndex, Symbol
 
-FLASK_ROOT = Path(
-    r"C:\Users\Selman\AppData\Local\Temp\claude\C--\2893ddbc-306e-4b5d-94d8-359c5612cb51"
-    r"\scratchpad\repos\flask"
-)
-needs_flask = pytest.mark.skipif(not (FLASK_ROOT / "src" / "flask").is_dir(), reason="Flask checkout absent")
+from conftest import FLASK_ROOT, needs_flask  # noqa: E402
 
 MakeRepo = Callable[[dict[str, "str | bytes"]], Path]
 
@@ -348,3 +347,164 @@ def test_flask_packages(flask_graph: ModuleGraph) -> None:
     packages = flask_graph.packages()
     assert {"src/flask", "tests", "examples", "docs"} <= set(packages)
     assert "src/flask/json/tag.py" in packages["src/flask"]
+
+
+# --------------------------------------------------------------------------- #
+# TypeScript: test paths, module names, packages, entry points
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        ("src/foo.test.ts", True),
+        ("src/foo.spec.ts", True),
+        ("src/View.test.tsx", True),
+        ("src/View.spec.tsx", True),
+        ("src/lib.test.mts", True),
+        ("src/ghidra/GhidraProvider.behavior.test.ts", True),
+        ("src/__tests__/helpers.ts", True),
+        ("packages/a/__tests__/deep/x.tsx", True),
+        ("src/latest.ts", False),
+        ("src/contest.ts", False),
+        ("src/testing.ts", False),
+        ("src/spec.ts", False),
+        ("src/test-utils.ts", False),
+        ("src/types.d.ts", False),
+    ],
+)
+def test_is_test_path_typescript(path: str, expected: bool) -> None:
+    assert is_test_path(path) is expected
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        ("pkg/mod.py", ("pkg/mod", ".py")),
+        ("src/a.ts", ("src/a", ".ts")),
+        ("src/View.tsx", ("src/View", ".tsx")),
+        ("src/types.d.ts", ("src/types", ".d.ts")),
+        ("scripts/lib/tool.d.mts", ("scripts/lib/tool", ".d.mts")),
+        ("src/a.test.ts", ("src/a.test", ".ts")),
+        ("README.md", ("README.md", "")),
+        (".eslintrc", (".eslintrc", "")),
+    ],
+)
+def test_split_source_extension(path: str, expected: tuple[str, str]) -> None:
+    assert split_source_extension(path) == expected
+
+
+def test_module_names_for_typescript_paths() -> None:
+    names = module_names(
+        [
+            "src/util/strings.ts",
+            "src/util/index.ts",
+            "src/App.tsx",
+            "src/types.d.ts",
+            "scripts/lib/tool.d.mts",
+            "index.ts",
+            "src/flask/app.py",
+            "src/flask/__init__.py",
+            "README.md",
+        ]
+    )
+    assert names == {
+        "src/util/strings.ts": "src/util/strings",
+        "src/util/index.ts": "src/util",          # an index file names its directory
+        "src/App.tsx": "src/App",
+        "src/types.d.ts": "src/types",
+        "scripts/lib/tool.d.mts": "scripts/lib/tool",
+        "index.ts": "index",                      # at the root there is no directory to name
+        "src/flask/app.py": "flask.app",          # Python is unchanged
+        "src/flask/__init__.py": "flask",
+    }
+    assert path_module_name("src/flask/app.py") is None
+
+
+def test_packages_for_typescript_files_are_their_directories() -> None:
+    files = [
+        "index.ts",
+        "src/cli.ts",
+        "src/domain/index.ts",
+        "src/domain/model.ts",
+        "src/domain/rules/a.ts",
+        "src/pkg/__init__.py",
+        "src/pkg/core.py",
+    ]
+    index = RepoIndex(
+        "r", "Z:/nope", "r",
+        files=[FileRecord(p, "python" if p.endswith(".py") else "typescript", 1, 1, True) for p in files],
+    )
+    graph = build_graph(index)
+    assert graph.packages() == {
+        ".": ["index.ts"],
+        "src": ["src/cli.ts"],
+        "src/domain": ["src/domain/index.ts", "src/domain/model.ts"],
+        "src/domain/rules": ["src/domain/rules/a.ts"],
+        "src/pkg": ["src/pkg/__init__.py", "src/pkg/core.py"],
+    }
+    assert graph.nodes["src/domain/index.ts"].module == "src/domain"
+    assert graph.nodes["src/pkg/core.py"].module == "pkg.core"
+
+
+def test_entry_points_typescript_package_json_and_file_names(make_repo: MakeRepo) -> None:
+    root_package = {"name": "@acme/tool", "bin": "./dist/cli.js", "main": "dist/index.js"}
+    app_package = {
+        "name": "app",
+        "bin": {"app-cli": "bin/run.ts", "gone": "bin/missing.js", "bad": 3},
+        "main": "lib/server.mjs",
+    }
+    indexed = [
+        "src/cli.ts",
+        "src/index.ts",
+        "src/main.ts",
+        "src/util.ts",
+        "src/__tests__/main.ts",
+        "src/app.test.ts",
+        "packages/app/bin/run.ts",
+        "packages/app/src/server.mts",
+        "packages/broken/index.mts",
+        "packages/list/app.ts",
+    ]
+    files: dict[str, str | bytes] = {p: "export {};\n" for p in indexed}
+    files.update(
+        {
+            "package.json": json.dumps(root_package),
+            "packages/app/package.json": json.dumps(app_package),
+            "packages/broken/package.json": "{ not json",
+            "packages/list/package.json": "[1, 2]",
+        }
+    )
+    root = make_repo(files)
+    index = RepoIndex("ts", str(root), "ts", files=[FileRecord(p, "typescript", 10, 1, True) for p in sorted(indexed)])
+    reasons = entry_point_reasons(index)
+    assert reasons == {
+        # package.json "bin"/"main" at compiled output resolve to the indexed source
+        "src/cli.ts": "script `tool` = `./dist/cli.js` (package.json [bin]); conventional name `cli.ts`",
+        "src/index.ts": "main `dist/index.js` (package.json); conventional name `index.ts`",
+        "packages/app/bin/run.ts": (
+            "script `app-cli` = `bin/run.ts` (packages/app/package.json [bin]); conventional name `bin/run.ts`"
+        ),
+        "packages/app/src/server.mts": "main `lib/server.mjs` (packages/app/package.json)",
+        # file names only (a malformed package.json is ignored)
+        "src/main.ts": "conventional name `main.ts`",
+        "packages/broken/index.mts": "conventional name `index.mts`",
+        "packages/list/app.ts": "conventional name `app.ts`",
+    }
+    graph = build_graph(index)
+    assert [n.path for n in graph.entry_points()] == [
+        "packages/app/bin/run.ts",       # declared in a package.json
+        "packages/app/src/server.mts",
+        "src/cli.ts",
+        "src/index.ts",
+        "packages/broken/index.mts",     # file name only
+        "packages/list/app.ts",
+        "src/main.ts",
+    ]
+    assert not graph.nodes["src/__tests__/main.ts"].is_entry and graph.nodes["src/__tests__/main.ts"].is_test
+    assert graph.nodes["src/app.test.ts"].is_test
+
+
+def test_package_json_without_a_checkout_is_ignored() -> None:
+    index = RepoIndex("ts", "Z:/does/not/exist", "ts", files=[FileRecord("src/server.ts", "typescript", 1, 1, True)])
+    assert entry_point_reasons(index) == {"src/server.ts": "conventional name `server.ts`"}

@@ -13,11 +13,7 @@ from repofinder.ingest import build_index
 from repofinder.mapper import render_map
 from repofinder.models import FileRecord, ImportEdge, RepoIndex, Symbol
 
-FLASK_ROOT = Path(
-    r"C:\Users\Selman\AppData\Local\Temp\claude\C--\2893ddbc-306e-4b5d-94d8-359c5612cb51"
-    r"\scratchpad\repos\flask"
-)
-needs_flask = pytest.mark.skipif(not (FLASK_ROOT / "src" / "flask").is_dir(), reason="Flask checkout absent")
+from conftest import FLASK_ROOT, needs_flask  # noqa: E402
 
 SECTIONS = [
     "## Overview",
@@ -252,3 +248,54 @@ def test_flask_map() -> None:
     assert core_rows[0].startswith("| `src/flask/__init__.py` | `flask` |")
     assert all(not r.startswith("| `tests/") for r in core_rows)
     assert "- `tests/` — 41 test files (collapsed)" in section(md, "## Package layout")
+
+
+# --------------------------------------------------------------------------- #
+# TypeScript
+# --------------------------------------------------------------------------- #
+
+
+def ts_index() -> RepoIndex:
+    files = {
+        "src/cli.ts": 30,
+        "src/domain/index.ts": 5,
+        "src/domain/model.ts": 80,
+        "src/domain/__tests__/model.test.ts": 40,
+        "src/util.spec.ts": 10,
+    }
+
+    def ts_sym(path: str, name: str, kind: str, start: int, end: int) -> Symbol:
+        return Symbol(f"{path}::{name}", path, name, name, kind, start, end, f"export {kind} {name}", None, None)
+
+    symbols = [
+        ts_sym("src/cli.ts", "main", "function", 1, 20),
+        ts_sym("src/domain/model.ts", "Model", "interface", 1, 20),
+        ts_sym("src/domain/model.ts", "Kind", "enum", 21, 30),
+        ts_sym("src/domain/model.ts", "Id", "type", 31, 31),
+    ]
+    imports = [
+        ImportEdge("src/cli.ts", "./domain", "src/domain/index.ts", ["Model"], 1),
+        ImportEdge("src/domain/index.ts", "./model", "src/domain/model.ts", ["Model"], 1),
+        ImportEdge("src/domain/__tests__/model.test.ts", "../model", "src/domain/model.ts", ["Kind"], 1),
+    ]
+    return RepoIndex(
+        name="tsdemo",
+        root="Z:/no/such/checkout",
+        source="https://github.com/o/tsdemo",
+        files=[FileRecord(p, "typescript", n * 10, n, True) for p, n in files.items()],
+        symbols=symbols,
+        imports=imports,
+    )
+
+
+def test_typescript_map() -> None:
+    index = ts_index()
+    md = render_map(index, build_graph(index))
+    assert "4 symbols (1 function, 1 enum, 1 interface, 1 type)" in md
+    assert "`src/domain` (2 files)" in section(md, "## Overview")
+    assert "| `src/cli.ts` | conventional name `cli.ts` |" in section(md, "## Entry points")
+    core = section(md, "## Core modules")
+    assert "| `src/domain/model.ts` | `src/domain/model` | 2 | 0 | 3 | `Model`, `Kind`, `Id` |" in core
+    assert "| `src/domain/index.ts` | `src/domain` | 1 | 1 | 0 |" in core
+    assert "src/util.spec.ts" not in core and "__tests__" not in core
+    assert "`__tests__/` — 1 test file (collapsed)" in section(md, "## Package layout")

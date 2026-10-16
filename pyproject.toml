@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
     "tree-sitter>=0.23",
     "tree-sitter-python>=0.23",
+    "tree-sitter-typescript>=0.23",
     "anthropic>=1.12",
     "typer>=0.12",
     "rich>=13.7",
@@ -30,3 +31,6 @@ packages = ["repofinder"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "slow: parses a large real repository (skipped when its checkout is missing)",
+]

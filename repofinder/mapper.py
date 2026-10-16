@@ -23,6 +23,9 @@ START_CORE_MODULES = 3
 LAYOUT_MAX_DEPTH = 6
 
 _KIND_ORDER = ("class", "function", "method")
+# Module-level kinds named in the core-modules table (TypeScript adds interfaces, type aliases,
+# enums and namespaces).
+_TOP_LEVEL_KINDS = ("class", "function", "interface", "type", "enum", "namespace")
 _SENTENCE_END_RE = re.compile(r"(?<=[.!?])\s+")
 
 
@@ -266,10 +269,10 @@ def _main_test_dir(graph: ModuleGraph) -> Optional[tuple[str, int]]:
 
 
 def _top_symbol_names(index: RepoIndex) -> dict[str, list[str]]:
-    """Up to three module-level class/function names per file: public first, then by size."""
+    """Up to three module-level names per file (:data:`_TOP_LEVEL_KINDS`): public first, then by size."""
     candidates: dict[str, list[tuple[bool, int, int, str]]] = {}
     for sym in index.symbols:
-        if sym.parent is None and sym.kind in ("class", "function"):
+        if sym.parent is None and sym.kind in _TOP_LEVEL_KINDS:
             candidates.setdefault(sym.path, []).append(
                 (sym.name.startswith("_"), -(sym.end_line - sym.start_line), sym.start_line, sym.name)
             )
