@@ -1,0 +1,3906 @@
+{
+  "meta": {
+    "repo": {
+      "name": "httpx",
+      "source": "https://github.com/encode/httpx",
+      "commit": "b5addb6"
+    },
+    "source": "C:\\Users\\Selman\\.repofinder\\repos\\httpx\\checkout\\httpx",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\.repofinder\\repos\\httpx\\checkout\\httpx",
+      "commit": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
+      "golden_commit": "b5addb6",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20"
+    ],
+    "started": "2026-10-16T15:42:01",
+    "open_workspace_s": 1.004,
+    "total_s": 1.042,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "pipeline": "search_baseline (build_index + SearchIndex; chunks = symbol-hit ranges)"
+  },
+  "summary": {
+    "overall": {
+      "n": 20,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 17,
+          "yes": 6,
+          "rate": 0.353
+        },
+        "hit@3": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "hit@k": {
+          "n": 17,
+          "yes": 13,
+          "rate": 0.765
+        },
+        "loose_hit@1": {
+          "n": 17,
+          "yes": 6,
+          "rate": 0.353
+        },
+        "loose_hit@3": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "loose_hit@k": {
+          "n": 17,
+          "yes": 13,
+          "rate": 0.765
+        },
+        "mrr": 0.475,
+        "chunk_recall": {
+          "n": 17,
+          "yes": 13,
+          "rate": 0.765
+        },
+        "all@k": null,
+        "pointer@k": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        }
+      },
+      "elapsed_s": {
+        "total": 0.037,
+        "mean": 0.002,
+        "median": 0.002,
+        "max": 0.003
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 8,
+            "yes": 3,
+            "rate": 0.375
+          },
+          "hit@3": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "hit@k": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "loose_hit@1": {
+            "n": 8,
+            "yes": 3,
+            "rate": 0.375
+          },
+          "loose_hit@3": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "loose_hit@k": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "mrr": 0.504,
+          "chunk_recall": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.016,
+          "mean": 0.002,
+          "median": 0.002,
+          "max": 0.003
+        }
+      },
+      "locate-feature": {
+        "n": 6,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 2,
+            "rate": 0.333
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 2,
+            "rate": 0.333
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "mrr": 0.486,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.01,
+          "mean": 0.002,
+          "median": 0.002,
+          "max": 0.003
+        }
+      },
+      "flow": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "hit@3": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "hit@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@1": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "loose_hit@3": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "loose_hit@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "mrr": 0.375,
+          "chunk_recall": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.006,
+          "mean": 0.002,
+          "median": 0.002,
+          "max": 0.003
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.004,
+          "mean": 0.001,
+          "median": 0.002,
+          "max": 0.002
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 12,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 10,
+            "yes": 4,
+            "rate": 0.4
+          },
+          "hit@3": {
+            "n": 10,
+            "yes": 7,
+            "rate": 0.7
+          },
+          "hit@k": {
+            "n": 10,
+            "yes": 8,
+            "rate": 0.8
+          },
+          "loose_hit@1": {
+            "n": 10,
+            "yes": 4,
+            "rate": 0.4
+          },
+          "loose_hit@3": {
+            "n": 10,
+            "yes": 7,
+            "rate": 0.7
+          },
+          "loose_hit@k": {
+            "n": 10,
+            "yes": 8,
+            "rate": 0.8
+          },
+          "mrr": 0.525,
+          "chunk_recall": {
+            "n": 10,
+            "yes": 8,
+            "rate": 0.8
+          },
+          "all@k": null,
+          "pointer@k": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.022,
+          "mean": 0.002,
+          "median": 0.002,
+          "max": 0.003
+        }
+      },
+      "tr": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "hit@3": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "hit@k": {
+            "n": 7,
+            "yes": 5,
+            "rate": 0.714
+          },
+          "loose_hit@1": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "loose_hit@3": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "loose_hit@k": {
+            "n": 7,
+            "yes": 5,
+            "rate": 0.714
+          },
+          "mrr": 0.404,
+          "chunk_recall": {
+            "n": 7,
+            "yes": 5,
+            "rate": 0.714
+          },
+          "all@k": null,
+          "pointer@k": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.015,
+          "mean": 0.002,
+          "median": 0.002,
+          "max": 0.003
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is `Client.send` implemented, the method that sends a Request object I built myself?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_client.py",
+          "symbol": "Client.send",
+          "start_line": 879,
+          "end_line": 928
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.002,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client.send",
+            "start_line": 879,
+            "end_line": 928,
+            "kind": "symbol",
+            "score": 57.1733,
+            "match": "symbol",
+            "why": "name match: send (explicit client.send); qualname/path match: client.send; bm25: send, request, client"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client._send_single_request",
+            "start_line": 1001,
+            "end_line": 1034,
+            "kind": "symbol",
+            "score": 30.6798,
+            "match": null,
+            "why": "name match: _send_single_request x1.67 (request, send, sends); owner match: Client x1.21; bm25: sends, send, request, client"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::AsyncClient._send_single_request",
+            "start_line": 1717,
+            "end_line": 1749,
+            "kind": "symbol",
+            "score": 27.5778,
+            "match": null,
+            "why": "name match: _send_single_request x1.67 (request, send, sends); owner match: AsyncClient x1.10; bm25: sends, send, request, client"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::AsyncClient.send",
+            "start_line": 1594,
+            "end_line": 1643,
+            "kind": "symbol",
+            "score": 17.8516,
+            "match": null,
+            "why": "name match: send x1.71 (send, sends); owner match: AsyncClient x1.10; bm25: send, request, client"
+          },
+          {
+            "path": "httpx/_api.py",
+            "symbol_id": "httpx/_api.py::request",
+            "start_line": 39,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 16.0136,
+            "match": null,
+            "why": "name match: request x1.10 (request); bm25: object, sends, request, send; body: client"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client._send_handling_auth",
+            "start_line": 930,
+            "end_line": 962,
+            "kind": "symbol",
+            "score": 13.6678,
+            "match": null,
+            "why": "name match: _send_handling_auth x1.36 (send, sends); owner match: Client x1.12; bm25: send, request, client"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client._send_handling_redirects",
+            "start_line": 964,
+            "end_line": 999,
+            "kind": "symbol",
+            "score": 13.4024,
+            "match": null,
+            "why": "name match: _send_handling_redirects x1.36 (send, sends); owner match: Client x1.12; bm25: send, request, client"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::AsyncClient._send_handling_redirects",
+            "start_line": 1679,
+            "end_line": 1715,
+            "kind": "symbol",
+            "score": 12.5536,
+            "match": null,
+            "why": "name match: _send_handling_redirects x1.36 (send, sends); owner match: AsyncClient x1.06; bm25: send, request, client"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_client.py",
+            "start_line": 879,
+            "end_line": 928,
+            "label": "httpx/_client.py::Client.send"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1001,
+            "end_line": 1034,
+            "label": "httpx/_client.py::Client._send_single_request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1717,
+            "end_line": 1749,
+            "label": "httpx/_client.py::AsyncClient._send_single_request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1594,
+            "end_line": 1643,
+            "label": "httpx/_client.py::AsyncClient.send"
+          },
+          {
+            "path": "httpx/_api.py",
+            "start_line": 39,
+            "end_line": 120,
+            "label": "httpx/_api.py::request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 930,
+            "end_line": 962,
+            "label": "httpx/_client.py::Client._send_handling_auth"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 964,
+            "end_line": 999,
+            "label": "httpx/_client.py::Client._send_handling_redirects"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1679,
+            "end_line": 1715,
+            "label": "httpx/_client.py::AsyncClient._send_handling_redirects"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is an error message like \"Client error '404 Not Found' for url ...\" put together?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_models.py",
+          "symbol": "Response.raise_for_status",
+          "start_line": 794,
+          "end_line": 829
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0016,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Headers.get",
+            "start_line": 242,
+            "end_line": 250,
+            "kind": "symbol",
+            "score": 20.0209,
+            "match": null,
+            "why": "bm25: together; body: error"
+          },
+          {
+            "path": "httpx/_utils.py",
+            "symbol_id": "httpx/_utils.py::peek_filelike_length",
+            "start_line": 95,
+            "end_line": 117,
+            "kind": "symbol",
+            "score": 19.9332,
+            "match": null,
+            "why": "bm25: like; body: put, error"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::StreamError.__init__",
+            "start_line": 305,
+            "end_line": 306,
+            "kind": "symbol",
+            "score": 17.9908,
+            "match": null,
+            "why": "bm25: message, error"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::HTTPError.__init__",
+            "start_line": 92,
+            "end_line": 94,
+            "kind": "symbol",
+            "score": 17.8571,
+            "match": null,
+            "why": "bm25: message, error"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient._merge_url",
+            "start_line": 391,
+            "end_line": 411,
+            "kind": "symbol",
+            "score": 17.5138,
+            "match": null,
+            "why": "name match: _merge_url x1.03 (url); owner match: BaseClient x1.00; bm25: together, url, client"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::RequestError.__init__",
+            "start_line": 112,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 17.2339,
+            "match": null,
+            "why": "bm25: message, error; body: client"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::InvalidURL.__init__",
+            "start_line": 276,
+            "end_line": 277,
+            "kind": "symbol",
+            "score": 16.8613,
+            "match": null,
+            "why": "bm25: message, url"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::HTTPStatusError.__init__",
+            "start_line": 265,
+            "end_line": 268,
+            "kind": "symbol",
+            "score": 16.7058,
+            "match": null,
+            "why": "bm25: message, error"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_models.py",
+            "start_line": 242,
+            "end_line": 250,
+            "label": "httpx/_models.py::Headers.get"
+          },
+          {
+            "path": "httpx/_utils.py",
+            "start_line": 95,
+            "end_line": 117,
+            "label": "httpx/_utils.py::peek_filelike_length"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 305,
+            "end_line": 306,
+            "label": "httpx/_exceptions.py::StreamError.__init__"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 92,
+            "end_line": 94,
+            "label": "httpx/_exceptions.py::HTTPError.__init__"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 391,
+            "end_line": 411,
+            "label": "httpx/_client.py::BaseClient._merge_url"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 112,
+            "end_line": 120,
+            "label": "httpx/_exceptions.py::RequestError.__init__"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 276,
+            "end_line": 277,
+            "label": "httpx/_exceptions.py::InvalidURL.__init__"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 265,
+            "end_line": 268,
+            "label": "httpx/_exceptions.py::HTTPStatusError.__init__"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "When a server answers with a relative `Location: /login` header, which method works out the absolute URL to follow next?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_client.py",
+          "symbol": "BaseClient._redirect_url",
+          "start_line": 517,
+          "end_line": 544
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0015,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "httpx/_urls.py",
+            "symbol_id": "httpx/_urls.py::URL.is_relative_url",
+            "start_line": 319,
+            "end_line": 325,
+            "kind": "symbol",
+            "score": 39.7554,
+            "match": null,
+            "why": "name match: is_relative_url x1.11 (relative, url); bm25: absolute, relative, url"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "symbol_id": "httpx/_urls.py::URL.is_absolute_url",
+            "start_line": 307,
+            "end_line": 317,
+            "kind": "symbol",
+            "score": 36.0882,
+            "match": null,
+            "why": "name match: is_absolute_url x1.12 (absolute, url); bm25: absolute, relative, url"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient._redirect_url",
+            "start_line": 517,
+            "end_line": 544,
+            "kind": "symbol",
+            "score": 23.2846,
+            "match": "symbol",
+            "why": "name match: _redirect_url x1.02 (url); bm25: follow, url; body: relative, absolute, header"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 641,
+            "kind": "file",
+            "score": 18.7219,
+            "match": null,
+            "why": "path match: _urls x1.02 (url); bm25: absolute, relative, url"
+          },
+          {
+            "path": "httpx/_urlparse.py",
+            "symbol_id": "httpx/_urlparse.py::validate_path",
+            "start_line": 422,
+            "end_line": 444,
+            "kind": "symbol",
+            "score": 18.1674,
+            "match": null,
+            "why": "bm25: url; body: relative, absolute"
+          },
+          {
+            "path": "tests/models/test_url.py",
+            "symbol_id": "tests/models/test_url.py::test_url_with_relative_path",
+            "start_line": 423,
+            "end_line": 426,
+            "kind": "symbol",
+            "score": 15.9304,
+            "match": null,
+            "why": "test file x0.5; bm25: relative, url; body: absolute"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.base_url",
+            "start_line": 287,
+            "end_line": 292,
+            "kind": "symbol",
+            "score": 15.8765,
+            "match": null,
+            "why": "name match: base_url x1.02 (url); bm25: relative, url"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "symbol_id": "httpx/_urls.py::URL.join",
+            "start_line": 354,
+            "end_line": 366,
+            "kind": "symbol",
+            "score": 15.7178,
+            "match": null,
+            "why": "bm25: absolute, url"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_urls.py",
+            "start_line": 319,
+            "end_line": 325,
+            "label": "httpx/_urls.py::URL.is_relative_url"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "start_line": 307,
+            "end_line": 317,
+            "label": "httpx/_urls.py::URL.is_absolute_url"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 517,
+            "end_line": 544,
+            "label": "httpx/_client.py::BaseClient._redirect_url"
+          },
+          {
+            "path": "httpx/_urlparse.py",
+            "start_line": 422,
+            "end_line": 444,
+            "label": "httpx/_urlparse.py::validate_path"
+          },
+          {
+            "path": "tests/models/test_url.py",
+            "start_line": 423,
+            "end_line": 426,
+            "label": "tests/models/test_url.py::test_url_with_relative_path"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 287,
+            "end_line": 292,
+            "label": "httpx/_client.py::BaseClient.base_url"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "start_line": 354,
+            "end_line": 366,
+            "label": "httpx/_urls.py::URL.join"
+          }
+        ],
+        "rank": 3,
+        "loose_rank": 3,
+        "rr": 0.3333333333333333,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Testlerde gerçek ağa çıkmadan, gelen her isteğe benim yazdığım bir Python fonksiyonuyla cevap veren transport hangisi?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_transports/mock.py",
+          "symbol": "MockTransport",
+          "start_line": 15,
+          "end_line": 43
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0016,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::WriteError",
+            "start_line": 181,
+            "end_line": 184,
+            "kind": "symbol",
+            "score": 11.2442,
+            "match": null,
+            "why": "name match: WriteError x1.31 (yazdığım); class boost; bm25: write~"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::WriteTimeout",
+            "start_line": 152,
+            "end_line": 155,
+            "kind": "symbol",
+            "score": 11.1444,
+            "match": null,
+            "why": "name match: WriteTimeout x1.31 (yazdığım); class boost; bm25: write~"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 377,
+            "kind": "file",
+            "score": 9.8881,
+            "match": null,
+            "why": "bm25: write~, request, transport, response~"
+          },
+          {
+            "path": "httpx/_transports/asgi.py",
+            "symbol_id": "httpx/_transports/asgi.py::ASGITransport",
+            "start_line": 63,
+            "end_line": 187,
+            "kind": "symbol",
+            "score": 8.3061,
+            "match": null,
+            "why": "name match: ASGITransport x1.11 (transport); class boost; bm25: transport, python, request"
+          },
+          {
+            "path": "httpx/_transports/mock.py",
+            "symbol_id": "httpx/_transports/mock.py::MockTransport.handle_request",
+            "start_line": 19,
+            "end_line": 27,
+            "kind": "symbol",
+            "score": 8.0028,
+            "match": "overlap",
+            "why": "name match: handle_request x1.08 (isteğe); owner match: MockTransport x1.02; bm25: request, transport, response~"
+          },
+          {
+            "path": "httpx/_transports/mock.py",
+            "symbol_id": "httpx/_transports/mock.py::MockTransport.handle_async_request",
+            "start_line": 29,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 7.8173,
+            "match": "overlap",
+            "why": "name match: handle_async_request x1.07 (isteğe); owner match: MockTransport x1.01; bm25: request, transport, response~"
+          },
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Timeout.__repr__",
+            "start_line": 149,
+            "end_line": 156,
+            "kind": "symbol",
+            "score": 7.694,
+            "match": null,
+            "why": "bm25: body: write~"
+          },
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Timeout.as_dict",
+            "start_line": 132,
+            "end_line": 138,
+            "kind": "symbol",
+            "score": 7.687,
+            "match": null,
+            "why": "bm25: body: write~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 181,
+            "end_line": 184,
+            "label": "httpx/_exceptions.py::WriteError"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 152,
+            "end_line": 155,
+            "label": "httpx/_exceptions.py::WriteTimeout"
+          },
+          {
+            "path": "httpx/_transports/asgi.py",
+            "start_line": 63,
+            "end_line": 187,
+            "label": "httpx/_transports/asgi.py::ASGITransport"
+          },
+          {
+            "path": "httpx/_transports/mock.py",
+            "start_line": 19,
+            "end_line": 27,
+            "label": "httpx/_transports/mock.py::MockTransport.handle_request"
+          },
+          {
+            "path": "httpx/_transports/mock.py",
+            "start_line": 29,
+            "end_line": 43,
+            "label": "httpx/_transports/mock.py::MockTransport.handle_async_request"
+          },
+          {
+            "path": "httpx/_config.py",
+            "start_line": 149,
+            "end_line": 156,
+            "label": "httpx/_config.py::Timeout.__repr__"
+          },
+          {
+            "path": "httpx/_config.py",
+            "start_line": 132,
+            "end_line": 138,
+            "label": "httpx/_config.py::Timeout.as_dict"
+          }
+        ],
+        "rank": 5,
+        "loose_rank": 5,
+        "rr": 0.2,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.828
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Which class decides whether a request URL matches a mount key such as \"all://*example.org\" or \"https://example.com:1234\", and makes more specific keys win over general ones?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_utils.py",
+          "symbol": "URLPattern",
+          "start_line": 120,
+          "end_line": 226
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0029,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_utils.py",
+            "symbol_id": "httpx/_utils.py::URLPattern",
+            "start_line": 120,
+            "end_line": 226,
+            "kind": "symbol",
+            "score": 112.7562,
+            "match": "symbol",
+            "why": "name match: URLPattern x1.02 (url); class boost; class asked x3; bm25: matches, example, https, makes~, com, keys, url, key"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "symbol_id": "httpx/_urls.py::URL",
+            "start_line": 15,
+            "end_line": 417,
+            "kind": "symbol",
+            "score": 55.1624,
+            "match": null,
+            "why": "name match: URL x1.03 (url); class boost; class asked x3; bm25: 1234, https, com, url"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::UnsupportedProtocol",
+            "start_line": 208,
+            "end_line": 213,
+            "kind": "symbol",
+            "score": 41.7623,
+            "match": null,
+            "why": "class boost; class asked x3; bm25: makes~, example, com, request"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::HTTPError",
+            "start_line": 74,
+            "end_line": 104,
+            "kind": "symbol",
+            "score": 36.2433,
+            "match": null,
+            "why": "name match: HTTPError x1.03 (https); class boost; class asked x3; bm25: https, example, request, com, url"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client",
+            "start_line": 594,
+            "end_line": 1304,
+            "kind": "symbol",
+            "score": 27.8618,
+            "match": null,
+            "why": "class boost; class asked x3; bm25: https, example, org, request, url"
+          },
+          {
+            "path": "httpx/_utils.py",
+            "symbol_id": "httpx/_utils.py::URLPattern.matches",
+            "start_line": 192,
+            "end_line": 203,
+            "kind": "symbol",
+            "score": 23.7767,
+            "match": "overlap",
+            "why": "name match: matches x1.13 (matches); owner match: URLPattern x1.02; bm25: matches, url"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::AsyncClient",
+            "start_line": 1307,
+            "end_line": 2019,
+            "kind": "symbol",
+            "score": 23.4454,
+            "match": null,
+            "why": "class boost; class asked x3; bm25: https, example, org, request"
+          },
+          {
+            "path": "httpx/_utils.py",
+            "symbol_id": "httpx/_utils.py::URLPattern.__init__",
+            "start_line": 162,
+            "end_line": 190,
+            "kind": "symbol",
+            "score": 21.4097,
+            "match": "overlap",
+            "why": "bm25: url; body: example, matches~, com, keys, key"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_utils.py",
+            "start_line": 120,
+            "end_line": 226,
+            "label": "httpx/_utils.py::URLPattern"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "start_line": 15,
+            "end_line": 417,
+            "label": "httpx/_urls.py::URL"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 208,
+            "end_line": 213,
+            "label": "httpx/_exceptions.py::UnsupportedProtocol"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 74,
+            "end_line": 104,
+            "label": "httpx/_exceptions.py::HTTPError"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 594,
+            "end_line": 1304,
+            "label": "httpx/_client.py::Client"
+          },
+          {
+            "path": "httpx/_utils.py",
+            "start_line": 192,
+            "end_line": 203,
+            "label": "httpx/_utils.py::URLPattern.matches"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1307,
+            "end_line": 2019,
+            "label": "httpx/_client.py::AsyncClient"
+          },
+          {
+            "path": "httpx/_utils.py",
+            "start_line": 162,
+            "end_line": 190,
+            "label": "httpx/_utils.py::URLPattern.__init__"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "httpcore'un fırlattığı hatalar `httpx.ReadTimeout` ya da `httpx.ConnectError` gibi httpx istisnalarına nerede dönüştürülüyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_transports/default.py",
+          "symbol": "map_httpcore_exceptions",
+          "start_line": 96,
+          "end_line": 118
+        },
+        {
+          "path": "httpx/_transports/default.py",
+          "symbol": "_load_httpcore_exceptions",
+          "start_line": 74,
+          "end_line": 92
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0032,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::ConnectError",
+            "start_line": 187,
+            "end_line": 190,
+            "kind": "symbol",
+            "score": 53.4643,
+            "match": null,
+            "why": "name match: ConnectError x1.27 (explicit httpx.connecterror); qualname/path match: httpx.connecterror; class boost; bm25: connecterror, error, exception, httpx"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::_load_httpcore_exceptions",
+            "start_line": 74,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 47.4372,
+            "match": "symbol",
+            "why": "name match: _load_httpcore_exceptions x1.25 (httpcore, istisnalarına); bm25: httpcore, exception, error, httpx; body: connecterror, readtimeout"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::map_httpcore_exceptions",
+            "start_line": 95,
+            "end_line": 118,
+            "kind": "symbol",
+            "score": 42.5221,
+            "match": "symbol",
+            "why": "name match: map_httpcore_exceptions x1.25 (httpcore, istisnalarına); bm25: httpcore, exception, httpx; body: readtimeout"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": "httpx/_exceptions.py::ReadTimeout",
+            "start_line": 146,
+            "end_line": 149,
+            "kind": "symbol",
+            "score": 40.5165,
+            "match": null,
+            "why": "name match: ReadTimeout x1.25 (explicit httpx.readtimeout); qualname/path match: httpx.readtimeout; class boost; bm25: readtimeout, exception, httpx"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::HTTPTransport.__exit__",
+            "start_line": 221,
+            "end_line": 228,
+            "kind": "symbol",
+            "score": 20.2797,
+            "match": null,
+            "why": "bm25: exception, httpx; body: httpcore"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::AsyncHTTPTransport.__aexit__",
+            "start_line": 365,
+            "end_line": 372,
+            "kind": "symbol",
+            "score": 20.2645,
+            "match": null,
+            "why": "bm25: exception, httpx; body: httpcore"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 377,
+            "kind": "file",
+            "score": 18.7971,
+            "match": null,
+            "why": "path match: _exceptions x1.07 (istisnalarına); bm25: connecterror, readtimeout, error, exception, httpx"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::ResponseStream.__iter__",
+            "start_line": 125,
+            "end_line": 128,
+            "kind": "symbol",
+            "score": 18.6914,
+            "match": null,
+            "why": "bm25: httpx; body: httpcore, exception"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 187,
+            "end_line": 190,
+            "label": "httpx/_exceptions.py::ConnectError"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 74,
+            "end_line": 92,
+            "label": "httpx/_transports/default.py::_load_httpcore_exceptions"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 95,
+            "end_line": 118,
+            "label": "httpx/_transports/default.py::map_httpcore_exceptions"
+          },
+          {
+            "path": "httpx/_exceptions.py",
+            "start_line": 146,
+            "end_line": 149,
+            "label": "httpx/_exceptions.py::ReadTimeout"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 221,
+            "end_line": 228,
+            "label": "httpx/_transports/default.py::HTTPTransport.__exit__"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 365,
+            "end_line": 372,
+            "label": "httpx/_transports/default.py::AsyncHTTPTransport.__aexit__"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 125,
+            "end_line": 128,
+            "label": "httpx/_transports/default.py::ResponseStream.__iter__"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 2,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "404 gibi bir durum kodunu 'Not Found' aciklamasina ceviren yapi nerede tanimli?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_status_codes.py",
+          "symbol": "codes",
+          "start_line": 8,
+          "end_line": 157
+        },
+        {
+          "path": "httpx/_status_codes.py",
+          "symbol": "codes.get_reason_phrase",
+          "start_line": 39,
+          "end_line": 43
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0008,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "tests/test_status_codes.py",
+            "symbol_id": "tests/test_status_codes.py::test_status_code_as_int",
+            "start_line": 4,
+            "end_line": 7,
+            "kind": "symbol",
+            "score": 9.6996,
+            "match": null,
+            "why": "test file x0.5; bm25: status; body: 404, found"
+          },
+          {
+            "path": "tests/test_status_codes.py",
+            "symbol_id": "tests/test_status_codes.py::test_status_code_phrase_lookup",
+            "start_line": 14,
+            "end_line": 15,
+            "kind": "symbol",
+            "score": 9.3182,
+            "match": null,
+            "why": "test file x0.5; bm25: status; body: 404, found"
+          },
+          {
+            "path": "tests/test_status_codes.py",
+            "symbol_id": "tests/test_status_codes.py::test_lowercase_status_code",
+            "start_line": 18,
+            "end_line": 19,
+            "kind": "symbol",
+            "score": 9.0781,
+            "match": null,
+            "why": "test file x0.5; bm25: status; body: 404, found"
+          },
+          {
+            "path": "tests/test_status_codes.py",
+            "symbol_id": "tests/test_status_codes.py::test_reason_phrase_for_status_code",
+            "start_line": 22,
+            "end_line": 23,
+            "kind": "symbol",
+            "score": 8.964,
+            "match": null,
+            "why": "test file x0.5; bm25: status; body: 404, found"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Headers.__setitem__",
+            "start_line": 304,
+            "end_line": 326,
+            "kind": "symbol",
+            "score": 7.7355,
+            "match": null,
+            "why": "bm25: body: found"
+          },
+          {
+            "path": "tests/test_status_codes.py",
+            "symbol_id": "tests/test_status_codes.py::test_status_code_value_lookup",
+            "start_line": 10,
+            "end_line": 11,
+            "kind": "symbol",
+            "score": 6.6269,
+            "match": null,
+            "why": "test file x0.5; bm25: status; body: 404"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient._redirect_method",
+            "start_line": 494,
+            "end_line": 515,
+            "kind": "symbol",
+            "score": 5.8744,
+            "match": null,
+            "why": "bm25: body: found, status"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.has_redirect_location",
+            "start_line": 771,
+            "end_line": 792,
+            "kind": "symbol",
+            "score": 5.7614,
+            "match": null,
+            "why": "bm25: body: found, status"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "tests/test_status_codes.py",
+            "start_line": 4,
+            "end_line": 7,
+            "label": "tests/test_status_codes.py::test_status_code_as_int"
+          },
+          {
+            "path": "tests/test_status_codes.py",
+            "start_line": 14,
+            "end_line": 15,
+            "label": "tests/test_status_codes.py::test_status_code_phrase_lookup"
+          },
+          {
+            "path": "tests/test_status_codes.py",
+            "start_line": 18,
+            "end_line": 19,
+            "label": "tests/test_status_codes.py::test_lowercase_status_code"
+          },
+          {
+            "path": "tests/test_status_codes.py",
+            "start_line": 22,
+            "end_line": 23,
+            "label": "tests/test_status_codes.py::test_reason_phrase_for_status_code"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 304,
+            "end_line": 326,
+            "label": "httpx/_models.py::Headers.__setitem__"
+          },
+          {
+            "path": "tests/test_status_codes.py",
+            "start_line": 10,
+            "end_line": 11,
+            "label": "tests/test_status_codes.py::test_status_code_value_lookup"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 494,
+            "end_line": 515,
+            "label": "httpx/_client.py::BaseClient._redirect_method"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 771,
+            "end_line": 792,
+            "label": "httpx/_models.py::Response.has_redirect_location"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "İstek nesnesi oluşturulurken `Host` başlığı ve gövdesiz POST için `Content-Length: 0` otomatik olarak nerede ekleniyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_models.py",
+          "symbol": "Request._prepare",
+          "start_line": 441,
+          "end_line": 460
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0024,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Request._prepare",
+            "start_line": 441,
+            "end_line": 460,
+            "kind": "symbol",
+            "score": 25.5371,
+            "match": "symbol",
+            "why": "bm25: header, request; body: auto, length, host, content, post"
+          },
+          {
+            "path": "httpx/_api.py",
+            "symbol_id": "httpx/_api.py::request",
+            "start_line": 39,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 16.8242,
+            "match": null,
+            "why": "name match: request x1.04 (istek); bm25: object, request, body, content, post, header"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Cookies._CookieCompatRequest.add_unredirected_header",
+            "start_line": 1257,
+            "end_line": 1259,
+            "kind": "symbol",
+            "score": 16.1607,
+            "match": null,
+            "why": "name match: add_unredirected_header x1.17 (başlığı, ekleniyor); owner match: _CookieCompatRequest x1.02; bm25: add, header, request"
+          },
+          {
+            "path": "httpx/_content.py",
+            "symbol_id": "httpx/_content.py::encode_text",
+            "start_line": 160,
+            "end_line": 165,
+            "kind": "symbol",
+            "score": 15.9854,
+            "match": null,
+            "why": "bm25: content; body: length, body, header"
+          },
+          {
+            "path": "httpx/_content.py",
+            "symbol_id": "httpx/_content.py::encode_html",
+            "start_line": 168,
+            "end_line": 173,
+            "kind": "symbol",
+            "score": 15.9854,
+            "match": null,
+            "why": "bm25: content; body: length, body, header"
+          },
+          {
+            "path": "httpx/_content.py",
+            "symbol_id": "httpx/_content.py::encode_json",
+            "start_line": 176,
+            "end_line": 183,
+            "kind": "symbol",
+            "score": 15.2914,
+            "match": null,
+            "why": "bm25: content; body: length, body, header"
+          },
+          {
+            "path": "httpx/_main.py",
+            "symbol_id": "httpx/_main.py::print_help",
+            "start_line": 26,
+            "end_line": 100,
+            "kind": "symbol",
+            "score": 15.2431,
+            "match": null,
+            "why": "bm25: body: add, body, request, post, content, header"
+          },
+          {
+            "path": "httpx/_content.py",
+            "symbol_id": "httpx/_content.py::encode_urlencoded_data",
+            "start_line": 136,
+            "end_line": 149,
+            "kind": "symbol",
+            "score": 14.3527,
+            "match": null,
+            "why": "bm25: content, request; body: length, body, header"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_models.py",
+            "start_line": 441,
+            "end_line": 460,
+            "label": "httpx/_models.py::Request._prepare"
+          },
+          {
+            "path": "httpx/_api.py",
+            "start_line": 39,
+            "end_line": 120,
+            "label": "httpx/_api.py::request"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1257,
+            "end_line": 1259,
+            "label": "httpx/_models.py::Cookies._CookieCompatRequest.add_unredirected_header"
+          },
+          {
+            "path": "httpx/_content.py",
+            "start_line": 160,
+            "end_line": 165,
+            "label": "httpx/_content.py::encode_text"
+          },
+          {
+            "path": "httpx/_content.py",
+            "start_line": 168,
+            "end_line": 173,
+            "label": "httpx/_content.py::encode_html"
+          },
+          {
+            "path": "httpx/_content.py",
+            "start_line": 176,
+            "end_line": 183,
+            "label": "httpx/_content.py::encode_json"
+          },
+          {
+            "path": "httpx/_main.py",
+            "start_line": 26,
+            "end_line": 100,
+            "label": "httpx/_main.py::print_help"
+          },
+          {
+            "path": "httpx/_content.py",
+            "start_line": 136,
+            "end_line": 149,
+            "label": "httpx/_content.py::encode_urlencoded_data"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "With `base_url=\"https://api.example.com/v1\"`, a request to \"/users\" ends up at /v1/users and not at /users. Where is the URL merged like that?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_client.py",
+          "symbol": "BaseClient._merge_url",
+          "start_line": 391,
+          "end_line": 411
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "BaseClient._enforce_trailing_slash",
+          "start_line": 234,
+          "end_line": 237
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0026,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.base_url",
+            "start_line": 287,
+            "end_line": 292,
+            "kind": "symbol",
+            "score": 55.167,
+            "match": null,
+            "why": "name match: base_url (explicit base_url); bm25: base_url, base, url, request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.base_url",
+            "start_line": 294,
+            "end_line": 296,
+            "kind": "symbol",
+            "score": 51.0457,
+            "match": null,
+            "why": "name match: base_url (explicit base_url); bm25: base_url, base, url"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient._merge_url",
+            "start_line": 391,
+            "end_line": 411,
+            "kind": "symbol",
+            "score": 47.4726,
+            "match": "symbol",
+            "why": "name match: _merge_url x1.16 (merged, url); bm25: merged~, base_url, base, url, request; body: ends, example, https, com"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.build_request",
+            "start_line": 340,
+            "end_line": 389,
+            "kind": "symbol",
+            "score": 22.7745,
+            "match": null,
+            "why": "name match: build_request x1.02 (request); bm25: merged, base_url, request, base, url"
+          },
+          {
+            "path": "httpx/_transports/base.py",
+            "symbol_id": "httpx/_transports/base.py::BaseTransport.handle_request",
+            "start_line": 26,
+            "end_line": 59,
+            "kind": "symbol",
+            "score": 22.7731,
+            "match": null,
+            "why": "name match: handle_request x1.02 (request); bm25: api, users~, https, request, base; body: example, com, url"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "symbol_id": "httpx/_urls.py::URL.raw_path",
+            "start_line": 282,
+            "end_line": 297,
+            "kind": "symbol",
+            "score": 22.755,
+            "match": null,
+            "why": "bm25: users, example, https~, url, request"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::Auth.auth_flow",
+            "start_line": 38,
+            "end_line": 60,
+            "kind": "symbol",
+            "score": 22.0976,
+            "match": null,
+            "why": "bm25: like, ends~, request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient._merge_headers",
+            "start_line": 424,
+            "end_line": 431,
+            "kind": "symbol",
+            "score": 21.7697,
+            "match": null,
+            "why": "name match: _merge_headers x1.09 (merged); bm25: merged, base, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_client.py",
+            "start_line": 287,
+            "end_line": 292,
+            "label": "httpx/_client.py::BaseClient.base_url"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 294,
+            "end_line": 296,
+            "label": "httpx/_client.py::BaseClient.base_url"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 391,
+            "end_line": 411,
+            "label": "httpx/_client.py::BaseClient._merge_url"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 340,
+            "end_line": 389,
+            "label": "httpx/_client.py::BaseClient.build_request"
+          },
+          {
+            "path": "httpx/_transports/base.py",
+            "start_line": 26,
+            "end_line": 59,
+            "label": "httpx/_transports/base.py::BaseTransport.handle_request"
+          },
+          {
+            "path": "httpx/_urls.py",
+            "start_line": 282,
+            "end_line": 297,
+            "label": "httpx/_urls.py::URL.raw_path"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 38,
+            "end_line": 60,
+            "label": "httpx/_auth.py::Auth.auth_flow"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 424,
+            "end_line": 431,
+            "label": "httpx/_client.py::BaseClient._merge_headers"
+          }
+        ],
+        "rank": 3,
+        "loose_rank": 3,
+        "rr": 0.3333333333333333,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Where are the callables registered in `event_hooks` actually invoked for each request and response?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_client.py",
+          "symbol": "Client._send_handling_redirects",
+          "start_line": 964,
+          "end_line": 999
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "AsyncClient._send_handling_redirects",
+          "start_line": 1679,
+          "end_line": 1715
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0017,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.event_hooks",
+            "start_line": 265,
+            "end_line": 270,
+            "kind": "symbol",
+            "score": 91.4065,
+            "match": null,
+            "why": "name match: event_hooks (explicit event_hooks); bm25: event_hooks, hooks, event; body: response, request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.event_hooks",
+            "start_line": 261,
+            "end_line": 263,
+            "kind": "symbol",
+            "score": 73.0393,
+            "match": null,
+            "why": "name match: event_hooks (explicit event_hooks); bm25: event_hooks, hooks, event"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.__init__",
+            "start_line": 189,
+            "end_line": 221,
+            "kind": "symbol",
+            "score": 25.2753,
+            "match": null,
+            "why": "bm25: event_hooks, hooks, event, callables~; body: response, request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client._send_handling_redirects",
+            "start_line": 964,
+            "end_line": 999,
+            "kind": "symbol",
+            "score": 19.431,
+            "match": "symbol",
+            "why": "bm25: response, request; body: event_hooks, hooks, event"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::AsyncClient._send_handling_redirects",
+            "start_line": 1679,
+            "end_line": 1715,
+            "kind": "symbol",
+            "score": 19.4239,
+            "match": "symbol",
+            "why": "bm25: response, request; body: event_hooks, hooks, event"
+          },
+          {
+            "path": "httpx/_transports/mock.py",
+            "symbol_id": "httpx/_transports/mock.py::MockTransport.handle_async_request",
+            "start_line": 29,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 14.2156,
+            "match": null,
+            "why": "name match: handle_async_request x1.03 (request); bm25: response, request; body: actually"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client.__init__",
+            "start_line": 639,
+            "end_line": 716,
+            "kind": "symbol",
+            "score": 14.131,
+            "match": null,
+            "why": "bm25: event_hooks, event, hooks, callables~"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::AsyncClient.__init__",
+            "start_line": 1353,
+            "end_line": 1430,
+            "kind": "symbol",
+            "score": 14.0057,
+            "match": null,
+            "why": "bm25: event_hooks, event, hooks, callables~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_client.py",
+            "start_line": 265,
+            "end_line": 270,
+            "label": "httpx/_client.py::BaseClient.event_hooks"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 261,
+            "end_line": 263,
+            "label": "httpx/_client.py::BaseClient.event_hooks"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 189,
+            "end_line": 221,
+            "label": "httpx/_client.py::BaseClient.__init__"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 964,
+            "end_line": 999,
+            "label": "httpx/_client.py::Client._send_handling_redirects"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1679,
+            "end_line": 1715,
+            "label": "httpx/_client.py::AsyncClient._send_handling_redirects"
+          },
+          {
+            "path": "httpx/_transports/mock.py",
+            "start_line": 29,
+            "end_line": 43,
+            "label": "httpx/_transports/mock.py::MockTransport.handle_async_request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 639,
+            "end_line": 716,
+            "label": "httpx/_client.py::Client.__init__"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1353,
+            "end_line": 1430,
+            "label": "httpx/_client.py::AsyncClient.__init__"
+          }
+        ],
+        "rank": 4,
+        "loose_rank": 4,
+        "rr": 0.25,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "After a response sets cookies with Set-Cookie, where does the client store them so that later requests send them back?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_client.py",
+          "symbol": "Client._send_single_request",
+          "start_line": 1001,
+          "end_line": 1034
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "AsyncClient._send_single_request",
+          "start_line": 1717,
+          "end_line": 1749
+        },
+        {
+          "path": "httpx/_models.py",
+          "symbol": "Cookies.extract_cookies",
+          "start_line": 1101,
+          "end_line": 1108
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0023,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Cookies.set_cookie_header",
+            "start_line": 1110,
+            "end_line": 1115,
+            "kind": "symbol",
+            "score": 49.1015,
+            "match": null,
+            "why": "name match: set_cookie_header x1.27 (cookie, set, sets); owner match: Cookies x1.09; bm25: sets, cookie, cookies, requests~"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.cookies",
+            "start_line": 318,
+            "end_line": 323,
+            "kind": "symbol",
+            "score": 37.5481,
+            "match": null,
+            "why": "name match: cookies x1.07 (cookies); owner match: BaseClient x1.01; bm25: cookies, cookie, requests, send, client"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Cookies.extract_cookies",
+            "start_line": 1101,
+            "end_line": 1108,
+            "kind": "symbol",
+            "score": 33.0296,
+            "match": "symbol",
+            "why": "name match: extract_cookies x1.05 (cookies); bm25: cookies, cookie, response, sets~; body: requests~"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Cookies.set",
+            "start_line": 1117,
+            "end_line": 1141,
+            "kind": "symbol",
+            "score": 29.0323,
+            "match": null,
+            "why": "name match: set x1.25 (set, sets); owner match: Cookies x1.08; bm25: cookie, sets~, cookies"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client.request",
+            "start_line": 771,
+            "end_line": 825,
+            "kind": "symbol",
+            "score": 28.9428,
+            "match": null,
+            "why": "name match: request x1.07 (requests); owner match: Client x1.03; bm25: cookies, cookie, send, requests~, client, response; body: sets~"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::AsyncClient.request",
+            "start_line": 1485,
+            "end_line": 1540,
+            "kind": "symbol",
+            "score": 28.2191,
+            "match": null,
+            "why": "name match: request x1.07 (requests); owner match: AsyncClient x1.01; bm25: cookies, cookie, send, requests~, client, response; body: sets~"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Cookies.__init__",
+            "start_line": 1084,
+            "end_line": 1099,
+            "kind": "symbol",
+            "score": 27.7046,
+            "match": null,
+            "why": "bm25: cookies, cookie; body: sets~"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Cookies.update",
+            "start_line": 1205,
+            "end_line": 1208,
+            "kind": "symbol",
+            "score": 26.9498,
+            "match": null,
+            "why": "bm25: cookie, cookies; body: sets~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1110,
+            "end_line": 1115,
+            "label": "httpx/_models.py::Cookies.set_cookie_header"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 318,
+            "end_line": 323,
+            "label": "httpx/_client.py::BaseClient.cookies"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1101,
+            "end_line": 1108,
+            "label": "httpx/_models.py::Cookies.extract_cookies"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1117,
+            "end_line": 1141,
+            "label": "httpx/_models.py::Cookies.set"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 771,
+            "end_line": 825,
+            "label": "httpx/_client.py::Client.request"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1485,
+            "end_line": 1540,
+            "label": "httpx/_client.py::AsyncClient.request"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1084,
+            "end_line": 1099,
+            "label": "httpx/_models.py::Cookies.__init__"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1205,
+            "end_line": 1208,
+            "label": "httpx/_models.py::Cookies.update"
+          }
+        ],
+        "rank": 3,
+        "loose_rank": 3,
+        "rr": 0.3333333333333333,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "HTTP_PROXY ve HTTPS_PROXY ortam degiskenleri nerede okunuyor, NO_PROXY'deki hostlar proxy disinda nasil birakiliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_utils.py",
+          "symbol": "get_environment_proxies",
+          "start_line": 30,
+          "end_line": 76
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "BaseClient._get_proxy_map",
+          "start_line": 239,
+          "end_line": 251
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0014,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_utils.py",
+            "symbol_id": "httpx/_utils.py::get_environment_proxies",
+            "start_line": 30,
+            "end_line": 76,
+            "kind": "symbol",
+            "score": 45.7673,
+            "match": "symbol",
+            "why": "name match: get_environment_proxies x1.23 (ortam, proxy); bm25: environment, proxy; body: no_proxy, no, https_proxy, http_proxy, http, https"
+          },
+          {
+            "path": "tests/test_utils.py",
+            "symbol_id": "tests/test_utils.py::test_get_environment_proxies",
+            "start_line": 89,
+            "end_line": 112,
+            "kind": "symbol",
+            "score": 26.9609,
+            "match": null,
+            "why": "test file x0.5; bm25: environment, proxy; body: no_proxy, http_proxy, no, https_proxy, https, http"
+          },
+          {
+            "path": "tests/client/test_proxies.py",
+            "symbol_id": "tests/client/test_proxies.py::test_proxies_environ",
+            "start_line": 128,
+            "end_line": 236,
+            "kind": "symbol",
+            "score": 22.3148,
+            "match": null,
+            "why": "test file x0.5; bm25: environment~, proxy; body: no_proxy, no, http_proxy, http, https"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient._get_proxy_map",
+            "start_line": 239,
+            "end_line": 251,
+            "kind": "symbol",
+            "score": 20.4499,
+            "match": "symbol",
+            "why": "name match: _get_proxy_map x1.06 (proxy); bm25: environment, proxy"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client._init_proxy_transport",
+            "start_line": 740,
+            "end_line": 758,
+            "kind": "symbol",
+            "score": 16.7685,
+            "match": null,
+            "why": "name match: _init_proxy_transport x1.06 (proxy); bm25: environment~, proxy, http"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::AsyncClient._init_proxy_transport",
+            "start_line": 1454,
+            "end_line": 1472,
+            "kind": "symbol",
+            "score": 16.6602,
+            "match": null,
+            "why": "name match: _init_proxy_transport x1.06 (proxy); bm25: environment~, proxy, http"
+          },
+          {
+            "path": "httpx/_api.py",
+            "symbol_id": "httpx/_api.py::request",
+            "start_line": 39,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 14.2002,
+            "match": null,
+            "why": "bm25: environment, proxy, http; body: variable~, https"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::HTTPTransport.__init__",
+            "start_line": 136,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 13.4988,
+            "match": null,
+            "why": "bm25: proxy, environment~, http; body: https"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_utils.py",
+            "start_line": 30,
+            "end_line": 76,
+            "label": "httpx/_utils.py::get_environment_proxies"
+          },
+          {
+            "path": "tests/test_utils.py",
+            "start_line": 89,
+            "end_line": 112,
+            "label": "tests/test_utils.py::test_get_environment_proxies"
+          },
+          {
+            "path": "tests/client/test_proxies.py",
+            "start_line": 128,
+            "end_line": 236,
+            "label": "tests/client/test_proxies.py::test_proxies_environ"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 239,
+            "end_line": 251,
+            "label": "httpx/_client.py::BaseClient._get_proxy_map"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 740,
+            "end_line": 758,
+            "label": "httpx/_client.py::Client._init_proxy_transport"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1454,
+            "end_line": 1472,
+            "label": "httpx/_client.py::AsyncClient._init_proxy_transport"
+          },
+          {
+            "path": "httpx/_api.py",
+            "start_line": 39,
+            "end_line": 120,
+            "label": "httpx/_api.py::request"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 136,
+            "end_line": 215,
+            "label": "httpx/_transports/default.py::HTTPTransport.__init__"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Yanıt `Content-Encoding: gzip, br` başlığıyla geldiğinde gövde hangi sırayla ve hangi kodla açılıyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_models.py",
+          "symbol": "Response._get_content_decoder",
+          "start_line": 699,
+          "end_line": 722
+        },
+        {
+          "path": "httpx/_decoders.py",
+          "symbol": "MultiDecoder",
+          "start_line": 203,
+          "end_line": 225
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.002,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_content.py",
+            "symbol_id": "httpx/_content.py::encode_response",
+            "start_line": 221,
+            "end_line": 240,
+            "kind": "symbol",
+            "score": 23.444,
+            "match": null,
+            "why": "name match: encode_response x1.19 (encoding, yanıt); bm25: responsecontent, encoding, content, response~, header"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.__init__",
+            "start_line": 516,
+            "end_line": 569,
+            "kind": "symbol",
+            "score": 18.2649,
+            "match": null,
+            "why": "bm25: responsecontent, encoding, content, header, response~; body: body"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.charset_encoding",
+            "start_line": 688,
+            "end_line": 697,
+            "kind": "symbol",
+            "score": 15.375,
+            "match": null,
+            "why": "name match: charset_encoding x1.09 (encoding); owner match: Response x1.03; bm25: encoding, content, header, response~"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.encoding",
+            "start_line": 652,
+            "end_line": 672,
+            "kind": "symbol",
+            "score": 15.3648,
+            "match": null,
+            "why": "name match: encoding x1.12 (encoding); owner match: Response x1.04; bm25: encoding, content, header, response~"
+          },
+          {
+            "path": "httpx/_content.py",
+            "symbol_id": "httpx/_content.py::encode_content",
+            "start_line": 107,
+            "end_line": 133,
+            "kind": "symbol",
+            "score": 14.6835,
+            "match": null,
+            "why": "name match: encode_content x1.21 (content, encoding); bm25: encoding, content; body: body, header"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.iter_text",
+            "start_line": 907,
+            "end_line": 924,
+            "kind": "symbol",
+            "score": 14.4329,
+            "match": null,
+            "why": "bm25: encoding, gzip, content, response~"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.aiter_text",
+            "start_line": 1007,
+            "end_line": 1026,
+            "kind": "symbol",
+            "score": 14.2914,
+            "match": null,
+            "why": "bm25: encoding, gzip, content, response~"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.encoding",
+            "start_line": 674,
+            "end_line": 686,
+            "kind": "symbol",
+            "score": 12.8196,
+            "match": null,
+            "why": "name match: encoding x1.12 (encoding); owner match: Response x1.04; bm25: encoding, content, response~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_content.py",
+            "start_line": 221,
+            "end_line": 240,
+            "label": "httpx/_content.py::encode_response"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 516,
+            "end_line": 569,
+            "label": "httpx/_models.py::Response.__init__"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 688,
+            "end_line": 697,
+            "label": "httpx/_models.py::Response.charset_encoding"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 652,
+            "end_line": 672,
+            "label": "httpx/_models.py::Response.encoding"
+          },
+          {
+            "path": "httpx/_content.py",
+            "start_line": 107,
+            "end_line": 133,
+            "label": "httpx/_content.py::encode_content"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 907,
+            "end_line": 924,
+            "label": "httpx/_models.py::Response.iter_text"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1007,
+            "end_line": 1026,
+            "label": "httpx/_models.py::Response.aiter_text"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 674,
+            "end_line": 686,
+            "label": "httpx/_models.py::Response.encoding"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How is the multipart boundary chosen for file uploads, and how can I force my own boundary?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_multipart.py",
+          "symbol": "MultipartStream.__init__",
+          "start_line": 229,
+          "end_line": 242
+        },
+        {
+          "path": "httpx/_multipart.py",
+          "symbol": "get_multipart_boundary_from_content_type",
+          "start_line": 56,
+          "end_line": 67
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0005,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "httpx/_multipart.py",
+            "symbol_id": "httpx/_multipart.py::get_multipart_boundary_from_content_type",
+            "start_line": 56,
+            "end_line": 67,
+            "kind": "symbol",
+            "score": 17.6859,
+            "match": "symbol",
+            "why": "name match: get_multipart_boundary_from_content_type x1.27 (boundary, multipart); bm25: boundary, multipart"
+          },
+          {
+            "path": "httpx/_content.py",
+            "symbol_id": "httpx/_content.py::encode_multipart_data",
+            "start_line": 152,
+            "end_line": 157,
+            "kind": "symbol",
+            "score": 15.4341,
+            "match": null,
+            "why": "name match: encode_multipart_data x1.11 (multipart); bm25: boundary, multipart"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "symbol_id": "httpx/_multipart.py::MultipartStream.__init__",
+            "start_line": 229,
+            "end_line": 242,
+            "kind": "symbol",
+            "score": 13.8799,
+            "match": "symbol",
+            "why": "bm25: boundary, multipart"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "symbol_id": "httpx/_multipart.py::MultipartStream.get_content_length",
+            "start_line": 265,
+            "end_line": 283,
+            "kind": "symbol",
+            "score": 13.593,
+            "match": null,
+            "why": "bm25: multipart; body: boundary"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "symbol_id": "httpx/_multipart.py::MultipartStream.iter_chunks",
+            "start_line": 258,
+            "end_line": 263,
+            "kind": "symbol",
+            "score": 12.079,
+            "match": null,
+            "why": "bm25: multipart; body: boundary"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "symbol_id": "httpx/_multipart.py::FileField.__init__",
+            "start_line": 122,
+            "end_line": 169,
+            "kind": "symbol",
+            "score": 11.8684,
+            "match": null,
+            "why": "bm25: multipart; body: uploads"
+          },
+          {
+            "path": "tests/test_multipart.py",
+            "symbol_id": "tests/test_multipart.py::test_multipart_encode_non_seekable_filelike",
+            "start_line": 382,
+            "end_line": 420,
+            "kind": "symbol",
+            "score": 11.4513,
+            "match": null,
+            "why": "test file x0.5; bm25: uploads, multipart; body: boundary"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 300,
+            "kind": "file",
+            "score": 10.8617,
+            "match": "file",
+            "why": "path match: _multipart x1.12 (multipart); bm25: multipart, boundary"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_multipart.py",
+            "start_line": 56,
+            "end_line": 67,
+            "label": "httpx/_multipart.py::get_multipart_boundary_from_content_type"
+          },
+          {
+            "path": "httpx/_content.py",
+            "start_line": 152,
+            "end_line": 157,
+            "label": "httpx/_content.py::encode_multipart_data"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "start_line": 229,
+            "end_line": 242,
+            "label": "httpx/_multipart.py::MultipartStream.__init__"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "start_line": 265,
+            "end_line": 283,
+            "label": "httpx/_multipart.py::MultipartStream.get_content_length"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "start_line": 258,
+            "end_line": 263,
+            "label": "httpx/_multipart.py::MultipartStream.iter_chunks"
+          },
+          {
+            "path": "httpx/_multipart.py",
+            "start_line": 122,
+            "end_line": 169,
+            "label": "httpx/_multipart.py::FileField.__init__"
+          },
+          {
+            "path": "tests/test_multipart.py",
+            "start_line": 382,
+            "end_line": 420,
+            "label": "tests/test_multipart.py::test_multipart_encode_non_seekable_filelike"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "flow",
+      "lang": "en",
+      "question": "How does a `timeout=` passed to `client.get()` reach the layer that actually enforces it?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_client.py",
+          "symbol": "BaseClient.build_request",
+          "start_line": 340,
+          "end_line": 389
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "BaseClient._set_timeout",
+          "start_line": 584,
+          "end_line": 591
+        },
+        {
+          "path": "httpx/_transports/default.py",
+          "symbol": "HTTPTransport.handle_request",
+          "start_line": 230,
+          "end_line": 259
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0017,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client.get",
+            "start_line": 1036,
+            "end_line": 1063,
+            "kind": "symbol",
+            "score": 58.4517,
+            "match": null,
+            "why": "name match: get (explicit client.get); qualname/path match: client.get; bm25: timeout, get, client"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.auth",
+            "start_line": 272,
+            "end_line": 281,
+            "kind": "symbol",
+            "score": 18.6177,
+            "match": null,
+            "why": "bm25: passed, client"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Headers.get_list",
+            "start_line": 252,
+            "end_line": 272,
+            "kind": "symbol",
+            "score": 14.8792,
+            "match": null,
+            "why": "name match: get_list x1.04 (get); bm25: passed, get"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient._enforce_trailing_slash",
+            "start_line": 234,
+            "end_line": 237,
+            "kind": "symbol",
+            "score": 14.5218,
+            "match": null,
+            "why": "name match: _enforce_trailing_slash x1.13 (enforces); owner match: BaseClient x1.02; bm25: enforces~, client"
+          },
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Timeout.__init__",
+            "start_line": 86,
+            "end_line": 130,
+            "kind": "symbol",
+            "score": 13.1127,
+            "match": null,
+            "why": "bm25: timeout; body: passed"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::BasicAuth",
+            "start_line": 126,
+            "end_line": 142,
+            "kind": "symbol",
+            "score": 11.8841,
+            "match": null,
+            "why": "class boost; bm25: passed"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::FunctionAuth",
+            "start_line": 113,
+            "end_line": 123,
+            "kind": "symbol",
+            "score": 11.3414,
+            "match": null,
+            "why": "class boost; bm25: passed"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::Auth.auth_flow",
+            "start_line": 38,
+            "end_line": 60,
+            "kind": "symbol",
+            "score": 11.0185,
+            "match": null,
+            "why": "bm25: reach, client"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_client.py",
+            "start_line": 1036,
+            "end_line": 1063,
+            "label": "httpx/_client.py::Client.get"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 272,
+            "end_line": 281,
+            "label": "httpx/_client.py::BaseClient.auth"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 252,
+            "end_line": 272,
+            "label": "httpx/_models.py::Headers.get_list"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 234,
+            "end_line": 237,
+            "label": "httpx/_client.py::BaseClient._enforce_trailing_slash"
+          },
+          {
+            "path": "httpx/_config.py",
+            "start_line": 86,
+            "end_line": 130,
+            "label": "httpx/_config.py::Timeout.__init__"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 126,
+            "end_line": 142,
+            "label": "httpx/_auth.py::BasicAuth"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 113,
+            "end_line": 123,
+            "label": "httpx/_auth.py::FunctionAuth"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 38,
+            "end_line": 60,
+            "label": "httpx/_auth.py::Auth.auth_flow"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "flow",
+      "lang": "tr",
+      "question": "Kendi Auth sinifimda auth_flow icinde yield ettigim istekler nasil gonderiliyor, gelen yanit generator'a nasil geri veriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_client.py",
+          "symbol": "Client._send_handling_auth",
+          "start_line": 930,
+          "end_line": 962
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "AsyncClient._send_handling_auth",
+          "start_line": 1645,
+          "end_line": 1677
+        },
+        {
+          "path": "httpx/_auth.py",
+          "symbol": "Auth.sync_auth_flow",
+          "start_line": 62,
+          "end_line": 85
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "BaseClient._build_request_auth",
+          "start_line": 457,
+          "end_line": 473
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0017,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::Auth.auth_flow",
+            "start_line": 38,
+            "end_line": 60,
+            "kind": "symbol",
+            "score": 152.8835,
+            "match": null,
+            "why": "name match: auth_flow (explicit auth_flow); owner match: Auth x1.50; bm25: flow, auth_flow, generator, auth, send, request, response~"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::FunctionAuth.auth_flow",
+            "start_line": 122,
+            "end_line": 123,
+            "kind": "symbol",
+            "score": 117.8502,
+            "match": null,
+            "why": "name match: auth_flow (explicit auth_flow); owner match: FunctionAuth x1.22; bm25: auth_flow, flow, generator, auth, request, response~"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::BasicAuth.auth_flow",
+            "start_line": 135,
+            "end_line": 137,
+            "kind": "symbol",
+            "score": 116.2166,
+            "match": null,
+            "why": "name match: auth_flow (explicit auth_flow); owner match: BasicAuth x1.22; bm25: auth_flow, flow, generator, auth, request, response~"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::DigestAuth.auth_flow",
+            "start_line": 193,
+            "end_line": 222,
+            "kind": "symbol",
+            "score": 107.3237,
+            "match": null,
+            "why": "name match: auth_flow (explicit auth_flow); owner match: DigestAuth x1.22; bm25: auth_flow, flow, generator, auth, request, response~"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "symbol_id": "httpx/_auth.py::NetRCAuth.auth_flow",
+            "start_line": 157,
+            "end_line": 167,
+            "kind": "symbol",
+            "score": 102.0969,
+            "match": null,
+            "why": "name match: auth_flow (explicit auth_flow); owner match: NetRCAuth x1.14; bm25: auth_flow, flow, generator, auth, request, response~"
+          },
+          {
+            "path": "tests/client/test_auth.py",
+            "symbol_id": "tests/client/test_auth.py::ResponseBodyAuth.auth_flow",
+            "start_line": 127,
+            "end_line": 134,
+            "kind": "symbol",
+            "score": 59.1084,
+            "match": null,
+            "why": "name match: auth_flow (explicit auth_flow); owner match: ResponseBodyAuth x1.31; test file x0.5; bm25: auth_flow, flow, generator, auth, request, response~"
+          },
+          {
+            "path": "tests/client/test_auth.py",
+            "symbol_id": "tests/client/test_auth.py::RepeatAuth.auth_flow",
+            "start_line": 100,
+            "end_line": 112,
+            "kind": "symbol",
+            "score": 53.791,
+            "match": null,
+            "why": "name match: auth_flow (explicit auth_flow); owner match: RepeatAuth x1.22; test file x0.5; bm25: auth_flow, flow, generator, auth, request, response~"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client._send_handling_auth",
+            "start_line": 930,
+            "end_line": 962,
+            "kind": "symbol",
+            "score": 36.659,
+            "match": "symbol",
+            "why": "name match: _send_handling_auth x1.32 (auth, gonderiliyor); bm25: send, auth, request, response~; body: auth_flow, flow"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 38,
+            "end_line": 60,
+            "label": "httpx/_auth.py::Auth.auth_flow"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 122,
+            "end_line": 123,
+            "label": "httpx/_auth.py::FunctionAuth.auth_flow"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 135,
+            "end_line": 137,
+            "label": "httpx/_auth.py::BasicAuth.auth_flow"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 193,
+            "end_line": 222,
+            "label": "httpx/_auth.py::DigestAuth.auth_flow"
+          },
+          {
+            "path": "httpx/_auth.py",
+            "start_line": 157,
+            "end_line": 167,
+            "label": "httpx/_auth.py::NetRCAuth.auth_flow"
+          },
+          {
+            "path": "tests/client/test_auth.py",
+            "start_line": 127,
+            "end_line": 134,
+            "label": "tests/client/test_auth.py::ResponseBodyAuth.auth_flow"
+          },
+          {
+            "path": "tests/client/test_auth.py",
+            "start_line": 100,
+            "end_line": 112,
+            "label": "tests/client/test_auth.py::RepeatAuth.auth_flow"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 930,
+            "end_line": 962,
+            "label": "httpx/_client.py::Client._send_handling_auth"
+          }
+        ],
+        "rank": 8,
+        "loose_rank": 8,
+        "rr": 0.125,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "flow",
+      "lang": "en",
+      "question": "When I loop over `iter_bytes()` inside `with client.stream(\"GET\", url) as r:`, how do the bytes get from the transport to my loop, and when is the connection released?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "httpx/_client.py",
+          "symbol": "Client.stream",
+          "start_line": 828,
+          "end_line": 877
+        },
+        {
+          "path": "httpx/_models.py",
+          "symbol": "Response.iter_bytes",
+          "start_line": 884,
+          "end_line": 905
+        },
+        {
+          "path": "httpx/_models.py",
+          "symbol": "Response.iter_raw",
+          "start_line": 935,
+          "end_line": 959
+        },
+        {
+          "path": "httpx/_models.py",
+          "symbol": "Response.close",
+          "start_line": 961,
+          "end_line": 972
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0028,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.iter_bytes",
+            "start_line": 884,
+            "end_line": 905,
+            "kind": "symbol",
+            "score": 23.9463,
+            "match": "symbol",
+            "why": "name match: iter_bytes x1.20 (explicit iter_bytes); bm25: iter_bytes, bytes, iter; body: get"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.close",
+            "start_line": 961,
+            "end_line": 972,
+            "kind": "symbol",
+            "score": 18.4281,
+            "match": "symbol",
+            "why": "bm25: released~, connection; body: stream, bytes~"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.aclose",
+            "start_line": 1065,
+            "end_line": 1076,
+            "kind": "symbol",
+            "score": 18.4281,
+            "match": null,
+            "why": "bm25: released~, connection; body: stream, bytes~"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.read",
+            "start_line": 876,
+            "end_line": 882,
+            "kind": "symbol",
+            "score": 18.2656,
+            "match": null,
+            "why": "bm25: bytes; body: iter_bytes, iter"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BoundSyncStream.__iter__",
+            "start_line": 152,
+            "end_line": 154,
+            "kind": "symbol",
+            "score": 17.2977,
+            "match": null,
+            "why": "bm25: iter, bytes, stream, client"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::ResponseStream.__iter__",
+            "start_line": 125,
+            "end_line": 128,
+            "kind": "symbol",
+            "score": 17.2292,
+            "match": null,
+            "why": "bm25: iter, bytes, stream, transport"
+          },
+          {
+            "path": "httpx/_transports/wsgi.py",
+            "symbol_id": "httpx/_transports/wsgi.py::WSGIByteStream.__iter__",
+            "start_line": 35,
+            "end_line": 37,
+            "kind": "symbol",
+            "score": 16.7738,
+            "match": null,
+            "why": "bm25: iter, bytes, stream, transport"
+          },
+          {
+            "path": "httpx/_content.py",
+            "symbol_id": "httpx/_content.py::ByteStream.__iter__",
+            "start_line": 35,
+            "end_line": 36,
+            "kind": "symbol",
+            "score": 16.4119,
+            "match": null,
+            "why": "bm25: iter, bytes, stream"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_models.py",
+            "start_line": 884,
+            "end_line": 905,
+            "label": "httpx/_models.py::Response.iter_bytes"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 961,
+            "end_line": 972,
+            "label": "httpx/_models.py::Response.close"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1065,
+            "end_line": 1076,
+            "label": "httpx/_models.py::Response.aclose"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 876,
+            "end_line": 882,
+            "label": "httpx/_models.py::Response.read"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 152,
+            "end_line": 154,
+            "label": "httpx/_client.py::BoundSyncStream.__iter__"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 125,
+            "end_line": 128,
+            "label": "httpx/_transports/default.py::ResponseStream.__iter__"
+          },
+          {
+            "path": "httpx/_transports/wsgi.py",
+            "start_line": 35,
+            "end_line": 37,
+            "label": "httpx/_transports/wsgi.py::WSGIByteStream.__iter__"
+          },
+          {
+            "path": "httpx/_content.py",
+            "start_line": 35,
+            "end_line": 36,
+            "label": "httpx/_content.py::ByteStream.__iter__"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where is the keep-alive connection pool implemented, the code that picks an idle connection to a host or opens a new one up to max_connections?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "httpx/_transports/default.py",
+          "symbol": "HTTPTransport.__init__",
+          "start_line": 136,
+          "end_line": 215
+        },
+        {
+          "path": "httpx/_config.py",
+          "symbol": "Limits",
+          "start_line": 159,
+          "end_line": 198
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0009,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Limits",
+            "start_line": 159,
+            "end_line": 198,
+            "kind": "symbol",
+            "score": 59.9995,
+            "match": "symbol",
+            "why": "class boost; bm25: idle, connections, alive, connection, keepalive, max_connections, max, keep, pool"
+          },
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Limits.__init__",
+            "start_line": 173,
+            "end_line": 182,
+            "kind": "symbol",
+            "score": 46.8953,
+            "match": "overlap",
+            "why": "bm25: keepalive, connections, max_connections, max, connection"
+          },
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Limits.__eq__",
+            "start_line": 184,
+            "end_line": 190,
+            "kind": "symbol",
+            "score": 42.8515,
+            "match": "overlap",
+            "why": "bm25: body: keepalive, connections, max_connections, max, connection"
+          },
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Limits.__repr__",
+            "start_line": 192,
+            "end_line": 198,
+            "kind": "symbol",
+            "score": 41.8127,
+            "match": "overlap",
+            "why": "bm25: body: keepalive, connections, max_connections, max, connection"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::HTTPTransport.__init__",
+            "start_line": 136,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 35.374,
+            "match": "symbol",
+            "why": "bm25: body: keepalive, connections, max, connection, max_connections, pool, host"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::AsyncHTTPTransport.__init__",
+            "start_line": 280,
+            "end_line": 359,
+            "kind": "symbol",
+            "score": 35.266,
+            "match": null,
+            "why": "bm25: body: keepalive, connections, max, connection, max_connections, pool, host"
+          },
+          {
+            "path": "tests/test_config.py",
+            "symbol_id": "tests/test_config.py::test_limits_repr",
+            "start_line": 89,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 19.2996,
+            "match": null,
+            "why": "test file x0.5; bm25: body: connections, keepalive, max_connections, max, connection"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::BaseClient.headers",
+            "start_line": 305,
+            "end_line": 316,
+            "kind": "symbol",
+            "score": 16.9682,
+            "match": null,
+            "why": "bm25: body: alive, keep, connection"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_config.py",
+            "start_line": 159,
+            "end_line": 198,
+            "label": "httpx/_config.py::Limits"
+          },
+          {
+            "path": "httpx/_config.py",
+            "start_line": 173,
+            "end_line": 182,
+            "label": "httpx/_config.py::Limits.__init__"
+          },
+          {
+            "path": "httpx/_config.py",
+            "start_line": 184,
+            "end_line": 190,
+            "label": "httpx/_config.py::Limits.__eq__"
+          },
+          {
+            "path": "httpx/_config.py",
+            "start_line": 192,
+            "end_line": 198,
+            "label": "httpx/_config.py::Limits.__repr__"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 136,
+            "end_line": 215,
+            "label": "httpx/_transports/default.py::HTTPTransport.__init__"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 280,
+            "end_line": 359,
+            "label": "httpx/_transports/default.py::AsyncHTTPTransport.__init__"
+          },
+          {
+            "path": "tests/test_config.py",
+            "start_line": 89,
+            "end_line": 95,
+            "label": "tests/test_config.py::test_limits_repr"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 305,
+            "end_line": 316,
+            "label": "httpx/_client.py::BaseClient.headers"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q19",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "HTTP/2 frame'leri ve ayni baglanti uzerinde stream coklama (multiplexing) nerede isleniyor?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "httpx/_transports/default.py",
+          "symbol": "HTTPTransport.__init__",
+          "start_line": 136,
+          "end_line": 215
+        },
+        {
+          "path": "httpx/_transports/default.py",
+          "symbol": "AsyncHTTPTransport.__init__",
+          "start_line": 280,
+          "end_line": 359
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "Client.__init__",
+          "start_line": 639,
+          "end_line": 716
+        },
+        {
+          "path": "httpx/_client.py",
+          "symbol": "AsyncClient.__init__",
+          "start_line": 1353,
+          "end_line": 1430
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0016,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::HTTPTransport.__init__",
+            "start_line": 136,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 13.0672,
+            "match": "symbol",
+            "why": "bm25: http2, http; body: connection"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::AsyncHTTPTransport.__init__",
+            "start_line": 280,
+            "end_line": 359,
+            "kind": "symbol",
+            "score": 13.0274,
+            "match": "symbol",
+            "why": "bm25: http2, http; body: connection"
+          },
+          {
+            "path": "tests/test_decoders.py",
+            "symbol_id": "tests/test_decoders.py::test_zstd_multiframe",
+            "start_line": 122,
+            "end_line": 141,
+            "kind": "symbol",
+            "score": 10.7304,
+            "match": null,
+            "why": "test file x0.5; bm25: body: frame"
+          },
+          {
+            "path": "httpx/_main.py",
+            "symbol_id": "httpx/_main.py::trace",
+            "start_line": 212,
+            "end_line": 248,
+            "kind": "symbol",
+            "score": 10.5519,
+            "match": null,
+            "why": "bm25: body: http2, connection, http, stream"
+          },
+          {
+            "path": "httpx/_main.py",
+            "symbol_id": "httpx/_main.py::print_request_headers",
+            "start_line": 147,
+            "end_line": 153,
+            "kind": "symbol",
+            "score": 10.1484,
+            "match": null,
+            "why": "bm25: http2, http"
+          },
+          {
+            "path": "httpx/_main.py",
+            "symbol_id": "httpx/_main.py::format_request_headers",
+            "start_line": 116,
+            "end_line": 126,
+            "kind": "symbol",
+            "score": 9.9237,
+            "match": null,
+            "why": "bm25: http2, http"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client._init_proxy_transport",
+            "start_line": 740,
+            "end_line": 758,
+            "kind": "symbol",
+            "score": 9.8562,
+            "match": null,
+            "why": "bm25: http2, http"
+          },
+          {
+            "path": "httpx/_client.py",
+            "symbol_id": "httpx/_client.py::Client._init_transport",
+            "start_line": 718,
+            "end_line": 738,
+            "kind": "symbol",
+            "score": 9.8072,
+            "match": null,
+            "why": "bm25: http2, http"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 136,
+            "end_line": 215,
+            "label": "httpx/_transports/default.py::HTTPTransport.__init__"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 280,
+            "end_line": 359,
+            "label": "httpx/_transports/default.py::AsyncHTTPTransport.__init__"
+          },
+          {
+            "path": "tests/test_decoders.py",
+            "start_line": 122,
+            "end_line": 141,
+            "label": "tests/test_decoders.py::test_zstd_multiframe"
+          },
+          {
+            "path": "httpx/_main.py",
+            "start_line": 212,
+            "end_line": 248,
+            "label": "httpx/_main.py::trace"
+          },
+          {
+            "path": "httpx/_main.py",
+            "start_line": 147,
+            "end_line": 153,
+            "label": "httpx/_main.py::print_request_headers"
+          },
+          {
+            "path": "httpx/_main.py",
+            "start_line": 116,
+            "end_line": 126,
+            "label": "httpx/_main.py::format_request_headers"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 740,
+            "end_line": 758,
+            "label": "httpx/_client.py::Client._init_proxy_transport"
+          },
+          {
+            "path": "httpx/_client.py",
+            "start_line": 718,
+            "end_line": 738,
+            "label": "httpx/_client.py::Client._init_transport"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q20",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Does httpx automatically retry a request after a 503 or a dropped connection? Where is the retry loop with backoff?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "httpx/_transports/default.py",
+          "symbol": "HTTPTransport.__init__",
+          "start_line": 136,
+          "end_line": 215
+        },
+        {
+          "path": "httpx/_transports/default.py",
+          "symbol": "AsyncHTTPTransport.__init__",
+          "start_line": 280,
+          "end_line": 359
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0019,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.close",
+            "start_line": 961,
+            "end_line": 972,
+            "kind": "symbol",
+            "score": 15.2149,
+            "match": null,
+            "why": "bm25: automatically, connection, httpx; body: request"
+          },
+          {
+            "path": "httpx/_models.py",
+            "symbol_id": "httpx/_models.py::Response.aclose",
+            "start_line": 1065,
+            "end_line": 1076,
+            "kind": "symbol",
+            "score": 15.2149,
+            "match": null,
+            "why": "bm25: automatically, connection, httpx; body: request"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::HTTPTransport.__init__",
+            "start_line": 136,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 11.6153,
+            "match": "symbol",
+            "why": "bm25: retry, httpx; body: connection"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "symbol_id": "httpx/_transports/default.py::AsyncHTTPTransport.__init__",
+            "start_line": 280,
+            "end_line": 359,
+            "kind": "symbol",
+            "score": 11.5651,
+            "match": "symbol",
+            "why": "bm25: retry, httpx; body: connection"
+          },
+          {
+            "path": "httpx/_types.py",
+            "symbol_id": "httpx/_types.py::SyncByteStream.close",
+            "start_line": 99,
+            "end_line": 103,
+            "kind": "symbol",
+            "score": 8.8307,
+            "match": null,
+            "why": "bm25: after, request, httpx"
+          },
+          {
+            "path": "httpx/_urlparse.py",
+            "symbol_id": "httpx/_urlparse.py::normalize_path",
+            "start_line": 447,
+            "end_line": 475,
+            "kind": "symbol",
+            "score": 8.6848,
+            "match": null,
+            "why": "bm25: dropped~, httpx"
+          },
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Limits.__init__",
+            "start_line": 173,
+            "end_line": 182,
+            "kind": "symbol",
+            "score": 7.4521,
+            "match": null,
+            "why": "bm25: connection, httpx"
+          },
+          {
+            "path": "httpx/_config.py",
+            "symbol_id": "httpx/_config.py::Limits",
+            "start_line": 159,
+            "end_line": 198,
+            "kind": "symbol",
+            "score": 7.1043,
+            "match": null,
+            "why": "class boost; bm25: connection, httpx"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "httpx/_models.py",
+            "start_line": 961,
+            "end_line": 972,
+            "label": "httpx/_models.py::Response.close"
+          },
+          {
+            "path": "httpx/_models.py",
+            "start_line": 1065,
+            "end_line": 1076,
+            "label": "httpx/_models.py::Response.aclose"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 136,
+            "end_line": 215,
+            "label": "httpx/_transports/default.py::HTTPTransport.__init__"
+          },
+          {
+            "path": "httpx/_transports/default.py",
+            "start_line": 280,
+            "end_line": 359,
+            "label": "httpx/_transports/default.py::AsyncHTTPTransport.__init__"
+          },
+          {
+            "path": "httpx/_types.py",
+            "start_line": 99,
+            "end_line": 103,
+            "label": "httpx/_types.py::SyncByteStream.close"
+          },
+          {
+            "path": "httpx/_urlparse.py",
+            "start_line": 447,
+            "end_line": 475,
+            "label": "httpx/_urlparse.py::normalize_path"
+          },
+          {
+            "path": "httpx/_config.py",
+            "start_line": 173,
+            "end_line": 182,
+            "label": "httpx/_config.py::Limits.__init__"
+          },
+          {
+            "path": "httpx/_config.py",
+            "start_line": 159,
+            "end_line": 198,
+            "label": "httpx/_config.py::Limits"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 3,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    }
+  ]
+}

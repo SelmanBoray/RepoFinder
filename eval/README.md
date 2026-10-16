@@ -8,10 +8,13 @@ their exact answer locations, and a runner that scores the product against it.
 | --- | --- |
 | `golden/flask.json` | 30 questions about Flask at commit `d086db8`, every location checked by reading the file |
 | `golden/httpx.json` | 20 questions about httpx at commit `b5addb6`, written blind (first held-out set), every location checked with `ast` |
+| `golden/rea.json` | 20 questions about the TypeScript repository morluto/rea at commit `fe2a398`, written blind to `search.py` (first TypeScript set, the tuning set for search v4); 104 locations verified with tree-sitter and the TypeScript compiler |
 | `golden/chat_routes.json` | 24 conversations, 73 user turns, each turn labelled with its route (locate, followup, explain, chat, outside); written blind to the routing code |
+| `golden/chat_routes_rea.json` | Chat routing conversations over the REA repository, same format and route labels as `golden/chat_routes.json` |
 | `run_eval.py` | The runner: validates the golden set, calls the pipeline, scores, writes a report |
 | `route_eval.py` | Routing runner: feeds each turn the previous turns as history, calls `decisions.route_message` (`--decisions jev\|rules`), scores the route per turn |
 | `search_baseline.py` | The same scoring with `repofinder.search` alone (no pipeline, no LLM) |
+| `rank_analysis.py` | Error analysis for search: the rank of every expected location in the top 100 with the competitors above it, to classify why a question missed |
 | `results/` | JSON reports. `flask-search-baseline-d086db8-k8.json` is the search-only baseline |
 
 The runner uses the standard library plus `repofinder.admit` (the phrase
@@ -699,3 +702,105 @@ Honesty: the wording and the block were changed after reading this set's errors,
 0.89 is a tuned number; a fresh routing set is needed to confirm it. One run per mode;
 Jev's run-to-run variation on this set is unmeasured (v1 and none differ on two turns
 with the same state content except wording).
+
+## Search v4 (2026-10-16): TypeScript, body field, REA as the tuning set
+
+RepoFinder now indexes TypeScript (commit `4baa850`). The first TypeScript set is
+`golden/rea.json`: morluto/rea at `fe2a398`, 20 questions (8 locate-symbol, 6
+locate-feature, 3 flow, 3 not-in-repo; 12 en, 8 tr, of which 3 ASCII-only Turkish).
+It was written blind to `search.py`; all 104 locations were verified with tree-sitter
+and the TypeScript compiler. Search v3 on it: hit@1 0.18, hit@3 0.18, hit@8 0.35, MRR
+0.205 (`rea-search-v3ts-fe2a398-k8.json`); with Jev, 16 candidates: 0.35 / 0.41 / 0.41
+(`rea-pipeline-jev-c16-searchv3ts-fe2a398-k8.json`), where 10 of 17 answers were
+outside the top 16, so Jev could not help. Decision: REA became the tuning set for
+TypeScript search. httpx stayed held out and was not run until v4 was frozen.
+
+Error analysis (`rank_analysis.py`, rank of every expected location in the top 100
+with the competitors above it):
+
+| class | what | cases |
+| --- | --- | --- |
+| a | test-file pollution | several |
+| b | interface/type declarations outranking the implementation | q06, q09, q14, q15 (3 interfaces/types in the top 5) |
+| c | tokenization: lowerCamel query words (`ipcRenderer`) not split; `#private` and `$` names | q04 and others |
+| d | Turkish mapping: kimlik bilgisi, surec, incele, aday, secenek | several |
+| e | query concept only in function bodies, not in names, signatures or docs | 9 questions (priority/auto, Unity/Mono, cacheable, backup) |
+| g | other: Turkish filler words indexed; stopword-only joins | few |
+
+Class (f), granularity, had no case.
+
+### Mechanisms, cumulative
+
+Strict, k=8, each row on top of the previous (hit@1 / hit@3 / hit@8, MRR):
+
+| step | REA | Flask | requests |
+| --- | --- | --- | --- |
+| v3 | .18 / .18 / .35, .205 | .67 / .85 / .89, .752 | .59 / .65 / .82, .642 |
+| + TYPE_PENALTY 0.7 for interface/type kinds when the query is not about types | .18 / .18 / .41, .227 | same | same |
+| + lowerCamel query words split into parts; `#`/`$`-prefixed names match the bare name (bug fixes) | same (q04 64 -> 13) | same | same |
+| + Turkish filler words dropped even when indexed; lexicon +14 words, +3 phrases | .18 / .18 / .47, .242 | same | same |
+| + no stopword-only joins (bug fix) | same | same | same |
+| + BM25F body field (= v4) | **.41 / .47 / .71, .494** | **.74 / .85 / .93, .812** | **.59 / .765 / .88, .693** |
+
+The body field: BODY_WEIGHT 1.0, per-field length normalization, bodies read from the
+checkout (BODY_MAX_BYTES 2 MiB). The body contributes to BM25 only, not to the
+vocabulary used for Turkish mapping and joins, and `why` gains a `body: ...` part.
+v4 reports: `rea-search-v4-fe2a398-k8.json`, `flask-search-v4-d086db8-k8.json`,
+`requests-search-v4-611c6162-k8.json`.
+
+Weight choice: hit@8 is flat for BODY_WEIGHT 0.7 to 2.0 on all three sets. 1.5 raised
+hit@3 slightly but dropped REA hit@16 from 0.76 to 0.71 (Jev sees 16), so the untuned
+1.0 was kept. Leave-one-out from v4: without TYPE_PENALTY REA hit@16 0.76 -> 0.71;
+without the lexicon REA hit@8 0.71 -> 0.59; without the body REA hit@8 0.47.
+
+Rejected:
+
+- Splitting UpperCamel query words (JavaScript -> java + script): REA q14 55 -> >100.
+- Not lifting the test penalty on the single word "test": only q13 moved, 44 -> 24.
+- The body as a single-field BM25 term, or weighted tf with shared length
+  normalization: Flask hit@3 0.85 -> 0.81 at every weight, because long bodies dilute
+  the name match of `create_app` and `make_response`.
+- df counted on the name, signature and doc fields only: Flask hit@1 0.59-0.63.
+
+Side regressions to watch: Flask not-in-repo pointer@8 2/3 -> 1/3 (q29 4 -> 9);
+requests q09 7 -> 9; requests chunk_recall 0.88 -> 0.82 and loose hit@8 1.00 -> 0.88;
+REA q06 4 -> 15 (functions whose bodies mention GHIDRA_INSTALL_DIR). SearchIndex build
+on REA 0.74 s -> 4.8 s (once per workspace; Flask 0.32 s, requests 0.18 s).
+
+The remaining REA misses q01, q06, q09, q10, q11 are vocabulary gaps ("cacheable" vs
+"answerable from snapshot", "backup" vs "copy"): semantic search or LLM query
+expansion territory, not a ranking fix.
+
+### Held-out confirmation: httpx, run once after v4 was frozen
+
+httpx search v3 .29 / .35 / .53, MRR .345 -> v4 **.35 / .59 / .77, MRR .475**
+(`httpx-search-v4-b5addb6-k8.json`). Loose hit@8 0.77, chunk_recall 0.77, not-in-repo
+pointer@8 0.33 -> 1.00. By language: en hit@1 0.40, tr 0.29 (tr hit@8 0.71). This is
+the number that shows v4 generalizes; the REA, Flask and requests numbers are tuned or
+semi-tuned.
+
+### With Jev, 16 candidates, on v4
+
+Strict hit@1 / hit@3 / hit@8:
+
+| set | v4 + Jev | v3 + Jev | report | calls, cost |
+| --- | --- | --- | --- | --- |
+| Flask | .85 / .89 / .93 | .89 / .89 / .89 (hit@1 -0.04, hit@8 +0.04) | `flask-pipeline-jev-c16-searchv4-d086db8-k8.json` | 30, $0.0058 |
+| requests | .94 / 1.00 / 1.00 | .88 / .88 / .88 | `requests-pipeline-jev-c16-searchv4-611c6162-k8.json` | 20, $0.0040 |
+| httpx | .88 / .88 / .88, pointer@8 1.00 | .65 / .77 / .77 | `httpx-pipeline-jev-c16-searchv4-b5addb6-k8.json` | 20, $0.0035 |
+| REA | .59 / .77 / .77 | .35 / .41 / .41 | `rea-pipeline-jev-c16-searchv4-fe2a398-k8.json` | 20, $0.0051 |
+
+### Four-set summary (hit@1 / hit@8, strict, k=8)
+
+| set | status | search v3 | search v4 | v3 + Jev | v4 + Jev |
+| --- | --- | --- | --- | --- | --- |
+| Flask | tuning | .67 / .89 | .74 / .93 | .89 / .89 | .85 / .93 |
+| requests | semi-tainted validation (used for the weight choice) | .59 / .82 | .59 / .88 | .88 / .88 | .94 / 1.00 |
+| httpx | held out, one run | .29 / .53 | .35 / .77 | .65 / .77 | .88 / .88 |
+| REA | tuning | .18 / .35 | .41 / .71 | .35 / .41 | .59 / .77 |
+
+Honesty: the lexicon words were chosen while looking at REA questions, so REA is
+optimistic. The body weight was chosen looking at Flask and requests too, so requests
+is no longer a clean set. httpx is the only clean set and was run once, after v4 was
+frozen. One run each. The agent that implemented v4 was interrupted once by an API
+timeout and resumed; the measurements were logged per step.

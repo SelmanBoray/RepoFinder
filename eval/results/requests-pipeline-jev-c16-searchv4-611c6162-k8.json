@@ -1,0 +1,4165 @@
+{
+  "meta": {
+    "decisions": "jev",
+    "candidates": 16,
+    "repo": {
+      "name": "requests",
+      "source": "https://github.com/psf/requests",
+      "commit": "611c6162"
+    },
+    "source": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\C--\\4162a3fb-b459-4996-adbe-33b24ab53ad0\\scratchpad\\repos\\requests",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\C--\\4162a3fb-b459-4996-adbe-33b24ab53ad0\\scratchpad\\repos\\requests",
+      "commit": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "golden_commit": "611c6162",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20"
+    ],
+    "started": "2026-10-16T15:43:40",
+    "open_workspace_s": 0.01,
+    "total_s": 10.712,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "golden": "eval/golden/requests.json",
+    "validation_warnings": []
+  },
+  "summary": {
+    "overall": {
+      "n": 20,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 17,
+          "yes": 16,
+          "rate": 0.941
+        },
+        "hit@3": {
+          "n": 17,
+          "yes": 17,
+          "rate": 1.0
+        },
+        "hit@k": {
+          "n": 17,
+          "yes": 17,
+          "rate": 1.0
+        },
+        "loose_hit@1": {
+          "n": 17,
+          "yes": 16,
+          "rate": 0.941
+        },
+        "loose_hit@3": {
+          "n": 17,
+          "yes": 17,
+          "rate": 1.0
+        },
+        "loose_hit@k": {
+          "n": 17,
+          "yes": 17,
+          "rate": 1.0
+        },
+        "mrr": 0.971,
+        "chunk_recall": {
+          "n": 17,
+          "yes": 16,
+          "rate": 0.941
+        },
+        "all@k": {
+          "n": 3,
+          "yes": 2,
+          "rate": 0.667
+        },
+        "pointer@k": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        }
+      },
+      "decision_calls": 20,
+      "decision_cost_usd": 0.003994,
+      "admit_judge_calls": 0,
+      "admit_judge_cost_usd": 0,
+      "reranked": 20,
+      "off_target": 0,
+      "decision_errors": 0,
+      "elapsed_s": {
+        "total": 10.7,
+        "mean": 0.535,
+        "median": 0.418,
+        "max": 1.634
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "hit@3": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "loose_hit@3": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "mrr": 1.0,
+          "chunk_recall": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001468,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 8,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 5.428,
+          "mean": 0.679,
+          "median": 0.466,
+          "max": 1.634
+        }
+      },
+      "locate-feature": {
+        "n": 6,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "mrr": 1.0,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 6,
+        "decision_cost_usd": 0.001208,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 6,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 2.742,
+          "mean": 0.457,
+          "median": 0.452,
+          "max": 0.582
+        }
+      },
+      "flow": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "hit@3": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@3": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "mrr": 0.833,
+          "chunk_recall": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "all@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.000654,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 3,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 1.301,
+          "mean": 0.434,
+          "median": 0.414,
+          "max": 0.485
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.000664,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 3,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 1.229,
+          "mean": 0.41,
+          "median": 0.401,
+          "max": 0.432
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 13,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 11,
+            "yes": 10,
+            "rate": 0.909
+          },
+          "hit@3": {
+            "n": 11,
+            "yes": 11,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 11,
+            "yes": 11,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 11,
+            "yes": 10,
+            "rate": 0.909
+          },
+          "loose_hit@3": {
+            "n": 11,
+            "yes": 11,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 11,
+            "yes": 11,
+            "rate": 1.0
+          },
+          "mrr": 0.955,
+          "chunk_recall": {
+            "n": 11,
+            "yes": 10,
+            "rate": 0.909
+          },
+          "all@k": {
+            "n": 1,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 13,
+        "decision_cost_usd": 0.002634,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 13,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 7.63,
+          "mean": 0.587,
+          "median": 0.432,
+          "max": 1.634
+        }
+      },
+      "tr": {
+        "n": 7,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "mrr": 1.0,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 6,
+            "rate": 1.0
+          },
+          "all@k": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          },
+          "pointer@k": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 7,
+        "decision_cost_usd": 0.00136,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 7,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 3.07,
+          "mean": 0.439,
+          "median": 0.402,
+          "max": 0.582
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is `Session.request` defined?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "Session.request",
+          "start_line": 557,
+          "end_line": 653
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00019341,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 1.6336,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.request",
+            "start_line": 557,
+            "end_line": 653,
+            "kind": "symbol",
+            "score": 10.7132,
+            "match": "symbol",
+            "why": "name match: request; qualname/path match: session.request; bm25: session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin",
+            "start_line": 127,
+            "end_line": 392,
+            "kind": "symbol",
+            "score": 5.0097,
+            "match": null,
+            "why": "class boost; bm25: session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session",
+            "start_line": 395,
+            "end_line": 905,
+            "kind": "symbol",
+            "score": 4.9354,
+            "match": "broad",
+            "why": "class boost; bm25: session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::session",
+            "start_line": 908,
+            "end_line": 920,
+            "kind": "symbol",
+            "score": 4.8107,
+            "match": null,
+            "why": "bm25: session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::merge_hooks",
+            "start_line": 108,
+            "end_line": 124,
+            "kind": "symbol",
+            "score": 4.3068,
+            "match": null,
+            "why": "bm25: session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.close",
+            "start_line": 883,
+            "end_line": 886,
+            "kind": "symbol",
+            "score": 4.2563,
+            "match": null,
+            "why": "bm25: session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.prepare_request",
+            "start_line": 511,
+            "end_line": 555,
+            "kind": "symbol",
+            "score": 4.2433,
+            "match": null,
+            "why": "name match: prepare_request x1.08 (request); owner match: Session x1.03; bm25: session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.__init__",
+            "start_line": 442,
+            "end_line": 503,
+            "kind": "symbol",
+            "score": 4.1509,
+            "match": null,
+            "why": "bm25: session, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 557,
+            "end_line": 653,
+            "label": "Session.request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 127,
+            "end_line": 228,
+            "label": "SessionRedirectMixin (first 102 of 266 lines)"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 395,
+            "end_line": 504,
+            "label": "Session (first 110 of 511 lines)"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 908,
+            "end_line": 920,
+            "label": "session"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 108,
+            "end_line": 124,
+            "label": "merge_hooks"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 883,
+            "end_line": 886,
+            "label": "Session.close"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 511,
+            "end_line": 555,
+            "label": "Session.prepare_request"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is the top-level `requests.get` function defined?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/api.py",
+          "symbol": "get",
+          "start_line": 74,
+          "end_line": 87
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00014427,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3962,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "src/requests/api.py",
+            "symbol_id": "src/requests/api.py::get",
+            "start_line": 74,
+            "end_line": 87,
+            "kind": "symbol",
+            "score": 18.2912,
+            "match": "symbol",
+            "why": "name match: get (explicit requests.get); qualname/path match: requests.get; bm25: get, requests"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.build_digest_header",
+            "start_line": 157,
+            "end_line": 266,
+            "kind": "symbol",
+            "score": 4.5099,
+            "match": null,
+            "why": "bm25: requests; body: level, top, get"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "symbol_id": "src/requests/cookies.py::MockRequest.get_origin_req_host",
+            "start_line": 57,
+            "end_line": 58,
+            "kind": "symbol",
+            "score": 3.7175,
+            "match": null,
+            "why": "name match: get_origin_req_host x1.07 (get); owner match: MockRequest x1.01; bm25: get, requests"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::_basic_auth_str",
+            "start_line": 34,
+            "end_line": 75,
+            "kind": "symbol",
+            "score": 3.4872,
+            "match": null,
+            "why": "bm25: requests; body: top"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.get",
+            "start_line": 655,
+            "end_line": 671,
+            "kind": "symbol",
+            "score": 3.3279,
+            "match": null,
+            "why": "name match: get x1.10 (get); bm25: get, requests"
+          },
+          {
+            "path": "src/requests/structures.py",
+            "symbol_id": "src/requests/structures.py::LookupDict.get",
+            "start_line": 129,
+            "end_line": 130,
+            "kind": "symbol",
+            "score": 3.3162,
+            "match": null,
+            "why": "name match: get x1.10 (get); bm25: get, requests"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "symbol_id": "src/requests/cookies.py::MockRequest.get_header",
+            "start_line": 86,
+            "end_line": 87,
+            "kind": "symbol",
+            "score": 3.2268,
+            "match": null,
+            "why": "name match: get_header x1.07 (get); owner match: MockRequest x1.01; bm25: get, requests"
+          },
+          {
+            "path": "src/requests/_types.py",
+            "symbol_id": "src/requests/_types.py::GetKwargs",
+            "start_line": 177,
+            "end_line": 179,
+            "kind": "symbol",
+            "score": 3.2266,
+            "match": null,
+            "why": "name match: GetKwargs x1.07 (get); class boost; bm25: get, requests"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/api.py",
+            "start_line": 74,
+            "end_line": 87,
+            "label": "get"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 124,
+            "end_line": 125,
+            "label": "HTTPDigestAuth (class header)"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 157,
+            "end_line": 266,
+            "label": "HTTPDigestAuth.build_digest_header"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "start_line": 31,
+            "end_line": 41,
+            "label": "MockRequest (class header)"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "start_line": 57,
+            "end_line": 58,
+            "label": "MockRequest.get_origin_req_host"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 34,
+            "end_line": 75,
+            "label": "_basic_auth_str"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 655,
+            "end_line": 671,
+            "label": "Session.get"
+          },
+          {
+            "path": "src/requests/structures.py",
+            "start_line": 96,
+            "end_line": 97,
+            "label": "LookupDict (class header)"
+          },
+          {
+            "path": "src/requests/structures.py",
+            "start_line": 129,
+            "end_line": 130,
+            "label": "LookupDict.get"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "start_line": 86,
+            "end_line": 87,
+            "label": "MockRequest.get_header"
+          },
+          {
+            "path": "src/requests/_types.py",
+            "start_line": 177,
+            "end_line": 179,
+            "label": "GetKwargs"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Which method raises an exception when a response has a 4xx or 5xx status code?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/models.py",
+          "symbol": "Response.raise_for_status",
+          "start_line": 1144,
+          "end_line": 1171
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000197862,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4127,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.raise_for_status",
+            "start_line": 1144,
+            "end_line": 1171,
+            "kind": "symbol",
+            "score": 28.3965,
+            "match": "symbol",
+            "why": "name match: raise_for_status x1.24 (raises, status); owner match: Response x1.08; bm25: raises, status, response; body: status_code"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.ok",
+            "start_line": 861,
+            "end_line": 874,
+            "kind": "symbol",
+            "score": 17.0631,
+            "match": null,
+            "why": "bm25: response, status, status_code; body: raises~"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.build_response",
+            "start_line": 365,
+            "end_line": 401,
+            "kind": "symbol",
+            "score": 15.4649,
+            "match": null,
+            "why": "name match: build_response x1.07 (response); bm25: response; body: status, status_code"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.json",
+            "start_line": 1091,
+            "end_line": 1124,
+            "kind": "symbol",
+            "score": 14.6974,
+            "match": null,
+            "why": "bm25: response, raises, exception"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.__bool__",
+            "start_line": 837,
+            "end_line": 845,
+            "kind": "symbol",
+            "score": 14.3601,
+            "match": null,
+            "why": "bm25: response, status, status_code"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.__nonzero__",
+            "start_line": 847,
+            "end_line": 855,
+            "kind": "symbol",
+            "score": 14.3601,
+            "match": null,
+            "why": "bm25: response, status, status_code"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.__repr__",
+            "start_line": 834,
+            "end_line": 835,
+            "kind": "symbol",
+            "score": 13.8677,
+            "match": null,
+            "why": "bm25: response; body: status_code, status"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.handle_401",
+            "start_line": 273,
+            "end_line": 319,
+            "kind": "symbol",
+            "score": 13.6631,
+            "match": null,
+            "why": "bm25: response; body: 4xx, xx, status_code, status"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/models.py",
+            "start_line": 732,
+            "end_line": 735,
+            "label": "Response (class header)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 1144,
+            "end_line": 1171,
+            "label": "Response.raise_for_status"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 861,
+            "end_line": 874,
+            "label": "Response.ok"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 365,
+            "end_line": 401,
+            "label": "HTTPAdapter.build_response"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 1091,
+            "end_line": 1124,
+            "label": "Response.json"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 837,
+            "end_line": 845,
+            "label": "Response.__bool__"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 847,
+            "end_line": 855,
+            "label": "Response.__nonzero__"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 834,
+            "end_line": 835,
+            "label": "Response.__repr__"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 124,
+            "end_line": 125,
+            "label": "HTTPDigestAuth (class header)"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 273,
+            "end_line": 319,
+            "label": "HTTPDigestAuth.handle_401"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Which class makes header lookups case-insensitive?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/structures.py",
+          "symbol": "CaseInsensitiveDict",
+          "start_line": 20,
+          "end_line": 93
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00015645,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.6293,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 5,
+        "top_hits": [
+          {
+            "path": "src/requests/structures.py",
+            "symbol_id": "src/requests/structures.py::CaseInsensitiveDict",
+            "start_line": 20,
+            "end_line": 93,
+            "kind": "symbol",
+            "score": 66.4764,
+            "match": "symbol",
+            "why": "name match: CaseInsensitiveDict x1.26 (case, insensitive); class boost; class asked x3; bm25: insensitive, case"
+          },
+          {
+            "path": "src/requests/structures.py",
+            "symbol_id": "src/requests/structures.py::CaseInsensitiveDict.__setitem__",
+            "start_line": 59,
+            "end_line": 62,
+            "kind": "symbol",
+            "score": 26.3144,
+            "match": "overlap",
+            "why": "bm25: insensitive, case; body: lookups"
+          },
+          {
+            "path": "src/requests/structures.py",
+            "symbol_id": "src/requests/structures.py::LookupDict",
+            "start_line": 96,
+            "end_line": 130,
+            "kind": "symbol",
+            "score": 34.4657,
+            "match": null,
+            "why": "name match: LookupDict x1.29 (lookups); class boost; class asked x3; bm25: lookups~"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "symbol_id": "tests/test_requests.py::TestCaseInsensitiveDict",
+            "start_line": 2331,
+            "end_line": 2479,
+            "kind": "symbol",
+            "score": 32.3164,
+            "match": null,
+            "why": "class boost; class asked x3; test file x0.5; bm25: insensitive, case"
+          },
+          {
+            "path": "tests/test_structures.py",
+            "symbol_id": "tests/test_structures.py::TestCaseInsensitiveDict",
+            "start_line": 6,
+            "end_line": 51,
+            "kind": "symbol",
+            "score": 32.3164,
+            "match": null,
+            "why": "class boost; class asked x3; test file x0.5; bm25: insensitive, case"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::default_headers",
+            "start_line": 951,
+            "end_line": 962,
+            "kind": "symbol",
+            "score": 24.8596,
+            "match": null,
+            "why": "name match: default_headers x1.07 (header); bm25: insensitive, case, header"
+          },
+          {
+            "path": "src/requests/structures.py",
+            "symbol_id": "src/requests/structures.py::CaseInsensitiveDict.copy",
+            "start_line": 89,
+            "end_line": 90,
+            "kind": "symbol",
+            "score": 20.9204,
+            "match": "overlap",
+            "why": "bm25: insensitive, case"
+          },
+          {
+            "path": "src/requests/structures.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 130,
+            "kind": "file",
+            "score": 20.145,
+            "match": "file",
+            "why": "bm25: insensitive, case, lookups~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/structures.py",
+            "start_line": 1,
+            "end_line": 93,
+            "label": "CaseInsensitiveDict + module head"
+          },
+          {
+            "path": "src/requests/structures.py",
+            "start_line": 96,
+            "end_line": 130,
+            "label": "LookupDict"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "start_line": 2331,
+            "end_line": 2431,
+            "label": "TestCaseInsensitiveDict (first 101 of 149 lines)"
+          },
+          {
+            "path": "tests/test_structures.py",
+            "start_line": 6,
+            "end_line": 51,
+            "label": "TestCaseInsensitiveDict"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 951,
+            "end_line": 962,
+            "label": "default_headers"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where does the HTTP adapter send a prepared request?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/adapters.py",
+          "symbol": "HTTPAdapter.send",
+          "start_line": 634,
+          "end_line": 748
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000238812,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.5188,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.send",
+            "start_line": 634,
+            "end_line": 748,
+            "kind": "symbol",
+            "score": 29.8751,
+            "match": "symbol",
+            "why": "name match: send x1.25 (send); owner match: HTTPAdapter x1.09; bm25: prepared, adapter, preparedrequest, send, httpadapter, http, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.send",
+            "start_line": 752,
+            "end_line": 829,
+            "kind": "symbol",
+            "score": 29.1628,
+            "match": null,
+            "why": "name match: send x1.25 (send); bm25: prepared, preparedrequest, send, request; body: adapter"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.get_connection_with_tls_context",
+            "start_line": 455,
+            "end_line": 510,
+            "kind": "symbol",
+            "score": 26.4288,
+            "match": null,
+            "why": "bm25: adapter, prepared, httpadapter, preparedrequest, http, request"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.request_url",
+            "start_line": 565,
+            "end_line": 597,
+            "kind": "symbol",
+            "score": 29.8922,
+            "match": null,
+            "why": "name match: request_url x1.01 (request); owner match: HTTPAdapter x1.01; bm25: adapter, prepared, httpadapter, preparedrequest, http, request"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.add_headers",
+            "start_line": 599,
+            "end_line": 611,
+            "kind": "symbol",
+            "score": 36.187,
+            "match": null,
+            "why": "bm25: adapter, prepared, httpadapter, preparedrequest, http, request; body: send"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter",
+            "start_line": 158,
+            "end_line": 748,
+            "kind": "symbol",
+            "score": 29.9303,
+            "match": "broad",
+            "why": "name match: HTTPAdapter x1.52 (adapter, http, http adapter); class boost; bm25: adapter, httpadapter, http, request"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.build_response",
+            "start_line": 365,
+            "end_line": 401,
+            "kind": "symbol",
+            "score": 28.0452,
+            "match": null,
+            "why": "bm25: adapter, prepared, httpadapter, preparedrequest, http, request"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::BaseAdapter.send",
+            "start_line": 128,
+            "end_line": 151,
+            "kind": "symbol",
+            "score": 27.9384,
+            "match": null,
+            "why": "name match: send x1.25 (send); owner match: BaseAdapter x1.04; bm25: prepared, preparedrequest, adapter, send, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 634,
+            "end_line": 748,
+            "label": "HTTPAdapter.send"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 752,
+            "end_line": 829,
+            "label": "Session.send"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 455,
+            "end_line": 510,
+            "label": "HTTPAdapter.get_connection_with_tls_context"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 565,
+            "end_line": 597,
+            "label": "HTTPAdapter.request_url"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 599,
+            "end_line": 611,
+            "label": "HTTPAdapter.add_headers"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 158,
+            "end_line": 268,
+            "label": "HTTPAdapter (first 111 of 591 lines)"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 365,
+            "end_line": 401,
+            "label": "HTTPAdapter.build_response"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 122,
+            "end_line": 123,
+            "label": "BaseAdapter (class header)"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 128,
+            "end_line": 151,
+            "label": "BaseAdapter.send"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "What happens when I call close on a response?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/models.py",
+          "symbol": "Response.close",
+          "start_line": 1173,
+          "end_line": 1184
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00015183,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 1.0479,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.close",
+            "start_line": 1173,
+            "end_line": 1184,
+            "kind": "symbol",
+            "score": 33.794,
+            "match": "symbol",
+            "why": "name match: close x1.51 (close); owner match: Response x1.16; bm25: close, call, response"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.close",
+            "start_line": 883,
+            "end_line": 886,
+            "kind": "symbol",
+            "score": 17.9382,
+            "match": null,
+            "why": "name match: close x1.51 (close); bm25: close"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::BaseAdapter.close",
+            "start_line": 153,
+            "end_line": 155,
+            "kind": "symbol",
+            "score": 16.3142,
+            "match": null,
+            "why": "name match: close x1.51 (close); bm25: close"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.close",
+            "start_line": 555,
+            "end_line": 563,
+            "kind": "symbol",
+            "score": 15.9701,
+            "match": null,
+            "why": "name match: close x1.51 (close); bm25: close"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.build_response",
+            "start_line": 365,
+            "end_line": 401,
+            "kind": "symbol",
+            "score": 15.3052,
+            "match": null,
+            "why": "name match: build_response x1.19 (response); bm25: response, call"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.__call__",
+            "start_line": 321,
+            "end_line": 343,
+            "kind": "symbol",
+            "score": 14.6784,
+            "match": null,
+            "why": "name match: __call__ x1.55 (call); bm25: call; body: response"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.__exit__",
+            "start_line": 815,
+            "end_line": 816,
+            "kind": "symbol",
+            "score": 14.3038,
+            "match": null,
+            "why": "bm25: response; body: close"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.handle_401",
+            "start_line": 273,
+            "end_line": 319,
+            "kind": "symbol",
+            "score": 12.5061,
+            "match": null,
+            "why": "bm25: response; body: call, close"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/models.py",
+            "start_line": 732,
+            "end_line": 735,
+            "label": "Response (class header)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 1173,
+            "end_line": 1184,
+            "label": "Response.close"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 883,
+            "end_line": 886,
+            "label": "Session.close"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 122,
+            "end_line": 123,
+            "label": "BaseAdapter (class header)"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 153,
+            "end_line": 155,
+            "label": "BaseAdapter.close"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 555,
+            "end_line": 563,
+            "label": "HTTPAdapter.close"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 365,
+            "end_line": 401,
+            "label": "HTTPAdapter.build_response"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 124,
+            "end_line": 125,
+            "label": "HTTPDigestAuth (class header)"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 321,
+            "end_line": 343,
+            "label": "HTTPDigestAuth.__call__"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 815,
+            "end_line": 816,
+            "label": "Response.__exit__"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 273,
+            "end_line": 319,
+            "label": "HTTPDigestAuth.handle_401"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Digest kimlik doğrulaması hangi sınıfta yapılıyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/auth.py",
+          "symbol": "HTTPDigestAuth",
+          "start_line": 124,
+          "end_line": 354
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000173082,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4024,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth",
+            "start_line": 124,
+            "end_line": 354,
+            "kind": "symbol",
+            "score": 30.8994,
+            "match": "symbol",
+            "why": "name match: HTTPDigestAuth x2.45 (digest, doğrulaması); class boost; bm25: digest, auth"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.build_digest_header",
+            "start_line": 157,
+            "end_line": 266,
+            "kind": "symbol",
+            "score": 13.632,
+            "match": "overlap",
+            "why": "name match: build_digest_header x1.25 (digest); owner match: HTTPDigestAuth x1.06; bm25: digest, auth"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.__call__",
+            "start_line": 321,
+            "end_line": 343,
+            "kind": "symbol",
+            "score": 10.3576,
+            "match": "overlap",
+            "why": "bm25: digest, auth"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 354,
+            "kind": "file",
+            "score": 15.4357,
+            "match": "file",
+            "why": "path match: auth x1.56 (doğrulaması); bm25: digest, auth"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.handle_401",
+            "start_line": 273,
+            "end_line": 319,
+            "kind": "symbol",
+            "score": 10.3254,
+            "match": "overlap",
+            "why": "bm25: digest, auth"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::AuthBase",
+            "start_line": 78,
+            "end_line": 82,
+            "kind": "symbol",
+            "score": 8.8303,
+            "match": null,
+            "why": "name match: AuthBase x1.65 (doğrulaması); class boost; bm25: auth"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.__ne__",
+            "start_line": 353,
+            "end_line": 354,
+            "kind": "symbol",
+            "score": 8.6206,
+            "match": "overlap",
+            "why": "bm25: digest, auth"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPDigestAuth.__eq__",
+            "start_line": 345,
+            "end_line": 351,
+            "kind": "symbol",
+            "score": 8.4939,
+            "match": "overlap",
+            "why": "bm25: digest, auth"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 124,
+            "end_line": 266,
+            "label": "HTTPDigestAuth (first 100 of 231 lines) + HTTPDigestAuth.build_digest_header"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 321,
+            "end_line": 343,
+            "label": "HTTPDigestAuth.__call__"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 273,
+            "end_line": 319,
+            "label": "HTTPDigestAuth.handle_401"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 78,
+            "end_line": 82,
+            "label": "AuthBase"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 353,
+            "end_line": 354,
+            "label": "HTTPDigestAuth.__ne__"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 345,
+            "end_line": 351,
+            "label": "HTTPDigestAuth.__eq__"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.961
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "post istegi gonderen fonksiyon nerede tanimli?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/api.py",
+          "symbol": "post",
+          "start_line": 117,
+          "end_line": 134
+        },
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "Session.post",
+          "start_line": 695,
+          "end_line": 712
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000211932,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3876,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/requests/api.py",
+            "symbol_id": "src/requests/api.py::post",
+            "start_line": 117,
+            "end_line": 134,
+            "kind": "symbol",
+            "score": 17.0601,
+            "match": "symbol",
+            "why": "name match: post x1.75 (post); bm25: post, send, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.post",
+            "start_line": 695,
+            "end_line": 712,
+            "kind": "symbol",
+            "score": 17.1641,
+            "match": "symbol",
+            "why": "name match: post x1.75 (post); bm25: post, send, request"
+          },
+          {
+            "path": "src/requests/_types.py",
+            "symbol_id": "src/requests/_types.py::PostKwargs",
+            "start_line": 181,
+            "end_line": 182,
+            "kind": "symbol",
+            "score": 8.6639,
+            "match": null,
+            "why": "name match: PostKwargs x1.48 (post); class boost; bm25: post, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin.send",
+            "start_line": 132,
+            "end_line": 132,
+            "kind": "symbol",
+            "score": 8.5981,
+            "match": null,
+            "why": "name match: send x1.64 (gonderen); bm25: send, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.send",
+            "start_line": 752,
+            "end_line": 829,
+            "kind": "symbol",
+            "score": 8.4112,
+            "match": null,
+            "why": "name match: send x1.64 (gonderen); bm25: send, request"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::BaseAdapter.send",
+            "start_line": 128,
+            "end_line": 151,
+            "kind": "symbol",
+            "score": 7.4303,
+            "match": null,
+            "why": "name match: send x1.64 (gonderen); bm25: send, request"
+          },
+          {
+            "path": "src/requests/api.py",
+            "symbol_id": "src/requests/api.py::request",
+            "start_line": 24,
+            "end_line": 71,
+            "kind": "symbol",
+            "score": 7.1787,
+            "match": null,
+            "why": "name match: request x1.04 (istegi); bm25: send, post, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 920,
+            "kind": "file",
+            "score": 6.9449,
+            "match": "file",
+            "why": "bm25: send, post, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/api.py",
+            "start_line": 117,
+            "end_line": 134,
+            "label": "post"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 695,
+            "end_line": 712,
+            "label": "Session.post"
+          },
+          {
+            "path": "src/requests/_types.py",
+            "start_line": 181,
+            "end_line": 182,
+            "label": "PostKwargs"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 127,
+            "end_line": 127,
+            "label": "SessionRedirectMixin (class header)"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 132,
+            "end_line": 132,
+            "label": "SessionRedirectMixin.send"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 752,
+            "end_line": 829,
+            "label": "Session.send"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 122,
+            "end_line": 123,
+            "label": "BaseAdapter (class header)"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 128,
+            "end_line": 151,
+            "label": "BaseAdapter.send"
+          },
+          {
+            "path": "src/requests/api.py",
+            "start_line": 24,
+            "end_line": 71,
+            "label": "request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How does requests decide which proxy to use for a given URL?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/utils.py",
+          "symbol": "select_proxy",
+          "start_line": 885,
+          "end_line": 908
+        },
+        {
+          "path": "src/requests/utils.py",
+          "symbol": "resolve_proxies",
+          "start_line": 911,
+          "end_line": 939
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000201516,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3685,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::select_proxy",
+            "start_line": 885,
+            "end_line": 908,
+            "kind": "symbol",
+            "score": 9.505,
+            "match": "symbol",
+            "why": "name match: select_proxy x1.11 (proxy); bm25: proxy, url, requests"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin.should_strip_auth",
+            "start_line": 154,
+            "end_line": 184,
+            "kind": "symbol",
+            "score": 17.5826,
+            "match": null,
+            "why": "bm25: decide, url, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.request_url",
+            "start_line": 565,
+            "end_line": 597,
+            "kind": "symbol",
+            "score": 14.6846,
+            "match": null,
+            "why": "name match: request_url x1.12 (requests, url); bm25: use, proxy, url, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.proxy_manager_for",
+            "start_line": 269,
+            "end_line": 305,
+            "kind": "symbol",
+            "score": 14.4649,
+            "match": null,
+            "why": "name match: proxy_manager_for x1.13 (proxy); bm25: proxy, use, given, requests; body: url"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.get_connection",
+            "start_line": 512,
+            "end_line": 553,
+            "kind": "symbol",
+            "score": 13.7687,
+            "match": null,
+            "why": "bm25: proxy, url, use, given, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.proxy_headers",
+            "start_line": 613,
+            "end_line": 632,
+            "kind": "symbol",
+            "score": 13.347,
+            "match": null,
+            "why": "name match: proxy_headers x1.11 (proxy); bm25: use, proxy, url, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.get_connection_with_tls_context",
+            "start_line": 455,
+            "end_line": 510,
+            "kind": "symbol",
+            "score": 12.5992,
+            "match": null,
+            "why": "bm25: proxy, use, given, requests; body: url"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": "src/requests/exceptions.py::InvalidProxyURL",
+            "start_line": 126,
+            "end_line": 127,
+            "kind": "symbol",
+            "score": 11.118,
+            "match": null,
+            "why": "name match: InvalidProxyURL x1.22 (proxy, url); class boost; bm25: proxy, url, requests"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 885,
+            "end_line": 908,
+            "label": "select_proxy"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 127,
+            "end_line": 127,
+            "label": "SessionRedirectMixin (class header)"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 154,
+            "end_line": 184,
+            "label": "SessionRedirectMixin.should_strip_auth"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 565,
+            "end_line": 597,
+            "label": "HTTPAdapter.request_url"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 269,
+            "end_line": 305,
+            "label": "HTTPAdapter.proxy_manager_for"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 512,
+            "end_line": 553,
+            "label": "HTTPAdapter.get_connection"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 613,
+            "end_line": 632,
+            "label": "HTTPAdapter.proxy_headers"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 455,
+            "end_line": 510,
+            "label": "HTTPAdapter.get_connection_with_tls_context"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 126,
+            "end_line": 127,
+            "label": "InvalidProxyURL"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How is the text encoding of a response guessed when the server does not declare a charset?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/models.py",
+          "symbol": "Response.text",
+          "start_line": 1053,
+          "end_line": 1089
+        },
+        {
+          "path": "src/requests/models.py",
+          "symbol": "Response.apparent_encoding",
+          "start_line": 896,
+          "end_line": 904
+        },
+        {
+          "path": "src/requests/utils.py",
+          "symbol": "get_encoding_from_headers",
+          "start_line": 569,
+          "end_line": 591
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000219156,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4008,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.apparent_encoding",
+            "start_line": 896,
+            "end_line": 904,
+            "kind": "symbol",
+            "score": 22.087,
+            "match": "symbol",
+            "why": "name match: apparent_encoding x1.08 (encoding); owner match: Response x1.03; bm25: encoding, charset, response"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.text",
+            "start_line": 1053,
+            "end_line": 1089,
+            "kind": "symbol",
+            "score": 46.5045,
+            "match": "symbol",
+            "why": "name match: text x1.14 (text); owner match: Response x1.05; bm25: guessed, encoding, response, charset, text"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::get_encoding_from_headers",
+            "start_line": 569,
+            "end_line": 591,
+            "kind": "symbol",
+            "score": 18.3024,
+            "match": "symbol",
+            "why": "name match: get_encoding_from_headers x1.06 (encoding); bm25: encoding; body: charset, text"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.json",
+            "start_line": 1091,
+            "end_line": 1124,
+            "kind": "symbol",
+            "score": 22.6783,
+            "match": null,
+            "why": "bm25: response; body: encoding, guessed~, text, charset, server"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": "src/requests/exceptions.py::ChunkedEncodingError",
+            "start_line": 130,
+            "end_line": 131,
+            "kind": "symbol",
+            "score": 21.4195,
+            "match": null,
+            "why": "name match: ChunkedEncodingError x1.07 (encoding); class boost; bm25: encoding, declare~, server"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::get_unicode_from_response",
+            "start_line": 633,
+            "end_line": 671,
+            "kind": "symbol",
+            "score": 21.0189,
+            "match": null,
+            "why": "name match: get_unicode_from_response x1.04 (response); bm25: response, charset; body: encoding"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.build_response",
+            "start_line": 365,
+            "end_line": 401,
+            "kind": "symbol",
+            "score": 17.2348,
+            "match": null,
+            "why": "name match: build_response x1.05 (response); bm25: response; body: encoding, server"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.__init__",
+            "start_line": 765,
+            "end_line": 810,
+            "kind": "symbol",
+            "score": 14.6525,
+            "match": null,
+            "why": "bm25: response; body: encoding, text, server"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/models.py",
+            "start_line": 732,
+            "end_line": 735,
+            "label": "Response (class header)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 896,
+            "end_line": 904,
+            "label": "Response.apparent_encoding"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 1053,
+            "end_line": 1089,
+            "label": "Response.text"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 569,
+            "end_line": 591,
+            "label": "get_encoding_from_headers"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 1091,
+            "end_line": 1124,
+            "label": "Response.json"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 130,
+            "end_line": 131,
+            "label": "ChunkedEncodingError"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 633,
+            "end_line": 671,
+            "label": "get_unicode_from_response"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 365,
+            "end_line": 401,
+            "label": "HTTPAdapter.build_response"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 765,
+            "end_line": 810,
+            "label": "Response.__init__"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "When a redirect goes to a different host, where is the Authorization header removed?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "SessionRedirectMixin.rebuild_auth",
+          "start_line": 309,
+          "end_line": 332
+        },
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "SessionRedirectMixin.should_strip_auth",
+          "start_line": 154,
+          "end_line": 184
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000209328,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4232,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin.rebuild_auth",
+            "start_line": 309,
+            "end_line": 332,
+            "kind": "symbol",
+            "score": 23.8362,
+            "match": "symbol",
+            "why": "name match: rebuild_auth x1.12 (authorization); owner match: SessionRedirectMixin x1.01; bm25: authorization, removed~, redirect; body: header, host"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin.should_strip_auth",
+            "start_line": 154,
+            "end_line": 184,
+            "kind": "symbol",
+            "score": 26.1673,
+            "match": "symbol",
+            "why": "name match: should_strip_auth x1.10 (authorization); owner match: SessionRedirectMixin x1.01; bm25: removed, authorization, redirect, header; body: host"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin.rebuild_proxies",
+            "start_line": 334,
+            "end_line": 368,
+            "kind": "symbol",
+            "score": 13.8705,
+            "match": null,
+            "why": "bm25: authorization, redirect, header"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPBasicAuth.__call__",
+            "start_line": 111,
+            "end_line": 113,
+            "kind": "symbol",
+            "score": 12.0201,
+            "match": null,
+            "why": "bm25: authorization; body: header"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "symbol_id": "src/requests/auth.py::HTTPProxyAuth.__call__",
+            "start_line": 119,
+            "end_line": 121,
+            "kind": "symbol",
+            "score": 11.9302,
+            "match": null,
+            "why": "bm25: authorization; body: header"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "symbol_id": "tests/test_requests.py::TestRequests.test_auth_is_retained_for_redirect_on_host",
+            "start_line": 1933,
+            "end_line": 1938,
+            "kind": "symbol",
+            "score": 11.4014,
+            "match": null,
+            "why": "test file x0.5; bm25: authorization, host, redirect; body: header"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::session",
+            "start_line": 908,
+            "end_line": 920,
+            "kind": "symbol",
+            "score": 11.3499,
+            "match": null,
+            "why": "bm25: removed"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::parse_list_header",
+            "start_line": 408,
+            "end_line": 436,
+            "kind": "symbol",
+            "score": 11.1616,
+            "match": null,
+            "why": "name match: parse_list_header x1.04 (header); bm25: removed, header"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 127,
+            "end_line": 127,
+            "label": "SessionRedirectMixin (class header)"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 309,
+            "end_line": 332,
+            "label": "SessionRedirectMixin.rebuild_auth"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 154,
+            "end_line": 184,
+            "label": "SessionRedirectMixin.should_strip_auth"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 334,
+            "end_line": 368,
+            "label": "SessionRedirectMixin.rebuild_proxies"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 85,
+            "end_line": 86,
+            "label": "HTTPBasicAuth (class header)"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 111,
+            "end_line": 113,
+            "label": "HTTPBasicAuth.__call__"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 116,
+            "end_line": 117,
+            "label": "HTTPProxyAuth (class header)"
+          },
+          {
+            "path": "src/requests/auth.py",
+            "start_line": 119,
+            "end_line": 121,
+            "label": "HTTPProxyAuth.__call__"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "start_line": 84,
+            "end_line": 84,
+            "label": "TestRequests (class header)"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "start_line": 1933,
+            "end_line": 1938,
+            "label": "TestRequests.test_auth_is_retained_for_redirect_on_host"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 908,
+            "end_line": 920,
+            "label": "session"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 408,
+            "end_line": 436,
+            "label": "parse_list_header"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How can I point requests at a custom CA bundle with an environment variable?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "Session.merge_environment_settings",
+          "start_line": 831,
+          "end_line": 868
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000209664,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4812,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.merge_environment_settings",
+            "start_line": 831,
+            "end_line": 868,
+            "kind": "symbol",
+            "score": 29.5475,
+            "match": "symbol",
+            "why": "name match: merge_environment_settings x1.10 (environment); bm25: environment, requests; body: bundle, ca"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "symbol_id": "tests/test_requests.py::TestRequests.test_env_cert_bundles",
+            "start_line": 993,
+            "end_line": 1024,
+            "kind": "symbol",
+            "score": 18.2244,
+            "match": null,
+            "why": "test file x0.5; bm25: bundle, environment, requests; body: ca"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::set_environ",
+            "start_line": 787,
+            "end_line": 807,
+            "kind": "symbol",
+            "score": 41.1954,
+            "match": null,
+            "why": "name match: set_environ x1.13 (environment); bm25: environment, variable, requests"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::is_valid_cidr",
+            "start_line": 763,
+            "end_line": 784,
+            "kind": "symbol",
+            "score": 15.236,
+            "match": null,
+            "why": "bm25: variable, requests"
+          },
+          {
+            "path": "tests/conftest.py",
+            "symbol_id": "tests/conftest.py::clean_proxy_environ",
+            "start_line": 25,
+            "end_line": 31,
+            "kind": "symbol",
+            "score": 14.7983,
+            "match": null,
+            "why": "test file x0.5; bm25: variable~, environment"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::get_environ_proxies",
+            "start_line": 873,
+            "end_line": 882,
+            "kind": "symbol",
+            "score": 14.2548,
+            "match": null,
+            "why": "name match: get_environ_proxies x1.10 (environment); bm25: environment, requests"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::resolve_proxies",
+            "start_line": 911,
+            "end_line": 939,
+            "kind": "symbol",
+            "score": 14.1307,
+            "match": null,
+            "why": "bm25: environment, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.cert_verify",
+            "start_line": 307,
+            "end_line": 363,
+            "kind": "symbol",
+            "score": 11.857,
+            "match": null,
+            "why": "bm25: requests; body: bundle, ca"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 831,
+            "end_line": 868,
+            "label": "Session.merge_environment_settings"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "start_line": 84,
+            "end_line": 84,
+            "label": "TestRequests (class header)"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "start_line": 993,
+            "end_line": 1024,
+            "label": "TestRequests.test_env_cert_bundles"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 787,
+            "end_line": 807,
+            "label": "set_environ"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 763,
+            "end_line": 784,
+            "label": "is_valid_cidr"
+          },
+          {
+            "path": "tests/conftest.py",
+            "start_line": 25,
+            "end_line": 31,
+            "label": "clean_proxy_environ"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 873,
+            "end_line": 882,
+            "label": "get_environ_proxies"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 911,
+            "end_line": 939,
+            "label": "resolve_proxies"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 307,
+            "end_line": 363,
+            "label": "HTTPAdapter.cert_verify"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Zaman aşımı (timeout) tek bir sayı ya da (bağlantı, okuma) ikilisi olarak verildiğinde nasıl işleniyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/adapters.py",
+          "symbol": "HTTPAdapter.send",
+          "start_line": 634,
+          "end_line": 748
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00017514,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.5818,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.send",
+            "start_line": 634,
+            "end_line": 748,
+            "kind": "symbol",
+            "score": 11.546,
+            "match": "symbol",
+            "why": "bm25: timeout, read; body: connection"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::BaseAdapter.send",
+            "start_line": 128,
+            "end_line": 151,
+            "kind": "symbol",
+            "score": 8.0711,
+            "match": null,
+            "why": "bm25: timeout, read"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": "src/requests/exceptions.py::ReadTimeout",
+            "start_line": 98,
+            "end_line": 99,
+            "kind": "symbol",
+            "score": 21.8447,
+            "match": null,
+            "why": "name match: ReadTimeout x1.79 (aşımı, okuma, timeout); class boost; bm25: timeout, read"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.init_poolmanager",
+            "start_line": 239,
+            "end_line": 267,
+            "kind": "symbol",
+            "score": 14.5065,
+            "match": null,
+            "why": "bm25: number, connection"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": "src/requests/exceptions.py::Timeout",
+            "start_line": 82,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 13.6035,
+            "match": null,
+            "why": "name match: Timeout x1.47 (aşımı, timeout); class boost; bm25: timeout, read"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": "src/requests/exceptions.py::ConnectTimeout",
+            "start_line": 91,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 11.8476,
+            "match": null,
+            "why": "name match: ConnectTimeout x1.31 (aşımı, timeout); class boost; bm25: timeout, connection"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.iter_content",
+            "start_line": 914,
+            "end_line": 977,
+            "kind": "symbol",
+            "score": 10.0955,
+            "match": null,
+            "why": "bm25: read, number; body: connection, timeout"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 162,
+            "kind": "file",
+            "score": 9.8284,
+            "match": null,
+            "why": "bm25: timeout, connection, read"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 634,
+            "end_line": 748,
+            "label": "HTTPAdapter.send"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 122,
+            "end_line": 123,
+            "label": "BaseAdapter (class header)"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 128,
+            "end_line": 151,
+            "label": "BaseAdapter.send"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 98,
+            "end_line": 99,
+            "label": "ReadTimeout"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 239,
+            "end_line": 267,
+            "label": "HTTPAdapter.init_poolmanager"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 82,
+            "end_line": 88,
+            "label": "Timeout"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 91,
+            "end_line": 95,
+            "label": "ConnectTimeout"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 732,
+            "end_line": 735,
+            "label": "Response (class header)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 914,
+            "end_line": 977,
+            "label": "Response.iter_content"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Dosya yuklerken multipart govdesi nasil olusturuluyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/requests/models.py",
+          "symbol": "RequestEncodingMixin._encode_files",
+          "start_line": 182,
+          "end_line": 251
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000193368,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4862,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::RequestEncodingMixin._encode_files",
+            "start_line": 182,
+            "end_line": 251,
+            "kind": "symbol",
+            "score": 7.8037,
+            "match": "symbol",
+            "why": "bm25: multipart, body"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::PreparedRequest.prepare_body",
+            "start_line": 576,
+            "end_line": 652,
+            "kind": "symbol",
+            "score": 6.0287,
+            "match": null,
+            "why": "name match: prepare_body x1.14 (govdesi); bm25: body"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.json",
+            "start_line": 1091,
+            "end_line": 1124,
+            "kind": "symbol",
+            "score": 10.4562,
+            "match": null,
+            "why": "bm25: load, body"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Request",
+            "start_line": 284,
+            "end_line": 375,
+            "kind": "symbol",
+            "score": 9.5918,
+            "match": null,
+            "why": "class boost; bm25: multipart, create~, body"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::PreparedRequest.__init__",
+            "start_line": 407,
+            "end_line": 422,
+            "kind": "symbol",
+            "score": 7.5634,
+            "match": null,
+            "why": "bm25: body: body, create~"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "symbol_id": "src/requests/cookies.py::create_cookie",
+            "start_line": 494,
+            "end_line": 528,
+            "kind": "symbol",
+            "score": 7.4941,
+            "match": null,
+            "why": "name match: create_cookie x1.20 (olusturuluyor); bm25: create~"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "symbol_id": "src/requests/utils.py::rewind_body",
+            "start_line": 1139,
+            "end_line": 1155,
+            "kind": "symbol",
+            "score": 6.3512,
+            "match": null,
+            "why": "name match: rewind_body x1.14 (govdesi); bm25: body"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": "src/requests/exceptions.py::UnrewindableBodyError",
+            "start_line": 146,
+            "end_line": 147,
+            "kind": "symbol",
+            "score": 6.2627,
+            "match": null,
+            "why": "name match: UnrewindableBodyError x1.11 (govdesi); class boost; bm25: body"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/models.py",
+            "start_line": 108,
+            "end_line": 108,
+            "label": "RequestEncodingMixin (class header)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 182,
+            "end_line": 251,
+            "label": "RequestEncodingMixin._encode_files"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 576,
+            "end_line": 652,
+            "label": "PreparedRequest.prepare_body"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 732,
+            "end_line": 735,
+            "label": "Response (class header)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 1091,
+            "end_line": 1124,
+            "label": "Response.json"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 284,
+            "end_line": 375,
+            "label": "Request"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 407,
+            "end_line": 422,
+            "label": "PreparedRequest.__init__"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "start_line": 494,
+            "end_line": 528,
+            "label": "create_cookie"
+          },
+          {
+            "path": "src/requests/utils.py",
+            "start_line": 1139,
+            "end_line": 1155,
+            "label": "rewind_body"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 146,
+            "end_line": 147,
+            "label": "UnrewindableBodyError"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "flow",
+      "lang": "en",
+      "question": "What is the call path from requests.get(url) down to the transport adapter that sends it?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "Session.request",
+          "start_line": 557,
+          "end_line": 653
+        },
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "Session.send",
+          "start_line": 752,
+          "end_line": 829
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000244272,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4849,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/requests/api.py",
+            "symbol_id": "src/requests/api.py::get",
+            "start_line": 74,
+            "end_line": 87,
+            "kind": "symbol",
+            "score": 86.4267,
+            "match": null,
+            "why": "name match: get (explicit requests.get); qualname/path match: requests.get; bm25: sends, url, get, requests"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.send",
+            "start_line": 752,
+            "end_line": 829,
+            "kind": "symbol",
+            "score": 15.2766,
+            "match": "symbol",
+            "why": "name match: send x1.16 (sends); bm25: sends~, requests; body: adapter, get, url"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.send",
+            "start_line": 634,
+            "end_line": 748,
+            "kind": "symbol",
+            "score": 15.7682,
+            "match": null,
+            "why": "name match: send x1.16 (sends); owner match: HTTPAdapter x1.03; bm25: sends, adapter, requests; body: url, path, get"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.get",
+            "start_line": 655,
+            "end_line": 671,
+            "kind": "symbol",
+            "score": 14.9926,
+            "match": null,
+            "why": "name match: get x1.05 (get); bm25: sends, url, get, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::BaseAdapter",
+            "start_line": 122,
+            "end_line": 155,
+            "kind": "symbol",
+            "score": 22.9087,
+            "match": null,
+            "why": "name match: BaseAdapter x1.09 (adapter); class boost; bm25: adapter, transport, requests"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.get_adapter",
+            "start_line": 870,
+            "end_line": 881,
+            "kind": "symbol",
+            "score": 21.9917,
+            "match": null,
+            "why": "name match: get_adapter x1.19 (adapter, get); bm25: adapter, url, get, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.request_url",
+            "start_line": 565,
+            "end_line": 597,
+            "kind": "symbol",
+            "score": 20.4554,
+            "match": null,
+            "why": "name match: request_url x1.06 (url); owner match: HTTPAdapter x1.01; bm25: adapter, url, path, call, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.get_connection",
+            "start_line": 512,
+            "end_line": 553,
+            "kind": "symbol",
+            "score": 19.1762,
+            "match": null,
+            "why": "name match: get_connection x1.03 (get); owner match: HTTPAdapter x1.01; bm25: adapter, url, call, get, requests"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/api.py",
+            "start_line": 74,
+            "end_line": 87,
+            "label": "get"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 752,
+            "end_line": 829,
+            "label": "Session.send"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 634,
+            "end_line": 748,
+            "label": "HTTPAdapter.send"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 655,
+            "end_line": 671,
+            "label": "Session.get"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 122,
+            "end_line": 155,
+            "label": "BaseAdapter"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 870,
+            "end_line": 881,
+            "label": "Session.get_adapter"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 565,
+            "end_line": 597,
+            "label": "HTTPAdapter.request_url"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 512,
+            "end_line": 553,
+            "label": "HTTPAdapter.get_connection"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 2,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "flow",
+      "lang": "tr",
+      "question": "`Session.send` yönlendirmeleri (redirect) nasıl takip ediyor?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "Session.send",
+          "start_line": 752,
+          "end_line": 829
+        },
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "SessionRedirectMixin.resolve_redirects",
+          "start_line": 186,
+          "end_line": 307
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000208446,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4022,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.send",
+            "start_line": 752,
+            "end_line": 829,
+            "kind": "symbol",
+            "score": 67.3244,
+            "match": "symbol",
+            "why": "name match: send (explicit session.send); qualname/path match: session.send; bm25: send, session; body: redirect"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin.resolve_redirects",
+            "start_line": 186,
+            "end_line": 307,
+            "kind": "symbol",
+            "score": 10.7245,
+            "match": "symbol",
+            "why": "name match: resolve_redirects x1.50 (redirect, yönlendirmeleri); owner match: SessionRedirectMixin x1.10; bm25: redirect, session; body: send"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin",
+            "start_line": 127,
+            "end_line": 392,
+            "kind": "symbol",
+            "score": 15.9009,
+            "match": "overlap",
+            "why": "name match: SessionRedirectMixin x1.59 (redirect, yönlendirmeleri); class boost; bm25: redirect, session"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin.get_redirect_target",
+            "start_line": 134,
+            "end_line": 152,
+            "kind": "symbol",
+            "score": 11.6936,
+            "match": null,
+            "why": "name match: get_redirect_target x1.39 (redirect, yönlendirmeleri); owner match: SessionRedirectMixin x1.08; bm25: redirect, session"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::SessionRedirectMixin.send",
+            "start_line": 132,
+            "end_line": 132,
+            "kind": "symbol",
+            "score": 15.6385,
+            "match": null,
+            "why": "name match: send x1.33 (send); owner match: SessionRedirectMixin x1.07; bm25: send, session, redirect"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.is_redirect",
+            "start_line": 876,
+            "end_line": 881,
+            "kind": "symbol",
+            "score": 12.2157,
+            "match": null,
+            "why": "name match: is_redirect x1.50 (redirect, yönlendirmeleri); bm25: redirect, session"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 920,
+            "kind": "file",
+            "score": 11.4451,
+            "match": "file",
+            "why": "bm25: redirect, session, send"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.head",
+            "start_line": 684,
+            "end_line": 693,
+            "kind": "symbol",
+            "score": 8.5144,
+            "match": null,
+            "why": "bm25: send, session; body: redirect"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 752,
+            "end_line": 829,
+            "label": "Session.send"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 127,
+            "end_line": 285,
+            "label": "SessionRedirectMixin (class header) + SessionRedirectMixin.resolve_redirects (part 1/2) + SessionRedirectMixin (first 102 of 266 lines)"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 286,
+            "end_line": 307,
+            "label": "SessionRedirectMixin.resolve_redirects (part 2/2)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 732,
+            "end_line": 735,
+            "label": "Response (class header)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 876,
+            "end_line": 881,
+            "label": "Response.is_redirect"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 684,
+            "end_line": 693,
+            "label": "Session.head"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": true,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "flow",
+      "lang": "tr",
+      "question": "Istege verilen cookie'ler session cookie'leriyle nasil birlestirilip Cookie basligina yaziliyor?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "src/requests/sessions.py",
+          "symbol": "Session.prepare_request",
+          "start_line": 511,
+          "end_line": 555
+        },
+        {
+          "path": "src/requests/models.py",
+          "symbol": "PreparedRequest.prepare_cookies",
+          "start_line": 699,
+          "end_line": 720
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000201516,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4136,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.prepare_request",
+            "start_line": 511,
+            "end_line": 555,
+            "kind": "symbol",
+            "score": 18.0326,
+            "match": "symbol",
+            "why": "name match: prepare_request x1.01 (istege); owner match: Session x1.00; bm25: merge~, session, request; body: cookie, header"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::PreparedRequest.prepare_cookies",
+            "start_line": 699,
+            "end_line": 720,
+            "kind": "symbol",
+            "score": 13.2785,
+            "match": "symbol",
+            "why": "bm25: cookie, header, request"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "symbol_id": "src/requests/cookies.py::merge_cookies",
+            "start_line": 604,
+            "end_line": 625,
+            "kind": "symbol",
+            "score": 22.1253,
+            "match": null,
+            "why": "name match: merge_cookies x1.25 (birlestirilip); bm25: cookie, merge~, request"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "symbol_id": "src/requests/cookies.py::get_cookie_header",
+            "start_line": 153,
+            "end_line": 161,
+            "kind": "symbol",
+            "score": 17.8931,
+            "match": null,
+            "why": "name match: get_cookie_header x1.28 (basligina, cookie); bm25: cookie, header, request"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 625,
+            "kind": "file",
+            "score": 15.8086,
+            "match": null,
+            "why": "bm25: cookie, merge~, header, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::merge_hooks",
+            "start_line": 108,
+            "end_line": 124,
+            "kind": "symbol",
+            "score": 15.3871,
+            "match": null,
+            "why": "name match: merge_hooks x1.25 (birlestirilip); bm25: merge~, session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::merge_setting",
+            "start_line": 76,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 14.9688,
+            "match": null,
+            "why": "name match: merge_setting x1.25 (birlestirilip); bm25: merge~, session, request"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.merge_environment_settings",
+            "start_line": 831,
+            "end_line": 868,
+            "kind": "symbol",
+            "score": 13.9962,
+            "match": null,
+            "why": "name match: merge_environment_settings x1.20 (birlestirilip); owner match: Session x1.07; bm25: merge~, session, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 511,
+            "end_line": 555,
+            "label": "Session.prepare_request"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 699,
+            "end_line": 720,
+            "label": "PreparedRequest.prepare_cookies"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "start_line": 604,
+            "end_line": 625,
+            "label": "merge_cookies"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "start_line": 153,
+            "end_line": 161,
+            "label": "get_cookie_header"
+          },
+          {
+            "path": "src/requests/cookies.py",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 108,
+            "end_line": 124,
+            "label": "merge_hooks"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 76,
+            "end_line": 105,
+            "label": "merge_setting"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 831,
+            "end_line": 868,
+            "label": "Session.merge_environment_settings"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": true,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "How are connections pooled and reused across requests to the same host?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "src/requests/adapters.py",
+          "symbol": "HTTPAdapter.init_poolmanager",
+          "start_line": 239,
+          "end_line": 267
+        },
+        {
+          "path": "src/requests/adapters.py",
+          "symbol": "HTTPAdapter.get_connection_with_tls_context",
+          "start_line": 455,
+          "end_line": 510
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000208698,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4322,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.get_connection_with_tls_context",
+            "start_line": 455,
+            "end_line": 510,
+            "kind": "symbol",
+            "score": 16.9894,
+            "match": "symbol",
+            "why": "name match: get_connection_with_tls_context x1.11 (connections); bm25: pooled~, connections~, requests; body: host"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.init_poolmanager",
+            "start_line": 239,
+            "end_line": 267,
+            "kind": "symbol",
+            "score": 21.9723,
+            "match": "symbol",
+            "why": "bm25: connections, pooled~, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.build_connection_pool_key_attributes",
+            "start_line": 403,
+            "end_line": 453,
+            "kind": "symbol",
+            "score": 18.5172,
+            "match": null,
+            "why": "name match: build_connection_pool_key_attributes x1.46 (connections, pooled); bm25: pooled~, connections~, requests; body: host"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::_urllib3_request_context",
+            "start_line": 85,
+            "end_line": 119,
+            "kind": "symbol",
+            "score": 10.4469,
+            "match": null,
+            "why": "name match: _urllib3_request_context x1.01 (requests); bm25: pooled~, requests; body: host"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.get_connection",
+            "start_line": 512,
+            "end_line": 553,
+            "kind": "symbol",
+            "score": 14.1716,
+            "match": null,
+            "why": "name match: get_connection x1.19 (connections); bm25: connections~, pooled~, requests; body: host"
+          },
+          {
+            "path": "src/requests/models.py",
+            "symbol_id": "src/requests/models.py::Response.close",
+            "start_line": 1173,
+            "end_line": 1184,
+            "kind": "symbol",
+            "score": 9.5707,
+            "match": null,
+            "why": "bm25: pooled~, connections~, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter",
+            "start_line": 158,
+            "end_line": 748,
+            "kind": "symbol",
+            "score": 15.1259,
+            "match": "broad",
+            "why": "class boost; bm25: connections, pooled~, requests"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.close",
+            "start_line": 555,
+            "end_line": 563,
+            "kind": "symbol",
+            "score": 27.1098,
+            "match": null,
+            "why": "bm25: pooled, connections, requests"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 455,
+            "end_line": 510,
+            "label": "HTTPAdapter.get_connection_with_tls_context"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 158,
+            "end_line": 268,
+            "label": "HTTPAdapter.init_poolmanager + HTTPAdapter (first 111 of 591 lines)"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 403,
+            "end_line": 453,
+            "label": "HTTPAdapter.build_connection_pool_key_attributes"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 85,
+            "end_line": 119,
+            "label": "_urllib3_request_context"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 512,
+            "end_line": 553,
+            "label": "HTTPAdapter.get_connection"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 732,
+            "end_line": 735,
+            "label": "Response (class header)"
+          },
+          {
+            "path": "src/requests/models.py",
+            "start_line": 1173,
+            "end_line": 1184,
+            "label": "Response.close"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 555,
+            "end_line": 563,
+            "label": "HTTPAdapter.close"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q19",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where is the server's TLS certificate checked against the CA bundle during the handshake?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "src/requests/adapters.py",
+          "symbol": "HTTPAdapter.cert_verify",
+          "start_line": 307,
+          "end_line": 363
+        },
+        {
+          "path": "src/requests/adapters.py",
+          "symbol": "_urllib3_request_context",
+          "start_line": 85,
+          "end_line": 119
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000258468,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4007,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.cert_verify",
+            "start_line": 307,
+            "end_line": 363,
+            "kind": "symbol",
+            "score": 40.0975,
+            "match": "symbol",
+            "why": "name match: cert_verify x1.09 (certificate); bm25: certificate, tls, server; body: bundle, ca"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.send",
+            "start_line": 634,
+            "end_line": 748,
+            "kind": "symbol",
+            "score": 14.5957,
+            "match": null,
+            "why": "bm25: certificate, server; body: bundle, tls, ca"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::BaseAdapter.send",
+            "start_line": 128,
+            "end_line": 151,
+            "kind": "symbol",
+            "score": 26.088,
+            "match": null,
+            "why": "bm25: certificate, server; body: bundle, ca, tls"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.build_connection_pool_key_attributes",
+            "start_line": 403,
+            "end_line": 453,
+            "kind": "symbol",
+            "score": 24.5638,
+            "match": null,
+            "why": "bm25: certificate; body: bundle, ca, tls, server"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.get_connection_with_tls_context",
+            "start_line": 455,
+            "end_line": 510,
+            "kind": "symbol",
+            "score": 23.9067,
+            "match": null,
+            "why": "name match: get_connection_with_tls_context x1.05 (tls); bm25: certificate, tls; body: bundle, ca, checked~, server"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.merge_environment_settings",
+            "start_line": 831,
+            "end_line": 868,
+            "kind": "symbol",
+            "score": 19.9706,
+            "match": null,
+            "why": "bm25: certificate~, checked~; body: bundle, ca"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "symbol_id": "src/requests/sessions.py::Session.__init__",
+            "start_line": 442,
+            "end_line": 503,
+            "kind": "symbol",
+            "score": 19.468,
+            "match": null,
+            "why": "bm25: body: certificate, tls, bundle, ca, server"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "symbol_id": "tests/test_requests.py::TestPreparingURLs.test_different_connection_pool_for_tls_settings_verify_bundle_expired_cert",
+            "start_line": 2959,
+            "end_line": 2990,
+            "kind": "symbol",
+            "score": 18.0549,
+            "match": null,
+            "why": "test file x0.5; bm25: bundle, certificate, tls; body: server, ca"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 307,
+            "end_line": 363,
+            "label": "HTTPAdapter.cert_verify"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 634,
+            "end_line": 748,
+            "label": "HTTPAdapter.send"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 122,
+            "end_line": 123,
+            "label": "BaseAdapter (class header)"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 128,
+            "end_line": 151,
+            "label": "BaseAdapter.send"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 403,
+            "end_line": 453,
+            "label": "HTTPAdapter.build_connection_pool_key_attributes"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 455,
+            "end_line": 510,
+            "label": "HTTPAdapter.get_connection_with_tls_context"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 831,
+            "end_line": 868,
+            "label": "Session.merge_environment_settings"
+          },
+          {
+            "path": "src/requests/sessions.py",
+            "start_line": 442,
+            "end_line": 503,
+            "label": "Session.__init__"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "start_line": 2760,
+            "end_line": 2760,
+            "label": "TestPreparingURLs (class header)"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "start_line": 2959,
+            "end_line": 2990,
+            "label": "TestPreparingURLs.test_different_connection_pool_for_tls_settings_verify_bundle_expired_cert"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q20",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "Bağlantı koparsa istek nasıl yeniden deneniyor, yeniden deneme döngüsü nerede?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "src/requests/adapters.py",
+          "symbol": "HTTPAdapter.__init__",
+          "start_line": 201,
+          "end_line": 221
+        },
+        {
+          "path": "src/requests/adapters.py",
+          "symbol": "HTTPAdapter.send",
+          "start_line": 634,
+          "end_line": 748
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000196392,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3961,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.send",
+            "start_line": 634,
+            "end_line": 748,
+            "kind": "symbol",
+            "score": 6.2895,
+            "match": "symbol",
+            "why": "bm25: request; body: retry, connection"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.__init__",
+            "start_line": 201,
+            "end_line": 221,
+            "kind": "symbol",
+            "score": 15.0655,
+            "match": "symbol",
+            "why": "bm25: retry, connection, request"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter",
+            "start_line": 158,
+            "end_line": 748,
+            "kind": "symbol",
+            "score": 4.384,
+            "match": "broad",
+            "why": "class boost; bm25: connection, request"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": "src/requests/adapters.py::HTTPAdapter.get_connection_with_tls_context",
+            "start_line": 455,
+            "end_line": 510,
+            "kind": "symbol",
+            "score": 6.3115,
+            "match": null,
+            "why": "name match: get_connection_with_tls_context x1.12 (bağlantı); bm25: connection, request"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "symbol_id": "tests/test_requests.py::test_urllib3_retries",
+            "start_line": 2740,
+            "end_line": 2747,
+            "kind": "symbol",
+            "score": 5.3537,
+            "match": null,
+            "why": "test file x0.5; bm25: retry, request"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 748,
+            "kind": "file",
+            "score": 5.2815,
+            "match": "file",
+            "why": "bm25: connection, request"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": "src/requests/exceptions.py::RetryError",
+            "start_line": 142,
+            "end_line": 143,
+            "kind": "symbol",
+            "score": 20.7796,
+            "match": null,
+            "why": "name match: RetryError x1.81 (deneme, deneniyor); class boost; bm25: retry, request"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "symbol_id": "src/requests/exceptions.py::ConnectTimeout",
+            "start_line": 91,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 9.3423,
+            "match": null,
+            "why": "class boost; bm25: retry, connection, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 634,
+            "end_line": 748,
+            "label": "HTTPAdapter.send"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 158,
+            "end_line": 268,
+            "label": "HTTPAdapter.__init__ + HTTPAdapter (first 111 of 591 lines)"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 455,
+            "end_line": 510,
+            "label": "HTTPAdapter.get_connection_with_tls_context"
+          },
+          {
+            "path": "tests/test_requests.py",
+            "start_line": 2740,
+            "end_line": 2747,
+            "label": "test_urllib3_retries"
+          },
+          {
+            "path": "src/requests/adapters.py",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 142,
+            "end_line": 143,
+            "label": "RetryError"
+          },
+          {
+            "path": "src/requests/exceptions.py",
+            "start_line": 91,
+            "end_line": 95,
+            "label": "ConnectTimeout"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    }
+  ]
+}

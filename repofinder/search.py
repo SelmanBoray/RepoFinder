@@ -1,9 +1,18 @@
-"""Lexical search over a :class:`RepoIndex`: BM25 plus a few code-aware boosts.
+"""Lexical search over a :class:`RepoIndex`: BM25F plus a few code-aware boosts.
 
-Every symbol and every file becomes one bag-of-tokens document:
+Every symbol and every file becomes one document with up to two fields:
 
-* symbol: name, qualname, signature, docstring and path components;
+* symbol metadata: name, qualname, signature, docstring (JSDoc for
+  TypeScript) and path components;
+* symbol body (functions and methods only): the tokens of its source lines,
+  read from the checkout (``index.root``; no checkout, no body). Words that
+  only the code says ("priority", "Unity", "retryable") are found this way;
 * file: path components, the names of the file's symbols and its summary.
+
+Each field is length-normalized by its own mean (BM25F), so a long body does
+not dilute a name match; a body occurrence weighs :data:`BODY_WEIGHT`.
+Document frequencies count both fields; the vocabulary that decides Turkish
+translation and joined identifiers is the metadata field only.
 
 Every word is also indexed under a light English stem (:func:`stem`:
 ``signing`` -> ``sign``, ``loaded`` -> ``load``, ``builder`` -> ``build``), next
@@ -47,7 +56,17 @@ abbreviation) never weighs more than the word itself: in the requests repo
   strongly the name itself matched;
 * qualname/path: a dotted or slashed query term names the symbol or file
   (``requests.get`` also names ``get`` in module ``requests.api``);
-* class, kind ("which class ..."), test-file and nested-function adjustments.
+* class, kind ("which class ..."), test-file and nested-function adjustments;
+* type declarations: a TypeScript ``interface`` or ``type`` alias is a data
+  shape, rarely what "where is X done" asks for: x :data:`TYPE_PENALTY` unless
+  the query mentions types or interfaces.
+
+Query words keep their case for one decision: a lowerCamel word
+(``ipcRenderer``) is code and splits into its parts like an identifier; an
+UpperCamel word ("JavaScript", a class name) stays whole. Private class
+members (``#name``) match by their bare name. In a Turkish query, Turkish
+function words ("ve", "mi", "bu") are dropped even when some identifier makes
+them index words, unless they are written as code.
 
 Every boost that fires is named in :attr:`Hit.why`. Pure Python, standard
 library only.
@@ -61,6 +80,7 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 from itertools import product
+from pathlib import Path
 from typing import Callable, Optional
 
 from .graph import PATH_MODULE_EXTENSIONS, is_test_path, module_names, split_source_extension
@@ -76,6 +96,9 @@ FILE_NAME_BOOST = 2.0  # file stem (package dir name for __init__.py) is the who
 CLASS_BOOST = 1.2
 KIND_BOOST = 3.0       # the query asks for a class ("which class ...") and this is one
 TEST_PENALTY = 0.5
+TYPE_PENALTY = 0.7     # TypeScript interface/type alias declarations, unless the query asks for a type
+BODY_WEIGHT = 1.0      # BM25F weight of the body field (function/method source) vs. the metadata field
+BODY_MAX_BYTES = 2 * 1024 * 1024  # files larger than this are not read for bodies
 NESTED_PENALTY = 0.5   # closures ("outer.<locals>.inner") are rarely what a reader wants
 MAX_JOIN = 3           # adjacent query words joined into identifiers: "test client" -> test_client
 
@@ -141,6 +164,15 @@ _TEST_WORDS = frozenset({"test", "tests", "testing", "pytest", "conftest", "fixt
 _CLASS_WORDS = frozenset(
     {"class", "classes", "sınıf", "sınıfı", "sınıfını", "sınıflar", "sınıfları"}
 )
+# A query word from this set lifts the type-declaration penalty (TypeScript
+# ``interface``/``type``), unless it is part of a joined identifier.
+_TYPE_WORDS = frozenset(
+    {
+        "interface", "interfaces", "type", "types", "typed", "typing",
+        "arayüz", "arayüzü", "arayüzleri", "tip", "tipi", "tür", "türü",
+    }
+)
+_TYPE_KINDS = frozenset({"interface", "type"})
 
 # Common abbreviations in identifiers, looked up by a query word or its stem.
 _ABBREVIATIONS: dict[str, tuple[str, ...]] = {
@@ -219,13 +251,18 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     "yarat": ("create",), "sil": ("delete", "remove"), "güncelle": ("update",),
     "bağlantı": ("connection",), "içerik": ("content",), "biçim": ("format",),
     "doğrulama": ("validation", "auth"), "birleştir": ("merge",), "birleşti": ("merge",),
+    "süreç": ("process",), "değiştir": ("change", "modify"), "aday": ("candidate",),
+    "incele": ("inspect",), "seçenek": ("option",), "satır": ("line",), "ajan": ("agent",),
+    "hedef": ("target",), "enjekte": ("inject",), "senaryo": ("scenario",), "göreli": ("relative",),
+    "bağlan": ("connect", "attach"), "alanlar": ("field",), "oyun": ("game",),
 }
 # Two-word phrases: (first stem, second stem) -> English. The first word is
 # then filler and the second carries the translation ("zaman aşımı" -> timeout,
 # not time + exceed).
 _TR_PHRASES: dict[tuple[str, str], tuple[str, ...]] = {
     ("zaman", "aşım"): ("timeout",), ("yeniden", "dene"): ("retry",),
-    ("tekrar", "dene"): ("retry",),
+    ("tekrar", "dene"): ("retry",), ("kimlik", "bilgi"): ("credential",),
+    ("içe", "aktar"): ("import",), ("dışa", "aktar"): ("export",),
 }
 _TR_MIN_STEM = 3
 # A query is treated as Turkish when it has a Turkish letter or one of these
@@ -317,15 +354,22 @@ def stem(word: str) -> str:
     return w
 
 
+def _bare(name: str) -> str:
+    """A name without its outer underscores and JavaScript sigils:
+    ``__init__`` -> ``init``, ``#selectAutomatically`` (a private class
+    member) -> ``selectAutomatically``, ``$el`` -> ``el``."""
+    return name.strip("_#$")
+
+
 def _name_parts(name: str) -> tuple[str, ...]:
     parts = tuple(p for p in _pieces(name) if len(p) >= 2)
-    core = name.strip("_")
+    core = _bare(name)
     return parts or ((_lower(core),) if core else ())
 
 
 def _whole(name: str) -> str:
     """The whole-identifier token of a name, as :func:`tokenize` emits it."""
-    core = name.strip("_")
+    core = _bare(name)
     pieces = _pieces(core)
     if len(pieces) > 1:
         return _lower(core)
@@ -376,6 +420,7 @@ _TR = _tr_lexicon()
 _TR_PHRASES_FOLDED = {(_fold(a), _fold(b)): english for (a, b), english in _TR_PHRASES.items()}
 _TR_FILLER_FOLDED = frozenset(_fold(w) for w in _TR_FILLER)
 _CLASS_WORDS_FOLDED = frozenset(_fold(w) for w in _CLASS_WORDS)
+_TYPE_WORDS_FOLDED = frozenset(_fold(w) for w in _TYPE_WORDS)
 
 
 def _translate_tr(word: str) -> Optional[tuple[str, ...]]:
@@ -434,6 +479,48 @@ def _file_stem(path: str) -> str:
     return base.lower()
 
 
+# Symbols whose source lines are indexed as their body. A class body is the
+# sum of its methods (each indexed on its own); an interface or type alias is
+# a list of fields, which would make declarations match like implementations.
+_BODY_KINDS = frozenset({"function", "method"})
+
+
+class _SourceLines:
+    """Reads checkout files once, as lines split on ``\\n`` (the indexer's
+    line numbers). A missing root or file gives no text."""
+
+    def __init__(self, root: str) -> None:
+        self.root: Optional[Path] = None
+        try:
+            if root and Path(root).is_dir():
+                self.root = Path(root).resolve()
+        except OSError:
+            pass
+        self._lines: dict[str, list[str]] = {}
+
+    def text(self, path: str, start: int, end: int) -> str:
+        if self.root is None:
+            return ""
+        lines = self._lines.get(path)
+        if lines is None:
+            lines = self._lines[path] = self._read(self.root, path)
+        return "\n".join(lines[max(start, 1) - 1 : end])
+
+    @staticmethod
+    def _read(root: Path, path: str) -> list[str]:
+        full = (root / path).resolve()
+        if not full.is_relative_to(root):
+            return []
+        try:
+            with open(full, "rb") as handle:
+                raw = handle.read(BODY_MAX_BYTES + 1)
+        except OSError:
+            return []
+        if len(raw) > BODY_MAX_BYTES:
+            return []
+        return raw.decode("utf-8", errors="replace").lstrip("\ufeff").split("\n")
+
+
 @dataclass
 class Hit:
     path: str
@@ -451,19 +538,21 @@ class _Doc:
     path: str
     symbol: Optional[Symbol]
     end_line: int
-    length: int
+    length: int                # metadata tokens (stems included)
     name: str                  # display name: symbol name, or file stem
     qualname: str              # lowercase qualname without <locals>; "" for files
     dotted: str                # ".module.qualname." lowercase, dot-delimited; "" if unknown
     slashed: str               # "/path" lowercase
     is_test: bool
     is_class: bool
+    is_type: bool              # a TypeScript interface or type alias
     is_nested: bool
     whole: str                 # whole-name token: "url_for", "flaskclient"
     parts: tuple[tuple[str, str], ...]          # (part, stem) of the name
     owner: str = ""                             # enclosing class/function name
     owner_whole: str = ""
     owner_parts: tuple[tuple[str, str], ...] = ()
+    body_length: int = 0                        # body tokens (stems included)
 
 
 @dataclass
@@ -492,6 +581,7 @@ class _Query:
     qualifiers: frozenset[int]         # units only written as the qualifier of a dotted identifier
     mentions_tests: bool
     wants_class: bool
+    wants_type: bool                   # the query mentions types/interfaces (no type penalty)
 
 
 class SearchIndex:
@@ -503,9 +593,14 @@ class SearchIndex:
         modules = module_names(f.path for f in index.files)
 
         self._docs: list[_Doc] = []
+        # Metadata postings (name, qualname, signature, docstring, path; for a
+        # file its path, symbol names and summary) are also the vocabulary
+        # (translation, joined identifiers); body postings only add to BM25.
         self._postings: dict[str, list[tuple[int, int]]] = {}
+        self._body_postings: dict[str, list[tuple[int, int]]] = {}
         self._df: Counter[str] = Counter()
         self._stems: dict[str, str] = {}
+        source = _SourceLines(index.root) if BODY_WEIGHT > 0.0 else None
 
         names_by_file: dict[str, list[str]] = {}
         path_tokens: dict[str, list[str]] = {}
@@ -523,6 +618,11 @@ class SearchIndex:
                 tokens += tokenize(sym.docstring)
             tokens += path_tokens.get(sym.path) or tokenize(_path_text(sym.path))
             owner = qual.rsplit(".", 2)[-2] if "." in qual else ""
+            body: list[str] = []
+            if source is not None and sym.kind in _BODY_KINDS:
+                text = source.text(sym.path, sym.start_line, sym.end_line)
+                if text:
+                    body = tokenize(text)
             self._add(
                 tokens,
                 _Doc(
@@ -537,6 +637,7 @@ class SearchIndex:
                     slashed="/" + sym.path.lower(),
                     is_test=is_test_path(sym.path),
                     is_class=sym.kind == "class",
+                    is_type=sym.kind in _TYPE_KINDS,
                     is_nested="<locals>" in sym.qualname,
                     whole=_whole(sym.name),
                     parts=_with_stems(_name_parts(sym.name)),
@@ -544,6 +645,7 @@ class SearchIndex:
                     owner_whole=_whole(owner) if owner else "",
                     owner_parts=_with_stems(_name_parts(owner)) if owner else (),
                 ),
+                body,
             )
 
         for record in index.files:
@@ -569,25 +671,53 @@ class SearchIndex:
                     slashed="/" + record.path.lower(),
                     is_test=is_test_path(record.path),
                     is_class=False,
+                    is_type=False,
                     is_nested=False,
                     whole=_whole(file_stem),
                     parts=_with_stems(_name_parts(file_stem)),
                 ),
             )
 
-        # Symbols and files have very different lengths: normalize each kind by its own mean.
-        self._avgdl: dict[str, float] = {}
+        # Symbols and files have very different lengths: normalize each kind by
+        # its own mean, and a body by the mean body length (BM25F: each field
+        # is normalized by its own length, so a long body does not dilute the
+        # name and signature matches).
+        avgdl: dict[str, float] = {}
         for kind in ("symbol", "file"):
             lengths = [d.length for d in self._docs if d.kind == kind]
-            self._avgdl[kind] = (sum(lengths) / len(lengths)) if lengths else 1.0
+            avgdl[kind] = (sum(lengths) / len(lengths)) if lengths else 1.0
+        bodies = [d.body_length for d in self._docs if d.body_length]
+        avg_body = (sum(bodies) / len(bodies)) if bodies else 1.0
+        self._norm = [1.0 - B + B * d.length / avgdl[d.kind] for d in self._docs]
+        self._body_norm = [
+            (1.0 - B + B * d.body_length / avg_body) / BODY_WEIGHT if d.body_length else 0.0
+            for d in self._docs
+        ]
         n_docs = len(self._docs)
         self._idf = {
             tok: math.log(1.0 + (n_docs - df + 0.5) / (df + 0.5)) for tok, df in self._df.items()
         }
         self._idf_unseen = math.log(1.0 + (n_docs + 0.5) / 0.5)  # a word no document has
 
-    def _add(self, tokens: list[str], doc: _Doc) -> None:
-        """Index ``tokens`` plus the stem of every simple token whose stem differs."""
+    def _add(self, tokens: list[str], doc: _Doc, body: Optional[list[str]] = None) -> None:
+        """Index ``tokens`` and ``body`` (the tokens of the symbol's source
+        lines), each plus the stem of every simple token whose stem differs."""
+        tokens = tokens + self._stems_of(tokens)
+        body = body + self._stems_of(body) if body else []
+        doc.length = len(tokens)
+        doc.body_length = len(body)
+        doc_id = len(self._docs)
+        self._docs.append(doc)
+        counted = Counter(tokens)
+        for tok, tf in counted.items():
+            self._postings.setdefault(tok, []).append((doc_id, tf))
+            self._df[tok] += 1
+        for tok, tf in Counter(body).items():
+            self._body_postings.setdefault(tok, []).append((doc_id, tf))
+            if tok not in counted:
+                self._df[tok] += 1
+
+    def _stems_of(self, tokens: list[str]) -> list[str]:
         stems = []
         for tok in tokens:
             if "_" not in tok:
@@ -596,13 +726,7 @@ class SearchIndex:
                     s = self._stems[tok] = stem(tok)
                 if s != tok:
                     stems.append(s)
-        tokens = tokens + stems
-        doc.length = len(tokens)
-        doc_id = len(self._docs)
-        self._docs.append(doc)
-        for tok, tf in Counter(tokens).items():
-            self._postings.setdefault(tok, []).append((doc_id, tf))
-            self._df[tok] += 1
+        return stems
 
     # ------------------------------------------------------------------ query
 
@@ -614,17 +738,12 @@ class SearchIndex:
         if not q.tokens:
             return []
 
-        # BM25 accumulation over the postings of the query tokens only.
+        # BM25F accumulation over the postings of the query tokens only.
         scores: dict[int, float] = {}
         for tok in q.tokens:
-            postings = self._postings.get(tok)
-            if not postings:
-                continue
             idf = q.idf[tok]
-            for doc_id, tf in postings:
-                doc = self._docs[doc_id]
-                norm = K1 * (1.0 - B + B * doc.length / self._avgdl[doc.kind])
-                scores[doc_id] = scores.get(doc_id, 0.0) + idf * tf * (K1 + 1.0) / (tf + norm)
+            for doc_id, tf in self._term_frequencies(tok):
+                scores[doc_id] = scores.get(doc_id, 0.0) + idf * tf * (K1 + 1.0) / (tf + K1)
 
         scored = [(base * self._boost(self._docs[d], q, None), d) for d, base in scores.items()]
         top = heapq.nsmallest(k, scored, key=lambda sd: (-sd[0], *self._order(sd[1])))
@@ -649,6 +768,18 @@ class SearchIndex:
                 )
             )
         return hits
+
+    def _term_frequencies(self, tok: str) -> list[tuple[int, float]]:
+        """``(doc_id, tf)`` for ``tok``, each field's count divided by its
+        length normalization and a body count weighted by BODY_WEIGHT (BM25F)."""
+        norm = self._norm
+        merged = {doc_id: tf / norm[doc_id] for doc_id, tf in self._postings.get(tok) or ()}
+        body = self._body_postings.get(tok)
+        if body:
+            body_norm = self._body_norm
+            for doc_id, tf in body:
+                merged[doc_id] = merged.get(doc_id, 0.0) + tf / body_norm[doc_id]
+        return list(merged.items())
 
     def _order(self, doc_id: int) -> tuple[str, int, str, str]:
         doc = self._docs[doc_id]
@@ -693,6 +824,10 @@ class SearchIndex:
                 f *= NESTED_PENALTY
                 if why is not None:
                     why.append(f"nested x{NESTED_PENALTY:g}")
+            if doc.is_type and not q.wants_type:
+                f *= TYPE_PENALTY
+                if why is not None:
+                    why.append(f"type declaration x{TYPE_PENALTY:g}")
         else:
             name_f, _exp, _units = self._name_factor(doc, q, FILE_NAME_BOOST, "path match", why)
             f *= name_f
@@ -782,27 +917,39 @@ class SearchIndex:
         return factor, exponent, units
 
     def _bm25_terms(self, doc_id: int, q: _Query) -> str:
-        """Matched query words, strongest first.
+        """Matched query words, strongest first; after ``body:`` the words
+        found only in the symbol's body.
 
         ``word~`` marks a word that matched only through its stem or abbreviation.
         """
-        doc = self._docs[doc_id]
-        norm = K1 * (1.0 - B + B * doc.length / self._avgdl[doc.kind])
         groups: dict[str, list] = {}
         for tok in q.tokens:
-            tf = self._tf(tok, doc_id)
-            if not tf:
+            meta = self._tf(tok, doc_id)
+            body = self._tf(tok, doc_id, self._body_postings)
+            if not meta and not body:
                 continue
+            tf = meta / self._norm[doc_id] + (body / self._body_norm[doc_id] if body else 0.0)
             label = q.labels.get(tok, tok)
-            group = groups.setdefault(label, [0.0, False])
-            group[0] += q.idf[tok] * tf * (K1 + 1.0) / (tf + norm)
+            group = groups.setdefault(label, [0.0, False, False])
+            group[0] += q.idf[tok] * tf * (K1 + 1.0) / (tf + K1)
             group[1] = group[1] or tok == label
+            group[2] = group[2] or meta > 0
         ordered = sorted(groups.items(), key=lambda kv: (-kv[1][0], kv[0]))
-        return ", ".join(label if exact else label + "~" for label, (_s, exact) in ordered)
 
-    def _tf(self, tok: str, doc_id: int) -> int:
-        """Term frequency of ``tok`` in ``doc_id`` (postings are in doc-id order)."""
-        postings = self._postings.get(tok)
+        def words(in_meta: bool) -> str:
+            return ", ".join(
+                label if exact else label + "~" for label, (_s, exact, meta) in ordered if meta == in_meta
+            )
+
+        text, body = words(True), words(False)
+        if body:
+            return f"{text}; body: {body}" if text else f"body: {body}"
+        return text
+
+    def _tf(self, tok: str, doc_id: int, store: Optional[dict[str, list[tuple[int, int]]]] = None) -> int:
+        """Term frequency of ``tok`` in ``doc_id`` in the metadata postings (or
+        in ``store``); postings are in doc-id order."""
+        postings = (self._postings if store is None else store).get(tok)
         if not postings:
             return 0
         lo, hi = 0, len(postings)
@@ -825,8 +972,14 @@ class SearchIndex:
         return q
 
     def _analyze_with(self, query: str, drop: frozenset[str]) -> _Query:
-        raw = [_lower(w).strip("_") for w in _WORD_RE.findall(query)]
+        written = [w.strip("_") for w in _WORD_RE.findall(query)]
+        raw = [_lower(w) for w in written]
         turkish = _looks_turkish(query, raw)
+        if turkish:
+            # Turkish function words ("ve", "mi", "bu") are dropped even when
+            # some identifier piece makes them index words, unless written as code.
+            coded = {_lower(w) for span in _BACKTICK_RE.findall(query) for w in _WORD_RE.findall(span)}
+            drop = drop | frozenset(w for w in raw if _fold(w) in _TR_FILLER_FOLDED and w not in coded)
         units: list[_Unit] = []
         keys: dict[str, set[int]] = {}
         labels: dict[str, str] = {}
@@ -858,11 +1011,11 @@ class SearchIndex:
             phrase = phrases.get(i) if w not in self._postings else None
             if phrase is not None:
                 if (w, phrase) not in seen_phrase:
-                    seen_phrase[w, phrase] = self._add_word(w, drop, turkish, units, key, emit, phrase)
+                    seen_phrase[w, phrase] = self._add_word(w, drop, turkish, units, key, emit, phrase, written[i])
                 uid, forms = seen_phrase[w, phrase]
             else:
                 if w not in seen:
-                    seen[w] = self._add_word(w, drop, turkish, units, key, emit)
+                    seen[w] = self._add_word(w, drop, turkish, units, key, emit, None, written[i])
                 uid, forms = seen[w]
             word_unit.append(uid)
             spellings.append(forms)
@@ -884,6 +1037,8 @@ class SearchIndex:
                 if not found:
                     continue
                 members = {word_unit[j] for j in range(i, i + size)} - {None}
+                if not members:
+                    continue  # only function words: "may be" is not ``maybe``
                 excess = max(self._idf[c] for c in found) - sum(units[m].weight for m in members)
                 jid = len(units)
                 units.append(_Unit(" ".join(raw[i : i + size]), max(0.0, excess)))
@@ -921,6 +1076,7 @@ class SearchIndex:
             mentions_tests=any(w in _TEST_WORDS for i, w in enumerate(raw) if i not in consumed),
             wants_class=bool(_CLASS_WORDS_FOLDED & {_fold(w) for w in raw})
             and not _CLASS_BASED_RE.search(query),
+            wants_type=any(_fold(w) in _TYPE_WORDS_FOLDED for i, w in enumerate(raw) if i not in consumed),
         )
 
     def _add_word(
@@ -932,21 +1088,23 @@ class SearchIndex:
         key: Callable[[str, Optional[int]], None],
         emit: Callable[..., None],
         phrase: Optional[tuple[str, ...]] = None,
+        written: str = "",
     ) -> tuple[Optional[int], list[str]]:
         """Turn one query word into a unit (or nothing). Returns its unit id and the
         spellings tried when joining it with its neighbours. ``phrase`` is the
-        word's translation as part of a Turkish phrase."""
+        word's translation as part of a Turkish phrase; ``written`` the word as
+        written (case kept), so that a camelCase word splits as code does."""
         spellings = ([w] + [a for a in _abbreviations(w) if a != w]) if w else []
         if phrase is not None:
             forms: Optional[list[str]] = [e for e in phrase if e not in drop] or None
         else:
-            forms = self._forms(w, drop, turkish) if len(w) >= 2 else None
+            forms = self._forms(w, drop, turkish, written) if len(w) >= 2 else None
         if forms is None:  # stopword, filler or too short: may still complete a name's parts
             if len(w) >= 2:
                 key(w, None)
             return None, spellings
         uid = len(units)
-        translated = forms != [w]
+        translated = forms != [w] and forms != [written]
         unit_tokens: list[tuple[str, Optional[float]]] = []  # (token, IDF cap)
 
         def add(tok: str, label: str, cap: Optional[float] = None) -> None:
@@ -984,10 +1142,20 @@ class SearchIndex:
         units.append(_Unit(w, weight))
         return uid, spellings
 
-    def _forms(self, word: str, drop: frozenset[str], turkish: bool) -> Optional[list[str]]:
-        """The search forms of one query word, or None when it is dropped."""
+    def _forms(self, word: str, drop: frozenset[str], turkish: bool, written: str = "") -> Optional[list[str]]:
+        """The search forms of one query word, or None when it is dropped.
+
+        A compound word is searched as an identifier: its parts and its whole.
+        ``written`` is the word with its case, so a lowerCamel word
+        (``ipcRenderer``, code by its shape) splits into ``ipc``, ``renderer``
+        and ``ipcrenderer`` exactly as the same word in code does. An
+        UpperCamel word stays whole: in prose it is a product name
+        ("JavaScript" is not "java" + "script") or a class the query names,
+        which the explicit-identifier match handles."""
         if _is_compound(word):
             return [word]
+        if written[:1].islower() and written.isascii() and _is_compound(written):
+            return [written]
         if word in drop:
             return None
         if turkish and word not in self._postings:
@@ -1040,7 +1208,7 @@ def _explicit_match(doc: _Doc, explicit: list[_Explicit]) -> Optional[_Explicit]
     """
     if not explicit or doc.symbol is None:
         return None
-    name = doc.symbol.name.strip("_")
+    name = _bare(doc.symbol.name)
     for e in explicit:
         if e.name != name:
             continue

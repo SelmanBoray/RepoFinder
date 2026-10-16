@@ -17,6 +17,7 @@ from repofinder.search import (
     _explicit_identifiers,
     _file_stem,
     _path_text,
+    _whole,
     stem,
     tokenize,
 )
@@ -767,3 +768,183 @@ def test_typescript_index_file_name_and_test_penalty() -> None:
     assert "test file x0.5" in test_hit.why
     file_hit = next(h for h in search.search("parser", k=10) if h.kind == "file" and h.path == "src/parser/index.ts")
     assert "path match: parser" in file_hit.why
+
+
+# --------------------------------------------------------------------------- #
+# v4: TypeScript repositories (type penalty, body field, camelCase, #private,
+# Turkish filler and vocabulary)
+# --------------------------------------------------------------------------- #
+
+_TS_REGISTRY = """\
+/** What the registry chose and why. */
+export interface ProviderChoice {
+  readonly provider: string;
+  readonly reason: string;
+}
+
+export type ProviderChoiceResult = ProviderChoice | undefined;
+
+/** The policy of the snapshot cache. */
+export interface SnapshotPolicy {
+  readonly maxEntries: number;
+}
+
+/** Build the policy of the snapshot cache. */
+export function snapshotPolicy(maxEntries: number): SnapshotPolicy {
+  return { maxEntries };
+}
+
+export class ProviderRegistry {
+  /** Pick the provider for a target. */
+  choose(target: string): Promise<ProviderChoice> {
+    return this.#selectAutomatically(target);
+  }
+
+  async #selectAutomatically(target: string): Promise<ProviderChoice> {
+    // Ghidra comes before Hopper: a fixed priority order.
+    const ranked = ["ghidra", "hopper"];
+    return { provider: ranked[0], reason: target };
+  }
+}
+"""
+
+_TS_ELECTRON = """\
+/** Pair each renderer call with the main-process listener of its channel. */
+export const classifyIpcPairings = (records: readonly string[]): string[] => {
+  return records.filter((channel) => channel.length > 0);
+};
+
+export const loadJavaBridge = (): string => "jar";
+
+export function scriptRunner(): void {}
+"""
+
+
+@pytest.fixture()
+def ts_repo(tmp_path: Path) -> Path:
+    src = tmp_path / "src"
+    (src / "application").mkdir(parents=True)
+    (src / "application" / "ProviderRegistry.ts").write_text(_TS_REGISTRY, encoding="utf-8")
+    (src / "electron").mkdir()
+    (src / "electron" / "ipc.ts").write_text(_TS_ELECTRON, encoding="utf-8")
+    return tmp_path
+
+
+def _ts_search(root: Path) -> SearchIndex:
+    return SearchIndex(build_index(root, "ts", str(root)))
+
+
+def test_type_declarations_rank_below_the_implementation(ts_repo: Path) -> None:
+    search = _ts_search(ts_repo)
+    hits = search.search("snapshot policy", k=5)
+    order = ids(hits)
+    implementation = order.index("src/application/ProviderRegistry.ts::snapshotPolicy")
+    declaration = order.index("src/application/ProviderRegistry.ts::SnapshotPolicy")
+    assert implementation < declaration
+    assert "type declaration x0.7" in hits[declaration].why
+    assert "type declaration" not in hits[implementation].why
+    # Asking for the interface lifts the penalty.
+    asked = search.search("snapshot policy interface", k=5)
+    hit = next(h for h in asked if h.symbol_id == "src/application/ProviderRegistry.ts::SnapshotPolicy")
+    assert "type declaration" not in hit.why
+    # A type alias is a declaration too.
+    alias = next(h for h in search.search("provider choice result", k=5)
+                 if h.symbol_id == "src/application/ProviderRegistry.ts::ProviderChoiceResult")
+    assert "type declaration x0.7" in alias.why
+
+
+def test_function_bodies_are_searched(ts_repo: Path) -> None:
+    hits = _ts_search(ts_repo).search("priority order between ghidra and hopper", k=5)
+    assert hits[0].symbol_id == "src/application/ProviderRegistry.ts::ProviderRegistry.#selectAutomatically"
+    assert hits[0].why.endswith("body: ghidra, hopper, order, priority")
+    # A class is not indexed by its body (its methods are).
+    assert "src/application/ProviderRegistry.ts::ProviderRegistry" not in ids(hits)
+
+
+def test_no_checkout_means_no_body(ts_repo: Path) -> None:
+    index = build_index(ts_repo, "ts", str(ts_repo))
+    index.root = str(ts_repo / "gone")
+    assert SearchIndex(index).search("priority order between ghidra and hopper", k=5) == []
+
+
+def test_a_long_body_does_not_dilute_a_name_match(tmp_path: Path) -> None:
+    filler = "\n".join(f"  const step{i} = compute(value, {i});" for i in range(200))
+    (tmp_path / "src").mkdir()
+    (tmp_path / "src" / "a.ts").write_text(
+        f"export function refreshToken(value: string): void {{\n{filler}\n}}\n"
+        "export function helper(): string {\n  return 'refresh the token';\n}\n",
+        encoding="utf-8",
+    )
+    hits = _ts_search(tmp_path).search("refresh token", k=3)
+    assert hits[0].symbol_id == "src/a.ts::refreshToken"
+
+
+def test_lower_camel_query_words_split_like_code(ts_repo: Path) -> None:
+    search = _ts_search(ts_repo)
+    tokens = search._analyze("match an ipcRenderer call").tokens
+    assert {"ipc", "renderer", "ipcrenderer"} <= set(tokens)
+    assert search.search("ipcRenderer pairings", k=1)[0].symbol_id == "src/electron/ipc.ts::classifyIpcPairings"
+    # An UpperCamel word stays whole: "JavaScript" is not "java" + "script".
+    tokens = search._analyze("JavaScript bundles").tokens
+    assert "javascript" in tokens and "java" not in tokens and "script" not in tokens
+
+
+def test_private_members_match_by_their_bare_name(ts_repo: Path) -> None:
+    assert _whole("#selectAutomatically") == "selectautomatically"
+    assert _whole("$fooBar") == "foobar"
+    search = _ts_search(ts_repo)
+    target = "src/application/ProviderRegistry.ts::ProviderRegistry.#selectAutomatically"
+    hit = search.search("select automatically", k=1)[0]
+    assert hit.symbol_id == target
+    assert "name match: #selectAutomatically;" in hit.why  # the whole name, no partial factor
+    hit = search.search("where is `selectAutomatically`", k=1)[0]
+    assert hit.symbol_id == target
+
+
+def test_turkish_function_words_are_dropped_even_when_indexed() -> None:
+    index = make_index(
+        [
+            sym("pkg/flags.ts", "veFlag", doc="Vector extension flag."),
+            sym("pkg/session.ts", "openSession", doc="Open a session with a cookie."),
+        ]
+    )
+    search = SearchIndex(index)
+    units = [u.text for u in search._analyze("oturum ve çerez nerede açılıyor").units]
+    assert "ve" not in units
+    assert search.search("oturum ve çerez nerede", k=1)[0].symbol_id == "pkg/session.ts::openSession"
+    # Written as code it is kept, and an English query keeps it anyway.
+    assert "ve" in [u.text for u in search._analyze("`ve` nerede kullanılıyor").units]
+    assert "ve" in [u.text for u in search._analyze("where is the ve flag").units]
+
+
+@pytest.mark.parametrize(
+    "query, english, expected",
+    [
+        ("kimlik bilgisi nerede tutuluyor", "credential", "pkg/redact.ts::dropCredential"),
+        ("adaylar nerede", "candidate", "pkg/match.ts::pickCandidate"),
+        ("süreç nerede başlatılıyor", "process", "pkg/process.ts::spawnProcess"),
+        ("senaryo nerede", "scenario", "pkg/process.ts::runScenario"),
+        ("dosyalar nerede içe aktarılıyor", "import", "pkg/har.ts::importArchive"),
+    ],
+)
+def test_turkish_code_vocabulary(query: str, english: str, expected: str) -> None:
+    index = make_index(
+        [
+            sym("pkg/redact.ts", "dropCredential", doc="Remove a secret."),
+            sym("pkg/match.ts", "pickCandidate", doc="Choose one."),
+            sym("pkg/process.ts", "spawnProcess", doc="Start a child."),
+            sym("pkg/process.ts", "runScenario", doc="Replay the steps."),
+            sym("pkg/har.ts", "importArchive", doc="Read a capture."),
+            sym("pkg/identity.ts", "identityInfo", doc="Who the user is."),
+        ]
+    )
+    search = SearchIndex(index)
+    assert stem(english) in search._analyze(query).tokens
+    assert search.search(query, k=1)[0].symbol_id == expected
+
+
+def test_function_words_alone_never_join_into_an_identifier() -> None:
+    index = make_index([sym("pkg/util.ts", "maybe"), sym("pkg/cache.ts", "cacheAnswer", doc="Cache an answer.")])
+    q = SearchIndex(index)._analyze("which answers may be cached")
+    assert "may be" not in [u.text for u in q.units]
+    assert "maybe" not in q.tokens
