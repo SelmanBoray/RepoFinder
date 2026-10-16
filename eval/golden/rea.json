@@ -1,0 +1,352 @@
+{
+  "repo": {"name": "rea", "source": "https://github.com/morluto/rea", "commit": "fe2a398"},
+  "questions": [
+    {
+      "id": "q01",
+      "question": "With `REA_ANALYSIS_PROVIDER=auto`, which code decides what happens when both Ghidra and Hopper are installed and either one could open the same binary? Is there a priority order between them?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/application/binary/AnalysisProviderRegistry.ts", "symbol": "AnalysisProviderRegistry.#selectAutomatically", "start_line": 315, "end_line": 382}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/application/binary/AnalysisProviderRegistry.ts", "symbol": "AnalysisProviderRegistry.select", "start_line": 183, "end_line": 246},
+        {"path": "src/application/binary/AnalysisProviderRegistry.ts", "symbol": "AnalysisProviderRegistry.#selectConcrete", "start_line": 268, "end_line": 313},
+        {"path": "src/application/binary/AnalysisProviderEvaluation.ts", "symbol": "evaluateAnalysisProviderCandidate", "start_line": 27, "end_line": 123}
+      ],
+      "notes": "#selectAutomatically evaluates every available and target-supported candidate in parallel, keeps those that produced an analysis profile, and returns an 'ambiguous' ProviderSelectionError when more than one is usable, a null binding when none is, and binds only a single usable candidate ('auto-single-candidate') (AnalysisProviderRegistry.ts:315-382). There is no priority order: the constructor sorts providers by id only for determinism (116-120). Wrong but plausible: select (parses the selector and dispatches to #selectAutomatically or #selectConcrete), #selectConcrete (an explicitly named provider), evaluateAnalysisProviderCandidate (judges one candidate, never chooses between them)."
+    },
+    {
+      "id": "q02",
+      "question": "How is the `evidence_id` (the `ev_...` string) of an Evidence record computed, and which fields are left out of the hash so that display details such as the local file path can change without changing the id?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/domain/evidence.ts", "symbol": "computeEvidenceId", "start_line": 273, "end_line": 274},
+        {"path": "src/domain/evidence.ts", "symbol": "semanticProjection", "start_line": 247, "end_line": 270}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/domain/evidence.ts", "symbol": "createEvidence", "start_line": 338, "end_line": 353},
+        {"path": "src/domain/analysisSnapshot.ts", "symbol": "analysisQueryId", "start_line": 515, "end_line": 523},
+        {"path": "src/application/investigation/EvidenceLedger.ts", "symbol": "EvidenceLedger.record", "start_line": 49, "end_line": 72}
+      ],
+      "notes": "computeEvidenceId is 'ev_' + digestCanonicalValue(semanticProjection(evidence)) (evidence.ts:273-274). semanticProjection keeps only the subject's digest, format and architecture plus provider, profile, predicate, operation, parameters, raw and normalized results, confidence, authority, environment, limitations, coverage, locations and links; the subject's name and local_path are dropped (247-270), which is why rebindEvidenceToTargetPath can move a record to a new path under the same id. Wrong but plausible: createEvidence (only attaches the computed id), analysisQueryId (a different 'query_' sha256 used as the snapshot cache key), EvidenceLedger.record (deduplicates or rejects records that share an id)."
+    },
+    {
+      "id": "q03",
+      "question": "HAR dosyası içe aktarılırken `Authorization`, `Cookie` gibi başlıkların değerlerinin kimlik bilgisi sayılıp atılmasına hangi kod karar veriyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/browser/history/CaptureRedaction.ts", "symbol": "CaptureRedaction.harCredential", "start_line": 71, "end_line": 81}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/browser/history/HarCapture.ts", "symbol": "projectHar", "start_line": 105, "end_line": 240},
+        {"path": "src/browser/history/CaptureRedaction.ts", "symbol": "CaptureRedaction.text", "start_line": 27, "end_line": 46},
+        {"path": "src/browser/history/CaptureRedaction.ts", "symbol": "CaptureRedaction.harTransportUrl", "start_line": 84, "end_line": 95}
+      ],
+      "notes": "Turkish: 'When a HAR file is imported, which code decides that the values of headers such as Authorization and Cookie are credentials and drops them?'. CaptureRedaction.harCredential matches /request|response/headers/N/value pointers whose header name is authorization, proxy-authorization, cookie or set-cookie (set at CaptureRedaction.ts:6-11), and every /request|response/cookies/N/value pointer (71-81); projectHar then replaces the value through redactor.credential (HarCapture.ts:137-142), and the Fiddler SAZ projection reuses the same predicate. Wrong but plausible: projectHar (walks the HAR and only calls the predicate), CaptureRedaction.text (explicitly listed sensitive literals and URL userinfo), CaptureRedaction.harTransportUrl (decides which fields have URL semantics)."
+    },
+    {
+      "id": "q04",
+      "question": "In an Electron app, how does REA match a renderer's `ipcRenderer.invoke(\"save-file\")` call to the main-process `ipcMain.handle(\"save-file\")` handler, and what happens when two handlers listen on the same channel name?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/application/javascript/ElectronBoundaryAnalysis.ts", "symbol": "classifyElectronIpcPairings", "start_line": 46, "end_line": 70}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/application/javascript/ElectronBoundaryAnalysis.ts", "symbol": "unambiguousElectronIpcPairings", "start_line": 73, "end_line": 81},
+        {"path": "src/application/javascript/ElectronBoundaryGraphIpc.ts", "symbol": "addLiteralPairings", "start_line": 244, "end_line": 271},
+        {"path": "src/application/javascript/ElectronBoundaryAnalysis.ts", "symbol": "compatibleIpcModes", "start_line": 186, "end_line": 194}
+      ],
+      "notes": "classifyElectronIpcPairings takes every pairable renderer transmission, collects main-process handlers with exactly the same literal channel and a compatible mode, and labels it 'paired' (one candidate), 'ambiguous' (several) or 'unpaired' (none); a dynamic channel never pairs (ElectronBoundaryAnalysis.ts:46-70). Wrong but plausible: unambiguousElectronIpcPairings (keeps only the 'paired' results), addLiteralPairings in ElectronBoundaryGraphIpc.ts (draws the application-graph edge for those pairs), compatibleIpcModes (only the invoke->handle / send->listen rule)."
+    },
+    {
+      "id": "q05",
+      "question": "Bir .NET DLL'inin Unity/Mono oyunu mu, .NET Framework mu yoksa modern .NET mi oldugu hangi fonksiyonda belirleniyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/dotnet/ManagedArtifactInspector.ts", "symbol": "runtimeFamilyFor", "start_line": 172, "end_line": 247}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/dotnet/ManagedArtifactInspector.ts", "symbol": "runtimeFamilyFromCliHeader", "start_line": 163, "end_line": 170},
+        {"path": "src/dotnet/ManagedArtifactInspector.ts", "symbol": "implementationFor", "start_line": 249, "end_line": 256},
+        {"path": "src/dotnet/ManagedArtifactInspector.ts", "symbol": "runtimeClassification", "start_line": 269, "end_line": 298}
+      ],
+      "notes": "Turkish written without Turkish letters ('Bir .NET DLL'inin Unity/Mono oyunu mu, .NET Framework mu yoksa modern .NET mi olduğu hangi fonksiyonda belirleniyor?'). runtimeFamilyFor checks in order a cleared ILONLY flag (mixed-clr-native), a UnityEngine AssemblyRef (unity-mono), a .NETFramework TargetFrameworkAttribute (dotnet-framework), and .NETCoreApp or a ReadyToRun header (modern-dotnet), recording file-offset evidence for each; .NET Standard alone stays unknown (ManagedArtifactInspector.ts:172-247). Wrong but plausible: runtimeFamilyFromCliHeader (header-only shortcut used for partial metadata at 317), implementationFor (cil / ReadyToRun / C++/CLI, a different axis), runtimeClassification (only combines the three results)."
+    },
+    {
+      "id": "q06",
+      "question": "If `GHIDRA_INSTALL_DIR` is not set, how does REA find a Ghidra installation by itself?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/ghidra/GhidraInstallation.ts", "symbol": "discoverGhidraInstallationOnPath", "start_line": 978, "end_line": 1018}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/ghidra/GhidraInstallation.ts", "symbol": "installationCoordinates", "start_line": 409, "end_line": 499},
+        {"path": "src/config/environment.ts", "symbol": "parseEnvironmentValues", "start_line": 111, "end_line": 145},
+        {"path": "src/config/parseConfig.ts", "symbol": "defaultHopperLauncherPath", "start_line": 25, "end_line": 40}
+      ],
+      "notes": "discoverGhidraInstallationOnPath scans PATH for ghidra / ghidraRun (ghidra.bat, ghidraRun.bat, .exe on Windows), resolves the launcher with realpath and accepts its directory only if it contains Ghidra/application.properties and an executable support/analyzeHeadless (GhidraInstallation.ts:978-1018). installationCoordinates calls it only as a fallback when no install dir was configured (418-421). Wrong but plausible: installationCoordinates (derives the headless, properties and decompiler paths from whichever dir it gets), parseEnvironmentValues (only validates an explicit GHIDRA_INSTALL_DIR as absolute), defaultHopperLauncherPath (the equivalent default search, but for Hopper)."
+    },
+    {
+      "id": "q07",
+      "question": "Bir sağlayıcı hata verdiğinde `HopperStartError` gibi iç hata sınıfları, ajana dönen `code`, `retryable` ve `remediation` alanlarına nerede dönüştürülüyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/domain/analysisErrorProjection.ts", "symbol": "projectAnalysisError", "start_line": 46, "end_line": 96}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/domain/analysisErrorProjection.ts", "symbol": "underlyingErrorCode", "start_line": 98, "end_line": 127},
+        {"path": "src/server/toolResult.ts", "symbol": "ToolResultDelivery.toErrorToolResult", "start_line": 95, "end_line": 103},
+        {"path": "src/domain/analysisErrorBase.ts", "symbol": "AnalysisError", "start_line": 64, "end_line": 121}
+      ],
+      "notes": "Turkish: 'When a provider fails, where are internal error classes such as HopperStartError turned into the code, retryable and remediation fields returned to the agent?'. projectAnalysisError resolves the code (cleanup_incomplete overrides the underlying one), category, user message, retryable (RETRYABLE_CODES, retryable capability errors, capacity constraints), remediation.action and details such as captured output and partial observations (analysisErrorProjection.ts:46-96); HopperStartError maps to provider_unavailable through STATIC_ERROR_CODES. Wrong but plausible: underlyingErrorCode (only the code), ToolResultDelivery.toErrorToolResult (serializes the projection into an MCP result), AnalysisError (the tagged base class, no projection)."
+    },
+    {
+      "id": "q08",
+      "question": "Hopper runs REA's Python bridge script inside its own process. Where is the small Python bootstrap generated that hands that script the Unix socket path, the random auth token and the run id?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "src/hopper/BridgeLauncher.ts", "symbol": "bridgeBootstrapSource", "start_line": 451, "end_line": 466}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/hopper/BridgeLauncher.ts", "symbol": "HopperApplicationLauncher.#writeBootstrap", "start_line": 393, "end_line": 417},
+        {"path": "src/hopper/BridgeLauncher.ts", "symbol": "HopperApplicationLauncher.#launchPreparedTarget", "start_line": 225, "end_line": 350},
+        {"path": "src/hopper/HopperClient.ts", "symbol": "HopperClient.#authenticateServerInfo", "start_line": 508, "end_line": 547}
+      ],
+      "notes": "bridgeBootstrapSource emits Python assignments for REA_SOCKET, REA_TOKEN, REA_RUN_ID, REA_TARGET_PATH, REA_OWNS_PROCESS_LIFETIME and REA_RECONNECT_TIMEOUT_SECONDS, then exec()s the configured bridge script (bridge/hopper_bridge.py) (BridgeLauncher.ts:451-466). Wrong but plausible: #writeBootstrap (writes that text to bootstrap.py with mode 0600 and removes it on failure), #launchPreparedTarget (passes '-Y bootstrap.py' to the Hopper launcher), HopperClient.#authenticateServerInfo (validates the bridge's server info after the TypeScript side connects)."
+    },
+    {
+      "id": "q09",
+      "question": "Which native-analysis calls may be answered from REA's in-memory analysis snapshot instead of asking Ghidra or Hopper again, and what makes an operation ineligible?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/application/binary/AnalysisSnapshotCache.ts", "symbol": "isSnapshotCacheable", "start_line": 71, "end_line": 85}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/application/binary/AnalysisSnapshotCache.ts", "symbol": "AnalysisSnapshotCache.lookup", "start_line": 279, "end_line": 333},
+        {"path": "src/application/binary/BinarySessionExecution.ts", "symbol": "prepareSessionExecution", "start_line": 55, "end_line": 94},
+        {"path": "src/domain/analysisSnapshot.ts", "symbol": "analysisQueryId", "start_line": 515, "end_line": 523}
+      ],
+      "notes": "isSnapshotCacheable admits an operation only if it is not stateful, document-scoped operations name a document, cursor-default operations pass an explicit address, and its capability descriptor neither mutates the artifact nor changes permissions, is not cachePolicy 'live', and is either cachePolicy 'snapshot' or unable to write the filesystem (AnalysisSnapshotCache.ts:71-85). Wrong but plausible: AnalysisSnapshotCache.lookup (replays a hit by query id and adds a 'did not re-run the provider' limitation), prepareSessionExecution (calls the predicate and the lookup per request), analysisQueryId (builds the cache key)."
+    },
+    {
+      "id": "q10",
+      "question": "Bir süreç senaryosu çalıştırıldıktan sonra hangi dosyaların oluşturulduğu, silindiği ya da değiştirildiği nasıl belirleniyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/process/capture/ProcessFilesystemEffects.ts", "symbol": "classifyFilesystemEffects", "start_line": 33, "end_line": 116}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/process/capture/FilesystemSnapshot.ts", "symbol": "snapshotRoots", "start_line": 183, "end_line": 377},
+        {"path": "src/process/capture/FilesystemSnapshot.ts", "symbol": "hashFile", "start_line": 84, "end_line": 180},
+        {"path": "src/process/capture/ProcessFilesystemEffects.ts", "symbol": "unobservedAbsenceReason", "start_line": 8, "end_line": 30}
+      ],
+      "notes": "Turkish: 'After a process scenario runs, how is it determined which files were created, deleted or modified?'. classifyFilesystemEffects merges the before and after snapshots by path and labels each entry created, deleted, modified (type, mode, size, symlink target or sha256 differ) or unchanged, and 'unknown' when a root was not fully enumerated, a symlink was not followed, or a content hash is missing on either side (ProcessFilesystemEffects.ts:33-116). Wrong but plausible: snapshotRoots (takes one snapshot), hashFile (hashes one file), unobservedAbsenceReason (only explains why an absence cannot be trusted)."
+    },
+    {
+      "id": "q11",
+      "question": "Before `rea setup` rewrites an agent's existing MCP config file such as `~/.claude.json`, where does it save a copy of the original, and how does it avoid clobbering a copy saved by an earlier run?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/application/SetupClientConfiguration.ts", "symbol": "persistClientConfiguration", "start_line": 222, "end_line": 361},
+        {"path": "src/application/SetupRecoveryBackup.ts", "symbol": "selectCurrentRecoveryBackup", "start_line": 28, "end_line": 75},
+        {"path": "src/application/SetupRecoveryBackup.ts", "symbol": "preserveRecoveryBackup", "start_line": 78, "end_line": 88}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/application/SetupClientConfiguration.ts", "symbol": "restoreConfig", "start_line": 630, "end_line": 646},
+        {"path": "src/application/SetupClientConfiguration.ts", "symbol": "rollbackOrReadbackFailure", "start_line": 648, "end_line": 662},
+        {"path": "src/application/SetupClientConfiguration.ts", "symbol": "configureClientDocument", "start_line": 98, "end_line": 210}
+      ],
+      "notes": "persistClientConfiguration names '<config>.rea.backup', asks selectCurrentRecoveryBackup whether that file already holds the same bytes or otherwise falls back to '<backup>.<sha256>.recovery' (failing when that path holds different data), copies with preserveRecoveryBackup (COPYFILE_EXCL, so an existing copy is never replaced), re-checks the selection, then writes atomically and reads the result back (SetupClientConfiguration.ts:222-361; SetupRecoveryBackup.ts:28-88). Wrong but plausible: restoreConfig and rollbackOrReadbackFailure (restore the in-memory original after a failed readback; they make no copy), configureClientDocument (reads the existing files and plans the edit before persisting)."
+    },
+    {
+      "id": "q12",
+      "question": "Android APK analizi icin JADX jar dosyasinin yolu hangi ortam degiskeninden okunuyor; yol goreli verilirse ya da dosya okunamazsa nasil bir hata donuyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/android/JadxConfiguration.ts", "symbol": "resolveJar", "start_line": 364, "end_line": 395}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/android/JadxConfiguration.ts", "symbol": "requireEngineArchive", "start_line": 266, "end_line": 309},
+        {"path": "src/android/JadxConfiguration.ts", "symbol": "resolveJava", "start_line": 397, "end_line": 451},
+        {"path": "src/android/JadxDoctor.ts", "symbol": "inspectJadxProvider", "start_line": 15, "end_line": 55}
+      ],
+      "notes": "Turkish written without Turkish letters ('Android APK analizi için JADX jar dosyasının yolu hangi ortam değişkeninden okunuyor; yol göreli verilirse ya da dosya okunamazsa nasıl bir hata dönüyor?'). resolveJar reads REA_JADX_MCP_JAR, raises a 'not_configured' JadxConfigurationFailure when it is missing or not absolute and 'executable_missing' when it is unreadable or not a regular file, and returns its realpath (JadxConfiguration.ts:364-395); this variable is not part of the central schema in src/config/environment.ts. Wrong but plausible: requireEngineArchive (later checks the JAR's contents), resolveJava (JAVA_HOME / PATH), inspectJadxProvider (the doctor view of the same settings)."
+    },
+    {
+      "id": "q13",
+      "question": "`rea doctor` reports that everything is ready, but my agent still cannot see REA's tools. Where is the check that starts the real stdio MCP server as a child process, lists its tools and prompts and makes a test tool call?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/mcpDoctor.ts", "symbol": "runProductionMcpDoctor", "start_line": 82, "end_line": 168},
+        {"path": "src/mcpDoctor.ts", "symbol": "inspectProductionMcpSession", "start_line": 195, "end_line": 281}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/application/Doctor.ts", "symbol": "inspectDoctor", "start_line": 220, "end_line": 266},
+        {"path": "src/cli/setupCommands.ts", "symbol": "registerDoctorCommand", "start_line": 100, "end_line": 136},
+        {"path": "src/mcpDoctor.ts", "symbol": "parseOutputArguments", "start_line": 404, "end_line": 449}
+      ],
+      "notes": "This is `rea mcp doctor`, separate from `rea doctor`. runProductionMcpDoctor spawns the dispatcher's 'mcp' entry through the SDK's StdioClientTransport with target-free environment variables and a deadline, then cleans up client and transport (mcpDoctor.ts:82-168); inspectProductionMcpSession lists tools and prompts, compares them with TOOL_CONTRACTS / PROMPT_CONTRACTS, checks the server identity and catalog digest and calls binary_session (195-281). Wrong but plausible: inspectDoctor in Doctor.ts (host readiness behind `rea doctor`, no MCP session), registerDoctorCommand (registers `rea doctor`), parseOutputArguments (only parses --format / --json for `rea mcp doctor`)."
+    },
+    {
+      "id": "q14",
+      "question": "Bir web uygulamasında JavaScript kodunun yüklediği `.wasm` dosyaları, incelenen WASM adaylarıyla nerede eşleştiriliyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "src/wasm/WasmGlueAdapter.ts", "symbol": "associateWasmGlue", "start_line": 7, "end_line": 89}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/wasm/WabtArtifactProvider.ts", "symbol": "WabtArtifactProvider.inspect", "start_line": 74, "end_line": 89},
+        {"path": "src/wasm/WabtWat.ts", "symbol": "parseWabtWat", "start_line": 41, "end_line": 145},
+        {"path": "src/wasm/WabtInterface.ts", "symbol": "decodeWabtInterface", "start_line": 116, "end_line": 312}
+      ],
+      "notes": "Turkish: 'In a web application, where are the .wasm files loaded by the JavaScript code matched with the WASM candidates being inspected?'. associateWasmGlue parses the JavaScript with Babel, collects string, template and directive literals ending in .wasm, and links each one to candidates by exact resolved local path, else by basename, else marks it unresolved, always as static-literal evidence without claiming data flow (WasmGlueAdapter.ts:7-89); WabtArtifactProvider calls it at line 279. Wrong but plausible: WabtArtifactProvider.inspect (entry of inspect_wasm_artifact), parseWabtWat and decodeWabtInterface (parse WABT output for the .wasm module itself)."
+    },
+    {
+      "id": "q15",
+      "question": "When an agent calls a native-analysis MCP tool such as `procedure_pseudo_code`, what path does the request take from the MCP handler to the active provider, and how does the result come back as recorded Evidence?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "src/server/registerOfficialTools.ts", "symbol": "registerOfficialTool", "start_line": 45, "end_line": 113},
+        {"path": "src/server/registerOfficialTools.ts", "symbol": "runOfficialOperation", "start_line": 115, "end_line": 145},
+        {"path": "src/application/binary/BinarySession.ts", "symbol": "BinarySession.withAdmittedAnalysis", "start_line": 673, "end_line": 697},
+        {"path": "src/application/binary/BinarySession.ts", "symbol": "BinarySession.#execute", "start_line": 699, "end_line": 799},
+        {"path": "src/application/binary/BinarySessionExecution.ts", "symbol": "prepareSessionExecution", "start_line": 55, "end_line": 94},
+        {"path": "src/server/toolResult.ts", "symbol": "ToolResultDelivery.toEvidenceToolResult", "start_line": 68, "end_line": 87}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/application/binary/BinarySession.ts", "symbol": "BinarySession.execute", "start_line": 629, "end_line": 638},
+        {"path": "src/server/contractToolHandler.ts", "symbol": "createEvidenceToolHandler", "start_line": 78, "end_line": 106},
+        {"path": "src/application/binary/SessionProviderRouter.ts", "symbol": "SessionProviderRouter.resolve", "start_line": 85, "end_line": 106}
+      ],
+      "notes": "registerOfficialTool registers each OFFICIAL_TOOL_CONTRACTS entry; its handler runs inside withAdmittedAnalysis, parses the input with the contract schema and calls runOfficialOperation, which reports progress and calls analysis.execute (registerOfficialTools.ts:45-145). In a session that port comes from BinarySession.withAdmittedAnalysis, which waits for any target transition and calls #execute; #execute uses prepareSessionExecution to check the capability and try the snapshot cache, calls active.client.execute, binds profile and target, and for cacheable operations records Evidence and a snapshot entry (BinarySession.ts:673-799; BinarySessionExecution.ts:55-94). Back in the handler createEvidence builds the Evidence, recordEvidence stores it and ToolResultDelivery.toEvidenceToolResult returns it with its evidence_id (toolResult.ts:68-87). Wrong but plausible: BinarySession.execute (public entry not used on this MCP path), createEvidenceToolHandler (path of service-backed tools such as inspect_sqlite_database), SessionProviderRouter.resolve (picks the provider route when a target is opened, not per call)."
+    },
+    {
+      "id": "q16",
+      "question": "`rea setup --client claude_code` çalıştırıldığında, komut satırı seçeneklerinin okunmasından Claude Code yapılandırma dosyasının yazılmasına kadar hangi adımlardan geçiliyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "src/cli/setupCommands.ts", "symbol": "registerSetupCommand", "start_line": 45, "end_line": 98},
+        {"path": "src/cli/setupCommands.ts", "symbol": "setupRunOptions", "start_line": 240, "end_line": 285},
+        {"path": "src/application/Setup.ts", "symbol": "runSetupWorkflow", "start_line": 86, "end_line": 376},
+        {"path": "src/application/SetupPlan.ts", "symbol": "planSetupActions", "start_line": 134, "end_line": 243},
+        {"path": "src/application/SetupClients.ts", "symbol": "configureDetectedClients", "start_line": 28, "end_line": 72},
+        {"path": "src/application/SetupClientConfiguration.ts", "symbol": "configureClientConfiguration", "start_line": 82, "end_line": 96},
+        {"path": "src/application/SetupClientConfiguration.ts", "symbol": "persistClientConfiguration", "start_line": 222, "end_line": 361}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/cli/setupCommands.ts", "symbol": "registerDoctorCommand", "start_line": 100, "end_line": 136},
+        {"path": "src/application/SetupClientConfiguration.ts", "symbol": "inspectClientConfiguration", "start_line": 418, "end_line": 437},
+        {"path": "src/application/Setup.ts", "symbol": "installSkillAction", "start_line": 446, "end_line": 476}
+      ],
+      "notes": "Turkish: 'When `rea setup --client claude_code` runs, which steps does it go through from reading the command-line options to writing the Claude Code configuration file?'. registerSetupCommand declares the incur options (--client is an array of supported client ids, plus --yes, --dry-run and others) and runSetupCommand builds SetupOptions with setupRunOptions, which turns --client into clientIds and a readiness scope (setupCommands.ts:45-98, 240-285). runSetupWorkflow discovers state, plans configure_client / skill / Hopper actions with planSetupActions, asks for approval unless --yes, and calls configureDetectedClients (Setup.ts:86-376; SetupPlan.ts:134-243; SetupClients.ts:28-72). Each client goes through configureClientConfiguration, configureClientDocument and persistClientConfiguration, which saves a copy of the original, writes atomically and reads back (SetupClientConfiguration.ts:82-96, 222-361); for claude_code the file is .claude.json under CLAUDE_CONFIG_DIR or the home directory (SupportedClients.ts:161-162, 486-495). Wrong but plausible: registerDoctorCommand (sibling read-only command), inspectClientConfiguration (reads a registration for status, never writes), installSkillAction (installs the skill, not the MCP registration)."
+    },
+    {
+      "id": "q17",
+      "question": "How does REA inspect a SQLite database file and its `-wal` without opening or modifying the original? Walk me through the steps from the provider call to the code that finally runs SQL against the data.",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "src/sqlite/SqliteDatabaseProvider.ts", "symbol": "SqliteDatabaseProvider.inspect", "start_line": 79, "end_line": 124},
+        {"path": "src/sqlite/SqliteDatabaseProvider.ts", "symbol": "SqliteDatabaseProvider.#inspect", "start_line": 232, "end_line": 368},
+        {"path": "src/sqlite/SqliteDatabaseSnapshot.ts", "symbol": "captureSqliteDatabaseSnapshot", "start_line": 251, "end_line": 367},
+        {"path": "src/sqlite/SqliteDatabaseWorkerExecution.ts", "symbol": "executeSqliteDatabaseWorker", "start_line": 107, "end_line": 189},
+        {"path": "src/sqlite/SqliteDatabaseWorker.ts", "symbol": "main", "start_line": 15, "end_line": 56},
+        {"path": "src/sqlite/SqliteDatabaseInspection.ts", "symbol": "inspectSqliteDatabaseSnapshot", "start_line": 482, "end_line": 551}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "src/server/registerSqliteTools.ts", "symbol": "registerSqliteTools", "start_line": 11, "end_line": 31},
+        {"path": "src/sqlite/SqliteDatabaseProvider.ts", "symbol": "cleanupSqliteRoot", "start_line": 404, "end_line": 426},
+        {"path": "src/sqlite/SqliteDatabaseFailures.ts", "symbol": "sqliteDatabaseFailure", "start_line": 43, "end_line": 143}
+      ],
+      "notes": "SqliteDatabaseProvider.inspect enforces the concurrent-inspection capacity and runs #inspect in the artifact resource scope (SqliteDatabaseProvider.ts:79-124); #inspect validates the input, creates a private runtime root and calls captureSqliteDatabaseSnapshot, which stats the database, -wal and -journal, verifies any rollback journal is inactive, copies the database and WAL into database.snapshot(-wal) with mode 0600 and checks that the file set did not change (SqliteDatabaseSnapshot.ts:251-367). executeSqliteDatabaseWorker writes request.json and runs SqliteDatabaseWorker.js in a separate Node process with a 256 MiB heap and a deadline (SqliteDatabaseWorkerExecution.ts:107-189); the worker's main calls inspectSqliteDatabaseSnapshot, which opens only the copy with DatabaseSync readOnly, sets trusted_schema=OFF and query_only=ON and reads schema and rows (SqliteDatabaseWorker.ts:15-56; SqliteDatabaseInspection.ts:482-551). Wrong but plausible: registerSqliteTools (MCP binding only), cleanupSqliteRoot (removes the private copy afterwards), sqliteDatabaseFailure (maps failures to typed errors)."
+    },
+    {
+      "id": "q18",
+      "question": "Where is the decompiler itself, the code that does the data-flow analysis and type recovery to turn machine code into the C-like pseudocode that `procedure_pseudo_code` returns when Ghidra is the provider?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "src/ghidra/GhidraClient.ts", "symbol": "GhidraClient.callTool", "start_line": 356, "end_line": 371},
+        {"path": "bridge/ghidra/ReaGhidraBridge.java", "symbol": "ReaGhidraBridge.decompile", "start_line": 3305, "end_line": 3324}
+      ],
+      "related": [
+        {"path": "src/ghidra/GhidraInstallation.ts", "symbol": "nativeDecompilerCheck", "start_line": 661, "end_line": 747},
+        {"path": "src/ghidra/GhidraFunctionValues.ts", "symbol": "parseGhidraFunctionResult", "start_line": 446, "end_line": 514},
+        {"path": "src/ghidra/GhidraLauncher.ts", "symbol": "ghidraHeadlessArguments", "start_line": 567, "end_line": 734}
+      ],
+      "notes": "Decompilation is Ghidra's own: the packaged Java HeadlessScript only calls DecompInterface.decompileFunction in ReaGhidraBridge.decompile (ReaGhidraBridge.java:3305-3324), which drives Ghidra's native decompile process; on the TypeScript side GhidraClient.callTool only queues the operation to that bridge (GhidraClient.ts:356-371). Correct behaviour: say the decompiler is not in the repo and cite the pointer. Wrong but plausible: nativeDecompilerCheck (only checks that Ghidra's decompile executable exists and matches the JVM architecture), parseGhidraFunctionResult (validates the returned text), ghidraHeadlessArguments (builds the analyzeHeadless command line)."
+    },
+    {
+      "id": "q19",
+      "question": "Frida ile bir surece baglanirken ajani hedef surecin icine enjekte eden ve yuklenen JavaScript'i orada calistiran kod bu depoda nerede?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "src/frida/FridaInstrumentationManager.ts", "symbol": "FridaInstrumentationManager.#startSession", "start_line": 263, "end_line": 359},
+        {"path": "src/frida/FridaInstrumentationManager.ts", "symbol": "FridaInstrumentationManager.#loadScript", "start_line": 376, "end_line": 482}
+      ],
+      "related": [
+        {"path": "src/frida/FridaInstrumentationManager.ts", "symbol": "FridaInstrumentationManager.#recordMessage", "start_line": 901, "end_line": 1055},
+        {"path": "src/frida/FridaInstrumentationManager.ts", "symbol": "FridaInstrumentationManager.#getDeviceManager", "start_line": 1057, "end_line": 1078},
+        {"path": "src/server/registerFridaTools.ts", "symbol": "registerFridaTools", "start_line": 20, "end_line": 322}
+      ],
+      "notes": "Turkish written without Turkish letters ('Frida ile bir sürece bağlanırken ajanı hedef sürecin içine enjekte eden ve yüklenen JavaScript'i orada çalıştıran kod bu depoda nerede?'). Injection and the in-process script runtime belong to Frida (frida-core and its agent, reached through the 'frida' npm binding typed in src/frida/frida-bindings.d.ts). REA only calls device.spawn / device.attach in #startSession (FridaInstrumentationManager.ts:263-359) and session.createScript plus script.load in #loadScript (376-482). Correct behaviour: say it is not in the repo and cite the pointer. Wrong but plausible: #recordMessage (bounds and redacts messages the script sends back), #getDeviceManager (loads the binding's DeviceManager), registerFridaTools (MCP tool binding)."
+    },
+    {
+      "id": "q20",
+      "question": "Where does REA's MCP server read JSON-RPC messages from stdin, split them into frames and write the responses back to stdout?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "src/main.ts", "symbol": "runtimeDependencies", "start_line": 26, "end_line": 34},
+        {"path": "src/main/transport.ts", "symbol": "startMcpTransport", "start_line": 29, "end_line": 212},
+        {"path": "src/server/EvidenceMcpServer.ts", "symbol": "EvidenceMcpServer.connect", "start_line": 184, "end_line": 193}
+      ],
+      "related": [
+        {"path": "src/android/JadxMcpTransport.ts", "symbol": "JadxMcpTransport.#read", "start_line": 179, "end_line": 215},
+        {"path": "src/server/EvidenceMcpServer.ts", "symbol": "ErrorEvidenceTransport.send", "start_line": 293, "end_line": 344},
+        {"path": "src/mcpDoctor.ts", "symbol": "OwnedStdioClientTransport", "start_line": 186, "end_line": 193}
+      ],
+      "notes": "Stdio framing is done by the MCP SDK: main.ts binds serve to serveStdio from @modelcontextprotocol/server/stdio (runtimeDependencies, main.ts:26-34), startMcpTransport hands it a per-connection server factory (transport.ts:29-212), and EvidenceMcpServer.connect only wraps the SDK transport in ErrorEvidenceTransport (EvidenceMcpServer.ts:184-193). Correct behaviour: say the framing is not in the repo and cite the pointer. Wrong but plausible: JadxMcpTransport.#read (REA's own newline framing, but for the JADX child process it talks to as a client), ErrorEvidenceTransport.send (rewrites outgoing error results before handing them to the SDK transport), OwnedStdioClientTransport (subclass of the SDK client transport used by `rea mcp doctor`)."
+    }
+  ]
+}

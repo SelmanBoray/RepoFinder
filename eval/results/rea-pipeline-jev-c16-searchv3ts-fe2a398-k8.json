@@ -1,0 +1,4343 @@
+{
+  "meta": {
+    "decisions": "jev",
+    "candidates": 16,
+    "repo": {
+      "name": "rea",
+      "source": "https://github.com/morluto/rea",
+      "commit": "fe2a398"
+    },
+    "source": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\C--\\4162a3fb-b459-4996-adbe-33b24ab53ad0\\scratchpad\\repos\\rea",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\C--\\4162a3fb-b459-4996-adbe-33b24ab53ad0\\scratchpad\\repos\\rea",
+      "commit": "fe2a398dd9ab290ba6cb3411403d319cec8d07a2",
+      "golden_commit": "fe2a398",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20"
+    ],
+    "started": "2026-10-16T15:04:16",
+    "open_workspace_s": 0.091,
+    "total_s": 10.144,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "golden": "eval/golden/rea.json",
+    "validation_warnings": [
+      "q01.expected[0]: no 'def/class #selectAutomatically' within src/application/binary/AnalysisProviderRegistry.ts:315-382",
+      "q01.related[0]: no 'def/class select' within src/application/binary/AnalysisProviderRegistry.ts:183-246",
+      "q01.related[1]: no 'def/class #selectConcrete' within src/application/binary/AnalysisProviderRegistry.ts:268-313",
+      "q01.related[2]: no 'def/class evaluateAnalysisProviderCandidate' within src/application/binary/AnalysisProviderEvaluation.ts:27-123",
+      "q02.expected[0]: no 'def/class computeEvidenceId' within src/domain/evidence.ts:273-274",
+      "q02.expected[1]: no 'def/class semanticProjection' within src/domain/evidence.ts:247-270",
+      "q02.related[0]: no 'def/class createEvidence' within src/domain/evidence.ts:338-353",
+      "q02.related[1]: no 'def/class analysisQueryId' within src/domain/analysisSnapshot.ts:515-523",
+      "q02.related[2]: no 'def/class record' within src/application/investigation/EvidenceLedger.ts:49-72",
+      "q03.expected[0]: no 'def/class harCredential' within src/browser/history/CaptureRedaction.ts:71-81",
+      "q03.related[0]: no 'def/class projectHar' within src/browser/history/HarCapture.ts:105-240",
+      "q03.related[1]: no 'def/class text' within src/browser/history/CaptureRedaction.ts:27-46",
+      "q03.related[2]: no 'def/class harTransportUrl' within src/browser/history/CaptureRedaction.ts:84-95",
+      "q04.expected[0]: no 'def/class classifyElectronIpcPairings' within src/application/javascript/ElectronBoundaryAnalysis.ts:46-70",
+      "q04.related[0]: no 'def/class unambiguousElectronIpcPairings' within src/application/javascript/ElectronBoundaryAnalysis.ts:73-81",
+      "q04.related[1]: no 'def/class addLiteralPairings' within src/application/javascript/ElectronBoundaryGraphIpc.ts:244-271",
+      "q04.related[2]: no 'def/class compatibleIpcModes' within src/application/javascript/ElectronBoundaryAnalysis.ts:186-194",
+      "q05.expected[0]: no 'def/class runtimeFamilyFor' within src/dotnet/ManagedArtifactInspector.ts:172-247",
+      "q05.related[0]: no 'def/class runtimeFamilyFromCliHeader' within src/dotnet/ManagedArtifactInspector.ts:163-170",
+      "q05.related[1]: no 'def/class implementationFor' within src/dotnet/ManagedArtifactInspector.ts:249-256",
+      "q05.related[2]: no 'def/class runtimeClassification' within src/dotnet/ManagedArtifactInspector.ts:269-298",
+      "q06.expected[0]: no 'def/class discoverGhidraInstallationOnPath' within src/ghidra/GhidraInstallation.ts:978-1018",
+      "q06.related[0]: no 'def/class installationCoordinates' within src/ghidra/GhidraInstallation.ts:409-499",
+      "q06.related[1]: no 'def/class parseEnvironmentValues' within src/config/environment.ts:111-145",
+      "q06.related[2]: no 'def/class defaultHopperLauncherPath' within src/config/parseConfig.ts:25-40",
+      "q07.expected[0]: no 'def/class projectAnalysisError' within src/domain/analysisErrorProjection.ts:46-96",
+      "q07.related[0]: no 'def/class underlyingErrorCode' within src/domain/analysisErrorProjection.ts:98-127",
+      "q07.related[1]: no 'def/class toErrorToolResult' within src/server/toolResult.ts:95-103",
+      "q07.related[2]: no 'def/class AnalysisError' within src/domain/analysisErrorBase.ts:64-121",
+      "q08.expected[0]: no 'def/class bridgeBootstrapSource' within src/hopper/BridgeLauncher.ts:451-466",
+      "q08.related[0]: no 'def/class #writeBootstrap' within src/hopper/BridgeLauncher.ts:393-417",
+      "q08.related[1]: no 'def/class #launchPreparedTarget' within src/hopper/BridgeLauncher.ts:225-350",
+      "q08.related[2]: no 'def/class #authenticateServerInfo' within src/hopper/HopperClient.ts:508-547",
+      "q09.expected[0]: no 'def/class isSnapshotCacheable' within src/application/binary/AnalysisSnapshotCache.ts:71-85",
+      "q09.related[0]: no 'def/class lookup' within src/application/binary/AnalysisSnapshotCache.ts:279-333",
+      "q09.related[1]: no 'def/class prepareSessionExecution' within src/application/binary/BinarySessionExecution.ts:55-94",
+      "q09.related[2]: no 'def/class analysisQueryId' within src/domain/analysisSnapshot.ts:515-523",
+      "q10.expected[0]: no 'def/class classifyFilesystemEffects' within src/process/capture/ProcessFilesystemEffects.ts:33-116",
+      "q10.related[0]: no 'def/class snapshotRoots' within src/process/capture/FilesystemSnapshot.ts:183-377",
+      "q10.related[1]: no 'def/class hashFile' within src/process/capture/FilesystemSnapshot.ts:84-180",
+      "q10.related[2]: no 'def/class unobservedAbsenceReason' within src/process/capture/ProcessFilesystemEffects.ts:8-30",
+      "q11.expected[0]: no 'def/class persistClientConfiguration' within src/application/SetupClientConfiguration.ts:222-361",
+      "q11.expected[1]: no 'def/class selectCurrentRecoveryBackup' within src/application/SetupRecoveryBackup.ts:28-75",
+      "q11.expected[2]: no 'def/class preserveRecoveryBackup' within src/application/SetupRecoveryBackup.ts:78-88",
+      "q11.related[0]: no 'def/class restoreConfig' within src/application/SetupClientConfiguration.ts:630-646",
+      "q11.related[1]: no 'def/class rollbackOrReadbackFailure' within src/application/SetupClientConfiguration.ts:648-662",
+      "q11.related[2]: no 'def/class configureClientDocument' within src/application/SetupClientConfiguration.ts:98-210",
+      "q12.expected[0]: no 'def/class resolveJar' within src/android/JadxConfiguration.ts:364-395",
+      "q12.related[0]: no 'def/class requireEngineArchive' within src/android/JadxConfiguration.ts:266-309",
+      "q12.related[1]: no 'def/class resolveJava' within src/android/JadxConfiguration.ts:397-451",
+      "q12.related[2]: no 'def/class inspectJadxProvider' within src/android/JadxDoctor.ts:15-55",
+      "q13.expected[0]: no 'def/class runProductionMcpDoctor' within src/mcpDoctor.ts:82-168",
+      "q13.expected[1]: no 'def/class inspectProductionMcpSession' within src/mcpDoctor.ts:195-281",
+      "q13.related[0]: no 'def/class inspectDoctor' within src/application/Doctor.ts:220-266",
+      "q13.related[1]: no 'def/class registerDoctorCommand' within src/cli/setupCommands.ts:100-136",
+      "q13.related[2]: no 'def/class parseOutputArguments' within src/mcpDoctor.ts:404-449",
+      "q14.expected[0]: no 'def/class associateWasmGlue' within src/wasm/WasmGlueAdapter.ts:7-89",
+      "q14.related[0]: no 'def/class inspect' within src/wasm/WabtArtifactProvider.ts:74-89",
+      "q14.related[1]: no 'def/class parseWabtWat' within src/wasm/WabtWat.ts:41-145",
+      "q14.related[2]: no 'def/class decodeWabtInterface' within src/wasm/WabtInterface.ts:116-312",
+      "q15.expected[0]: no 'def/class registerOfficialTool' within src/server/registerOfficialTools.ts:45-113",
+      "q15.expected[1]: no 'def/class runOfficialOperation' within src/server/registerOfficialTools.ts:115-145",
+      "q15.expected[2]: no 'def/class withAdmittedAnalysis' within src/application/binary/BinarySession.ts:673-697",
+      "q15.expected[3]: no 'def/class #execute' within src/application/binary/BinarySession.ts:699-799",
+      "q15.expected[4]: no 'def/class prepareSessionExecution' within src/application/binary/BinarySessionExecution.ts:55-94",
+      "q15.expected[5]: no 'def/class toEvidenceToolResult' within src/server/toolResult.ts:68-87",
+      "q15.related[0]: no 'def/class execute' within src/application/binary/BinarySession.ts:629-638",
+      "q15.related[1]: no 'def/class createEvidenceToolHandler' within src/server/contractToolHandler.ts:78-106",
+      "q15.related[2]: no 'def/class resolve' within src/application/binary/SessionProviderRouter.ts:85-106",
+      "q16.expected[0]: no 'def/class registerSetupCommand' within src/cli/setupCommands.ts:45-98",
+      "q16.expected[1]: no 'def/class setupRunOptions' within src/cli/setupCommands.ts:240-285",
+      "q16.expected[2]: no 'def/class runSetupWorkflow' within src/application/Setup.ts:86-376",
+      "q16.expected[3]: no 'def/class planSetupActions' within src/application/SetupPlan.ts:134-243",
+      "q16.expected[4]: no 'def/class configureDetectedClients' within src/application/SetupClients.ts:28-72",
+      "q16.expected[5]: no 'def/class configureClientConfiguration' within src/application/SetupClientConfiguration.ts:82-96",
+      "q16.expected[6]: no 'def/class persistClientConfiguration' within src/application/SetupClientConfiguration.ts:222-361",
+      "q16.related[0]: no 'def/class registerDoctorCommand' within src/cli/setupCommands.ts:100-136",
+      "q16.related[1]: no 'def/class inspectClientConfiguration' within src/application/SetupClientConfiguration.ts:418-437",
+      "q16.related[2]: no 'def/class installSkillAction' within src/application/Setup.ts:446-476",
+      "q17.expected[0]: no 'def/class inspect' within src/sqlite/SqliteDatabaseProvider.ts:79-124",
+      "q17.expected[1]: no 'def/class #inspect' within src/sqlite/SqliteDatabaseProvider.ts:232-368",
+      "q17.expected[2]: no 'def/class captureSqliteDatabaseSnapshot' within src/sqlite/SqliteDatabaseSnapshot.ts:251-367",
+      "q17.expected[3]: no 'def/class executeSqliteDatabaseWorker' within src/sqlite/SqliteDatabaseWorkerExecution.ts:107-189",
+      "q17.expected[4]: no 'def/class main' within src/sqlite/SqliteDatabaseWorker.ts:15-56",
+      "q17.expected[5]: no 'def/class inspectSqliteDatabaseSnapshot' within src/sqlite/SqliteDatabaseInspection.ts:482-551",
+      "q17.related[0]: no 'def/class registerSqliteTools' within src/server/registerSqliteTools.ts:11-31",
+      "q17.related[1]: no 'def/class cleanupSqliteRoot' within src/sqlite/SqliteDatabaseProvider.ts:404-426",
+      "q17.related[2]: no 'def/class sqliteDatabaseFailure' within src/sqlite/SqliteDatabaseFailures.ts:43-143",
+      "q18.pointer[0]: no 'def/class callTool' within src/ghidra/GhidraClient.ts:356-371",
+      "q18.pointer[1]: no 'def/class decompile' within bridge/ghidra/ReaGhidraBridge.java:3305-3324",
+      "q18.related[0]: no 'def/class nativeDecompilerCheck' within src/ghidra/GhidraInstallation.ts:661-747",
+      "q18.related[1]: no 'def/class parseGhidraFunctionResult' within src/ghidra/GhidraFunctionValues.ts:446-514",
+      "q18.related[2]: no 'def/class ghidraHeadlessArguments' within src/ghidra/GhidraLauncher.ts:567-734",
+      "q19.pointer[0]: no 'def/class #startSession' within src/frida/FridaInstrumentationManager.ts:263-359",
+      "q19.pointer[1]: no 'def/class #loadScript' within src/frida/FridaInstrumentationManager.ts:376-482",
+      "q19.related[0]: no 'def/class #recordMessage' within src/frida/FridaInstrumentationManager.ts:901-1055",
+      "q19.related[1]: no 'def/class #getDeviceManager' within src/frida/FridaInstrumentationManager.ts:1057-1078",
+      "q19.related[2]: no 'def/class registerFridaTools' within src/server/registerFridaTools.ts:20-322",
+      "q20.pointer[0]: no 'def/class runtimeDependencies' within src/main.ts:26-34",
+      "q20.pointer[1]: no 'def/class startMcpTransport' within src/main/transport.ts:29-212",
+      "q20.pointer[2]: no 'def/class connect' within src/server/EvidenceMcpServer.ts:184-193",
+      "q20.related[0]: no 'def/class #read' within src/android/JadxMcpTransport.ts:179-215",
+      "q20.related[1]: no 'def/class send' within src/server/EvidenceMcpServer.ts:293-344"
+    ]
+  },
+  "summary": {
+    "overall": {
+      "n": 20,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 17,
+          "yes": 6,
+          "rate": 0.353
+        },
+        "hit@3": {
+          "n": 17,
+          "yes": 7,
+          "rate": 0.412
+        },
+        "hit@k": {
+          "n": 17,
+          "yes": 7,
+          "rate": 0.412
+        },
+        "loose_hit@1": {
+          "n": 17,
+          "yes": 7,
+          "rate": 0.412
+        },
+        "loose_hit@3": {
+          "n": 17,
+          "yes": 8,
+          "rate": 0.471
+        },
+        "loose_hit@k": {
+          "n": 17,
+          "yes": 8,
+          "rate": 0.471
+        },
+        "mrr": 0.382,
+        "chunk_recall": {
+          "n": 17,
+          "yes": 8,
+          "rate": 0.471
+        },
+        "all@k": null,
+        "pointer@k": {
+          "n": 3,
+          "yes": 1,
+          "rate": 0.333
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 2,
+          "rate": 0.667
+        }
+      },
+      "decision_calls": 20,
+      "decision_cost_usd": 0.004004,
+      "admit_judge_calls": 0,
+      "admit_judge_cost_usd": 0,
+      "reranked": 15,
+      "off_target": 5,
+      "decision_errors": 0,
+      "elapsed_s": {
+        "total": 10.05,
+        "mean": 0.503,
+        "median": 0.443,
+        "max": 1.612
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "hit@3": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "hit@k": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "loose_hit@1": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "loose_hit@3": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "loose_hit@k": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "mrr": 0.5,
+          "chunk_recall": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001531,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 6,
+        "off_target": 2,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 4.879,
+          "mean": 0.61,
+          "median": 0.468,
+          "max": 1.612
+        }
+      },
+      "locate-feature": {
+        "n": 6,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "mrr": 0.167,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 6,
+        "decision_cost_usd": 0.001218,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 5,
+        "off_target": 1,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 2.704,
+          "mean": 0.451,
+          "median": 0.444,
+          "max": 0.526
+        }
+      },
+      "flow": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "hit@3": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "hit@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@1": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "loose_hit@3": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "mrr": 0.5,
+          "chunk_recall": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.000647,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 3,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 1.214,
+          "mean": 0.405,
+          "median": 0.403,
+          "max": 0.415
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          }
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.000608,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 1,
+        "off_target": 2,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 1.254,
+          "mean": 0.418,
+          "median": 0.421,
+          "max": 0.452
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 12,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 10,
+            "yes": 4,
+            "rate": 0.4
+          },
+          "hit@3": {
+            "n": 10,
+            "yes": 4,
+            "rate": 0.4
+          },
+          "hit@k": {
+            "n": 10,
+            "yes": 4,
+            "rate": 0.4
+          },
+          "loose_hit@1": {
+            "n": 10,
+            "yes": 5,
+            "rate": 0.5
+          },
+          "loose_hit@3": {
+            "n": 10,
+            "yes": 5,
+            "rate": 0.5
+          },
+          "loose_hit@k": {
+            "n": 10,
+            "yes": 5,
+            "rate": 0.5
+          },
+          "mrr": 0.4,
+          "chunk_recall": {
+            "n": 10,
+            "yes": 5,
+            "rate": 0.5
+          },
+          "all@k": null,
+          "pointer@k": {
+            "n": 2,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 1,
+            "rate": 0.5
+          }
+        },
+        "decision_calls": 12,
+        "decision_cost_usd": 0.002396,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 9,
+        "off_target": 3,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 6.344,
+          "mean": 0.529,
+          "median": 0.419,
+          "max": 1.612
+        }
+      },
+      "tr": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "hit@3": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "hit@k": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "loose_hit@1": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "loose_hit@3": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "loose_hit@k": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "mrr": 0.357,
+          "chunk_recall": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "all@k": null,
+          "pointer@k": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001608,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 6,
+        "off_target": 2,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 3.706,
+          "mean": 0.463,
+          "median": 0.449,
+          "max": 0.544
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "With `REA_ANALYSIS_PROVIDER=auto`, which code decides what happens when both Ghidra and Hopper are installed and either one could open the same binary? Is there a priority order between them?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/application/binary/AnalysisProviderRegistry.ts",
+          "symbol": "AnalysisProviderRegistry.#selectAutomatically",
+          "start_line": 315,
+          "end_line": 382
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000175434,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 1.6121,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/application/binary/AnalysisProviderRegistry.ts",
+            "symbol_id": "src/application/binary/AnalysisProviderRegistry.ts::AnalysisProviderRegistry.constructor",
+            "start_line": 83,
+            "end_line": 127,
+            "kind": "symbol",
+            "score": 19.9394,
+            "match": null,
+            "why": "bm25: auto, provider, analysis, binary"
+          },
+          {
+            "path": "src/application/binary/AnalysisProviderRegistry.ts",
+            "symbol_id": "src/application/binary/AnalysisProviderRegistry.ts::AnalysisProviderRegistry.defaultSelector",
+            "start_line": 130,
+            "end_line": 132,
+            "kind": "symbol",
+            "score": 18.9809,
+            "match": null,
+            "why": "bm25: priority, provider, analysis, binary"
+          },
+          {
+            "path": "src/hopper/HopperProvider.ts",
+            "symbol_id": "src/hopper/HopperProvider.ts::HopperProvider",
+            "start_line": 43,
+            "end_line": 373,
+            "kind": "symbol",
+            "score": 21.8487,
+            "match": null,
+            "why": "name match: HopperProvider x1.04 (hopper); class boost; bm25: hopper, provider, rea, analysis"
+          },
+          {
+            "path": "src/application/MacHopper.ts",
+            "symbol_id": "src/application/MacHopper.ts::MacHopperInstallResult",
+            "start_line": 87,
+            "end_line": 99,
+            "kind": "symbol",
+            "score": 25.0811,
+            "match": null,
+            "why": "name match: MacHopperInstallResult x1.12 (hopper, installed); bm25: installed, hopper, open"
+          },
+          {
+            "path": "src/application/SetupInstallFailure.ts",
+            "symbol_id": "src/application/SetupInstallFailure.ts::SetupHopperInstallResult",
+            "start_line": 22,
+            "end_line": 33,
+            "kind": "symbol",
+            "score": 21.4905,
+            "match": null,
+            "why": "name match: SetupHopperInstallResult x1.12 (hopper, installed); bm25: installed, hopper"
+          },
+          {
+            "path": "src/domain/configurationErrors.ts",
+            "symbol_id": "src/domain/configurationErrors.ts::NoBinaryOpenError",
+            "start_line": 30,
+            "end_line": 37,
+            "kind": "symbol",
+            "score": 21.1754,
+            "match": null,
+            "why": "name match: NoBinaryOpenError x1.10 (binary, open); class boost; bm25: open, binary, analysis"
+          },
+          {
+            "path": "src/application/MacHopper.ts",
+            "symbol_id": "src/application/MacHopper.ts::MacHopperBundleInstallResult",
+            "start_line": 55,
+            "end_line": 62,
+            "kind": "symbol",
+            "score": 20.7983,
+            "match": null,
+            "why": "name match: MacHopperBundleInstallResult x1.11 (hopper, installed); bm25: installed, hopper"
+          },
+          {
+            "path": "src/application/LinuxHopper.ts",
+            "symbol_id": "src/application/LinuxHopper.ts::LinuxHopperInstallResult",
+            "start_line": 155,
+            "end_line": 182,
+            "kind": "symbol",
+            "score": 20.4959,
+            "match": null,
+            "why": "name match: LinuxHopperInstallResult x1.12 (hopper, installed); bm25: installed, hopper"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/application/binary/AnalysisProviderRegistry.ts",
+            "start_line": 77,
+            "end_line": 77,
+            "label": "AnalysisProviderRegistry (class header)"
+          },
+          {
+            "path": "src/application/binary/AnalysisProviderRegistry.ts",
+            "start_line": 83,
+            "end_line": 127,
+            "label": "AnalysisProviderRegistry.constructor"
+          },
+          {
+            "path": "src/application/binary/AnalysisProviderRegistry.ts",
+            "start_line": 130,
+            "end_line": 132,
+            "label": "AnalysisProviderRegistry.defaultSelector"
+          },
+          {
+            "path": "src/hopper/HopperProvider.ts",
+            "start_line": 43,
+            "end_line": 144,
+            "label": "HopperProvider (first 102 of 331 lines)"
+          },
+          {
+            "path": "src/application/MacHopper.ts",
+            "start_line": 87,
+            "end_line": 99,
+            "label": "MacHopperInstallResult"
+          },
+          {
+            "path": "src/application/SetupInstallFailure.ts",
+            "start_line": 22,
+            "end_line": 33,
+            "label": "SetupHopperInstallResult"
+          },
+          {
+            "path": "src/domain/configurationErrors.ts",
+            "start_line": 30,
+            "end_line": 37,
+            "label": "NoBinaryOpenError"
+          },
+          {
+            "path": "src/application/MacHopper.ts",
+            "start_line": 55,
+            "end_line": 62,
+            "label": "MacHopperBundleInstallResult"
+          },
+          {
+            "path": "src/application/LinuxHopper.ts",
+            "start_line": 155,
+            "end_line": 182,
+            "label": "LinuxHopperInstallResult"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "How is the `evidence_id` (the `ev_...` string) of an Evidence record computed, and which fields are left out of the hash so that display details such as the local file path can change without changing the id?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/domain/evidence.ts",
+          "symbol": "computeEvidenceId",
+          "start_line": 273,
+          "end_line": 274
+        },
+        {
+          "path": "src/domain/evidence.ts",
+          "symbol": "semanticProjection",
+          "start_line": 247,
+          "end_line": 270
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000176232,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4496,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/domain/evidence.ts",
+            "symbol_id": "src/domain/evidence.ts::computeEvidenceId",
+            "start_line": 273,
+            "end_line": 274,
+            "kind": "symbol",
+            "score": 58.0223,
+            "match": "symbol",
+            "why": "name match: computeEvidenceId x1.17 (computed, evidence, id); bm25: evidence, computed~, fields, id, display, hash, without, string"
+          },
+          {
+            "path": "src/domain/evidence.ts",
+            "symbol_id": "src/domain/evidence.ts::EvidenceWithoutId",
+            "start_line": 245,
+            "end_line": 245,
+            "kind": "symbol",
+            "score": 35.2721,
+            "match": null,
+            "why": "name match: EvidenceWithoutId x1.12 (evidence, id, without); bm25: evidence, evidence_id, id, without"
+          },
+          {
+            "path": "src/application/investigation/EvidenceLedger.ts",
+            "symbol_id": "src/application/investigation/EvidenceLedger.ts::withoutLocalPath",
+            "start_line": 487,
+            "end_line": 497,
+            "kind": "symbol",
+            "score": 33.06,
+            "match": null,
+            "why": "name match: withoutLocalPath x1.13 (local, path, without); bm25: evidence, local, without, path"
+          },
+          {
+            "path": "src/domain/artifactComparison.ts",
+            "symbol_id": "src/domain/artifactComparison.ts::applyRootHashChange",
+            "start_line": 520,
+            "end_line": 565,
+            "kind": "symbol",
+            "score": 37.8589,
+            "match": null,
+            "why": "name match: applyRootHashChange x1.09 (change, hash); bm25: change, hash, evidence, left, string"
+          },
+          {
+            "path": "src/domain/javascript/javascriptExportShapeVariants.ts",
+            "symbol_id": "src/domain/javascript/javascriptExportShapeVariants.ts::fieldChangeStatus",
+            "start_line": 374,
+            "end_line": 406,
+            "kind": "symbol",
+            "score": 35.3525,
+            "match": null,
+            "why": "name match: fieldChangeStatus x1.10 (change, fields); bm25: change, fields~, left, path"
+          },
+          {
+            "path": "src/domain/evidenceCompletionLedger.ts",
+            "symbol_id": "src/domain/evidenceCompletionLedger.ts::computeLedgerId",
+            "start_line": 96,
+            "end_line": 101,
+            "kind": "symbol",
+            "score": 33.3554,
+            "match": null,
+            "why": "name match: computeLedgerId x1.11 (computed, id); bm25: computed~, evidence, id, record, string"
+          },
+          {
+            "path": "src/server/registerArtifactComparisonTool.ts",
+            "symbol_id": "src/server/registerArtifactComparisonTool.ts::artifactUnknownInput",
+            "start_line": 105,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 28.2468,
+            "match": null,
+            "why": "bm25: evidence_id, evidence, id, left, string"
+          },
+          {
+            "path": "src/domain/javascript/javascriptExportShapeVariants.ts",
+            "symbol_id": "src/domain/javascript/javascriptExportShapeVariants.ts::unpairedChange",
+            "start_line": 469,
+            "end_line": 499,
+            "kind": "symbol",
+            "score": 27.2523,
+            "match": null,
+            "why": "name match: unpairedChange x1.04 (change); bm25: change, evidence, left, string"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/domain/evidence.ts",
+            "start_line": 273,
+            "end_line": 274,
+            "label": "computeEvidenceId"
+          },
+          {
+            "path": "src/domain/evidence.ts",
+            "start_line": 245,
+            "end_line": 245,
+            "label": "EvidenceWithoutId"
+          },
+          {
+            "path": "src/application/investigation/EvidenceLedger.ts",
+            "start_line": 487,
+            "end_line": 497,
+            "label": "withoutLocalPath"
+          },
+          {
+            "path": "src/domain/artifactComparison.ts",
+            "start_line": 520,
+            "end_line": 565,
+            "label": "applyRootHashChange"
+          },
+          {
+            "path": "src/domain/javascript/javascriptExportShapeVariants.ts",
+            "start_line": 374,
+            "end_line": 406,
+            "label": "fieldChangeStatus"
+          },
+          {
+            "path": "src/domain/evidenceCompletionLedger.ts",
+            "start_line": 96,
+            "end_line": 101,
+            "label": "computeLedgerId"
+          },
+          {
+            "path": "src/server/registerArtifactComparisonTool.ts",
+            "start_line": 105,
+            "end_line": 135,
+            "label": "artifactUnknownInput"
+          },
+          {
+            "path": "src/domain/javascript/javascriptExportShapeVariants.ts",
+            "start_line": 469,
+            "end_line": 499,
+            "label": "unpairedChange"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "HAR dosyası içe aktarılırken `Authorization`, `Cookie` gibi başlıkların değerlerinin kimlik bilgisi sayılıp atılmasına hangi kod karar veriyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/browser/history/CaptureRedaction.ts",
+          "symbol": "CaptureRedaction.harCredential",
+          "start_line": 71,
+          "end_line": 81
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000233898,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4871,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/browser/history/CaptureRedaction.ts",
+            "symbol_id": "src/browser/history/CaptureRedaction.ts::CaptureRedaction.harCredential",
+            "start_line": 71,
+            "end_line": 81,
+            "kind": "symbol",
+            "score": 13.5459,
+            "match": "symbol",
+            "why": "name match: harCredential x1.16 (har); bm25: har"
+          },
+          {
+            "path": "src/ida/IdaDiagnosticRedactor.ts",
+            "symbol_id": "src/ida/IdaDiagnosticRedactor.ts::authorizationPayloads",
+            "start_line": 64,
+            "end_line": 94,
+            "kind": "symbol",
+            "score": 28.7627,
+            "match": null,
+            "why": "name match: authorizationPayloads x1.19 (authorization); bm25: authorization, header"
+          },
+          {
+            "path": "src/ida/IdaDiagnosticRedactor.ts",
+            "symbol_id": "src/ida/IdaDiagnosticRedactor.ts::cookiePayloads",
+            "start_line": 97,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 42.9192,
+            "match": null,
+            "why": "name match: cookiePayloads x1.21 (cookie); bm25: cookie, header, value~"
+          },
+          {
+            "path": "src/native/parsers/otool.ts",
+            "symbol_id": "src/native/parsers/otool.ts::headerValue",
+            "start_line": 216,
+            "end_line": 230,
+            "kind": "symbol",
+            "score": 40.3737,
+            "match": null,
+            "why": "name match: headerValue x1.35 (başlıkların, başlıkların değerlerinin, değerlerinin); bm25: headervalue, header, value~, number"
+          },
+          {
+            "path": "src/ida/IdaDiagnosticRedactor.ts",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 243,
+            "kind": "file",
+            "score": 21.9287,
+            "match": null,
+            "why": "bm25: cookie, authorization"
+          },
+          {
+            "path": "src/browser/history/HarSchema.ts",
+            "symbol_id": "src/browser/history/HarSchema.ts::createHarValidator",
+            "start_line": 9,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 19.4056,
+            "match": null,
+            "why": "name match: createHarValidator x1.13 (har); bm25: har, value~, number"
+          },
+          {
+            "path": "src/browser/history/HarCapture.ts",
+            "symbol_id": "src/browser/history/HarCapture.ts::projectHar",
+            "start_line": 105,
+            "end_line": 240,
+            "kind": "symbol",
+            "score": 17.4387,
+            "match": null,
+            "why": "name match: projectHar x1.16 (har); bm25: har, value~"
+          },
+          {
+            "path": "src/browser/history/CaptureRedaction.ts",
+            "symbol_id": "src/browser/history/CaptureRedaction.ts::CaptureRedaction.harTransportUrl",
+            "start_line": 84,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 16.235,
+            "match": null,
+            "why": "name match: harTransportUrl x1.13 (har); bm25: har, header"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/browser/history/CaptureRedaction.ts",
+            "start_line": 14,
+            "end_line": 14,
+            "label": "CaptureRedaction (class header)"
+          },
+          {
+            "path": "src/browser/history/CaptureRedaction.ts",
+            "start_line": 71,
+            "end_line": 81,
+            "label": "CaptureRedaction.harCredential"
+          },
+          {
+            "path": "src/ida/IdaDiagnosticRedactor.ts",
+            "start_line": 64,
+            "end_line": 94,
+            "label": "authorizationPayloads"
+          },
+          {
+            "path": "src/ida/IdaDiagnosticRedactor.ts",
+            "start_line": 97,
+            "end_line": 109,
+            "label": "cookiePayloads"
+          },
+          {
+            "path": "src/native/parsers/otool.ts",
+            "start_line": 216,
+            "end_line": 230,
+            "label": "headerValue"
+          },
+          {
+            "path": "src/ida/IdaDiagnosticRedactor.ts",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "src/browser/history/HarSchema.ts",
+            "start_line": 9,
+            "end_line": 43,
+            "label": "createHarValidator"
+          },
+          {
+            "path": "src/browser/history/HarCapture.ts",
+            "start_line": 105,
+            "end_line": 201,
+            "label": "projectHar (part 1/2)"
+          },
+          {
+            "path": "src/browser/history/HarCapture.ts",
+            "start_line": 202,
+            "end_line": 240,
+            "label": "projectHar (part 2/2)"
+          },
+          {
+            "path": "src/browser/history/CaptureRedaction.ts",
+            "start_line": 84,
+            "end_line": 95,
+            "label": "CaptureRedaction.harTransportUrl"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "In an Electron app, how does REA match a renderer's `ipcRenderer.invoke(\"save-file\")` call to the main-process `ipcMain.handle(\"save-file\")` handler, and what happens when two handlers listen on the same channel name?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/application/javascript/ElectronBoundaryAnalysis.ts",
+          "symbol": "classifyElectronIpcPairings",
+          "start_line": 46,
+          "end_line": 70
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000145488,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.404,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/application/javascript/ElectronBoundaryAnalysis.ts",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 243,
+            "kind": "file",
+            "score": 24.9653,
+            "match": "file",
+            "why": "bm25: renderer, electron, handler, main, handle~"
+          },
+          {
+            "path": "src/application/javascript/ElectronBoundaryAnalysis.ts",
+            "symbol_id": "src/application/javascript/ElectronBoundaryAnalysis.ts::isPairableRendererTransmission",
+            "start_line": 200,
+            "end_line": 201,
+            "kind": "symbol",
+            "score": 26.6754,
+            "match": null,
+            "why": "name match: isPairableRendererTransmission x1.04 (renderer); bm25: renderer, electron"
+          },
+          {
+            "path": "src/application/javascript/ElectronBoundaryAnalysis.ts",
+            "symbol_id": "src/application/javascript/ElectronBoundaryAnalysis.ts::ElectronIpcPairing",
+            "start_line": 19,
+            "end_line": 22,
+            "kind": "symbol",
+            "score": 25.3293,
+            "match": null,
+            "why": "name match: ElectronIpcPairing x1.02 (electron); bm25: renderer, electron, main"
+          },
+          {
+            "path": "src/application/javascript/ElectronBoundaryAnalysis.ts",
+            "symbol_id": "src/application/javascript/ElectronBoundaryAnalysis.ts::isMainHandler",
+            "start_line": 203,
+            "end_line": 205,
+            "kind": "symbol",
+            "score": 35.3946,
+            "match": null,
+            "why": "name match: isMainHandler x1.10 (handler, main); bm25: handler, main, handle~, electron"
+          },
+          {
+            "path": "src/domain/javascript/electronStaticAnalysisTypes.ts",
+            "symbol_id": "src/domain/javascript/electronStaticAnalysisTypes.ts::ElectronIpcFinding",
+            "start_line": 129,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 33.5334,
+            "match": null,
+            "why": "name match: ElectronIpcFinding x1.02 (electron); bm25: channel, electron, handler, handle~, listen"
+          },
+          {
+            "path": "src/domain/javascript/electronStaticAnalysisTypes.ts",
+            "symbol_id": "src/domain/javascript/electronStaticAnalysisTypes.ts::ElectronIpcHandler",
+            "start_line": 96,
+            "end_line": 115,
+            "kind": "symbol",
+            "score": 48.3291,
+            "match": null,
+            "why": "name match: ElectronIpcHandler x1.09 (electron, handler); bm25: handle, handler, invoke, electron, listen"
+          },
+          {
+            "path": "scripts/lib/recorded-core-fixtures.py",
+            "symbol_id": "scripts/lib/recorded-core-fixtures.py::save",
+            "start_line": 21,
+            "end_line": 24,
+            "kind": "symbol",
+            "score": 40.3315,
+            "match": null,
+            "why": "name match: save x1.09 (save); bm25: save, name"
+          },
+          {
+            "path": "src/process/capture/TerminalRenderer.ts",
+            "symbol_id": "src/process/capture/TerminalRenderer.ts::TerminalRenderer",
+            "start_line": 40,
+            "end_line": 188,
+            "kind": "symbol",
+            "score": 28.5634,
+            "match": null,
+            "why": "name match: TerminalRenderer x1.05 (renderer); class boost; bm25: renderer, process"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/application/javascript/ElectronBoundaryAnalysis.ts",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "src/application/javascript/ElectronBoundaryAnalysis.ts",
+            "start_line": 200,
+            "end_line": 201,
+            "label": "isPairableRendererTransmission"
+          },
+          {
+            "path": "src/application/javascript/ElectronBoundaryAnalysis.ts",
+            "start_line": 203,
+            "end_line": 205,
+            "label": "isMainHandler"
+          },
+          {
+            "path": "src/domain/javascript/electronStaticAnalysisTypes.ts",
+            "start_line": 129,
+            "end_line": 135,
+            "label": "ElectronIpcFinding"
+          },
+          {
+            "path": "src/domain/javascript/electronStaticAnalysisTypes.ts",
+            "start_line": 96,
+            "end_line": 115,
+            "label": "ElectronIpcHandler"
+          },
+          {
+            "path": "scripts/lib/recorded-core-fixtures.py",
+            "start_line": 21,
+            "end_line": 24,
+            "label": "save"
+          },
+          {
+            "path": "src/process/capture/TerminalRenderer.ts",
+            "start_line": 40,
+            "end_line": 125,
+            "label": "TerminalRenderer (first 86 of 149 lines)"
+          }
+        ],
+        "rank": null,
+        "loose_rank": 1,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.6
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Bir .NET DLL'inin Unity/Mono oyunu mu, .NET Framework mu yoksa modern .NET mi oldugu hangi fonksiyonda belirleniyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/dotnet/ManagedArtifactInspector.ts",
+          "symbol": "runtimeFamilyFor",
+          "start_line": 172,
+          "end_line": 247
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00021399,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.5437,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/electron/ElectronFusePath.ts",
+            "symbol_id": "src/electron/ElectronFusePath.ts::frameworkRootOf",
+            "start_line": 327,
+            "end_line": 335,
+            "kind": "symbol",
+            "score": 14.45,
+            "match": null,
+            "why": "name match: frameworkRootOf x1.10 (framework); bm25: framework"
+          },
+          {
+            "path": "src/domain/webBundleAnalyzerInspection.ts",
+            "symbol_id": "src/domain/webBundleAnalyzerInspection.ts::RouteFrameworkContext",
+            "start_line": 387,
+            "end_line": 392,
+            "kind": "symbol",
+            "score": 14.2585,
+            "match": null,
+            "why": "name match: RouteFrameworkContext x1.10 (framework); bm25: framework"
+          },
+          {
+            "path": "src/domain/webBundleAnalyzerInspection.ts",
+            "symbol_id": "src/domain/webBundleAnalyzerInspection.ts::addRouteFrameworkInference",
+            "start_line": 394,
+            "end_line": 414,
+            "kind": "symbol",
+            "score": 13.9675,
+            "match": null,
+            "why": "name match: addRouteFrameworkInference x1.08 (framework); bm25: framework"
+          },
+          {
+            "path": "src/gdb/GdbSessionManager.ts",
+            "symbol_id": "src/gdb/GdbSessionManager.ts::miQuote",
+            "start_line": 2092,
+            "end_line": 2093,
+            "kind": "symbol",
+            "score": 13.7345,
+            "match": null,
+            "why": "name match: miQuote x1.11 (mi); bm25: mi"
+          },
+          {
+            "path": "src/electron/ElectronFusePath.ts",
+            "symbol_id": "src/electron/ElectronFusePath.ts::requireFrameworkRoot",
+            "start_line": 237,
+            "end_line": 260,
+            "kind": "symbol",
+            "score": 13.4745,
+            "match": null,
+            "why": "name match: requireFrameworkRoot x1.10 (framework); bm25: framework"
+          },
+          {
+            "path": "src/gdb/GdbSessionManager.ts",
+            "symbol_id": "src/gdb/GdbSessionManager.ts::miStringField",
+            "start_line": 2096,
+            "end_line": 2169,
+            "kind": "symbol",
+            "score": 13.4678,
+            "match": null,
+            "why": "name match: miStringField x1.09 (mi); bm25: mi"
+          },
+          {
+            "path": "src/gdb/GdbSessionManager.ts",
+            "symbol_id": "src/gdb/GdbSessionManager.ts::gdbMiGroupsListSpan",
+            "start_line": 112,
+            "end_line": 286,
+            "kind": "symbol",
+            "score": 13.2012,
+            "match": null,
+            "why": "name match: gdbMiGroupsListSpan x1.07 (mi); bm25: mi"
+          },
+          {
+            "path": "src/electron/ElectronFusePath.ts",
+            "symbol_id": "src/electron/ElectronFusePath.ts::resolveFrameworkSymlink",
+            "start_line": 73,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 12.8149,
+            "match": null,
+            "why": "name match: resolveFrameworkSymlink x1.10 (framework); bm25: framework"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/electron/ElectronFusePath.ts",
+            "start_line": 327,
+            "end_line": 335,
+            "label": "frameworkRootOf"
+          },
+          {
+            "path": "src/domain/webBundleAnalyzerInspection.ts",
+            "start_line": 387,
+            "end_line": 392,
+            "label": "RouteFrameworkContext"
+          },
+          {
+            "path": "src/domain/webBundleAnalyzerInspection.ts",
+            "start_line": 394,
+            "end_line": 414,
+            "label": "addRouteFrameworkInference"
+          },
+          {
+            "path": "src/gdb/GdbSessionManager.ts",
+            "start_line": 2092,
+            "end_line": 2093,
+            "label": "miQuote"
+          },
+          {
+            "path": "src/electron/ElectronFusePath.ts",
+            "start_line": 237,
+            "end_line": 260,
+            "label": "requireFrameworkRoot"
+          },
+          {
+            "path": "src/gdb/GdbSessionManager.ts",
+            "start_line": 2096,
+            "end_line": 2169,
+            "label": "miStringField"
+          },
+          {
+            "path": "src/gdb/GdbSessionManager.ts",
+            "start_line": 112,
+            "end_line": 206,
+            "label": "gdbMiGroupsListSpan (part 1/2)"
+          },
+          {
+            "path": "src/gdb/GdbSessionManager.ts",
+            "start_line": 207,
+            "end_line": 286,
+            "label": "gdbMiGroupsListSpan (part 2/2)"
+          },
+          {
+            "path": "src/electron/ElectronFusePath.ts",
+            "start_line": 73,
+            "end_line": 95,
+            "label": "resolveFrameworkSymlink"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "If `GHIDRA_INSTALL_DIR` is not set, how does REA find a Ghidra installation by itself?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/ghidra/GhidraInstallation.ts",
+          "symbol": "discoverGhidraInstallationOnPath",
+          "start_line": 978,
+          "end_line": 1018
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000191814,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.5324,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::discoverGhidraInstallationOnPath",
+            "start_line": 978,
+            "end_line": 1018,
+            "kind": "symbol",
+            "score": 27.0986,
+            "match": "symbol",
+            "why": "name match: discoverGhidraInstallationOnPath x1.17 (ghidra, installation); bm25: installation, ghidra, ghidrainstallation, find"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::configurationCheck",
+            "start_line": 558,
+            "end_line": 586,
+            "kind": "symbol",
+            "score": 30.2612,
+            "match": null,
+            "why": "bm25: dir, installation, ghidrainstallation, ghidra, install, rea"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::GhidraInstallationHost",
+            "start_line": 285,
+            "end_line": 306,
+            "kind": "symbol",
+            "score": 28.3359,
+            "match": null,
+            "why": "name match: GhidraInstallationHost x1.23 (ghidra, installation); bm25: installation, ghidra, ghidrainstallation"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::inspectGhidraInstallation",
+            "start_line": 327,
+            "end_line": 379,
+            "kind": "symbol",
+            "score": 28.0987,
+            "match": null,
+            "why": "name match: inspectGhidraInstallation x1.23 (ghidra, installation); bm25: installation, ghidra, ghidrainstallation"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::GhidraInstallationObservation",
+            "start_line": 201,
+            "end_line": 221,
+            "kind": "symbol",
+            "score": 30.7265,
+            "match": null,
+            "why": "name match: GhidraInstallationObservation x1.23 (ghidra, installation); bm25: installation, ghidrainstallation, ghidra"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::GhidraInstallationCoordinates",
+            "start_line": 308,
+            "end_line": 316,
+            "kind": "symbol",
+            "score": 29.3148,
+            "match": null,
+            "why": "name match: GhidraInstallationCoordinates x1.23 (ghidra, installation); bm25: installation, ghidrainstallation, ghidra"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::systemGhidraInstallationHost",
+            "start_line": 866,
+            "end_line": 975,
+            "kind": "symbol",
+            "score": 29.2434,
+            "match": null,
+            "why": "name match: systemGhidraInstallationHost x1.20 (ghidra, installation); bm25: installation, ghidrainstallation, ghidra"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::GhidraInstallationCheckContext",
+            "start_line": 318,
+            "end_line": 324,
+            "kind": "symbol",
+            "score": 29.176,
+            "match": null,
+            "why": "name match: GhidraInstallationCheckContext x1.20 (ghidra, installation); bm25: installation, ghidrainstallation, ghidra"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 978,
+            "end_line": 1018,
+            "label": "discoverGhidraInstallationOnPath"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 558,
+            "end_line": 586,
+            "label": "configurationCheck"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 285,
+            "end_line": 306,
+            "label": "GhidraInstallationHost"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 327,
+            "end_line": 379,
+            "label": "inspectGhidraInstallation"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 201,
+            "end_line": 221,
+            "label": "GhidraInstallationObservation"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 308,
+            "end_line": 316,
+            "label": "GhidraInstallationCoordinates"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 866,
+            "end_line": 975,
+            "label": "systemGhidraInstallationHost"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 318,
+            "end_line": 324,
+            "label": "GhidraInstallationCheckContext"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Bir sağlayıcı hata verdiğinde `HopperStartError` gibi iç hata sınıfları, ajana dönen `code`, `retryable` ve `remediation` alanlarına nerede dönüştürülüyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/domain/analysisErrorProjection.ts",
+          "symbol": "projectAnalysisError",
+          "start_line": 46,
+          "end_line": 96
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00017577,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.4452,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/domain/hopperErrors.ts",
+            "symbol_id": "src/domain/hopperErrors.ts::HopperStartError",
+            "start_line": 160,
+            "end_line": 181,
+            "kind": "symbol",
+            "score": 80.6011,
+            "match": null,
+            "why": "name match: HopperStartError x1.20 (explicit hopperstarterror); class boost; class asked x3; bm25: hopperstarterror, error"
+          },
+          {
+            "path": "src/domain/providerCleanupError.ts",
+            "symbol_id": "src/domain/providerCleanupError.ts::ProviderCleanupError",
+            "start_line": 6,
+            "end_line": 35,
+            "kind": "symbol",
+            "score": 36.4516,
+            "match": null,
+            "why": "name match: ProviderCleanupError x1.10 (hata, sağlayıcı); class boost; class asked x3; bm25: error, provider~"
+          },
+          {
+            "path": "src/domain/providerSelectionError.ts",
+            "symbol_id": "src/domain/providerSelectionError.ts::ProviderSelectionError",
+            "start_line": 35,
+            "end_line": 63,
+            "kind": "symbol",
+            "score": 36.2481,
+            "match": null,
+            "why": "name match: ProviderSelectionError x1.10 (hata, sağlayıcı); class boost; class asked x3; bm25: error, provider~"
+          },
+          {
+            "path": "src/domain/providerAdapterError.ts",
+            "symbol_id": "src/domain/providerAdapterError.ts::ProviderAdapterError",
+            "start_line": 13,
+            "end_line": 27,
+            "kind": "symbol",
+            "score": 35.2079,
+            "match": null,
+            "why": "name match: ProviderAdapterError x1.10 (hata, sağlayıcı); class boost; class asked x3; bm25: error, provider~"
+          },
+          {
+            "path": "src/domain/analysisErrorCore.ts",
+            "symbol_id": "src/domain/analysisErrorCore.ts::AnalysisOutputError",
+            "start_line": 95,
+            "end_line": 111,
+            "kind": "symbol",
+            "score": 30.6624,
+            "match": null,
+            "why": "name match: AnalysisOutputError x1.04 (hata); class boost; class asked x3; bm25: error, provider~"
+          },
+          {
+            "path": "src/domain/analysisErrorBase.ts",
+            "symbol_id": "src/domain/analysisErrorBase.ts::AnalysisError",
+            "start_line": 64,
+            "end_line": 121,
+            "kind": "symbol",
+            "score": 28.3366,
+            "match": null,
+            "why": "name match: AnalysisError x1.04 (hata); class boost; class asked x3; bm25: error, provider~"
+          },
+          {
+            "path": "src/domain/hopperErrors.ts",
+            "symbol_id": "src/domain/hopperErrors.ts::HopperError",
+            "start_line": 16,
+            "end_line": 16,
+            "kind": "symbol",
+            "score": 28.1424,
+            "match": null,
+            "why": "name match: HopperError x1.04 (hata); class boost; class asked x3; bm25: error, provider~"
+          },
+          {
+            "path": "src/domain/analysisErrorCore.ts",
+            "symbol_id": "src/domain/analysisErrorCore.ts::AnalysisProtocolError",
+            "start_line": 50,
+            "end_line": 52,
+            "kind": "symbol",
+            "score": 27.5462,
+            "match": null,
+            "why": "name match: AnalysisProtocolError x1.04 (hata); class boost; class asked x3; bm25: error, provider~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/domain/hopperErrors.ts",
+            "start_line": 160,
+            "end_line": 181,
+            "label": "HopperStartError"
+          },
+          {
+            "path": "src/domain/providerCleanupError.ts",
+            "start_line": 6,
+            "end_line": 35,
+            "label": "ProviderCleanupError"
+          },
+          {
+            "path": "src/domain/providerSelectionError.ts",
+            "start_line": 35,
+            "end_line": 63,
+            "label": "ProviderSelectionError"
+          },
+          {
+            "path": "src/domain/providerAdapterError.ts",
+            "start_line": 13,
+            "end_line": 27,
+            "label": "ProviderAdapterError"
+          },
+          {
+            "path": "src/domain/analysisErrorCore.ts",
+            "start_line": 95,
+            "end_line": 111,
+            "label": "AnalysisOutputError"
+          },
+          {
+            "path": "src/domain/analysisErrorBase.ts",
+            "start_line": 64,
+            "end_line": 121,
+            "label": "AnalysisError"
+          },
+          {
+            "path": "src/domain/hopperErrors.ts",
+            "start_line": 16,
+            "end_line": 16,
+            "label": "HopperError"
+          },
+          {
+            "path": "src/domain/analysisErrorCore.ts",
+            "start_line": 50,
+            "end_line": 52,
+            "label": "AnalysisProtocolError"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Hopper runs REA's Python bridge script inside its own process. Where is the small Python bootstrap generated that hands that script the Unix socket path, the random auth token and the run id?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/hopper/BridgeLauncher.ts",
+          "symbol": "bridgeBootstrapSource",
+          "start_line": 451,
+          "end_line": 466
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000218232,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4047,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/hopper/BridgeLauncher.ts",
+            "symbol_id": "src/hopper/BridgeLauncher.ts::bridgeBootstrapSource",
+            "start_line": 451,
+            "end_line": 466,
+            "kind": "symbol",
+            "score": 30.961,
+            "match": "symbol",
+            "why": "name match: bridgeBootstrapSource x1.08 (bootstrap, bridge); bm25: bridge, bootstrap, hopper, process, path"
+          },
+          {
+            "path": "src/hopper/BridgeLauncher.ts",
+            "symbol_id": "src/hopper/BridgeLauncher.ts::HopperApplicationLauncher.#writeBootstrap",
+            "start_line": 393,
+            "end_line": 417,
+            "kind": "symbol",
+            "score": 28.6385,
+            "match": null,
+            "why": "name match: #writeBootstrap x1.05 (bootstrap); owner match: HopperApplicationLauncher x1.01; bm25: bootstrap, bridge, hopper, process, path"
+          },
+          {
+            "path": "bridge/hopper_bridge.py",
+            "symbol_id": "bridge/hopper_bridge.py::_run",
+            "start_line": 1147,
+            "end_line": 1174,
+            "kind": "symbol",
+            "score": 45.0311,
+            "match": null,
+            "why": "name match: _run x1.11 (run, runs); bm25: bridge, unix, socket, runs~, hopper"
+          },
+          {
+            "path": "src/hopper/HopperClient.ts",
+            "symbol_id": "src/hopper/HopperClient.ts::HopperClient",
+            "start_line": 115,
+            "end_line": 1163,
+            "kind": "symbol",
+            "score": 37.1831,
+            "match": null,
+            "why": "name match: HopperClient x1.02 (hopper); class boost; bm25: unix, bridge, hopper, socket"
+          },
+          {
+            "path": "src/cutter/CutterBridgeClient.ts",
+            "symbol_id": "src/cutter/CutterBridgeClient.ts::CutterBridgeClient",
+            "start_line": 244,
+            "end_line": 892,
+            "kind": "symbol",
+            "score": 34.3912,
+            "match": null,
+            "why": "name match: CutterBridgeClient x1.02 (bridge); class boost; bm25: bridge, python, rea, process"
+          },
+          {
+            "path": "src/hopper/HopperSocketConnection.ts",
+            "symbol_id": "src/hopper/HopperSocketConnection.ts::connectHopperSocketOnce",
+            "start_line": 10,
+            "end_line": 39,
+            "kind": "symbol",
+            "score": 33.1011,
+            "match": null,
+            "why": "name match: connectHopperSocketOnce x1.06 (hopper, socket); bm25: socket, socketpath, unix, hopper, path"
+          },
+          {
+            "path": "src/process/ProcessOwnership.ts",
+            "symbol_id": "src/process/ProcessOwnership.ts::ProcessRunTokenObservation",
+            "start_line": 115,
+            "end_line": 117,
+            "kind": "symbol",
+            "score": 31.3987,
+            "match": null,
+            "why": "name match: ProcessRunTokenObservation x1.17 (process, run, runs, token); bm25: token, runs~, runid, process, id"
+          },
+          {
+            "path": "src/process/ProcessOwnership.ts",
+            "symbol_id": "src/process/ProcessOwnership.ts::processRunTokenFailures",
+            "start_line": 787,
+            "end_line": 809,
+            "kind": "symbol",
+            "score": 30.666,
+            "match": null,
+            "why": "name match: processRunTokenFailures x1.17 (process, run, runs, token); bm25: token, runs~, runid, process, id"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/hopper/BridgeLauncher.ts",
+            "start_line": 451,
+            "end_line": 466,
+            "label": "bridgeBootstrapSource"
+          },
+          {
+            "path": "src/hopper/BridgeLauncher.ts",
+            "start_line": 145,
+            "end_line": 145,
+            "label": "HopperApplicationLauncher (class header)"
+          },
+          {
+            "path": "src/hopper/BridgeLauncher.ts",
+            "start_line": 393,
+            "end_line": 417,
+            "label": "HopperApplicationLauncher.#writeBootstrap"
+          },
+          {
+            "path": "bridge/hopper_bridge.py",
+            "start_line": 1147,
+            "end_line": 1174,
+            "label": "_run"
+          },
+          {
+            "path": "src/hopper/HopperClient.ts",
+            "start_line": 115,
+            "end_line": 213,
+            "label": "HopperClient (first 99 of 1049 lines)"
+          },
+          {
+            "path": "src/cutter/CutterBridgeClient.ts",
+            "start_line": 244,
+            "end_line": 346,
+            "label": "CutterBridgeClient (first 103 of 649 lines)"
+          },
+          {
+            "path": "src/hopper/HopperSocketConnection.ts",
+            "start_line": 10,
+            "end_line": 39,
+            "label": "connectHopperSocketOnce"
+          },
+          {
+            "path": "src/process/ProcessOwnership.ts",
+            "start_line": 115,
+            "end_line": 117,
+            "label": "ProcessRunTokenObservation"
+          },
+          {
+            "path": "src/process/ProcessOwnership.ts",
+            "start_line": 787,
+            "end_line": 809,
+            "label": "processRunTokenFailures"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Which native-analysis calls may be answered from REA's in-memory analysis snapshot instead of asking Ghidra or Hopper again, and what makes an operation ineligible?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/application/binary/AnalysisSnapshotCache.ts",
+          "symbol": "isSnapshotCacheable",
+          "start_line": 71,
+          "end_line": 85
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000230916,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4664,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/application/native/NativeCallRoutes.ts",
+            "symbol_id": "src/application/native/NativeCallRoutes.ts::readNativeCallRoutes",
+            "start_line": 63,
+            "end_line": 162,
+            "kind": "symbol",
+            "score": 20.5912,
+            "match": null,
+            "why": "name match: readNativeCallRoutes x1.09 (calls, native); bm25: native, calls~, operation, analysis"
+          },
+          {
+            "path": "src/application/binary/AnalysisSnapshotCache.ts",
+            "symbol_id": "src/application/binary/AnalysisSnapshotCache.ts::AnalysisSnapshotCache",
+            "start_line": 93,
+            "end_line": 383,
+            "kind": "symbol",
+            "score": 21.0698,
+            "match": null,
+            "why": "name match: AnalysisSnapshotCache x1.07 (analysis, snapshot); class boost; bm25: snapshot, memory, analysis"
+          },
+          {
+            "path": "src/native/NativeCallObservation.ts",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 248,
+            "kind": "file",
+            "score": 22.6978,
+            "match": null,
+            "why": "bm25: calls, native"
+          },
+          {
+            "path": "bridge/hopper_bridge.py",
+            "symbol_id": "bridge/hopper_bridge.py::_native_calls",
+            "start_line": 372,
+            "end_line": 385,
+            "kind": "symbol",
+            "score": 33.1222,
+            "match": null,
+            "why": "name match: _native_calls x1.13 (calls, native); bm25: calls, native, hopper"
+          },
+          {
+            "path": "src/native/NativeCallObservation.ts",
+            "symbol_id": "src/native/NativeCallObservation.ts::projectNativeCalls",
+            "start_line": 98,
+            "end_line": 228,
+            "kind": "symbol",
+            "score": 29.3186,
+            "match": null,
+            "why": "name match: projectNativeCalls x1.10 (calls, native); bm25: calls, native, rea"
+          },
+          {
+            "path": "src/domain/analysisSnapshot.ts",
+            "symbol_id": "src/domain/analysisSnapshot.ts::createAnalysisSnapshotEntry",
+            "start_line": 526,
+            "end_line": 564,
+            "kind": "symbol",
+            "score": 21.9409,
+            "match": null,
+            "why": "name match: createAnalysisSnapshotEntry x1.06 (analysis, snapshot); bm25: snapshot, analysissnapshot, analysis, calls~, operation"
+          },
+          {
+            "path": "src/domain/analysisSnapshot.ts",
+            "symbol_id": "src/domain/analysisSnapshot.ts::parseAnalysisSnapshot",
+            "start_line": 569,
+            "end_line": 598,
+            "kind": "symbol",
+            "score": 20.5891,
+            "match": null,
+            "why": "name match: parseAnalysisSnapshot x1.07 (analysis, snapshot); bm25: analysissnapshot, snapshot, analysis"
+          },
+          {
+            "path": "src/domain/analysisSnapshot.ts",
+            "symbol_id": "src/domain/analysisSnapshot.ts::AnalysisSnapshot",
+            "start_line": 178,
+            "end_line": 178,
+            "kind": "symbol",
+            "score": 25.0436,
+            "match": null,
+            "why": "name match: AnalysisSnapshot x1.09 (analysis, analysis snapshot, snapshot); bm25: analysissnapshot, snapshot, analysis"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/application/native/NativeCallRoutes.ts",
+            "start_line": 63,
+            "end_line": 162,
+            "label": "readNativeCallRoutes"
+          },
+          {
+            "path": "src/application/binary/AnalysisSnapshotCache.ts",
+            "start_line": 93,
+            "end_line": 187,
+            "label": "AnalysisSnapshotCache (first 95 of 291 lines)"
+          },
+          {
+            "path": "src/native/NativeCallObservation.ts",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "bridge/hopper_bridge.py",
+            "start_line": 372,
+            "end_line": 385,
+            "label": "_native_calls"
+          },
+          {
+            "path": "src/native/NativeCallObservation.ts",
+            "start_line": 98,
+            "end_line": 195,
+            "label": "projectNativeCalls (part 1/2)"
+          },
+          {
+            "path": "src/native/NativeCallObservation.ts",
+            "start_line": 196,
+            "end_line": 228,
+            "label": "projectNativeCalls (part 2/2)"
+          },
+          {
+            "path": "src/domain/analysisSnapshot.ts",
+            "start_line": 526,
+            "end_line": 564,
+            "label": "createAnalysisSnapshotEntry"
+          },
+          {
+            "path": "src/domain/analysisSnapshot.ts",
+            "start_line": 569,
+            "end_line": 598,
+            "label": "parseAnalysisSnapshot"
+          },
+          {
+            "path": "src/domain/analysisSnapshot.ts",
+            "start_line": 178,
+            "end_line": 178,
+            "label": "AnalysisSnapshot"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Bir süreç senaryosu çalıştırıldıktan sonra hangi dosyaların oluşturulduğu, silindiği ya da değiştirildiği nasıl belirleniyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/process/capture/ProcessFilesystemEffects.ts",
+          "symbol": "classifyFilesystemEffects",
+          "start_line": 33,
+          "end_line": 116
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000198072,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4079,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "src/domain/process/processCapture.ts",
+            "symbol_id": "src/domain/process/processCapture.ts::FileEffect",
+            "start_line": 104,
+            "end_line": 127,
+            "kind": "symbol",
+            "score": 14.2797,
+            "match": null,
+            "why": "bm25: delete~, after, create~"
+          },
+          {
+            "path": "src/process/capture/ProcessCaptureLifecycle.ts",
+            "symbol_id": "src/process/capture/ProcessCaptureLifecycle.ts::createRunManifest",
+            "start_line": 620,
+            "end_line": 658,
+            "kind": "symbol",
+            "score": 12.8634,
+            "match": null,
+            "why": "name match: createRunManifest x1.37 (oluşturulduğu, çalıştırıldıktan); bm25: run, create~"
+          },
+          {
+            "path": "src/ida/IdaWorkspace.ts",
+            "symbol_id": "src/ida/IdaWorkspace.ts::IdaWorkspace.remove",
+            "start_line": 111,
+            "end_line": 113,
+            "kind": "symbol",
+            "score": 34.5828,
+            "match": null,
+            "why": "name match: remove x1.56 (silindiği); bm25: remove~, delete~, after"
+          },
+          {
+            "path": "src/native/CommandRunner.ts",
+            "symbol_id": "src/native/CommandRunner.ts::XcrunCommandRunner.#runAfterCleanup",
+            "start_line": 166,
+            "end_line": 206,
+            "kind": "symbol",
+            "score": 17.4952,
+            "match": null,
+            "why": "name match: #runAfterCleanup x1.47 (sonra, çalıştırıldıktan); bm25: after, run"
+          },
+          {
+            "path": "src/domain/javascript/javascriptSemanticProjection.ts",
+            "symbol_id": "src/domain/javascript/javascriptSemanticProjection.ts::isDeleteSite",
+            "start_line": 669,
+            "end_line": 670,
+            "kind": "symbol",
+            "score": 16.2669,
+            "match": null,
+            "why": "name match: isDeleteSite x1.29 (silindiği); bm25: delete~"
+          },
+          {
+            "path": "src/application/ClientConfigurationDocument.ts",
+            "symbol_id": "src/application/ClientConfigurationDocument.ts::deleteJsonProperty",
+            "start_line": 1272,
+            "end_line": 1309,
+            "kind": "symbol",
+            "score": 15.6722,
+            "match": null,
+            "why": "name match: deleteJsonProperty x1.29 (silindiği); bm25: delete~"
+          },
+          {
+            "path": "scripts/lib/verifier-run.d.mts",
+            "symbol_id": "scripts/lib/verifier-run.d.mts::createVerifierRun",
+            "start_line": 36,
+            "end_line": 36,
+            "kind": "symbol",
+            "score": 15.6547,
+            "match": null,
+            "why": "name match: createVerifierRun x1.37 (oluşturulduğu, çalıştırıldıktan); bm25: run, create~"
+          },
+          {
+            "path": "scripts/fixtures/http3-lab.test.py",
+            "symbol_id": "scripts/fixtures/http3-lab.test.py::CleanupTests.test_all_actions_run_after_multiple_close_failures",
+            "start_line": 16,
+            "end_line": 25,
+            "kind": "symbol",
+            "score": 15.399,
+            "match": null,
+            "why": "name match: test_all_actions_run_after_multiple_close_failures x1.27 (sonra, çalıştırıldıktan); bm25: after, run"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/domain/process/processCapture.ts",
+            "start_line": 104,
+            "end_line": 127,
+            "label": "FileEffect"
+          },
+          {
+            "path": "src/process/capture/ProcessCaptureLifecycle.ts",
+            "start_line": 620,
+            "end_line": 658,
+            "label": "createRunManifest"
+          },
+          {
+            "path": "src/ida/IdaWorkspace.ts",
+            "start_line": 24,
+            "end_line": 24,
+            "label": "IdaWorkspace (class header)"
+          },
+          {
+            "path": "src/ida/IdaWorkspace.ts",
+            "start_line": 111,
+            "end_line": 113,
+            "label": "IdaWorkspace.remove"
+          },
+          {
+            "path": "src/native/CommandRunner.ts",
+            "start_line": 131,
+            "end_line": 131,
+            "label": "XcrunCommandRunner (class header)"
+          },
+          {
+            "path": "src/native/CommandRunner.ts",
+            "start_line": 166,
+            "end_line": 206,
+            "label": "XcrunCommandRunner.#runAfterCleanup"
+          },
+          {
+            "path": "src/domain/javascript/javascriptSemanticProjection.ts",
+            "start_line": 669,
+            "end_line": 670,
+            "label": "isDeleteSite"
+          },
+          {
+            "path": "src/application/ClientConfigurationDocument.ts",
+            "start_line": 1272,
+            "end_line": 1309,
+            "label": "deleteJsonProperty"
+          },
+          {
+            "path": "scripts/lib/verifier-run.d.mts",
+            "start_line": 36,
+            "end_line": 36,
+            "label": "createVerifierRun"
+          },
+          {
+            "path": "scripts/fixtures/http3-lab.test.py",
+            "start_line": 15,
+            "end_line": 15,
+            "label": "CleanupTests (class header)"
+          },
+          {
+            "path": "scripts/fixtures/http3-lab.test.py",
+            "start_line": 16,
+            "end_line": 25,
+            "label": "CleanupTests.test_all_actions_run_after_multiple_close_failures"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Before `rea setup` rewrites an agent's existing MCP config file such as `~/.claude.json`, where does it save a copy of the original, and how does it avoid clobbering a copy saved by an earlier run?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/application/SetupClientConfiguration.ts",
+          "symbol": "persistClientConfiguration",
+          "start_line": 222,
+          "end_line": 361
+        },
+        {
+          "path": "src/application/SetupRecoveryBackup.ts",
+          "symbol": "selectCurrentRecoveryBackup",
+          "start_line": 28,
+          "end_line": 75
+        },
+        {
+          "path": "src/application/SetupRecoveryBackup.ts",
+          "symbol": "preserveRecoveryBackup",
+          "start_line": 78,
+          "end_line": 88
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000199668,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.4473,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/application/ClaudeDesktopConfigLocation.ts",
+            "symbol_id": "src/application/ClaudeDesktopConfigLocation.ts::resolveWindowsClaudeDesktopLocation",
+            "start_line": 58,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 37.4185,
+            "match": null,
+            "why": "name match: resolveWindowsClaudeDesktopLocation x1.03 (claude); bm25: claude, copy, config, existing~, json"
+          },
+          {
+            "path": "src/application/ClientRegistrationStatus.ts",
+            "symbol_id": "src/application/ClientRegistrationStatus.ts::remediation",
+            "start_line": 480,
+            "end_line": 485,
+            "kind": "symbol",
+            "score": 36.8371,
+            "match": null,
+            "why": "bm25: rewrites, before, setup"
+          },
+          {
+            "path": "src/application/SupportedClients.ts",
+            "symbol_id": "src/application/SupportedClients.ts::claudeCodeConfigDirectory",
+            "start_line": 161,
+            "end_line": 162,
+            "kind": "symbol",
+            "score": 34.0621,
+            "match": null,
+            "why": "name match: claudeCodeConfigDirectory x1.09 (claude, config); bm25: claude, config"
+          },
+          {
+            "path": "src/application/Uninstall.ts",
+            "symbol_id": "src/application/Uninstall.ts::uninstallConfigPaths",
+            "start_line": 312,
+            "end_line": 322,
+            "kind": "symbol",
+            "score": 33.7095,
+            "match": null,
+            "why": "name match: uninstallConfigPaths x1.03 (config); bm25: earlier, config, rea, setup, copy"
+          },
+          {
+            "path": "src/application/ClaudeDesktopConfigLocation.ts",
+            "symbol_id": "src/application/ClaudeDesktopConfigLocation.ts::ClaudeDesktopLocation",
+            "start_line": 26,
+            "end_line": 30,
+            "kind": "symbol",
+            "score": 33.0432,
+            "match": null,
+            "why": "name match: ClaudeDesktopLocation x1.04 (claude); bm25: claude, config"
+          },
+          {
+            "path": "src/application/binary/BinarySession.ts",
+            "symbol_id": "src/application/binary/BinarySession.ts::BinarySession.closeWithSnapshot",
+            "start_line": 454,
+            "end_line": 479,
+            "kind": "symbol",
+            "score": 32.1975,
+            "match": null,
+            "why": "bm25: save, earlier, saved"
+          },
+          {
+            "path": "scripts/lib/recorded-core-fixtures.py",
+            "symbol_id": "scripts/lib/recorded-core-fixtures.py::save",
+            "start_line": 21,
+            "end_line": 24,
+            "kind": "symbol",
+            "score": 31.1923,
+            "match": null,
+            "why": "name match: save x1.09 (save); bm25: save"
+          },
+          {
+            "path": "src/application/ClaudeDesktopConfigLocation.ts",
+            "symbol_id": "src/application/ClaudeDesktopConfigLocation.ts::ClaudeDesktopLocationFailure",
+            "start_line": 33,
+            "end_line": 36,
+            "kind": "symbol",
+            "score": 30.8458,
+            "match": null,
+            "why": "name match: ClaudeDesktopLocationFailure x1.04 (claude); bm25: claude, config"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/application/ClaudeDesktopConfigLocation.ts",
+            "start_line": 58,
+            "end_line": 120,
+            "label": "resolveWindowsClaudeDesktopLocation"
+          },
+          {
+            "path": "src/application/ClientRegistrationStatus.ts",
+            "start_line": 480,
+            "end_line": 485,
+            "label": "remediation"
+          },
+          {
+            "path": "src/application/SupportedClients.ts",
+            "start_line": 161,
+            "end_line": 162,
+            "label": "claudeCodeConfigDirectory"
+          },
+          {
+            "path": "src/application/Uninstall.ts",
+            "start_line": 312,
+            "end_line": 322,
+            "label": "uninstallConfigPaths"
+          },
+          {
+            "path": "src/application/ClaudeDesktopConfigLocation.ts",
+            "start_line": 26,
+            "end_line": 30,
+            "label": "ClaudeDesktopLocation"
+          },
+          {
+            "path": "src/application/binary/BinarySession.ts",
+            "start_line": 77,
+            "end_line": 80,
+            "label": "BinarySession (class header)"
+          },
+          {
+            "path": "src/application/binary/BinarySession.ts",
+            "start_line": 454,
+            "end_line": 479,
+            "label": "BinarySession.closeWithSnapshot"
+          },
+          {
+            "path": "scripts/lib/recorded-core-fixtures.py",
+            "start_line": 21,
+            "end_line": 24,
+            "label": "save"
+          },
+          {
+            "path": "src/application/ClaudeDesktopConfigLocation.ts",
+            "start_line": 33,
+            "end_line": 36,
+            "label": "ClaudeDesktopLocationFailure"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Android APK analizi icin JADX jar dosyasinin yolu hangi ortam degiskeninden okunuyor; yol goreli verilirse ya da dosya okunamazsa nasil bir hata donuyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/android/JadxConfiguration.ts",
+          "symbol": "resolveJar",
+          "start_line": 364,
+          "end_line": 395
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000205002,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4411,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/android/JadxConfiguration.ts",
+            "symbol_id": "src/android/JadxConfiguration.ts::resolveJar",
+            "start_line": 364,
+            "end_line": 395,
+            "kind": "symbol",
+            "score": 32.3312,
+            "match": "symbol",
+            "why": "name match: resolveJar x1.13 (jar); bm25: jar, jadx, android, environment"
+          },
+          {
+            "path": "src/android/JadxProvider.ts",
+            "symbol_id": "src/android/JadxProvider.ts::JadxProvider",
+            "start_line": 326,
+            "end_line": 631,
+            "kind": "symbol",
+            "score": 28.4665,
+            "match": null,
+            "why": "name match: JadxProvider x1.09 (jadx); class boost; bm25: jadx, apk, android"
+          },
+          {
+            "path": "src/ghidra/extensions/GhidraExtensions.ts",
+            "symbol_id": "src/ghidra/extensions/GhidraExtensions.ts::readJar",
+            "start_line": 72,
+            "end_line": 108,
+            "kind": "symbol",
+            "score": 27.4396,
+            "match": null,
+            "why": "name match: readJar x1.36 (jar, okunamazsa, okunuyor); bm25: jar, read, path"
+          },
+          {
+            "path": "src/android/JadxConfiguration.ts",
+            "symbol_id": "src/android/JadxConfiguration.ts::readJadxConfigurationInputs",
+            "start_line": 218,
+            "end_line": 229,
+            "kind": "symbol",
+            "score": 27.1022,
+            "match": null,
+            "why": "name match: readJadxConfigurationInputs x1.20 (jadx, okunamazsa, okunuyor); bm25: jadx, read, android, environment"
+          },
+          {
+            "path": "src/android/JadxConfiguration.ts",
+            "symbol_id": "src/android/JadxConfiguration.ts::inspectJadxAvailability",
+            "start_line": 153,
+            "end_line": 185,
+            "kind": "symbol",
+            "score": 25.723,
+            "match": null,
+            "why": "name match: inspectJadxAvailability x1.07 (jadx); bm25: jadx, jar, android, environment"
+          },
+          {
+            "path": "src/composition/android.ts",
+            "symbol_id": "src/composition/android.ts::createAndroidAnalysisProvider",
+            "start_line": 6,
+            "end_line": 9,
+            "kind": "symbol",
+            "score": 25.4144,
+            "match": null,
+            "why": "name match: createAndroidAnalysisProvider x1.05 (android); bm25: android, environment, apk, jadx"
+          },
+          {
+            "path": "src/android/JadxMcpTransport.ts",
+            "symbol_id": "src/android/JadxMcpTransport.ts::JadxMcpTransport.#read",
+            "start_line": 179,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 24.0708,
+            "match": null,
+            "why": "name match: #read x1.15 (okunamazsa, okunuyor); owner match: JadxMcpTransport x1.02; bm25: jadx, android, read"
+          },
+          {
+            "path": "src/android/JadxSession.ts",
+            "symbol_id": "src/android/JadxSession.ts::JadxSession.execute",
+            "start_line": 65,
+            "end_line": 163,
+            "kind": "symbol",
+            "score": 23.5908,
+            "match": null,
+            "why": "bm25: jadx, jar, android, apk"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/android/JadxConfiguration.ts",
+            "start_line": 364,
+            "end_line": 395,
+            "label": "resolveJar"
+          },
+          {
+            "path": "src/android/JadxProvider.ts",
+            "start_line": 326,
+            "end_line": 428,
+            "label": "JadxProvider (first 103 of 306 lines)"
+          },
+          {
+            "path": "src/ghidra/extensions/GhidraExtensions.ts",
+            "start_line": 72,
+            "end_line": 108,
+            "label": "readJar"
+          },
+          {
+            "path": "src/android/JadxConfiguration.ts",
+            "start_line": 218,
+            "end_line": 229,
+            "label": "readJadxConfigurationInputs"
+          },
+          {
+            "path": "src/android/JadxConfiguration.ts",
+            "start_line": 153,
+            "end_line": 185,
+            "label": "inspectJadxAvailability"
+          },
+          {
+            "path": "src/composition/android.ts",
+            "start_line": 6,
+            "end_line": 9,
+            "label": "createAndroidAnalysisProvider"
+          },
+          {
+            "path": "src/android/JadxMcpTransport.ts",
+            "start_line": 29,
+            "end_line": 29,
+            "label": "JadxMcpTransport (class header)"
+          },
+          {
+            "path": "src/android/JadxMcpTransport.ts",
+            "start_line": 179,
+            "end_line": 215,
+            "label": "JadxMcpTransport.#read"
+          },
+          {
+            "path": "src/android/JadxSession.ts",
+            "start_line": 34,
+            "end_line": 34,
+            "label": "JadxSession (class header)"
+          },
+          {
+            "path": "src/android/JadxSession.ts",
+            "start_line": 65,
+            "end_line": 163,
+            "label": "JadxSession.execute"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "`rea doctor` reports that everything is ready, but my agent still cannot see REA's tools. Where is the check that starts the real stdio MCP server as a child process, lists its tools and prompts and makes a test tool call?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/mcpDoctor.ts",
+          "symbol": "runProductionMcpDoctor",
+          "start_line": 82,
+          "end_line": 168
+        },
+        {
+          "path": "src/mcpDoctor.ts",
+          "symbol": "inspectProductionMcpSession",
+          "start_line": 195,
+          "end_line": 281
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000168798,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.416,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "tests/fixtures/localToolsMcp.ts",
+            "symbol_id": "tests/fixtures/localToolsMcp.ts::connectLocalToolsMcp",
+            "start_line": 37,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 28.1662,
+            "match": null,
+            "why": "name match: connectLocalToolsMcp x1.05 (mcp, tools); bm25: tools, mcp, starts~, server, test"
+          },
+          {
+            "path": "src/android/JadxMcpTransport.ts",
+            "symbol_id": "src/android/JadxMcpTransport.ts::JadxMcpTransport",
+            "start_line": 29,
+            "end_line": 238,
+            "kind": "symbol",
+            "score": 30.5855,
+            "match": null,
+            "why": "name match: JadxMcpTransport x1.02 (mcp); class boost; bm25: stdio, mcp, child, rea, process"
+          },
+          {
+            "path": "tests/process-global/verifierRun.test.ts",
+            "symbol_id": "tests/process-global/verifierRun.test.ts::spawnReadyChild",
+            "start_line": 109,
+            "end_line": 114,
+            "kind": "symbol",
+            "score": 35.6076,
+            "match": null,
+            "why": "name match: spawnReadyChild x1.08 (child, ready); bm25: ready, child, childprocess, process, test"
+          },
+          {
+            "path": "src/mcpDoctor.ts",
+            "symbol_id": "src/mcpDoctor.ts::OwnedStdioClientTransport",
+            "start_line": 186,
+            "end_line": 193,
+            "kind": "symbol",
+            "score": 35.0972,
+            "match": null,
+            "why": "name match: OwnedStdioClientTransport x1.03 (stdio); class boost; bm25: stdio, child, doctor, call, mcp"
+          },
+          {
+            "path": "scripts/lib/mcp-startup-probe.d.mts",
+            "symbol_id": "scripts/lib/mcp-startup-probe.d.mts::measureMcpStartup",
+            "start_line": 26,
+            "end_line": 32,
+            "kind": "symbol",
+            "score": 29.2324,
+            "match": null,
+            "why": "name match: measureMcpStartup x1.02 (mcp); bm25: tools, mcp, starts~, process, child, lists~"
+          },
+          {
+            "path": "tests/process-global/verifierRun.test.ts",
+            "symbol_id": "tests/process-global/verifierRun.test.ts::childReady",
+            "start_line": 116,
+            "end_line": 124,
+            "kind": "symbol",
+            "score": 38.4429,
+            "match": null,
+            "why": "name match: childReady x1.10 (child, ready); bm25: ready, child, childprocess, process, test"
+          },
+          {
+            "path": "src/server/registerPrompts.ts",
+            "symbol_id": "src/server/registerPrompts.ts::GuidedPromptRegistry",
+            "start_line": 24,
+            "end_line": 26,
+            "kind": "symbol",
+            "score": 35.2197,
+            "match": null,
+            "why": "name match: GuidedPromptRegistry x1.04 (prompts); bm25: prompts, lists~, server, mcp"
+          },
+          {
+            "path": "tests/boundary/mcp/compactInputSchemaMcp.test.ts",
+            "symbol_id": "tests/boundary/mcp/compactInputSchemaMcp.test.ts::listToolsThroughTransport",
+            "start_line": 82,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 33.5411,
+            "match": null,
+            "why": "name match: listToolsThroughTransport x1.07 (lists, tools); bm25: tools, lists~, server, mcp, test"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "tests/fixtures/localToolsMcp.ts",
+            "start_line": 37,
+            "end_line": 105,
+            "label": "connectLocalToolsMcp"
+          },
+          {
+            "path": "src/android/JadxMcpTransport.ts",
+            "start_line": 29,
+            "end_line": 125,
+            "label": "JadxMcpTransport (first 97 of 210 lines)"
+          },
+          {
+            "path": "tests/process-global/verifierRun.test.ts",
+            "start_line": 109,
+            "end_line": 114,
+            "label": "spawnReadyChild"
+          },
+          {
+            "path": "src/mcpDoctor.ts",
+            "start_line": 186,
+            "end_line": 193,
+            "label": "OwnedStdioClientTransport"
+          },
+          {
+            "path": "scripts/lib/mcp-startup-probe.d.mts",
+            "start_line": 26,
+            "end_line": 32,
+            "label": "measureMcpStartup"
+          },
+          {
+            "path": "tests/process-global/verifierRun.test.ts",
+            "start_line": 116,
+            "end_line": 124,
+            "label": "childReady"
+          },
+          {
+            "path": "src/server/registerPrompts.ts",
+            "start_line": 24,
+            "end_line": 26,
+            "label": "GuidedPromptRegistry"
+          },
+          {
+            "path": "tests/boundary/mcp/compactInputSchemaMcp.test.ts",
+            "start_line": 82,
+            "end_line": 95,
+            "label": "listToolsThroughTransport"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Bir web uygulamasında JavaScript kodunun yüklediği `.wasm` dosyaları, incelenen WASM adaylarıyla nerede eşleştiriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/wasm/WasmGlueAdapter.ts",
+          "symbol": "associateWasmGlue",
+          "start_line": 7,
+          "end_line": 89
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00021525,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.5256,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/domain/wasm/wasmArtifact.ts",
+            "symbol_id": "src/domain/wasm/wasmArtifact.ts::wasmArtifactMatchesSubject",
+            "start_line": 152,
+            "end_line": 159,
+            "kind": "symbol",
+            "score": 23.1889,
+            "match": null,
+            "why": "name match: wasmArtifactMatchesSubject x1.35 (eşleştiriliyor, wasm); bm25: wasm, match"
+          },
+          {
+            "path": "src/browser/assets/LocalWebScriptArtifacts.ts",
+            "symbol_id": "src/browser/assets/LocalWebScriptArtifacts.ts::LocalWebScriptArtifacts.#load",
+            "start_line": 52,
+            "end_line": 144,
+            "kind": "symbol",
+            "score": 15.8702,
+            "match": null,
+            "why": "name match: #load x1.22 (yüklediği); owner match: LocalWebScriptArtifacts x1.02; bm25: load, web"
+          },
+          {
+            "path": "src/domain/javascript/javascriptApplicationVersionKeys.ts",
+            "symbol_id": "src/domain/javascript/javascriptApplicationVersionKeys.ts::matchJavaScriptApplicationVersions",
+            "start_line": 74,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 15.4148,
+            "match": null,
+            "why": "name match: matchJavaScriptApplicationVersions x1.31 (eşleştiriliyor, uygulamasında); bm25: match, application, javascript"
+          },
+          {
+            "path": "src/domain/javascript/javascriptApplicationVersionItems.ts",
+            "symbol_id": "src/domain/javascript/javascriptApplicationVersionItems.ts::matchedMatch",
+            "start_line": 261,
+            "end_line": 300,
+            "kind": "symbol",
+            "score": 16.4247,
+            "match": null,
+            "why": "name match: matchedMatch x1.20 (eşleştiriliyor); bm25: match, application, javascript"
+          },
+          {
+            "path": "src/domain/javascript/javascriptApplicationVersionKeys.ts",
+            "symbol_id": "src/domain/javascript/javascriptApplicationVersionKeys.ts::ApplicationVersionMatchingProjection",
+            "start_line": 33,
+            "end_line": 39,
+            "kind": "symbol",
+            "score": 17.1425,
+            "match": null,
+            "why": "name match: ApplicationVersionMatchingProjection x1.35 (eşleştiriliyor, uygulamasında); bm25: match, application, javascript"
+          },
+          {
+            "path": "src/application/wasm/WasmArtifactService.ts",
+            "symbol_id": "src/application/wasm/WasmArtifactService.ts::WasmArtifactService",
+            "start_line": 24,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 16.2425,
+            "match": null,
+            "why": "name match: WasmArtifactService x1.15 (wasm); class boost; bm25: wasm, application"
+          },
+          {
+            "path": "src/browser/modules/WebModuleArtifacts.ts",
+            "symbol_id": "src/browser/modules/WebModuleArtifacts.ts::LocalWebModuleArtifacts.#load",
+            "start_line": 88,
+            "end_line": 125,
+            "kind": "symbol",
+            "score": 15.6754,
+            "match": null,
+            "why": "name match: #load x1.22 (yüklediği); owner match: LocalWebModuleArtifacts x1.02; bm25: load, web"
+          },
+          {
+            "path": "src/domain/javascript/javascriptFeatureSeed.ts",
+            "symbol_id": "src/domain/javascript/javascriptFeatureSeed.ts::ApplicationFeatureSeedMatch",
+            "start_line": 10,
+            "end_line": 15,
+            "kind": "symbol",
+            "score": 16.8881,
+            "match": null,
+            "why": "name match: ApplicationFeatureSeedMatch x1.35 (eşleştiriliyor, uygulamasında); bm25: match, application, javascript"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/domain/wasm/wasmArtifact.ts",
+            "start_line": 152,
+            "end_line": 159,
+            "label": "wasmArtifactMatchesSubject"
+          },
+          {
+            "path": "src/browser/assets/LocalWebScriptArtifacts.ts",
+            "start_line": 22,
+            "end_line": 22,
+            "label": "LocalWebScriptArtifacts (class header)"
+          },
+          {
+            "path": "src/browser/assets/LocalWebScriptArtifacts.ts",
+            "start_line": 52,
+            "end_line": 144,
+            "label": "LocalWebScriptArtifacts.#load"
+          },
+          {
+            "path": "src/domain/javascript/javascriptApplicationVersionKeys.ts",
+            "start_line": 74,
+            "end_line": 109,
+            "label": "matchJavaScriptApplicationVersions"
+          },
+          {
+            "path": "src/domain/javascript/javascriptApplicationVersionItems.ts",
+            "start_line": 261,
+            "end_line": 300,
+            "label": "matchedMatch"
+          },
+          {
+            "path": "src/domain/javascript/javascriptApplicationVersionKeys.ts",
+            "start_line": 33,
+            "end_line": 39,
+            "label": "ApplicationVersionMatchingProjection"
+          },
+          {
+            "path": "src/application/wasm/WasmArtifactService.ts",
+            "start_line": 24,
+            "end_line": 105,
+            "label": "WasmArtifactService"
+          },
+          {
+            "path": "src/browser/modules/WebModuleArtifacts.ts",
+            "start_line": 19,
+            "end_line": 19,
+            "label": "LocalWebModuleArtifacts (class header)"
+          },
+          {
+            "path": "src/browser/modules/WebModuleArtifacts.ts",
+            "start_line": 88,
+            "end_line": 125,
+            "label": "LocalWebModuleArtifacts.#load"
+          },
+          {
+            "path": "src/domain/javascript/javascriptFeatureSeed.ts",
+            "start_line": 10,
+            "end_line": 15,
+            "label": "ApplicationFeatureSeedMatch"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "flow",
+      "lang": "en",
+      "question": "When an agent calls a native-analysis MCP tool such as `procedure_pseudo_code`, what path does the request take from the MCP handler to the active provider, and how does the result come back as recorded Evidence?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/server/registerOfficialTools.ts",
+          "symbol": "registerOfficialTool",
+          "start_line": 45,
+          "end_line": 113
+        },
+        {
+          "path": "src/server/registerOfficialTools.ts",
+          "symbol": "runOfficialOperation",
+          "start_line": 115,
+          "end_line": 145
+        },
+        {
+          "path": "src/application/binary/BinarySession.ts",
+          "symbol": "BinarySession.withAdmittedAnalysis",
+          "start_line": 673,
+          "end_line": 697
+        },
+        {
+          "path": "src/application/binary/BinarySession.ts",
+          "symbol": "BinarySession.#execute",
+          "start_line": 699,
+          "end_line": 799
+        },
+        {
+          "path": "src/application/binary/BinarySessionExecution.ts",
+          "symbol": "prepareSessionExecution",
+          "start_line": 55,
+          "end_line": 94
+        },
+        {
+          "path": "src/server/toolResult.ts",
+          "symbol": "ToolResultDelivery.toEvidenceToolResult",
+          "start_line": 68,
+          "end_line": 87
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000237342,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.415,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "src/server/contractToolHandler.ts",
+            "symbol_id": "src/server/contractToolHandler.ts::createEvidenceToolHandler",
+            "start_line": 78,
+            "end_line": 106,
+            "kind": "symbol",
+            "score": 42.0451,
+            "match": null,
+            "why": "name match: createEvidenceToolHandler x1.15 (evidence, handler, tool); bm25: handler, evidence, tool, mcp, recorded~, result, analysis"
+          },
+          {
+            "path": "src/server/contractToolHandler.ts",
+            "symbol_id": "src/server/contractToolHandler.ts::createContractToolHandler",
+            "start_line": 60,
+            "end_line": 75,
+            "kind": "symbol",
+            "score": 40.7246,
+            "match": null,
+            "why": "name match: createContractToolHandler x1.09 (handler, tool); bm25: handler, evidence, tool, back, recorded~, mcp"
+          },
+          {
+            "path": "src/server/contractToolHandler.ts",
+            "symbol_id": "src/server/contractToolHandler.ts::deliverEvidenceResult",
+            "start_line": 28,
+            "end_line": 54,
+            "kind": "symbol",
+            "score": 39.1476,
+            "match": null,
+            "why": "name match: deliverEvidenceResult x1.06 (evidence, result); bm25: evidence, handler, tool, result, recorded~, calls~, mcp, analysis"
+          },
+          {
+            "path": "src/server/contractToolHandler.ts",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 106,
+            "kind": "file",
+            "score": 31.7074,
+            "match": null,
+            "why": "bm25: handler, evidence, tool, result"
+          },
+          {
+            "path": "src/ghidra/GhidraRequestQueue.ts",
+            "symbol_id": "src/ghidra/GhidraRequestQueue.ts::GhidraActiveCancellationHandler",
+            "start_line": 26,
+            "end_line": 28,
+            "kind": "symbol",
+            "score": 46.68,
+            "match": null,
+            "why": "name match: GhidraActiveCancellationHandler x1.11 (active, handler); bm25: handler, active, provider, request, result, analysis"
+          },
+          {
+            "path": "src/application/DirectAnalysis.ts",
+            "symbol_id": "src/application/DirectAnalysis.ts::DirectAnalysisTool",
+            "start_line": 63,
+            "end_line": 83,
+            "kind": "symbol",
+            "score": 39.9912,
+            "match": null,
+            "why": "name match: DirectAnalysisTool x1.06 (analysis, tool); bm25: procedure_pseudo_code, pseudo, native, tool, procedure, code, analysis"
+          },
+          {
+            "path": "src/server/toolResult.ts",
+            "symbol_id": "src/server/toolResult.ts::ToolResultDelivery.toRecordedPartialErrorToolResult",
+            "start_line": 106,
+            "end_line": 127,
+            "kind": "symbol",
+            "score": 37.74,
+            "match": null,
+            "why": "name match: toRecordedPartialErrorToolResult x1.12 (recorded, result, tool); bm25: recorded, evidence, tool, result, calls~, analysis"
+          },
+          {
+            "path": "src/application/javascript/ElectronActiveEvidence.ts",
+            "symbol_id": "src/application/javascript/ElectronActiveEvidence.ts::createElectronActiveEvidence",
+            "start_line": 10,
+            "end_line": 32,
+            "kind": "symbol",
+            "score": 37.463,
+            "match": null,
+            "why": "name match: createElectronActiveEvidence x1.07 (active, evidence); bm25: active, evidence, provider, result"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/server/contractToolHandler.ts",
+            "start_line": 78,
+            "end_line": 106,
+            "label": "createEvidenceToolHandler"
+          },
+          {
+            "path": "src/server/contractToolHandler.ts",
+            "start_line": 1,
+            "end_line": 75,
+            "label": "createContractToolHandler + deliverEvidenceResult + module head"
+          },
+          {
+            "path": "src/ghidra/GhidraRequestQueue.ts",
+            "start_line": 26,
+            "end_line": 28,
+            "label": "GhidraActiveCancellationHandler"
+          },
+          {
+            "path": "src/application/DirectAnalysis.ts",
+            "start_line": 63,
+            "end_line": 83,
+            "label": "DirectAnalysisTool"
+          },
+          {
+            "path": "src/server/toolResult.ts",
+            "start_line": 47,
+            "end_line": 47,
+            "label": "ToolResultDelivery (class header)"
+          },
+          {
+            "path": "src/server/toolResult.ts",
+            "start_line": 106,
+            "end_line": 127,
+            "label": "ToolResultDelivery.toRecordedPartialErrorToolResult"
+          },
+          {
+            "path": "src/application/javascript/ElectronActiveEvidence.ts",
+            "start_line": 10,
+            "end_line": 32,
+            "label": "createElectronActiveEvidence"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "flow",
+      "lang": "tr",
+      "question": "`rea setup --client claude_code` çalıştırıldığında, komut satırı seçeneklerinin okunmasından Claude Code yapılandırma dosyasının yazılmasına kadar hangi adımlardan geçiliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/cli/setupCommands.ts",
+          "symbol": "registerSetupCommand",
+          "start_line": 45,
+          "end_line": 98
+        },
+        {
+          "path": "src/cli/setupCommands.ts",
+          "symbol": "setupRunOptions",
+          "start_line": 240,
+          "end_line": 285
+        },
+        {
+          "path": "src/application/Setup.ts",
+          "symbol": "runSetupWorkflow",
+          "start_line": 86,
+          "end_line": 376
+        },
+        {
+          "path": "src/application/SetupPlan.ts",
+          "symbol": "planSetupActions",
+          "start_line": 134,
+          "end_line": 243
+        },
+        {
+          "path": "src/application/SetupClients.ts",
+          "symbol": "configureDetectedClients",
+          "start_line": 28,
+          "end_line": 72
+        },
+        {
+          "path": "src/application/SetupClientConfiguration.ts",
+          "symbol": "configureClientConfiguration",
+          "start_line": 82,
+          "end_line": 96
+        },
+        {
+          "path": "src/application/SetupClientConfiguration.ts",
+          "symbol": "persistClientConfiguration",
+          "start_line": 222,
+          "end_line": 361
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00017934,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4033,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/application/SetupClientConfiguration.ts",
+            "symbol_id": "src/application/SetupClientConfiguration.ts::configureClientDocument",
+            "start_line": 98,
+            "end_line": 210,
+            "kind": "symbol",
+            "score": 32.9875,
+            "match": null,
+            "why": "name match: configureClientDocument x1.15 (client, yapılandırma); bm25: configure~, setup, client, setupclient, command"
+          },
+          {
+            "path": "src/application/SetupClients.ts",
+            "symbol_id": "src/application/SetupClients.ts::configureDetectedClients",
+            "start_line": 28,
+            "end_line": 72,
+            "kind": "symbol",
+            "score": 33.7461,
+            "match": "symbol",
+            "why": "name match: configureDetectedClients x1.15 (client, yapılandırma); bm25: configure~, setupclient, setup, client, command"
+          },
+          {
+            "path": "src/application/SetupClientConfiguration.ts",
+            "symbol_id": "src/application/SetupClientConfiguration.ts::configureClientConfiguration",
+            "start_line": 82,
+            "end_line": 96,
+            "kind": "symbol",
+            "score": 33.6483,
+            "match": "symbol",
+            "why": "name match: configureClientConfiguration x1.15 (client, yapılandırma); bm25: configure~, setup, client, setupclient, command"
+          },
+          {
+            "path": "src/application/SupportedClients.ts",
+            "symbol_id": "src/application/SupportedClients.ts::claudeCodeConfigDirectory",
+            "start_line": 161,
+            "end_line": 162,
+            "kind": "symbol",
+            "score": 52.9023,
+            "match": null,
+            "why": "name match: claudeCodeConfigDirectory x1.25 (claude, yapılandırma); bm25: claude, config, code, client"
+          },
+          {
+            "path": "src/application/ClaudeDesktopConfigLocation.ts",
+            "symbol_id": "src/application/ClaudeDesktopConfigLocation.ts::ClaudeDesktopLocation",
+            "start_line": 26,
+            "end_line": 30,
+            "kind": "symbol",
+            "score": 37.8291,
+            "match": null,
+            "why": "name match: ClaudeDesktopLocation x1.08 (claude); bm25: claude, config, read"
+          },
+          {
+            "path": "src/application/SupportedClients.ts",
+            "symbol_id": "src/application/SupportedClients.ts::claudeCodeMarkerDirectory",
+            "start_line": 164,
+            "end_line": 165,
+            "kind": "symbol",
+            "score": 37.5507,
+            "match": null,
+            "why": "name match: claudeCodeMarkerDirectory x1.10 (claude); bm25: claude, code, client"
+          },
+          {
+            "path": "src/application/Setup.fixture.ts",
+            "symbol_id": "src/application/Setup.fixture.ts::FakeSetupHost.configureClient",
+            "start_line": 110,
+            "end_line": 121,
+            "kind": "symbol",
+            "score": 37.456,
+            "match": null,
+            "why": "name match: configureClient x1.19 (client, yapılandırma); owner match: FakeSetupHost x1.02; bm25: configure~, setup, client, setupclient, command"
+          },
+          {
+            "path": "src/application/SupportedClients.ts",
+            "symbol_id": "src/application/SupportedClients.ts::claudeDesktopLocation",
+            "start_line": 146,
+            "end_line": 159,
+            "kind": "symbol",
+            "score": 32.8121,
+            "match": null,
+            "why": "name match: claudeDesktopLocation x1.08 (claude); bm25: claude, client, read"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/application/SetupClientConfiguration.ts",
+            "start_line": 98,
+            "end_line": 210,
+            "label": "configureClientDocument"
+          },
+          {
+            "path": "src/application/SetupClients.ts",
+            "start_line": 28,
+            "end_line": 72,
+            "label": "configureDetectedClients"
+          },
+          {
+            "path": "src/application/SetupClientConfiguration.ts",
+            "start_line": 82,
+            "end_line": 96,
+            "label": "configureClientConfiguration"
+          },
+          {
+            "path": "src/application/SupportedClients.ts",
+            "start_line": 161,
+            "end_line": 162,
+            "label": "claudeCodeConfigDirectory"
+          },
+          {
+            "path": "src/application/ClaudeDesktopConfigLocation.ts",
+            "start_line": 26,
+            "end_line": 30,
+            "label": "ClaudeDesktopLocation"
+          },
+          {
+            "path": "src/application/SupportedClients.ts",
+            "start_line": 164,
+            "end_line": 165,
+            "label": "claudeCodeMarkerDirectory"
+          },
+          {
+            "path": "src/application/Setup.fixture.ts",
+            "start_line": 22,
+            "end_line": 22,
+            "label": "FakeSetupHost (class header)"
+          },
+          {
+            "path": "src/application/Setup.fixture.ts",
+            "start_line": 110,
+            "end_line": 121,
+            "label": "FakeSetupHost.configureClient"
+          },
+          {
+            "path": "src/application/SupportedClients.ts",
+            "start_line": 146,
+            "end_line": 159,
+            "label": "claudeDesktopLocation"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 2,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "flow",
+      "lang": "en",
+      "question": "How does REA inspect a SQLite database file and its `-wal` without opening or modifying the original? Walk me through the steps from the provider call to the code that finally runs SQL against the data.",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "src/sqlite/SqliteDatabaseProvider.ts",
+          "symbol": "SqliteDatabaseProvider.inspect",
+          "start_line": 79,
+          "end_line": 124
+        },
+        {
+          "path": "src/sqlite/SqliteDatabaseProvider.ts",
+          "symbol": "SqliteDatabaseProvider.#inspect",
+          "start_line": 232,
+          "end_line": 368
+        },
+        {
+          "path": "src/sqlite/SqliteDatabaseSnapshot.ts",
+          "symbol": "captureSqliteDatabaseSnapshot",
+          "start_line": 251,
+          "end_line": 367
+        },
+        {
+          "path": "src/sqlite/SqliteDatabaseWorkerExecution.ts",
+          "symbol": "executeSqliteDatabaseWorker",
+          "start_line": 107,
+          "end_line": 189
+        },
+        {
+          "path": "src/sqlite/SqliteDatabaseWorker.ts",
+          "symbol": "main",
+          "start_line": 15,
+          "end_line": 56
+        },
+        {
+          "path": "src/sqlite/SqliteDatabaseInspection.ts",
+          "symbol": "inspectSqliteDatabaseSnapshot",
+          "start_line": 482,
+          "end_line": 551
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000230328,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3953,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "src/sqlite/SqliteDatabaseInspection.ts",
+            "symbol_id": "src/sqlite/SqliteDatabaseInspection.ts::inspectSqliteDatabaseSnapshot",
+            "start_line": 482,
+            "end_line": 551,
+            "kind": "symbol",
+            "score": 61.7423,
+            "match": "symbol",
+            "why": "name match: inspectSqliteDatabaseSnapshot x1.14 (database, inspect, sqlite); bm25: sqlite, database, sql, inspect, provider"
+          },
+          {
+            "path": "src/sqlite/SqliteDatabaseProvider.ts",
+            "symbol_id": "src/sqlite/SqliteDatabaseProvider.ts::SqliteDatabaseProvider.#inspect",
+            "start_line": 232,
+            "end_line": 368,
+            "kind": "symbol",
+            "score": 50.8067,
+            "match": "symbol",
+            "why": "name match: #inspect x1.04 (inspect); owner match: SqliteDatabaseProvider x1.02; bm25: sqlite, database, inspect, provider"
+          },
+          {
+            "path": "src/application/sqlite/SqliteDatabaseService.ts",
+            "symbol_id": "src/application/sqlite/SqliteDatabaseService.ts::SqliteDatabaseService.inspect",
+            "start_line": 69,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 52.5807,
+            "match": null,
+            "why": "name match: inspect x1.04 (inspect); owner match: SqliteDatabaseService x1.01; bm25: database, sqlite, wal, inspect, original"
+          },
+          {
+            "path": "src/sqlite/SqliteDatabaseSnapshot.ts",
+            "symbol_id": "src/sqlite/SqliteDatabaseSnapshot.ts::captureSqliteDatabaseSnapshot",
+            "start_line": 251,
+            "end_line": 367,
+            "kind": "symbol",
+            "score": 47.4634,
+            "match": "symbol",
+            "why": "name match: captureSqliteDatabaseSnapshot x1.08 (database, sqlite); bm25: sqlite, database, opening, through, without"
+          },
+          {
+            "path": "src/sqlite/SqliteDatabaseProvider.ts",
+            "symbol_id": "src/sqlite/SqliteDatabaseProvider.ts::SqliteDatabaseProvider.inspect",
+            "start_line": 79,
+            "end_line": 124,
+            "kind": "symbol",
+            "score": 63.0881,
+            "match": "symbol",
+            "why": "name match: inspect x1.04 (inspect); owner match: SqliteDatabaseProvider x1.02; bm25: database, sqlite, wal, inspect, provider, original"
+          },
+          {
+            "path": "src/sqlite/SqliteDatabaseProvider.ts",
+            "symbol_id": "src/sqlite/SqliteDatabaseProvider.ts::SqliteDatabaseProvider",
+            "start_line": 60,
+            "end_line": 369,
+            "kind": "symbol",
+            "score": 75.4073,
+            "match": "overlap",
+            "why": "name match: SqliteDatabaseProvider x1.15 (database, provider, sqlite); class boost; bm25: sqlite, database, provider, through, inspect, without"
+          },
+          {
+            "path": "src/domain/sqlite/sqliteDatabase.ts",
+            "symbol_id": "src/domain/sqlite/sqliteDatabase.ts::InspectSqliteDatabaseInput",
+            "start_line": 212,
+            "end_line": 214,
+            "kind": "symbol",
+            "score": 60.2944,
+            "match": null,
+            "why": "name match: InspectSqliteDatabaseInput x1.14 (database, inspect, sqlite); bm25: sqlite, database, sqlitedatabase, inspect"
+          },
+          {
+            "path": "src/domain/sqlite/sqliteDatabase.ts",
+            "symbol_id": "src/domain/sqlite/sqliteDatabase.ts::SqliteDatabase",
+            "start_line": 215,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 59.833,
+            "match": null,
+            "why": "name match: SqliteDatabase x1.12 (database, sqlite, sqlite database); bm25: sqlite, database, sqlitedatabase"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/sqlite/SqliteDatabaseInspection.ts",
+            "start_line": 482,
+            "end_line": 551,
+            "label": "inspectSqliteDatabaseSnapshot"
+          },
+          {
+            "path": "src/sqlite/SqliteDatabaseProvider.ts",
+            "start_line": 60,
+            "end_line": 171,
+            "label": "SqliteDatabaseProvider (class header) + SqliteDatabaseProvider.inspect + SqliteDatabaseProvider (first 112 of 310 lines)"
+          },
+          {
+            "path": "src/sqlite/SqliteDatabaseProvider.ts",
+            "start_line": 232,
+            "end_line": 348,
+            "label": "SqliteDatabaseProvider.#inspect (part 1/2)"
+          },
+          {
+            "path": "src/sqlite/SqliteDatabaseProvider.ts",
+            "start_line": 349,
+            "end_line": 368,
+            "label": "SqliteDatabaseProvider.#inspect (part 2/2)"
+          },
+          {
+            "path": "src/application/sqlite/SqliteDatabaseService.ts",
+            "start_line": 60,
+            "end_line": 60,
+            "label": "SqliteDatabaseService (class header)"
+          },
+          {
+            "path": "src/application/sqlite/SqliteDatabaseService.ts",
+            "start_line": 69,
+            "end_line": 120,
+            "label": "SqliteDatabaseService.inspect"
+          },
+          {
+            "path": "src/sqlite/SqliteDatabaseSnapshot.ts",
+            "start_line": 251,
+            "end_line": 367,
+            "label": "captureSqliteDatabaseSnapshot"
+          },
+          {
+            "path": "src/domain/sqlite/sqliteDatabase.ts",
+            "start_line": 212,
+            "end_line": 214,
+            "label": "InspectSqliteDatabaseInput"
+          },
+          {
+            "path": "src/domain/sqlite/sqliteDatabase.ts",
+            "start_line": 215,
+            "end_line": 215,
+            "label": "SqliteDatabase"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where is the decompiler itself, the code that does the data-flow analysis and type recovery to turn machine code into the C-like pseudocode that `procedure_pseudo_code` returns when Ghidra is the provider?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "src/ghidra/GhidraClient.ts",
+          "symbol": "GhidraClient.callTool",
+          "start_line": 356,
+          "end_line": 371
+        },
+        {
+          "path": "bridge/ghidra/ReaGhidraBridge.java",
+          "symbol": "ReaGhidraBridge.decompile",
+          "start_line": 3305,
+          "end_line": 3324
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000189168,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.3799,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "bridge/hopper_bridge.py",
+            "symbol_id": "bridge/hopper_bridge.py::_pseudocode",
+            "start_line": 508,
+            "end_line": 513,
+            "kind": "symbol",
+            "score": 40.5289,
+            "match": null,
+            "why": "name match: _pseudocode x1.10 (pseudocode); bm25: pseudocode, procedure, provider"
+          },
+          {
+            "path": "src/application/EnhancedTools.ts",
+            "symbol_id": "src/application/EnhancedTools.ts::BatchDecompileItem",
+            "start_line": 73,
+            "end_line": 79,
+            "kind": "symbol",
+            "score": 37.1997,
+            "match": null,
+            "why": "name match: BatchDecompileItem x1.06 (decompiler); bm25: pseudocode, decompiler~, procedure, type"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::NativeDecompilerCompatibility",
+            "start_line": 88,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 34.3983,
+            "match": null,
+            "why": "name match: NativeDecompilerCompatibility x1.06 (decompiler); bm25: decompiler, ghidra, type"
+          },
+          {
+            "path": "src/application/EnhancedTools.ts",
+            "symbol_id": "src/application/EnhancedTools.ts::EnhancedTools.#batchPseudocode",
+            "start_line": 372,
+            "end_line": 414,
+            "kind": "symbol",
+            "score": 31.1294,
+            "match": null,
+            "why": "name match: #batchPseudocode x1.07 (pseudocode); bm25: pseudocode, decompiler~, analysis"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::nativeDecompilerCheck",
+            "start_line": 661,
+            "end_line": 747,
+            "kind": "symbol",
+            "score": 30.801,
+            "match": null,
+            "why": "name match: nativeDecompilerCheck x1.06 (decompiler); bm25: decompiler, ghidra"
+          },
+          {
+            "path": "src/application/DirectAnalysis.ts",
+            "symbol_id": "src/application/DirectAnalysis.ts::DirectAnalysisTool",
+            "start_line": 63,
+            "end_line": 83,
+            "kind": "symbol",
+            "score": 30.7662,
+            "match": null,
+            "why": "name match: DirectAnalysisTool x1.02 (analysis); bm25: procedure_pseudo_code, pseudo, procedure, type, code, analysis"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "symbol_id": "src/ghidra/GhidraInstallation.ts::assessNativeDecompiler",
+            "start_line": 105,
+            "end_line": 164,
+            "kind": "symbol",
+            "score": 29.6298,
+            "match": null,
+            "why": "name match: assessNativeDecompiler x1.06 (decompiler); bm25: decompiler, ghidra"
+          },
+          {
+            "path": "src/domain/managed/managedReconstruction.ts",
+            "symbol_id": "src/domain/managed/managedReconstruction.ts::buildDecompilerRecord",
+            "start_line": 226,
+            "end_line": 231,
+            "kind": "symbol",
+            "score": 29.5642,
+            "match": null,
+            "why": "name match: buildDecompilerRecord x1.06 (decompiler); bm25: decompiler"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "bridge/hopper_bridge.py",
+            "start_line": 508,
+            "end_line": 513,
+            "label": "_pseudocode"
+          },
+          {
+            "path": "src/application/EnhancedTools.ts",
+            "start_line": 73,
+            "end_line": 79,
+            "label": "BatchDecompileItem"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 88,
+            "end_line": 95,
+            "label": "NativeDecompilerCompatibility"
+          },
+          {
+            "path": "src/application/EnhancedTools.ts",
+            "start_line": 98,
+            "end_line": 98,
+            "label": "EnhancedTools (class header)"
+          },
+          {
+            "path": "src/application/EnhancedTools.ts",
+            "start_line": 372,
+            "end_line": 414,
+            "label": "EnhancedTools.#batchPseudocode"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 661,
+            "end_line": 747,
+            "label": "nativeDecompilerCheck"
+          },
+          {
+            "path": "src/application/DirectAnalysis.ts",
+            "start_line": 63,
+            "end_line": 83,
+            "label": "DirectAnalysisTool"
+          },
+          {
+            "path": "src/ghidra/GhidraInstallation.ts",
+            "start_line": 105,
+            "end_line": 164,
+            "label": "assessNativeDecompiler"
+          },
+          {
+            "path": "src/domain/managed/managedReconstruction.ts",
+            "start_line": 226,
+            "end_line": 231,
+            "label": "buildDecompilerRecord"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": null,
+        "pointer_at_k": false,
+        "pointer_chunk_recall": false
+      }
+    },
+    {
+      "id": "q19",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "Frida ile bir surece baglanirken ajani hedef surecin icine enjekte eden ve yuklenen JavaScript'i orada calistiran kod bu depoda nerede?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "src/frida/FridaInstrumentationManager.ts",
+          "symbol": "FridaInstrumentationManager.#startSession",
+          "start_line": 263,
+          "end_line": 359
+        },
+        {
+          "path": "src/frida/FridaInstrumentationManager.ts",
+          "symbol": "FridaInstrumentationManager.#loadScript",
+          "start_line": 376,
+          "end_line": 482
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000186858,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4522,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "src/frida/FridaInstrumentationManager.ts",
+            "symbol_id": "src/frida/FridaInstrumentationManager.ts::FridaInstrumentationManager.#loadScript",
+            "start_line": 376,
+            "end_line": 482,
+            "kind": "symbol",
+            "score": 17.0913,
+            "match": "symbol",
+            "why": "name match: #loadScript x1.11 (yuklenen); owner match: FridaInstrumentationManager x1.01; bm25: frida, load"
+          },
+          {
+            "path": "src/frida/FridaInstrumentationManager.ts",
+            "symbol_id": "src/frida/FridaInstrumentationManager.ts::FridaInstrumentationManager",
+            "start_line": 104,
+            "end_line": 1174,
+            "kind": "symbol",
+            "score": 12.1972,
+            "match": "broad",
+            "why": "name match: FridaInstrumentationManager x1.09 (frida); class boost; bm25: frida"
+          },
+          {
+            "path": "src/application/frida/FridaInstrumentationPort.ts",
+            "symbol_id": "src/application/frida/FridaInstrumentationPort.ts::FridaScriptLoadCancelledError",
+            "start_line": 67,
+            "end_line": 74,
+            "kind": "symbol",
+            "score": 23.6846,
+            "match": null,
+            "why": "name match: FridaScriptLoadCancelledError x1.21 (frida, yuklenen); class boost; bm25: frida, load"
+          },
+          {
+            "path": "src/frida/FridaInstrumentationManager.ts",
+            "symbol_id": "src/frida/FridaInstrumentationManager.ts::FridaInstrumentationManager.loadScript",
+            "start_line": 361,
+            "end_line": 374,
+            "kind": "symbol",
+            "score": 17.0913,
+            "match": null,
+            "why": "name match: loadScript x1.11 (yuklenen); owner match: FridaInstrumentationManager x1.01; bm25: frida, load"
+          },
+          {
+            "path": "src/application/frida/FridaInstrumentationService.ts",
+            "symbol_id": "src/application/frida/FridaInstrumentationService.ts::FridaInstrumentationService.loadScript",
+            "start_line": 182,
+            "end_line": 203,
+            "kind": "symbol",
+            "score": 16.6075,
+            "match": null,
+            "why": "name match: loadScript x1.11 (yuklenen); owner match: FridaInstrumentationService x1.01; bm25: frida, load"
+          },
+          {
+            "path": "src/application/frida/fridaInputErrors.ts",
+            "symbol_id": "src/application/frida/fridaInputErrors.ts::unknownFridaScript",
+            "start_line": 17,
+            "end_line": 27,
+            "kind": "symbol",
+            "score": 14.2,
+            "match": null,
+            "why": "name match: unknownFridaScript x1.09 (frida); bm25: frida, load"
+          },
+          {
+            "path": "src/application/frida/FridaInstrumentationPort.ts",
+            "symbol_id": "src/application/frida/FridaInstrumentationPort.ts::FridaScriptLoadCancelledError.constructor",
+            "start_line": 68,
+            "end_line": 73,
+            "kind": "symbol",
+            "score": 13.55,
+            "match": null,
+            "why": "bm25: frida, load"
+          },
+          {
+            "path": "src/application/frida/FridaInstrumentationPort.ts",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 136,
+            "kind": "file",
+            "score": 12.6148,
+            "match": null,
+            "why": "bm25: frida, load"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/frida/FridaInstrumentationManager.ts",
+            "start_line": 104,
+            "end_line": 197,
+            "label": "FridaInstrumentationManager (class header) + FridaInstrumentationManager (first 94 of 1071 lines)"
+          },
+          {
+            "path": "src/frida/FridaInstrumentationManager.ts",
+            "start_line": 376,
+            "end_line": 482,
+            "label": "FridaInstrumentationManager.#loadScript"
+          },
+          {
+            "path": "src/application/frida/FridaInstrumentationPort.ts",
+            "start_line": 67,
+            "end_line": 74,
+            "label": "FridaScriptLoadCancelledError"
+          },
+          {
+            "path": "src/frida/FridaInstrumentationManager.ts",
+            "start_line": 361,
+            "end_line": 374,
+            "label": "FridaInstrumentationManager.loadScript"
+          },
+          {
+            "path": "src/application/frida/FridaInstrumentationService.ts",
+            "start_line": 86,
+            "end_line": 86,
+            "label": "FridaInstrumentationService (class header)"
+          },
+          {
+            "path": "src/application/frida/FridaInstrumentationService.ts",
+            "start_line": 182,
+            "end_line": 203,
+            "label": "FridaInstrumentationService.loadScript"
+          },
+          {
+            "path": "src/application/frida/fridaInputErrors.ts",
+            "start_line": 17,
+            "end_line": 27,
+            "label": "unknownFridaScript"
+          },
+          {
+            "path": "src/application/frida/FridaInstrumentationPort.ts",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q20",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where does REA's MCP server read JSON-RPC messages from stdin, split them into frames and write the responses back to stdout?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "src/main.ts",
+          "symbol": "runtimeDependencies",
+          "start_line": 26,
+          "end_line": 34
+        },
+        {
+          "path": "src/main/transport.ts",
+          "symbol": "startMcpTransport",
+          "start_line": 29,
+          "end_line": 212
+        },
+        {
+          "path": "src/server/EvidenceMcpServer.ts",
+          "symbol": "EvidenceMcpServer.connect",
+          "start_line": 184,
+          "end_line": 193
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000232386,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.4215,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "src/cutter/CutterBridgeClient.ts",
+            "symbol_id": "src/cutter/CutterBridgeClient.ts::CutterBridgeResponseFrames",
+            "start_line": 103,
+            "end_line": 165,
+            "kind": "symbol",
+            "score": 37.0379,
+            "match": null,
+            "why": "name match: CutterBridgeResponseFrames x1.15 (frames, responses); class boost; bm25: frames, responses~"
+          },
+          {
+            "path": "src/android/JadxMcpTransport.ts",
+            "symbol_id": "src/android/JadxMcpTransport.ts::JadxMcpTransport.send",
+            "start_line": 91,
+            "end_line": 100,
+            "kind": "symbol",
+            "score": 32.5752,
+            "match": null,
+            "why": "bm25: messages, jsonrpc, mcp, write~"
+          },
+          {
+            "path": "bridge/hopper_bridge.py",
+            "symbol_id": "bridge/hopper_bridge.py::_write_message",
+            "start_line": 1117,
+            "end_line": 1120,
+            "kind": "symbol",
+            "score": 28.3669,
+            "match": null,
+            "why": "name match: _write_message x1.18 (messages, write); bm25: write, messages~"
+          },
+          {
+            "path": "src/hopper/HopperResponseStream.ts",
+            "symbol_id": "src/hopper/HopperResponseStream.ts::HopperResponseStream",
+            "start_line": 14,
+            "end_line": 55,
+            "kind": "symbol",
+            "score": 27.4428,
+            "match": null,
+            "why": "name match: HopperResponseStream x1.07 (responses); class boost; bm25: frames, responses~"
+          },
+          {
+            "path": "src/application/process/ProcessCli.ts",
+            "symbol_id": "src/application/process/ProcessCli.ts::readJson",
+            "start_line": 212,
+            "end_line": 236,
+            "kind": "symbol",
+            "score": 27.1098,
+            "match": null,
+            "why": "name match: readJson x1.12 (json, read, read json); bm25: readjson, json, read"
+          },
+          {
+            "path": "src/server/EvidenceMcpServer.ts",
+            "symbol_id": "src/server/EvidenceMcpServer.ts::EvidenceMcpServer",
+            "start_line": 107,
+            "end_line": 194,
+            "kind": "symbol",
+            "score": 26.8792,
+            "match": "broad",
+            "why": "name match: EvidenceMcpServer x1.08 (mcp, server); class boost; bm25: mcpserver, server, mcp"
+          },
+          {
+            "path": "src/server/EvidenceMcpServer.ts",
+            "symbol_id": "src/server/EvidenceMcpServer.ts::ErrorEvidenceTransport.recoverError",
+            "start_line": 346,
+            "end_line": 456,
+            "kind": "symbol",
+            "score": 26.6387,
+            "match": null,
+            "why": "bm25: jsonrpc, messages~, server, mcp"
+          },
+          {
+            "path": "src/server/EvidenceMcpServer.ts",
+            "symbol_id": "src/server/EvidenceMcpServer.ts::ErrorEvidenceTransport.send",
+            "start_line": 293,
+            "end_line": 344,
+            "kind": "symbol",
+            "score": 24.0671,
+            "match": null,
+            "why": "bm25: jsonrpc, messages~, server, mcp"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "src/cutter/CutterBridgeClient.ts",
+            "start_line": 103,
+            "end_line": 165,
+            "label": "CutterBridgeResponseFrames"
+          },
+          {
+            "path": "src/android/JadxMcpTransport.ts",
+            "start_line": 29,
+            "end_line": 29,
+            "label": "JadxMcpTransport (class header)"
+          },
+          {
+            "path": "src/android/JadxMcpTransport.ts",
+            "start_line": 91,
+            "end_line": 100,
+            "label": "JadxMcpTransport.send"
+          },
+          {
+            "path": "bridge/hopper_bridge.py",
+            "start_line": 1117,
+            "end_line": 1120,
+            "label": "_write_message"
+          },
+          {
+            "path": "src/hopper/HopperResponseStream.ts",
+            "start_line": 14,
+            "end_line": 55,
+            "label": "HopperResponseStream"
+          },
+          {
+            "path": "src/application/process/ProcessCli.ts",
+            "start_line": 212,
+            "end_line": 236,
+            "label": "readJson"
+          },
+          {
+            "path": "src/server/EvidenceMcpServer.ts",
+            "start_line": 107,
+            "end_line": 194,
+            "label": "EvidenceMcpServer"
+          },
+          {
+            "path": "src/server/EvidenceMcpServer.ts",
+            "start_line": 196,
+            "end_line": 196,
+            "label": "ErrorEvidenceTransport (class header)"
+          },
+          {
+            "path": "src/server/EvidenceMcpServer.ts",
+            "start_line": 346,
+            "end_line": 456,
+            "label": "ErrorEvidenceTransport.recoverError"
+          },
+          {
+            "path": "src/server/EvidenceMcpServer.ts",
+            "start_line": 293,
+            "end_line": 344,
+            "label": "ErrorEvidenceTransport.send"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": null,
+        "pointer_at_k": false,
+        "pointer_chunk_recall": true
+      }
+    }
+  ]
+}
