@@ -1062,3 +1062,69 @@ def test_flask_golden_set_validates_against_the_checkout():
     errors, warnings = run_eval.validate_golden(_flask_golden(), FLASK_CHECKOUT)
     assert errors == []
     assert warnings == []
+
+
+# ---- TypeScript / Java declarations ------------------------------------------------- #
+
+_TS_SOURCE = (
+    "import x from 'y';\n"                                   # 1
+    "export default async function loadAll(a: number) {\n"   # 2
+    "}\n"                                                    # 3
+    "export abstract class Base {\n"                         # 4
+    "  private readonly cache = new Map();\n"                # 5
+    "  constructor(private a: string) {}\n"                  # 6
+    "  static create(): Base {}\n"                           # 7
+    "  async fetchOne(id: string) {}\n"                      # 8
+    "  get size(): number { return 1; }\n"                   # 9
+    "  protected handle = async (e: Event) => {};\n"         # 10
+    "}\n"                                                    # 11
+    "export interface Options { a: 1 }\n"                    # 12
+    "export type Mode = 'a' | 'b';\n"                        # 13
+    "export enum Kind { A }\n"                               # 14
+    "export namespace Util { }\n"                            # 15
+    "export const build = async (x: number) => x;\n"         # 16
+    "export const make = function () {};\n"                  # 17
+    "const other = (a) => a;\n"                              # 18
+    "  doOther(1);\n"                                        # 19
+)
+
+_JAVA_SOURCE = (
+    "public class Bridge {\n"                                # 1
+    "    public static void main(String[] args) {\n"         # 2
+    "    }\n"                                                # 3
+    "}\n"                                                    # 4
+)
+
+
+@pytest.fixture
+def ts_repo(make_repo) -> Path:
+    root = make_repo({"src/a.ts": _TS_SOURCE, "bridge/Bridge.java": _JAVA_SOURCE})
+    _write_git_head(root, "abc1234def5678")
+    return root
+
+
+@pytest.mark.parametrize("line, symbol", [
+    (2, "loadAll"), (4, "Base"), (6, "Base.constructor"), (7, "Base.create"),
+    (8, "Base.fetchOne"), (9, "Base.size"), (10, "Base.handle"), (12, "Options"),
+    (13, "Mode"), (14, "Kind"), (15, "Util"), (16, "build"), (17, "make"), (18, "other"),
+])
+def test_validate_golden_recognises_typescript_declarations(ts_repo, line, symbol):
+    g = _src_golden(loc("src/a.ts", line, line, symbol))
+    assert run_eval.validate_golden(g, ts_repo) == ([], [])
+
+
+def test_validate_golden_recognises_java_method(ts_repo):
+    g = _src_golden(loc("bridge/Bridge.java", 2, 3, "Bridge.main"))
+    assert run_eval.validate_golden(g, ts_repo) == ([], [])
+
+
+def test_validate_golden_typescript_negatives(ts_repo):
+    # a name that is not declared anywhere in the window
+    _, warnings = run_eval.validate_golden(_src_golden(loc("src/a.ts", 12, 18, "missing")), ts_repo)
+    assert any("no 'def/class missing'" in w for w in warnings)
+    # a name that is only a prefix of the declared one must not match
+    _, warnings = run_eval.validate_golden(_src_golden(loc("src/a.ts", 12, 12, "Option")), ts_repo)
+    assert any("no 'def/class Option'" in w for w in warnings)
+    # declaration exists in the window but the range starts earlier
+    _, warnings = run_eval.validate_golden(_src_golden(loc("src/a.ts", 1, 3, "loadAll")), ts_repo)
+    assert any("does not start at the definition" in w for w in warnings)

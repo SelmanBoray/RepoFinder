@@ -244,17 +244,44 @@ def _check_location(
         return
     if symbol:
         name = symbol.split(".")[-1]
-        def_re = re.compile(rf"^\s*(?:async\s+def|def|class)\s+{re.escape(name)}\b")
+        decl_res = _declaration_patterns(name)
         window = lines[start - 1 : end]
-        if not any(def_re.match(line) for line in window):
-            warnings.append(f"{where}: no 'def/class {name}' within {path}:{start}-{end}")
+        if not any(_is_declaration(line, decl_res) for line in window):
+            warnings.append(f"{where}: no 'def/class {name}' (or TS/JS/Java declaration) within {path}:{start}-{end}")
         else:
             first = next((line.strip() for line in window if line.strip()), "")
-            if not (first.startswith("@") or def_re.match(first)):
+            if not (first.startswith("@") or _is_declaration(first, decl_res)):
                 warnings.append(
                     f"{where}: {path}:{start} does not start at the definition of {symbol}"
                     f" or its decorators (it starts with {first[:40]!r})"
                 )
+
+
+_TS_MODS = r"(?:(?:export|default|declare|abstract|async|public|private|protected|static|readonly|override|get|set)\s+)*"
+
+
+def _declaration_patterns(name: str) -> list["re.Pattern[str]"]:
+    """Line patterns that declare ``name``: Python, TypeScript/JavaScript, and Java-style methods."""
+    n = re.escape(name)
+    patterns = [
+        # Python (unchanged)
+        rf"^\s*(?:async\s+def|def|class)\s+{n}\b",
+        # TypeScript / JavaScript
+        rf"^\s*(?:export\s+)?(?:default\s+)?(?:declare\s+)?(?:async\s+)?function\s*\*?\s*{n}\b",
+        rf"^\s*(?:export\s+)?(?:default\s+)?(?:declare\s+)?(?:abstract\s+)?class\s+{n}\b",
+        rf"^\s*(?:export\s+)?(?:declare\s+)?(?:const\s+)?(?:interface|type|enum|namespace|module)\s+{n}\b",
+        rf"^\s*(?:export\s+)?(?:declare\s+)?(?:const|let|var)\s+{n}\b\s*(?::[^=]+)?=",
+        # class members: name(, async name(, static name(, get name(, private readonly name = (...
+        rf"^\s*{_TS_MODS}\*?\s*{n}\s*[(<]",
+        rf"^\s*{_TS_MODS}{n}\s*[?!]?\s*(?::[^=]+)?=\s*(?:async\b|function\b|\(|<|[A-Za-z_$][\w$]*\s*=>)",
+        # Java-style method: modifiers, return type, name(
+        rf"^\s*(?:public|private|protected|static|final|abstract|synchronized)\b[^=;(]*?\b{n}\s*\(",
+    ]
+    return [re.compile(p) for p in patterns]
+
+
+def _is_declaration(line: str, patterns: list["re.Pattern[str]"]) -> bool:
+    return any(p.match(line) for p in patterns)
 
 
 def _is_int(value: Any) -> bool:
