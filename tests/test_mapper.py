@@ -292,10 +292,112 @@ def test_typescript_map() -> None:
     index = ts_index()
     md = render_map(index, build_graph(index))
     assert "4 symbols (1 function, 1 enum, 1 interface, 1 type)" in md
-    assert "`src/domain` (2 files)" in section(md, "## Overview")
+    # TypeScript groups modules by directory: the overview counts top-level directories.
+    assert section(md, "## Overview").strip() == (
+        "`tsdemo` has 5 source files, all TypeScript, in 1 top-level directory: `src` (5 files). "
+        "2 files are tests."
+    )
     assert "| `src/cli.ts` | conventional name `cli.ts` |" in section(md, "## Entry points")
     core = section(md, "## Core modules")
     assert "| `src/domain/model.ts` | `src/domain/model` | 2 | 0 | 3 | `Model`, `Kind`, `Id` |" in core
     assert "| `src/domain/index.ts` | `src/domain` | 1 | 1 | 0 |" in core
     assert "src/util.spec.ts" not in core and "__tests__" not in core
     assert "`__tests__/` — 1 test file (collapsed)" in section(md, "## Package layout")
+
+
+# --------------------------------------------------------------------------- #
+# Entry ranking, the row cap, unindexed bins and the language sentence
+# --------------------------------------------------------------------------- #
+
+
+def test_mixed_repo_entry_table_and_language_sentence(make_repo) -> None:
+    root = make_repo(
+        {
+            "package.json": '{"name": "tool", "bin": {"tool": "scripts/run.mjs"}}',
+            "scripts/run.mjs": "#!/usr/bin/env node\n",
+            "src/cli.ts": "export function main(): void {}\n" * 17,
+            "experiments/x.py": "if __name__ == '__main__':\n    pass\n",
+            "tests/x.test.ts": "export {};\n",
+        }
+    )
+    index = build_index(root, "mixed", str(root))
+    md = render_map(index, build_graph(index))
+    # 18 TypeScript lines, 2 Python lines.
+    assert section(md, "## Overview").strip() == (
+        "`mixed` has 3 source files, mostly TypeScript (90%) with some Python, in 3 top-level directories: "
+        "`experiments` (1 file), `src` (1 file) and `tests` (1 file). 1 file is tests."
+    )
+    assert section(md, "## Entry points").strip().splitlines() == [
+        "| path | reason |",
+        "|---|---|",
+        "| `scripts/run.mjs` | `package.json` bin (not indexed: JavaScript) |",
+        "| `src/cli.ts` | conventional name `cli.ts` |",
+        '| `experiments/x.py` | has `if __name__ == "__main__"` |',
+    ]
+    assert section(md, "## Where to start").strip().splitlines()[:3] == [
+        "- `scripts/run.mjs` — entry point: `package.json` bin (not indexed: JavaScript).",
+        "- `src/cli.ts` — entry point: conventional name `cli.ts`.",
+        '- `experiments/x.py` — entry point: has `if __name__ == "__main__"`.',
+    ]
+
+
+def _named_files_index(n_nested: int) -> RepoIndex:
+    """``src/cli.ts`` (score 80) plus ``n_nested`` ``pkgNN/main.py`` files (score 60); no checkout."""
+    files = [FileRecord("src/cli.ts", "typescript", 1, 1, True)]
+    files += [FileRecord(f"pkg{i:02d}/main.py", "python", 1, 1, True) for i in range(n_nested)]
+    return RepoIndex(name="many", root="Z:/no/such/checkout", source="many", files=files)
+
+
+def _entry_section(index: RepoIndex) -> str:
+    return section(render_map(index, build_graph(index)), "## Entry points").strip()
+
+
+def test_entry_table_is_capped_at_twelve_rows() -> None:
+    index = _named_files_index(15)
+    assert len(build_graph(index).all_entry_points()) == 16   # the data model keeps every entry point
+    lines = _entry_section(index).splitlines()
+    rows = [line for line in lines if line.startswith("| `")]
+    assert [row.split(" | ")[0] for row in rows] == ["| `src/cli.ts`"] + [f"| `pkg{i:02d}/main.py`" for i in range(11)]
+    assert lines[-2:] == ["", "… and 4 more (lower-confidence) entry points."]
+
+    assert _entry_section(_named_files_index(12)).endswith("|\n\n… and 1 more (lower-confidence) entry point.")
+    exact = _entry_section(_named_files_index(11))
+    assert "more (lower-confidence)" not in exact and exact.count("| `") == 12
+
+
+@pytest.mark.parametrize(
+    "languages, expected",
+    [
+        # Python-led: grouped by package; the languages are named only when there are several.
+        ([("python", 75), ("typescript", 25)],
+         "`r` has 2 source files, mostly Python (75%) with some TypeScript, in 2 top-level packages and directories"),
+        ([("python", 40), ("typescript", 35), ("tsx", 5), ("javascript", 20)],
+         "`r` has 4 source files, a mix of Python (40%), TypeScript (40%) and JavaScript (20%), "
+         "in 4 top-level packages and directories"),
+        ([("python", 1)], "`r` has 1 source file in 1 top-level package or directory"),
+        # TypeScript-led: grouped by top-level directory.
+        ([("typescript", 999), ("python", 1)],
+         "`r` has 2 source files, mostly TypeScript (99%) with some Python, in 2 top-level directories"),
+    ],
+)
+def test_overview_names_the_languages(languages: list[tuple[str, int]], expected: str) -> None:
+    files = [
+        FileRecord(f"d{i}/m{i}.{'py' if lang == 'python' else 'ts'}", lang, 1, n, True)
+        for i, (lang, n) in enumerate(languages)
+    ]
+    index = RepoIndex(name="r", root="Z:/no/such/checkout", source="r", files=files)
+    overview = section(render_map(index, build_graph(index)), "## Overview").strip()
+    assert overview.startswith(expected + ": "), overview
+
+
+def test_overview_counts_the_repository_root_apart_from_directories() -> None:
+    files = [FileRecord(p, "typescript", 1, 1, True) for p in ["index.ts", "src/a.ts", "lib/b.ts"]]
+    index = RepoIndex(name="r", root="Z:/no/such/checkout", source="r", files=files)
+    assert section(render_map(index, build_graph(index)), "## Overview").strip().startswith(
+        "`r` has 3 source files, all TypeScript, in 2 top-level directories and the repository root: "
+    )
+    only_root = RepoIndex(name="r", root="Z:/no/such/checkout", source="r", files=files[:1])
+    assert section(render_map(only_root, build_graph(only_root)), "## Overview").strip() == (
+        "`r` has 1 source file, all TypeScript, in the repository root: the repository root (1 file). "
+        "0 files are tests."
+    )

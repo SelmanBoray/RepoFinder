@@ -1,0 +1,1498 @@
+{
+  "meta": {
+    "golden": "eval/golden/chat_routes_rea.json",
+    "decisions": "rules",
+    "decisions_model": null,
+    "repo_info": "full",
+    "ids": [
+      "r01",
+      "r02",
+      "r03",
+      "r04",
+      "r05",
+      "r06",
+      "r07",
+      "r08",
+      "r09",
+      "r10",
+      "r11",
+      "r12",
+      "r13",
+      "r14",
+      "r15",
+      "r16",
+      "r17",
+      "r18",
+      "r19",
+      "r20"
+    ],
+    "started": "2026-10-16T15:00:42",
+    "totals": {
+      "conversations": 20,
+      "turns": 63,
+      "correct": 34,
+      "accuracy": 0.54,
+      "errors": 0,
+      "calls": 63,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.004
+    },
+    "constants": {
+      "ROUTES": [
+        "locate",
+        "explain",
+        "followup",
+        "chat",
+        "outside"
+      ],
+      "HISTORY_EXCHANGES": 3,
+      "HISTORY_TEXT_CHARS": 600,
+      "MESSAGE_CHARS": 2000,
+      "REPO_DESCRIPTION_CHARS": 400
+    },
+    "validation_warnings": []
+  },
+  "summary": {
+    "n": 63,
+    "errors": 0,
+    "accuracy": {
+      "n": 63,
+      "correct": 34,
+      "rate": 0.54
+    },
+    "per_route": {
+      "locate": {
+        "support": 16,
+        "predicted": 28,
+        "correct": 13,
+        "precision": 0.464,
+        "recall": 0.812
+      },
+      "explain": {
+        "support": 9,
+        "predicted": 12,
+        "correct": 6,
+        "precision": 0.5,
+        "recall": 0.667
+      },
+      "followup": {
+        "support": 20,
+        "predicted": 19,
+        "correct": 12,
+        "precision": 0.632,
+        "recall": 0.6
+      },
+      "chat": {
+        "support": 9,
+        "predicted": 4,
+        "correct": 3,
+        "precision": 0.75,
+        "recall": 0.333
+      },
+      "outside": {
+        "support": 9,
+        "predicted": 0,
+        "correct": 0,
+        "precision": null,
+        "recall": 0.0
+      }
+    },
+    "per_lang": {
+      "en": {
+        "n": 33,
+        "correct": 16,
+        "rate": 0.485
+      },
+      "tr": {
+        "n": 16,
+        "correct": 11,
+        "rate": 0.688
+      },
+      "tr-ascii": {
+        "n": 14,
+        "correct": 7,
+        "rate": 0.5
+      }
+    },
+    "confusion": {
+      "locate": {
+        "locate": 13,
+        "explain": 0,
+        "followup": 3,
+        "chat": 0,
+        "outside": 0
+      },
+      "explain": {
+        "locate": 2,
+        "explain": 6,
+        "followup": 1,
+        "chat": 0,
+        "outside": 0
+      },
+      "followup": {
+        "locate": 4,
+        "explain": 3,
+        "followup": 12,
+        "chat": 1,
+        "outside": 0
+      },
+      "chat": {
+        "locate": 4,
+        "explain": 1,
+        "followup": 1,
+        "chat": 3,
+        "outside": 0
+      },
+      "outside": {
+        "locate": 5,
+        "explain": 2,
+        "followup": 2,
+        "chat": 0,
+        "outside": 0
+      }
+    },
+    "errors_by_expected": {
+      "locate": 0,
+      "explain": 0,
+      "followup": 0,
+      "chat": 0,
+      "outside": 0
+    },
+    "p_expected": {
+      "correct_mean": 1.0,
+      "correct_n": 34,
+      "wrong_mean": 0.0,
+      "wrong_n": 29
+    },
+    "cost_usd": 0.0,
+    "elapsed_s": {
+      "total": 0.001,
+      "mean": 0.0
+    }
+  },
+  "turns": [
+    {
+      "id": "r01",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where are the open_binary and close_binary MCP tools registered?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0001,
+      "error": null
+    },
+    {
+      "id": "r01",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "and what does close do when you pass snapshot_path?",
+      "expected": "followup",
+      "predicted": "explain",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r01",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "who calls that register function in the first place?",
+      "expected": "followup",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r02",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Merhaba! Bugün REA üzerinde çalışacağız, hazır mısın?",
+      "expected": "chat",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r02",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Ghidra'yı headless başlatırken komut satırı argümanları nerede oluşturuluyor?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r02",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "bu neden -readOnly ve -deleteProject ile çalıştırıyor?",
+      "expected": "followup",
+      "predicted": "explain",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r02",
+      "turn": 4,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Süper, teşekkürler!",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r03",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where does Ghidra's decompiler emit the C code?",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r03",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "Then where does REA's own Ghidra bridge ask for a function's pseudocode?",
+      "expected": "locate",
+      "predicted": "followup",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0001,
+      "error": null
+    },
+    {
+      "id": "r03",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "which options does it set on the decompiler before opening the program?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r04",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "rea binary'yi nerede decompile ediyor? yani makine kodunu C'ye ceviren kisim",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r04",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "peki ghidra'yi hangi dosya baslatiyor",
+      "expected": "locate",
+      "predicted": "followup",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r04",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": true,
+      "message": "onu kendi process grubuna nasil aliyor?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r05",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where is the evidence ID computed?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r05",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "How does an evidence ID stay identical when the same binary is opened from a different folder?",
+      "expected": "explain",
+      "predicted": "followup",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r05",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "nice. and is it checked again when evidence is read back in?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r06",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Selam! Başlamadan sorayım: sen bu depoda nasıl arama yapıyorsun, kodun kendisini mi okuyorsun?",
+      "expected": "chat",
+      "predicted": "explain",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r06",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Java köprü dosyaları da indekste mi, yoksa sadece TypeScript mi taranıyor?",
+      "expected": "chat",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r06",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Ghidra köprüsünde gelen isteğin adına göre hangi Java metodunun çalışacağı nerede seçiliyor?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r07",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "How does REA keep a tool result from overflowing the client's receive buffer?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r07",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "thanks, one more: where is REA_MCP_MAX_RESPONSE_BYTES parsed?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r07",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "why is the floor exactly 10 MiB?",
+      "expected": "followup",
+      "predicted": "explain",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r08",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "frida script mesajlari nerede biriktiriliyor?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r08",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "yer dolunca eskileri atiyor mu?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r08",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": true,
+      "message": "neden?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r09",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where does Frida attach to the target process?",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r09",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "Fair. Which REA function calls device.attach and picks between spawn and attach mode?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r09",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "if it spawned the process, who resumes it later?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r10",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "How does the Ghidra client make sure only one request reaches the bridge at a time?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r10",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "peki iptal edilirse ne oluyor?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r10",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "şunu da merak ettim: cevaplar sırayla mı eşleşiyor yoksa bir kimlikle mi?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r11",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "I'm planning to add a new analysis provider and I've been reading AGENTS.md. It says dependencies flow inward, from domain semantics and contracts to provider adapters, then shared application workflows, then the CLI/MCP adapters, and that engine protocols must stay out of the domain and application layers. I understand that in the abstract, but I can't picture it with real code yet. Could you walk me through how one native call, say procedure_pseudo_code, travels from the MCP tool handler down to the Ghidra bridge and back, and which layer owns which part?",
+      "expected": "explain",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0003,
+      "error": null
+    },
+    {
+      "id": "r11",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "where does the evidence get recorded in that path?",
+      "expected": "followup",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r12",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Electron fuse'larını çalıştırılabilir dosyanın içinde nasıl buluyor?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r12",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Chrome'un DevToolsActivePort dosyasını bekleyen kod nerede?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r12",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Bu bekleme kaç saniye sonra pes ediyor?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r13",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "How does REA make sure it only kills processes it actually started?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r13",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "And when Node spawns with detached: true, what does that actually do under the hood on Linux, setsid?",
+      "expected": "outside",
+      "predicted": "followup",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0001,
+      "error": null
+    },
+    {
+      "id": "r13",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "ok, where does REA create the Windows job object for a provider process?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r14",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "selam, nasilsin",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r14",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "sen hangi dosyalari tariyorsun, docs klasoru de dahil mi?",
+      "expected": "chat",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r14",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": true,
+      "message": "mcp doctor komutu nerde tanimli",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r14",
+      "turn": 4,
+      "lang": "tr",
+      "ascii": true,
+      "message": "tools/list'i kac saniye bekliyo",
+      "expected": "followup",
+      "predicted": "chat",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r15",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "When I run npx rea-agents setup, where does npx keep the downloaded package?",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r15",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "Got it. Which code plans the config changes that setup shows before asking for approval?",
+      "expected": "locate",
+      "predicted": "followup",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r15",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "does it back up my existing config first?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r15",
+      "turn": 4,
+      "lang": "en",
+      "ascii": false,
+      "message": "Thanks, that's all for now.",
+      "expected": "chat",
+      "predicted": "followup",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r16",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Ghidra köprüsünün soket yolu nerede belirleniyor?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r16",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": false,
+      "message": "Unix soket yolu sockaddr sınırını aşınca REA nasıl davranıyor?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r16",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": false,
+      "message": "macOS'ta bu sınır neden 104 bayt, çekirdekte nerede tanımlı?",
+      "expected": "outside",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r17",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "hey, quick one before we start: do you index tests too, or only src?",
+      "expected": "chat",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r17",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "cool. wheres the test that checks a spawned frida proces gets resumed when the session closes?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0001,
+      "error": null
+    },
+    {
+      "id": "r17",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "how does it fake the frida device in there?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r18",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "How does the MCP SDK's stdio transport frame messages, newline-delimited JSON?",
+      "expected": "outside",
+      "predicted": "explain",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r18",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "Where does REA's stdio server actually get started?",
+      "expected": "locate",
+      "predicted": "locate",
+      "correct": true,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r18",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "what does it clean up when it shuts down?",
+      "expected": "followup",
+      "predicted": "followup",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r19",
+      "turn": 1,
+      "lang": "en",
+      "ascii": false,
+      "message": "How does REA turn a Frida script's send() messages into evidence?",
+      "expected": "explain",
+      "predicted": "explain",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r19",
+      "turn": 2,
+      "lang": "en",
+      "ascii": false,
+      "message": "And how does rea inject its agent into the target's memory?",
+      "expected": "outside",
+      "predicted": "followup",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 1.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r19",
+      "turn": 3,
+      "lang": "en",
+      "ascii": false,
+      "message": "where in that message handling does the remote token get scrubbed?",
+      "expected": "followup",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r20",
+      "turn": 1,
+      "lang": "tr",
+      "ascii": true,
+      "message": "javascript analizinde her dosya icin hangi asamalar calisiyor?",
+      "expected": "explain",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r20",
+      "turn": 2,
+      "lang": "tr",
+      "ascii": true,
+      "message": "ilk asamada hangi kutuphane kullaniliyor, babel mi?",
+      "expected": "followup",
+      "predicted": "locate",
+      "correct": false,
+      "probabilities": {
+        "locate": 1.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r20",
+      "turn": 3,
+      "lang": "tr",
+      "ascii": true,
+      "message": "babel errorRecovery acikken bozuk kodu nasil toparliyor peki?",
+      "expected": "outside",
+      "predicted": "explain",
+      "correct": false,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 1.0,
+        "followup": 0.0,
+        "chat": 0.0,
+        "outside": 0.0
+      },
+      "p_expected": 0.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    },
+    {
+      "id": "r20",
+      "turn": 4,
+      "lang": "tr",
+      "ascii": true,
+      "message": "tamam sagol, simdilik bu kadar",
+      "expected": "chat",
+      "predicted": "chat",
+      "correct": true,
+      "probabilities": {
+        "locate": 0.0,
+        "explain": 0.0,
+        "followup": 0.0,
+        "chat": 1.0,
+        "outside": 0.0
+      },
+      "p_expected": 1.0,
+      "cost_usd": 0.0,
+      "elapsed_s": 0.0,
+      "error": null
+    }
+  ]
+}

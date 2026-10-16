@@ -1,0 +1,250 @@
+{
+  "version": 1,
+  "notes": "Second chat-routing golden set, about morluto/rea (TypeScript reverse-engineering MCP server) at commit fe2a398. Written blind: the router's code, prompts, tests, results and the first set (chat_routes.json) were not read, so it measures the router without tuning. Assistant replies are history only, grounded in the REA source at fe2a398. Hard cases are named in each conversation's notes with the prefix 'HARD:'.",
+  "repos": {
+    "rea": {
+      "description": "See a feature in an app that you want in your own product? Ask your agent to investigate it with REA. It can inspect the app without its source code, explain how the feature works, show the evidence, and build a version for your project."
+    }
+  },
+  "conversations": [
+    {
+      "id": "r01", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "Baseline: a locate, then two follow-ups that only make sense with history ('what does close do', 'that register function'). HARD: deictic 'that' follow-up with no tool name.",
+      "turns": [
+        {"user": "Where are the open_binary and close_binary MCP tools registered?", "route": "locate",
+         "assistant": "open_binary is registered in registerOpenLifecycleTool (src/server/registerSessionTools.ts:172-219) and close_binary in src/server/registerCloseLifecycleTool.ts:14-96; registerSessionTools (src/server/registerSessionTools.ts:272-382) wires both up."},
+        {"user": "and what does close do when you pass snapshot_path?", "route": "followup",
+         "assistant": "With snapshot_path it calls session.closeWithSnapshot (src/server/registerCloseLifecycleTool.ts:76-94), which drains earlier requests, saves an immutable analysis snapshot and closes the provider under one lifecycle lock (src/application/binary/BinarySession.ts:453-479)."},
+        {"user": "who calls that register function in the first place?", "route": "followup",
+         "assistant": "createServer calls registerSessionTools at src/server/createServer.ts:584-599, only when it was given a session; createServer itself runs inside the server factory that startMcpTransport hands to serveStdio (src/main/transport.ts:112-138)."}
+      ]
+    },
+    {
+      "id": "r02", "repo": "rea", "lang": "tr", "ascii": false,
+      "notes": "HARD: Turkish greeting ('Merhaba!') is chat even though it names REA. Then a locate and a 'bu' pronoun follow-up. HARD: Turkish thanks at the end is chat.",
+      "turns": [
+        {"user": "Merhaba! Bugün REA üzerinde çalışacağız, hazır mısın?", "route": "chat",
+         "assistant": "Merhaba! Hazırım, REA deposu (fe2a398) açık. Neyi bulmak istersin?"},
+        {"user": "Ghidra'yı headless başlatırken komut satırı argümanları nerede oluşturuluyor?", "route": "locate",
+         "assistant": "ghidraHeadlessArguments fonksiyonunda, src/ghidra/GhidraLauncher.ts:567-734; -import, loader/processor seçimleri ve en sonda -postScript ile köprü betiği burada sıraya diziliyor."},
+        {"user": "bu neden -readOnly ve -deleteProject ile çalıştırıyor?", "route": "followup",
+         "assistant": "Proje geçici kalsın diye: 672-673. satırlardaki bu bayraklarla Ghidra çalıştırılabilir dosyayı değiştirmeden, iş bitince silinen bir veritabanıyla çalışıyor; AGENTS.md de Ghidra'nın geçici veritabanı kullanmasını kural olarak koyuyor."},
+        {"user": "Süper, teşekkürler!", "route": "chat"}
+      ]
+    },
+    {
+      "id": "r03", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "HARD: outside question phrased like locate ('where does Ghidra's decompiler emit the C code'): C generation happens inside Ghidra's decompiler, not in this repo. HARD: turn 2 is its counterpart locate about REA's own bridge wrapper; it opens with 'Then' right after an answer but is self-contained, so locate, not followup. Turn 3 is an 'it' follow-up.",
+      "turns": [
+        {"user": "Where does Ghidra's decompiler emit the C code?", "route": "outside",
+         "assistant": "That happens inside Ghidra's own decompiler behind its DecompInterface API, which is not part of this repository; REA only reads the finished text through DecompiledFunction.getC() in bridge/ghidra/ReaGhidraBridge.java:3326-3332."},
+        {"user": "Then where does REA's own Ghidra bridge ask for a function's pseudocode?", "route": "locate",
+         "assistant": "procedurePseudocode in bridge/ghidra/ReaGhidraBridge.java:927-953 resolves the procedure and calls decompile (3305-3324), which runs decompiler.decompileFunction and maps cancellation and failure to decompile_cancelled and decompile_failed."},
+        {"user": "which options does it set on the decompiler before opening the program?", "route": "followup",
+         "assistant": "initializeDecompiler (bridge/ghidra/ReaGhidraBridge.java:914-925) lifts the instruction limit with setMaxInstructions(Integer.MAX_VALUE), turns on C code, syntax tree and jump-load output, then opens currentProgram and throws if that fails."}
+      ]
+    },
+    {
+      "id": "r04", "repo": "rea", "lang": "tr", "ascii": true,
+      "notes": "ASCII Turkish. HARD: outside question that attributes the behaviour to REA ('rea binary'yi nerede decompile ediyor'): turning machine code into C is Ghidra's/Hopper's/IDA's work and REA only calls DecompInterface, so it is labelled outside even though it names rea. HARD: turn 2 starts with 'peki' but is a fresh, self-contained locate. Turn 3 is an 'onu' follow-up.",
+      "turns": [
+        {"user": "rea binary'yi nerede decompile ediyor? yani makine kodunu C'ye ceviren kisim", "route": "outside",
+         "assistant": "O isi REA yapmiyor: makine kodunu C'ye Ghidra (ya da Hopper/IDA) ceviriyor ve o kod bu repoda yok. REA sadece Ghidra'nin decompileFunction'ini cagirip sonucu aliyor (bridge/ghidra/ReaGhidraBridge.java:3305-3332)."},
+        {"user": "peki ghidra'yi hangi dosya baslatiyor", "route": "locate",
+         "assistant": "src/ghidra/GhidraLauncher.ts icindeki GhidraHeadlessLauncher.launch (191-451. satirlar); argumanlari kurup sureci spawnOwnedProviderProcess ile baslatiyor ve sahiplik bilgisini bir dosyaya yaziyor."},
+        {"user": "onu kendi process grubuna nasil aliyor?", "route": "followup",
+         "assistant": "spawnOwnedProviderProcess (src/process/ProviderProcess.ts:206-286) POSIX'te detached: true ile yeni bir process grubu aciyor ve ortama REA_PROCESS_RUN_ID token'ini koyuyor (223-228); Windows'ta ayni isi WindowsOwnedProcess bir Job Object ile yapiyor."}
+      ]
+    },
+    {
+      "id": "r05", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "HARD: explain/locate boundary pair on one subject. Turn 1 asks where the evidence ID is computed (locate); turn 2 asks how it stays stable across folders and names its subject, so it is a self-contained explain, not a followup. Turn 3 ('is it checked again') is the follow-up.",
+      "turns": [
+        {"user": "Where is the evidence ID computed?", "route": "locate",
+         "assistant": "computeEvidenceId in src/domain/evidence.ts:272-274 hashes the semantic projection into an ev_ ID, and createEvidence (src/domain/evidence.ts:338-353) calls it for every new record."},
+        {"user": "How does an evidence ID stay identical when the same binary is opened from a different folder?", "route": "explain",
+         "assistant": "The semantic projection keeps only the subject's digest, format and architecture, not its local path or name (src/domain/evidence.ts:247-270), so the hash ignores where the file lives; rebindEvidenceToTargetPath (291-325) then swaps only the display path."},
+        {"user": "nice. and is it checked again when evidence is read back in?", "route": "followup",
+         "assistant": "Yes: parseEvidence (src/domain/evidence.ts:277-284) validates with the authenticated schema, which rejects a record whose ID does not match its recomputed content."}
+      ]
+    },
+    {
+      "id": "r06", "repo": "rea", "lang": "tr", "ascii": false,
+      "notes": "HARD: Turkish greeting plus questions about RepoFinder itself (how it searches; whether the Java bridge files are indexed) are chat, even though turn 2 names repository folders and languages. Turn 3 is a locate worded without 'route'/'dispatch'.",
+      "turns": [
+        {"user": "Selam! Başlamadan sorayım: sen bu depoda nasıl arama yapıyorsun, kodun kendisini mi okuyorsun?", "route": "chat",
+         "assistant": "Selam! Ben RepoFinder'ım: deponun indekslenmiş kodunda arama yapıp ilgili parçaları path:satır alıntılarıyla gösteriyorum. Ne arayalım?"},
+        {"user": "Java köprü dosyaları da indekste mi, yoksa sadece TypeScript mi taranıyor?", "route": "chat",
+         "assistant": "Hangi dosyaların indekse girdiği indeksleme ayarlarına bağlı; bridge/ altındaki bir dosya aramada çıkıyorsa indekstedir. Köprüyle ilgili bir şey sor, birlikte görelim."},
+        {"user": "Ghidra köprüsünde gelen isteğin adına göre hangi Java metodunun çalışacağı nerede seçiliyor?", "route": "locate"}
+      ]
+    },
+    {
+      "id": "r07", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "Explain about the response budget, then HARD: 'thanks, one more: where is X' is a fresh locate despite the thanks. HARD: turn 3 asks why REA's own floor is 10 MiB; the code comment cites the SDK's buffer, but the question is about REA's constant just shown, so followup, not outside.",
+      "turns": [
+        {"user": "How does REA keep a tool result from overflowing the client's receive buffer?", "route": "explain",
+         "assistant": "encodeToolResult (src/server/toolResultEncoding.ts:87-119) counts the bytes of both the structured copy and the escaped text copy part by part, and stops with a receive-buffer or string-length failure before building the whole text once the budget is exceeded."},
+        {"user": "thanks, one more: where is REA_MCP_MAX_RESPONSE_BYTES parsed?", "route": "locate",
+         "assistant": "In parseMcpResponseBudget, src/config/mcpResponseBudget.ts:21-38, using the schema at lines 12-16 that requires a decimal safe integer of at least 10 MiB."},
+        {"user": "why is the floor exactly 10 MiB?", "route": "followup",
+         "assistant": "The comment at src/config/mcpResponseBudget.ts:6-9 says it is the SDK's default stdio receive-buffer size, so the setting can only raise the budget for clients with larger frames, never go below what the default transport accepts."}
+      ]
+    },
+    {
+      "id": "r08", "repo": "rea", "lang": "tr", "ascii": true,
+      "notes": "ASCII Turkish. A locate, a follow-up with no pronoun ('yer dolunca eskileri atiyor mu?'), then HARD: the one-word follow-up 'neden?'.",
+      "turns": [
+        {"user": "frida script mesajlari nerede biriktiriliyor?", "route": "locate",
+         "assistant": "FridaInstrumentationManager icindeki #recordMessage'da, src/frida/FridaInstrumentationManager.ts:901-1055; her mesajin boyutu olculup oturumun kuyruguna ekleniyor."},
+        {"user": "yer dolunca eskileri atiyor mu?", "route": "followup",
+         "assistant": "Evet: toplam 16 MiB'lik MAX_SESSION_CAPTURE_BYTES asilacaksa en eski mesajlari kuyruktan cikarip o script'i truncated olarak isaretliyor (src/frida/FridaInstrumentationManager.ts:1033-1055)."},
+        {"user": "neden?", "route": "followup"}
+      ]
+    },
+    {
+      "id": "r09", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "HARD: outside question phrased like locate ('where does Frida attach to the target process'): attaching and injecting is Frida's runtime, loaded as the frida npm package. HARD: turn 2 is the counterpart locate about REA's own wrapper (#startSession). Turn 3 'if it spawned the process' is a follow-up.",
+      "turns": [
+        {"user": "Where does Frida attach to the target process?", "route": "outside",
+         "assistant": "The attach itself, getting Frida's agent into the process, happens inside Frida's own runtime, which REA loads as the frida npm package; that code is not in this repository."},
+        {"user": "Fair. Which REA function calls device.attach and picks between spawn and attach mode?", "route": "locate",
+         "assistant": "#startSession in src/frida/FridaInstrumentationManager.ts:263-359: attach mode looks up the given pid, spawn mode calls device.spawn first, and both then call device.attach(pid) and record the session as running or paused."},
+        {"user": "if it spawned the process, who resumes it later?", "route": "followup",
+         "assistant": "resume_frida_session goes through #resumeSession (src/frida/FridaInstrumentationManager.ts:502-545), which only resumes a paused process this session spawned; closing the session also resumes a still-paused spawn before detaching (653-737)."}
+      ]
+    },
+    {
+      "id": "r10", "repo": "rea", "lang": "tr", "ascii": false,
+      "notes": "Mixed language: turn 1 is English, turns 2-3 are Turkish. lang is tr because the hard-case turns are Turkish. HARD: Turkish follow-up with no word shared with the English question ('peki iptal edilirse ne oluyor?'). HARD: 'şunu' follow-up.",
+      "turns": [
+        {"user": "How does the Ghidra client make sure only one request reaches the bridge at a time?", "route": "explain",
+         "assistant": "Every call goes through GhidraRequestQueue (src/ghidra/GhidraRequestQueue.ts:38-225), a FIFO whose #drain (100-165) sends the next request only after the active one settles; GhidraClient.callTool (src/ghidra/GhidraClient.ts:356-371) enqueues into it."},
+        {"user": "peki iptal edilirse ne oluyor?", "route": "followup",
+         "assistant": "Henüz gönderilmemiş bir istek iptal edilirse kuyruktan çıkarılıp 'cancelled' ile sonuçlanıyor (src/ghidra/GhidraRequestQueue.ts:167-174); aktif istek iptal edilirse kuyruktaki her şey başarısız sayılıyor ve onActiveCancellation ile Ghidra oturumu kapatılıyor (115-127)."},
+        {"user": "şunu da merak ettim: cevaplar sırayla mı eşleşiyor yoksa bir kimlikle mi?", "route": "followup",
+         "assistant": "Kimlikle: GhidraResponseRouter.route (src/ghidra/GhidraResponseRouter.ts:28-44) her satırı ayrıştırıp id'sine göre bekleyen işlemi kapatıyor, bilinmeyen bir id gelirse protokol hatası veriyor."}
+      ]
+    },
+    {
+      "id": "r11", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "HARD: one long multi-sentence message (plans, an AGENTS.md paraphrase, then the real question at the end); it asks how a call travels through the layers, so explain. Turn 2 'in that path' is a follow-up.",
+      "turns": [
+        {"user": "I'm planning to add a new analysis provider and I've been reading AGENTS.md. It says dependencies flow inward, from domain semantics and contracts to provider adapters, then shared application workflows, then the CLI/MCP adapters, and that engine protocols must stay out of the domain and application layers. I understand that in the abstract, but I can't picture it with real code yet. Could you walk me through how one native call, say procedure_pseudo_code, travels from the MCP tool handler down to the Ghidra bridge and back, and which layer owns which part?", "route": "explain",
+         "assistant": "The MCP handler in registerOfficialTools (src/server/registerOfficialTools.ts:45-113) validates the input and calls analysis.execute, which BinarySession sends to the active provider (src/application/binary/BinarySession.ts:629-640); GhidraClient.callTool queues it to the bridge (src/ghidra/GhidraClient.ts:356-371), whose handleRequest switch hands procedure_pseudo_code to procedurePseudocode (bridge/ghidra/ReaGhidraBridge.java:416-477, 927-953). Only the Ghidra adapter knows the socket protocol; the handler just gets a Result back and wraps it as Evidence."},
+        {"user": "where does the evidence get recorded in that path?", "route": "followup",
+         "assistant": "Back in the handler, src/server/registerOfficialTools.ts:80-105 builds the record with createEvidence and passes it to registration.recordEvidence before delivering it as the tool result."}
+      ]
+    },
+    {
+      "id": "r12", "repo": "rea", "lang": "tr", "ascii": false,
+      "notes": "Explain, then HARD: a fresh locate on an unrelated topic right after the answer (Chrome's DevToolsActivePort wait), which is not a followup. Turn 3 is a 'bu' follow-up on the new topic.",
+      "turns": [
+        {"user": "Electron fuse'larını çalıştırılabilir dosyanın içinde nasıl buluyor?", "route": "explain",
+         "assistant": "readElectronFuseImage (src/electron/ElectronFuseReader.ts:77-171) dosyayı hash'lerken 256 KiB'lık parçalar halinde okuyor ve her dilimde fuse sentinel'ini arıyor; parçalar arasında yalnızca sentinel boyunda bir örtüşme tutuyor (scanSlices, 273-326)."},
+        {"user": "Chrome'un DevToolsActivePort dosyasını bekleyen kod nerede?", "route": "locate",
+         "assistant": "src/browser/BrowserProcessStartup.ts:65-92'deki waitForBrowserDevtoolsPort; dosyayı readDevtoolsPort (153-166) ile yokluyor, Chrome süreci erken biterse BrowserStartupError fırlatıyor."},
+        {"user": "Bu bekleme kaç saniye sonra pes ediyor?", "route": "followup",
+         "assistant": "Varsayılan BROWSER_DEVTOOLS_STARTUP_TIMEOUT_MS, yani 60 saniye (src/browser/BrowserProcessStartup.ts:52); bu sürede 25 ms aralıklarla dosyayı yokluyor (68-69)."}
+      ]
+    },
+    {
+      "id": "r13", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "Explain about REA's process ownership, then HARD: an outside question that continues the thread ('And when Node spawns with detached: true...') but asks about Node/libuv/OS behaviour, so outside beats followup. HARD: turn 3 is the counterpart locate in REA's own native code, self-contained despite 'ok,'.",
+      "turns": [
+        {"user": "How does REA make sure it only kills processes it actually started?", "route": "explain",
+         "assistant": "Each provider is spawned with a REA_PROCESS_RUN_ID token in its environment (src/process/ProviderProcess.ts:223-228), and cleanupOwnedProcessGroup (src/process/ProcessOwnership.ts:240-299) re-reads that token from every live group member before sending SIGKILL, so a PID alone never authorizes a signal."},
+        {"user": "And when Node spawns with detached: true, what does that actually do under the hood on Linux, setsid?", "route": "outside",
+         "assistant": "That is Node's child_process and libuv behaviour, not something this repository implements; REA only passes detached: true when it spawns a provider (src/process/ProviderProcess.ts:258-266)."},
+        {"user": "ok, where does REA create the Windows job object for a provider process?", "route": "locate",
+         "assistant": "createJob in native/windows/src/process.cc:24-44 calls CreateJobObjectW with JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, plus a memory limit when one is requested; the TypeScript side is WindowsOwnedProcess in src/windows/WindowsOwnedProcess.ts."}
+      ]
+    },
+    {
+      "id": "r14", "repo": "rea", "lang": "tr", "ascii": true,
+      "notes": "ASCII Turkish. HARD: Turkish greeting ('selam, nasilsin') and a question about RepoFinder itself ('hangi dosyalari tariyorsun') are chat. Then a locate and a follow-up, both with HARD: light typos ('nerde', 'bekliyo').",
+      "turns": [
+        {"user": "selam, nasilsin", "route": "chat",
+         "assistant": "Selam, iyiyim! REA deposu acik, neye bakalim?"},
+        {"user": "sen hangi dosyalari tariyorsun, docs klasoru de dahil mi?", "route": "chat",
+         "assistant": "Ben indekslenmis dosyalarda arama yapiyorum; neyin indekse girdigi RepoFinder'in indeksleme ayarlarina bagli. docs/ altindan bir sey sorarsan sonuc gelip gelmedigini birlikte goruruz."},
+        {"user": "mcp doctor komutu nerde tanimli", "route": "locate",
+         "assistant": "src/mcpDoctor.ts: is runProductionMcpDoctor'da (82-183), CLI girisi runProductionMcpDoctorCli'de (287-325); scripts/rea.mjs 16. satirda 'mcp doctor' argumanlarini yakalayip 61-70'de bunu cagiriyor."},
+        {"user": "tools/list'i kac saniye bekliyo", "route": "followup",
+         "assistant": "Ayri bir sure yok; tum kontrol tek bir deadline altinda: MCP_STARTUP_POLICY.doctorDeadlineMs = 30 saniye (src/mcpStartupPolicy.ts:17), her istek kalan sureyi aliyor (src/mcpDoctor.ts:84-90, 471-474)."}
+      ]
+    },
+    {
+      "id": "r15", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "HARD: outside question about npm/npx itself (where npx keeps a downloaded package), phrased with 'where'. Then a self-contained locate about REA's setup planning, a follow-up, and a closing thanks (chat).",
+      "turns": [
+        {"user": "When I run npx rea-agents setup, where does npx keep the downloaded package?", "route": "outside",
+         "assistant": "That is npm's behaviour: npx installs the package into npm's own cache, which this repository does not control; REA's code only starts once npx runs scripts/rea.mjs."},
+        {"user": "Got it. Which code plans the config changes that setup shows before asking for approval?", "route": "locate",
+         "assistant": "planSetupActions in src/application/SetupPlan.ts:134-245 builds the planned actions for the selected clients, and the setup command itself is registered in src/cli/setupCommands.ts:45-99."},
+        {"user": "does it back up my existing config first?", "route": "followup",
+         "assistant": "Yes: before writing it keeps the original as <config>.rea.backup (src/application/SetupClientConfiguration.ts:238-258) and copies with COPYFILE_EXCL so an earlier backup is never overwritten (src/application/SetupRecoveryBackup.ts:78-88)."},
+        {"user": "Thanks, that's all for now.", "route": "chat"}
+      ]
+    },
+    {
+      "id": "r16", "repo": "rea", "lang": "tr", "ascii": false,
+      "notes": "HARD: explain/locate boundary pair on the Ghidra socket path: turn 1 locate, turn 2 a self-contained explain on the same subject. HARD: turn 3 has an anaphoric 'bu' but asks why the OS limit is 104 bytes and where the kernel defines it; that belongs to the OS, so outside, not followup.",
+      "turns": [
+        {"user": "Ghidra köprüsünün soket yolu nerede belirleniyor?", "route": "locate",
+         "assistant": "createGhidraEndpoint'te, src/ghidra/GhidraTransport.ts:21-49; Unix soketi için runtime klasöründe bridge.sock, Windows'taki TCP yolu için bridge-endpoint.json seçiliyor."},
+        {"user": "Unix soket yolu sockaddr sınırını aşınca REA nasıl davranıyor?", "route": "explain",
+         "assistant": "Yol macOS'ta 103, Linux'ta 107 baytı aşarsa REA projeyi taşımadan /tmp altında rea-ghidra-socket- önekli özel bir klasör açıp soketi orada kısa 's' adıyla oluşturuyor (src/ghidra/GhidraTransport.ts:33-48)."},
+        {"user": "macOS'ta bu sınır neden 104 bayt, çekirdekte nerede tanımlı?", "route": "outside"}
+      ]
+    },
+    {
+      "id": "r17", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "HARD: question about RepoFinder itself ('do you index tests too?') is chat. Then a locate into a test file with HARD: light typos ('wheres', 'proces'), then an 'it ... in there' follow-up.",
+      "turns": [
+        {"user": "hey, quick one before we start: do you index tests too, or only src?", "route": "chat",
+         "assistant": "I search whatever was indexed for this repository; if a test file comes back in the results, it is in the index. Ask about a specific test and we'll see."},
+        {"user": "cool. wheres the test that checks a spawned frida proces gets resumed when the session closes?", "route": "locate",
+         "assistant": "src/application/frida/FridaInstrumentationManager.test.ts:539-561, 'unloads scripts, resumes a paused spawn, and detaches without killing it'; it asserts the fake device saw resume(512) and the session ended detached."},
+        {"user": "how does it fake the frida device in there?", "route": "followup",
+         "assistant": "The test file defines FakeScript, FakeSession, FakeDevice and FakeDeviceManager (src/application/frida/FridaInstrumentationManager.test.ts:31-196) and passes the fake through the deviceManager option, which the manager uses instead of importing frida (src/frida/FridaInstrumentationManager.ts:125-130)."}
+      ]
+    },
+    {
+      "id": "r18", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "Outside question about the MCP SDK's stdio transport framing; a self-contained locate for REA's own stdio startup (HARD: fresh locate right after an outside answer); an 'it' follow-up about shutdown.",
+      "turns": [
+        {"user": "How does the MCP SDK's stdio transport frame messages, newline-delimited JSON?", "route": "outside",
+         "assistant": "Message framing belongs to the MCP SDK's stdio transport (@modelcontextprotocol/server/stdio), not to REA; REA only hands serveStdio a server factory."},
+        {"user": "Where does REA's stdio server actually get started?", "route": "locate",
+         "assistant": "run() in src/main.ts:41-82 parses the config, opens any initial target and calls startMcpTransport (src/main/transport.ts:29-212), which calls serveStdio at lines 112-145 with a factory that builds each server through createServer."},
+        {"user": "what does it clean up when it shuts down?", "route": "followup",
+         "assistant": "createShutdown (src/main/shutdown.ts:16-92) closes the stdio handle, the Android providers, the shared optional providers and the binary session, retrying only the owners that failed; it is triggered by SIGINT, SIGTERM or stdin end/close (src/main/processShutdown.ts:24-38)."}
+      ]
+    },
+    {
+      "id": "r19", "repo": "rea", "lang": "en", "ascii": false,
+      "notes": "Explain, then HARD: an outside question that attributes injection to REA ('how does rea inject its agent'): REA only calls session.createScript and script.load, the injection is Frida's, so it is labelled outside. Turn 3 'that message handling' is a follow-up back on REA's own code.",
+      "turns": [
+        {"user": "How does REA turn a Frida script's send() messages into evidence?", "route": "explain",
+         "assistant": "#loadScript connects each script's message signal to #recordMessage (src/frida/FridaInstrumentationManager.ts:376-482, 901-1055), which bounds and stores the payloads; instrument_with_frida then returns them as an Evidence result (src/server/registerFridaTools.ts:254-322)."},
+        {"user": "And how does rea inject its agent into the target's memory?", "route": "outside",
+         "assistant": "REA does not inject anything itself: it calls session.createScript and script.load (src/frida/FridaInstrumentationManager.ts:428-440), and Frida's runtime does the actual injection, which is not in this repository."},
+        {"user": "where in that message handling does the remote token get scrubbed?", "route": "followup"}
+      ]
+    },
+    {
+      "id": "r20", "repo": "rea", "lang": "tr", "ascii": true,
+      "notes": "ASCII Turkish. Explain, a follow-up that needs history ('ilk asamada'), then an outside question about Babel's own errorRecovery internals, then thanks (chat).",
+      "turns": [
+        {"user": "javascript analizinde her dosya icin hangi asamalar calisiyor?", "route": "explain",
+         "assistant": "Worker'da dosya basina parse, static, semantic ve projection asamalari sirayla calisiyor; her asamadan sonra parent'in verdigi sonuc butcesine gore durabiliyor (src/composition/javascriptAnalysisWorkerProcess.ts:19-78)."},
+        {"user": "ilk asamada hangi kutuphane kullaniliyor, babel mi?", "route": "followup",
+         "assistant": "Evet, @babel/parser: parseJavaScriptSource (src/domain/javascript/javascriptSourceParser.ts:115-146) errorRecovery acik parse ediyor, eklentileri dosya uzantisina gore parserPluginsForPath (24-41) seciyor."},
+        {"user": "babel errorRecovery acikken bozuk kodu nasil toparliyor peki?", "route": "outside",
+         "assistant": "Bu Babel parser'inin kendi ic isleyisi, REA'da degil; REA sadece donen sonucu ve file.errors listesini kullaniyor."},
+        {"user": "tamam sagol, simdilik bu kadar", "route": "chat"}
+      ]
+    }
+  ]
+}

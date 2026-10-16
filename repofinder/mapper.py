@@ -12,12 +12,13 @@ import re
 from collections import Counter
 from typing import Optional
 
-from .graph import TEST_DIR_NAMES, ModuleGraph
+from .graph import DIRECTORY_PACKAGE_LANGUAGES, TEST_DIR_NAMES, ModuleGraph, language_mix
 from .models import RepoIndex
 
 SUMMARY_MAX_CHARS = 80
 HOT_SPOTS = 10
 MAX_OVERVIEW_PACKAGES = 12
+MAX_ENTRY_ROWS = 12
 MAX_START_ENTRIES = 5
 START_CORE_MODULES = 3
 LAYOUT_MAX_DEPTH = 6
@@ -70,9 +71,18 @@ def _header(index: RepoIndex) -> str:
 
 
 def _overview(index: RepoIndex, graph: ModuleGraph, repo_summary: Optional[str]) -> str:
+    """Files per top-level group, in the dominant language's terms.
+
+    Python-led repositories are grouped by importable package; when the
+    dominant language (by indexed lines) groups modules by directory
+    (TypeScript, JavaScript), files are grouped by their top-level directory.
+    The languages are named unless the repository is a single Python-style language.
+    """
     if repo_summary is not None:
         return f"## Overview\n\n{repo_summary.strip()}"
-    packages = graph.packages()
+    mix = language_mix(index.files)
+    by_directory = bool(mix) and mix[0][0] in DIRECTORY_PACKAGE_LANGUAGES
+    packages = graph.top_level_directories() if by_directory else graph.packages()
     if not packages:
         return f"## Overview\n\n`{index.name}` has no indexed source files."
     ranked = sorted(packages.items(), key=lambda kv: (-len(kv[1]), kv[0]))
@@ -85,21 +95,48 @@ def _overview(index: RepoIndex, graph: ModuleGraph, repo_summary: Optional[str])
         rest = sum(len(files) for _key, files in ranked[len(shown):])
         parts.append(f"{len(ranked) - len(shown)} more ({_plural(rest, 'file')})")
     n_tests = sum(1 for node in graph.nodes.values() if node.is_test)
+    if by_directory:
+        n_dirs = len(packages) - ("." in packages)
+        where = _plural(n_dirs, "top-level directory", "top-level directories")
+        if "." in packages:
+            where = f"{where} and the repository root" if n_dirs else "the repository root"
+    else:
+        where = _plural(len(packages), "top-level package or directory", "top-level packages and directories")
     sentence = (
-        f"`{index.name}` has {_plural(len(graph.nodes), 'source file')} in "
-        f"{_plural(len(packages), 'top-level package or directory', 'top-level packages and directories')}: "
-        f"{_join(parts)}. "
+        f"`{index.name}` has {_plural(len(graph.nodes), 'source file')}{_languages(mix)} in "
+        f"{where}: {_join(parts)}. "
         f"{_plural(n_tests, 'file')} {'is' if n_tests == 1 else 'are'} tests."
     )
     return f"## Overview\n\n{sentence}"
 
 
+def _languages(mix: list[tuple[str, int]]) -> str:
+    """``", mostly TypeScript (98%) with some Python,"`` and the like; ``""`` for one
+    Python-style language (whose overview sentence predates language names)."""
+    if not mix or (len(mix) == 1 and mix[0][0] not in DIRECTORY_PACKAGE_LANGUAGES):
+        return ""
+    if len(mix) == 1:
+        return f", all {mix[0][0]},"
+    total = sum(weight for _name, weight in mix) or 1
+    percent = [(name, min(99, weight * 100 // total)) for name, weight in mix]
+    (lead, lead_pct), rest = percent[0], percent[1:]
+    if lead_pct >= 50:
+        return f", mostly {lead} ({lead_pct}%) with some {_join([name for name, _pct in rest])},"
+    return f", a mix of {_join([f'{name} ({pct}%)' for name, pct in percent])},"
+
+
 def _entry_points(graph: ModuleGraph) -> str:
-    entries = graph.entry_points()
+    """Up to :data:`MAX_ENTRY_ROWS` entry points by score; the rest are only counted."""
+    entries = graph.all_entry_points()
     if not entries:
         return "## Entry points\n\n_No entry points detected._"
-    rows = [f"| `{node.path}` | {_cell(node.entry_reason or '')} |" for node in entries]
-    return "## Entry points\n\n| path | reason |\n|---|---|\n" + "\n".join(rows)
+    shown = entries[:MAX_ENTRY_ROWS]
+    rows = [f"| `{entry.path}` | {_cell(entry.reason)} |" for entry in shown]
+    text = "## Entry points\n\n| path | reason |\n|---|---|\n" + "\n".join(rows)
+    hidden = len(entries) - len(shown)
+    if hidden:
+        text += f"\n\n… and {hidden} more (lower-confidence) {'entry point' if hidden == 1 else 'entry points'}."
+    return text
 
 
 def _core_modules(
@@ -173,11 +210,11 @@ def _where_to_start(index: RepoIndex, graph: ModuleGraph) -> str:
     listed: set[str] = set()
     top_names = _top_symbol_names(index)
 
-    entries = graph.entry_points()
-    for node in entries[:MAX_START_ENTRIES]:
-        reason = (node.entry_reason or "").split("; ", 1)[0]
-        lines.append(f"- `{node.path}` — entry point: {reason}.")
-        listed.add(node.path)
+    entries = graph.all_entry_points()
+    for entry in entries[:MAX_START_ENTRIES]:
+        reason = entry.reason.split("; ", 1)[0]
+        lines.append(f"- `{entry.path}` — entry point: {reason}.")
+        listed.add(entry.path)
     if len(entries) > MAX_START_ENTRIES:
         lines.append(f"- … and {len(entries) - MAX_START_ENTRIES} more entry points (see above).")
 

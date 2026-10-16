@@ -4,7 +4,7 @@
 RepoFinder, büyük bir açık kaynak projeye katkıda bulunmadan önce o projede
 yolunuzu bulmanıza yardım eder. Ona bir GitHub deposu verdiğinizde bir mimari
 haritası çizer ve "X özelliği nerede uygulanmış?" sorusunu koda işaret eden
-`path:start-end` alıntılarıyla yanıtlar.
+`path:start-end` alıntılarıyla yanıtlar. Python ve TypeScript projelerini okur.
 
 ## Kurulum
 
@@ -130,7 +130,7 @@ yaklaşık 80), bu yüzden önce `--limit 10` ile deneyin.
 
 | Komut | Ne yapar |
 | --- | --- |
-| `repofinder index <source> [--refresh]` | Klonlar (URL ise) ve indeksler. `--refresh` mevcut bir indeksi yeniden oluşturur ve hâlâ var olan dosyaların özetlerini korur. |
+| `repofinder index <source> [--refresh]` | Klonlar (URL ise) ve Python ile TypeScript dosyalarını indeksler. `--refresh` mevcut bir indeksi yeniden oluşturur ve hâlâ var olan dosyaların özetlerini korur. |
 | `repofinder map <source> [--out FILE] [--max-modules N]` | Markdown biçiminde mimari haritası: giriş noktaları, fan-in'e göre çekirdek modüller, paket düzeni, sıcak noktalar ve nereden başlanacağı. |
 | `repofinder ask <source> "question" [-k N] [--show-context] [--decisions jev\|rules] [--candidates N] [--json]` | Alıntılarla yanıt verir. `-k` kaç arama sonucunun bağlama gireceğini belirler (varsayılan 8); `--show-context` Claude'a gönderilen kesitleri listeler; `--decisions` bu çalıştırma için karar katmanını seçer (varsayılan: kuruluysa Jev, değilse kurallar); Jev ile, en üstteki `-k` sonuç bağlama girmeden önce tek bir çağrı ilk `--candidates` sonucu yeniden sıralar (varsayılan 16, en fazla 16); `--json` şunları yazdırır: `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage`, `elapsed_s`, `decisions` (`name`, `calls`, `cost_usd`, `reranked`, `off_target`, `error`), `candidates` ve `probabilities` (`path:start-end`'den p'ye). |
 | `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | Kod hakkında bir sohbet; stdin'den her satırda bir mesaj okunur (bkz. [Sohbet modu](#sohbet-modu)). `-k` arama başına sonuç sayısını belirler (varsayılan 8); `--decisions` bu çalıştırma için karar katmanını seçer. `/context` son aramanın kesitlerini listeler, `/route` son mesajın nasıl yönlendirildiğini gösterir, `/help` komutları listeler, `/quit` ya da girdinin sonu sohbetten çıkarır. `--json` her tur için satır başına bir JSON nesnesi yazdırır (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). `you>` istemi yalnızca terminalde yazarken gösterilir; böylece pipe ile aktarılan çıktı temiz kalır. |
@@ -186,8 +186,8 @@ requests'te 0.59'dan 0.88'e çıkarır
 
 ## Nasıl çalışır
 
-Tree-sitter her Python dosyasını sınıflara, fonksiyonlara, metotlara ve
-import'lara ayrıştırır; bunlar bir import grafiğiyle (fan-in, fan-out, giriş
+Tree-sitter her Python ve TypeScript dosyasını sınıflara, fonksiyonlara,
+metotlara ve import'lara ayrıştırır; bunlar bir import grafiğiyle (fan-in, fan-out, giriş
 noktaları) birlikte bir SQLite veritabanında saklanır. Bir soru, en iyi
 sembolleri ve dosyaları döndüren sözcüksel bir aramayla (sembol adları,
 imzalar, docstring'ler, yollar ve dosya özetleri üzerinde BM25) yanıtlanır. Bir
@@ -204,9 +204,25 @@ karakter. Claude yalnızca bu kesitlerden yanıt verir ve `path:start-end`
 biçiminde alıntı yapar; Sources listesi yalnızca kesitlerin içine düşen
 alıntıları tutar.
 
+### Diller
+
+Python (`.py`) ve TypeScript (`.ts`, `.mts`, `.cts`, `.tsx`) indekslenir.
+TypeScript sembolleri fonksiyonlar, sınıflar, metotlar, interface'ler,
+type'lar, enum'lar, namespace'ler ve arrow-function const'larıdır; JSDoc
+yorumu docstring olarak alınır. Göreli import'lar çözülür (`./a.js`,
+`a.ts` veya `index.ts` dosyasını bulur), `index.ts` adlı dosya dizinin adını
+taşır ve `*.test.ts`, `*.spec.ts` ile `__tests__/` test sayılır.
+`node_modules`, `dist`, `build`, `third_party`, `licenses`, minify edilmiş
+dosyalar ve 2 MB'tan büyük dosyalar atlanır. JavaScript (`.js`, `.mjs`)
+henüz ayrıştırılmıyor. morluto/rea üzerinde (3.119 dosya, 747 bin satır)
+indeksleme 5,4 sn sürdü ve 12,5 MB'lık indekste 15.267 sembol üretti; 59
+dosya ayrıştırılamadı (tree-sitter 0.23 `importOriginal<typeof import("x")>()`
+ifadesini okuyamıyor); arama anında yanıt verir.
+
 ## Sınırlamalar
 
-- Şimdilik yalnızca Python (diğer diller için bir ayrıştırıcı kaydı gerekir).
+- Şimdilik yalnızca Python ve TypeScript; JavaScript henüz ayrıştırılmıyor
+  (diğer diller için bir ayrıştırıcı kaydı gerekir).
 - Getirme işlemi anlamsal değil sözcükseldir: sorunun kodla ortak sözcükleri
   olmalıdır (tanımlayıcılar, docstring'ler, dosya adları). Yanıt yanlış
   görünüyorsa `repofinder search` neyin getirildiğini gösterir; beklediğiniz

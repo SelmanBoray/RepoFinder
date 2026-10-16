@@ -13,7 +13,9 @@ from repofinder.graph import (
     build_graph,
     detect_entry_points,
     entry_point_reasons,
+    find_entry_points,
     is_test_path,
+    language_mix,
     module_names,
     path_module_name,
     split_source_extension,
@@ -213,12 +215,12 @@ def test_entry_points_all_heuristics(make_repo: MakeRepo) -> None:
     assert detect_entry_points(index) == set(reasons)
 
     graph = build_graph(index)
-    assert [n.path for n in graph.entry_points()] == [
-        "src/demo/cli.py",       # declared script
-        "src/demo/plugin.py",    # declared entry point
-        "src/demo/__main__.py",
-        "scripts/tool.py",       # main guard
-        "src/demo/server.py",    # file name only
+    assert [(n.path, n.entry_score) for n in graph.entry_points()] == [
+        ("src/demo/cli.py", 100),       # declared script
+        ("src/demo/plugin.py", 100),    # declared entry point
+        ("src/demo/__main__.py", 70),
+        ("src/demo/server.py", 60),     # file name, below the source root
+        ("scripts/tool.py", 40),        # main guard only
     ]
     assert graph.nodes["src/demo/cli.py"].is_entry
     assert graph.nodes["src/demo/cli.py"].entry_reason == reasons["src/demo/cli.py"]
@@ -492,15 +494,16 @@ def test_entry_points_typescript_package_json_and_file_names(make_repo: MakeRepo
         "packages/list/app.ts": "conventional name `app.ts`",
     }
     graph = build_graph(index)
-    assert [n.path for n in graph.entry_points()] == [
-        "packages/app/bin/run.ts",       # declared in a package.json
-        "packages/app/src/server.mts",
-        "src/cli.ts",
-        "src/index.ts",
-        "packages/broken/index.mts",     # file name only
-        "packages/list/app.ts",
-        "src/main.ts",
+    assert [(n.path, n.entry_score) for n in graph.entry_points()] == [
+        ("packages/app/bin/run.ts", 100),       # declared in a package.json
+        ("packages/app/src/server.mts", 100),
+        ("src/cli.ts", 100),
+        ("src/index.ts", 100),
+        ("src/main.ts", 80),                    # file name directly in src/
+        ("packages/broken/index.mts", 60),      # file name deeper down
+        ("packages/list/app.ts", 60),
     ]
+    assert graph.unindexed_entries == []  # "bin/missing.js" is not on disk
     assert not graph.nodes["src/__tests__/main.ts"].is_entry and graph.nodes["src/__tests__/main.ts"].is_test
     assert graph.nodes["src/app.test.ts"].is_test
 
@@ -508,3 +511,111 @@ def test_entry_points_typescript_package_json_and_file_names(make_repo: MakeRepo
 def test_package_json_without_a_checkout_is_ignored() -> None:
     index = RepoIndex("ts", "Z:/does/not/exist", "ts", files=[FileRecord("src/server.ts", "typescript", 1, 1, True)])
     assert entry_point_reasons(index) == {"src/server.ts": "conventional name `server.ts`"}
+
+
+# --------------------------------------------------------------------------- #
+# Entry ranking: scores, peripheral directories, unindexed package.json bins
+# --------------------------------------------------------------------------- #
+
+GUARD = "if __name__ == '__main__':\n    pass\n"
+
+
+def test_entry_ranking_in_a_mixed_repo(make_repo: MakeRepo) -> None:
+    package = {
+        "name": "tool",
+        "bin": {"tool": "./scripts/tool.mjs", "tool-alias": "scripts/tool.mjs", "run": "bin/run",
+                "blob": "bin/blob", "gone": "scripts/missing.mjs"},
+        "main": "tests/x.test.ts",   # a test file is never an entry point
+    }
+    root = make_repo(
+        {
+            "package.json": json.dumps(package),
+            "scripts/tool.mjs": "#!/usr/bin/env node\nimport './lib.mjs';\n",
+            "bin/run": "#!/usr/bin/env -S node --no-warnings\nrequire('../dist/cli.js');\n",
+            "bin/blob": b"\x7fELF\x00",
+            "packages/app/package.json": json.dumps({"name": "app", "bin": "cli.cjs"}),
+            "packages/app/cli.cjs": "module.exports = 1;\n",
+            "packages/app/src/lib.ts": "export {};\n",  # package.json files are found next to indexed files
+            "src/cli.ts": "export function main(): void {}\n",
+            "src/server/app.ts": "export const app = 1;\n",
+            "src/pkg/__main__.py": "",
+            "tools/build.py": GUARD,
+            "examples/demo/main.py": "",
+            "experiments/x.py": GUARD,
+            "scripts/fixtures/serve.py": GUARD,
+            "tests/x.test.ts": "export {};\n",
+            "tests/run_all.py": GUARD,
+        }
+    )
+    index = build_index(root, "mixed", str(root))
+    indexed = {f.path for f in index.files}
+    assert {"src/cli.ts", "experiments/x.py", "tests/x.test.ts"} <= indexed
+    assert "scripts/tool.mjs" not in indexed   # JavaScript is not indexed
+
+    found = find_entry_points(index)
+    assert [(e.path, e.score, e.indexed) for e in found] == [
+        ("bin/blob", 100, False),                 # package.json bin, on disk, not indexed
+        ("bin/run", 100, False),
+        ("packages/app/cli.cjs", 100, False),
+        ("scripts/tool.mjs", 100, False),
+        ("src/cli.ts", 80, True),                 # conventional name directly in src/
+        ("src/pkg/__main__.py", 70, True),
+        ("src/server/app.ts", 60, True),          # conventional name deeper down
+        ("tools/build.py", 40, True),             # main guard
+        ("examples/demo/main.py", 30, True),      # 60 - 30: peripheral directory
+        ("experiments/x.py", 10, True),           # 40 - 30
+        ("scripts/fixtures/serve.py", 10, True),  # 40 - 30
+    ]
+    reasons = {e.path: e.reason for e in found}
+    # Two commands naming one file give one reason; the language comes from the
+    # extension, else from the "#!" interpreter, else it is left out.
+    assert reasons["scripts/tool.mjs"] == "`package.json` bin (not indexed: JavaScript)"
+    assert reasons["bin/run"] == "`package.json` bin (not indexed: JavaScript)"
+    assert reasons["bin/blob"] == "`package.json` bin (not indexed)"
+    assert reasons["packages/app/cli.cjs"] == "`packages/app/package.json` bin (not indexed: JavaScript)"
+    assert reasons["experiments/x.py"] == 'has `if __name__ == "__main__"`'
+    # entry_point_reasons covers indexed files only.
+    assert set(entry_point_reasons(index)) == {e.path for e in found if e.indexed}
+
+    graph = build_graph(index)
+    assert graph.all_entry_points() == found
+    assert [e.path for e in graph.unindexed_entries] == [
+        "bin/blob", "bin/run", "packages/app/cli.cjs", "scripts/tool.mjs",
+    ]
+    assert [n.path for n in graph.entry_points()] == [e.path for e in found if e.indexed]
+    assert graph.nodes["src/cli.ts"].entry_score == 80
+    assert not graph.nodes["tests/x.test.ts"].is_entry and graph.nodes["tests/x.test.ts"].entry_score == 0
+    assert not graph.nodes["tests/run_all.py"].is_entry
+
+
+def test_entry_ranking_by_location_with_ties_broken_by_path() -> None:
+    files = ["b/main.py", "a/main.py", "main.py", "src/app.ts", "website/src/main.ts", "pkg/docs/cli.py"]
+    index = RepoIndex("r", "Z:/does/not/exist", "r", files=[FileRecord(p, "python", 1, 1, True) for p in files])
+    assert [(e.path, e.score) for e in find_entry_points(index)] == [
+        ("main.py", 80),               # repository root
+        ("src/app.ts", 80),            # directly in src/
+        ("a/main.py", 60),             # deeper; ties broken by path
+        ("b/main.py", 60),
+        ("website/src/main.ts", 50),   # 80 - 30: peripheral directory
+        ("pkg/docs/cli.py", 30),       # 60 - 30: docs/ at any depth
+    ]
+
+
+def test_language_mix_and_top_level_directories() -> None:
+    files = [
+        FileRecord("src/a.ts", "typescript", 1, 90, True),
+        FileRecord("src/ui/b.tsx", "tsx", 1, 8, True),
+        FileRecord("tools/x.py", "python", 1, 2, True),
+        FileRecord("index.ts", "typescript", 1, 0, True),
+    ]
+    assert language_mix(files) == [("TypeScript", 98), ("Python", 2)]
+    # Without any lines the files are counted.
+    empty = [FileRecord(p, lang, 0, 0, True) for p, lang in [("a.py", "python"), ("b.ts", "typescript"), ("c.py", "python")]]
+    assert language_mix(empty) == [("Python", 2), ("TypeScript", 1)]
+    assert language_mix([]) == []
+    graph = build_graph(RepoIndex("r", "Z:/nope", "r", files=files))
+    assert graph.top_level_directories() == {
+        ".": ["index.ts"],
+        "src": ["src/a.ts", "src/ui/b.tsx"],
+        "tools": ["tools/x.py"],
+    }

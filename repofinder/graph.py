@@ -5,9 +5,10 @@
 between files. Fan-in/fan-out count *distinct* files, so ``import a`` and
 ``from a import b`` in the same file are one edge.
 
-Entry points are found with cheap heuristics (see :func:`entry_point_reasons`).
-Only a few small files are read from ``index.root`` (packaging metadata and
-candidate sources); nothing from the checkout is executed or imported.
+Entry points are found with cheap heuristics and ranked by a confidence score
+(see :func:`find_entry_points`). Only a few small files are read from
+``index.root`` (packaging metadata and candidate sources); nothing from the
+checkout is executed or imported.
 
 Module names follow the language: Python files get their dotted import name
 (``parser.build_module_map``); TypeScript and JavaScript files are named by
@@ -26,7 +27,7 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from . import parser
-from .models import RepoIndex
+from .models import FileRecord, RepoIndex
 from .parser import build_module_map
 
 # File names that conventionally start an application or a command. A file in
@@ -56,11 +57,39 @@ _BUILD_OUTPUT_DIRS = ("dist", "build", "out", "lib")  # tried as "src/" when the
 
 MAX_READ_BYTES = 1024 * 1024  # never read more than this from a checkout file
 
-# Reason strings, from the strongest to the weakest signal. ``entry_rank`` relies on them.
-# They are Markdown-friendly: code is wrapped in backticks.
+# Reason strings. They are Markdown-friendly: code is wrapped in backticks.
 REASON_MAIN_FILE = "`__main__.py` (run with `python -m`)"
 REASON_MAIN_GUARD = 'has `if __name__ == "__main__"`'
 REASON_FILENAME_PREFIX = "conventional name "
+REASON_UNINDEXED_BIN = "`{source}` bin (not indexed{language})"  # language: ": JavaScript" or ""
+
+# Entry-point confidence scores (see :func:`find_entry_points`). A file scores its
+# strongest reason, minus PERIPHERAL_PENALTY once if it lives in a peripheral directory.
+SCORE_DECLARED = 100            # packaging metadata: package.json "bin"/"main", pyproject/setup scripts
+SCORE_NAME_AT_SOURCE_ROOT = 80  # conventional name at the repository root or directly in a "src/" dir
+SCORE_MAIN_FILE = 70            # __main__.py
+SCORE_NAME_NESTED = 60          # conventional name in any other directory
+SCORE_MAIN_GUARD = 40           # module-level if __name__ == "__main__"
+PERIPHERAL_PENALTY = 30
+PERIPHERAL_DIRS = ("experiments", "examples", "scripts/fixtures", "benchmarks", "docs", "website")
+"""Directories (matched at any depth) whose entry points are demos, fixtures or tooling."""
+SOURCE_DIR_NAME = "src"
+_PERIPHERAL_PARTS = tuple(tuple(d.split("/")) for d in PERIPHERAL_DIRS)
+
+# Display names of FileRecord.language values (TSX is TypeScript).
+LANGUAGE_NAMES = {"python": "Python", "typescript": "TypeScript", "tsx": "TypeScript", "javascript": "JavaScript"}
+DIRECTORY_PACKAGE_LANGUAGES = frozenset({"TypeScript", "JavaScript"})
+"""Languages (display names) whose modules are grouped by directory rather than importable package."""
+
+# Language of a package.json "bin" target that is not indexed, by extension or shebang interpreter.
+_UNINDEXED_LANGUAGES = {
+    **{ext: "JavaScript" for ext in (".js", ".mjs", ".cjs", ".jsx")},
+    **{ext: "TypeScript" for ext in (".ts", ".mts", ".cts", ".tsx")},
+    ".py": "Python",
+    ".sh": "shell",
+}
+_SHEBANG_LANGUAGES = (("node", "JavaScript"), ("deno", "JavaScript"), ("bun", "JavaScript"),
+                      ("python", "Python"), ("bash", "shell"), ("sh", "shell"))
 
 _MAIN_GUARD_RE = re.compile(
     rb"^if\s+(?:__name__\s*==\s*['\"]__main__['\"]|['\"]__main__['\"]\s*==\s*__name__)\s*:",
@@ -138,6 +167,14 @@ def is_test_path(path: str) -> bool:
     )
 
 
+@dataclass(frozen=True)
+class EntryPoint:
+    path: str
+    reason: str           # every reason, "; "-joined, in heuristic order (see find_entry_points)
+    score: int            # confidence (SCORE_* minus PERIPHERAL_PENALTY); higher is stronger
+    indexed: bool = True  # False: a package.json "bin" file that exists but is not in the index
+
+
 @dataclass
 class ModuleNode:
     path: str
@@ -149,12 +186,14 @@ class ModuleNode:
     is_entry: bool
     is_test: bool
     entry_reason: Optional[str] = None   # why the file counts as an entry point ("; "-joined)
+    entry_score: int = 0                 # EntryPoint.score when is_entry
 
 
 @dataclass
 class ModuleGraph:
     nodes: dict[str, ModuleNode]              # keyed by path
     edges: list[tuple[str, str]]              # (src_path, dst_path), deduplicated, sorted
+    unindexed_entries: list[EntryPoint] = field(default_factory=list)  # declared, on disk, not indexed
     _importers: dict[str, list[str]] = field(init=False, repr=False, compare=False)
     _imports: dict[str, list[str]] = field(init=False, repr=False, compare=False)
 
@@ -182,10 +221,29 @@ class ModuleGraph:
         return nodes[: max(n, 0)]
 
     def entry_points(self) -> list[ModuleNode]:
-        """Entry-point files, strongest signal first, then by path."""
+        """Indexed entry-point files, highest score first, then by path."""
         nodes = [node for node in self.nodes.values() if node.is_entry]
-        nodes.sort(key=lambda node: (entry_rank(node.entry_reason), node.path))
+        nodes.sort(key=lambda node: (-node.entry_score, node.path))
         return nodes
+
+    def all_entry_points(self) -> list[EntryPoint]:
+        """Every entry point, indexed or not (:attr:`unindexed_entries`), highest score first, then by path."""
+        entries = [
+            EntryPoint(node.path, node.entry_reason or "", node.entry_score)
+            for node in self.nodes.values()
+            if node.is_entry
+        ]
+        entries.extend(self.unindexed_entries)
+        entries.sort(key=lambda entry: (-entry.score, entry.path))
+        return entries
+
+    def top_level_directories(self) -> dict[str, list[str]]:
+        """First path component -> sorted file paths (``"."`` for files at the repository root)."""
+        groups: dict[str, list[str]] = {}
+        for path in self.nodes:
+            head, sep, _rest = path.partition("/")
+            groups.setdefault(head if sep else ".", []).append(path)
+        return {key: sorted(groups[key]) for key in sorted(groups)}
 
     def packages(self) -> dict[str, list[str]]:
         """Top-level package directory -> sorted file paths.
@@ -246,6 +304,20 @@ def module_names(paths: Iterable[str]) -> dict[str, str]:
     return best
 
 
+def language_mix(files: Iterable[FileRecord]) -> list[tuple[str, int]]:
+    """(language display name, indexed lines) over ``files``, largest first (ties: name).
+
+    Languages are named by :data:`LANGUAGE_NAMES` (``tsx`` counts as TypeScript).
+    File counts are used instead when no file has any lines.
+    """
+    records = list(files)
+    use_lines = any(record.n_lines > 0 for record in records)
+    weights: Counter[str] = Counter()
+    for record in records:
+        weights[LANGUAGE_NAMES.get(record.language, record.language)] += record.n_lines if use_lines else 1
+    return sorted(weights.items(), key=lambda kv: (-kv[1], kv[0]))
+
+
 def build_graph(index: RepoIndex) -> ModuleGraph:
     """Build the file-level import graph of ``index``. Self-imports are dropped."""
     paths = sorted(f.path for f in index.files)
@@ -264,13 +336,14 @@ def build_graph(index: RepoIndex) -> ModuleGraph:
     )
     fan_in = Counter(dst for _src, dst in edges)
     fan_out = Counter(src for src, _dst in edges)
-    entries = entry_point_reasons(index)
+    found = find_entry_points(index)
+    entries = {entry.path: entry for entry in found if entry.indexed}
     by_path = {f.path: f for f in index.files}
 
     nodes: dict[str, ModuleNode] = {}
     for path in paths:
         record = by_path[path]
-        reason = entries.get(path)
+        entry = entries.get(path)
         nodes[path] = ModuleNode(
             path=path,
             module=modules.get(path),
@@ -278,11 +351,12 @@ def build_graph(index: RepoIndex) -> ModuleGraph:
             n_lines=record.n_lines,
             fan_in=fan_in.get(path, 0),
             fan_out=fan_out.get(path, 0),
-            is_entry=reason is not None,
+            is_entry=entry is not None,
             is_test=is_test_path(path),
-            entry_reason=reason,
+            entry_reason=entry.reason if entry else None,
+            entry_score=entry.score if entry else 0,
         )
-    return ModuleGraph(nodes=nodes, edges=edges)
+    return ModuleGraph(nodes=nodes, edges=edges, unindexed_entries=[e for e in found if not e.indexed])
 
 
 # --------------------------------------------------------------------------- #
@@ -291,83 +365,107 @@ def build_graph(index: RepoIndex) -> ModuleGraph:
 
 
 def detect_entry_points(index: RepoIndex) -> set[str]:
-    """Paths of the files that look like entry points (see :func:`entry_point_reasons`)."""
+    """Paths of the indexed files that look like entry points (see :func:`find_entry_points`)."""
     return set(entry_point_reasons(index))
 
 
-def entry_rank(reason: Optional[str]) -> int:
-    """Strength of an entry reason: 0 declared (packaging metadata), 1 ``__main__.py``,
-    2 main guard, 3 file name or ``bin/`` directory."""
-    if not reason:
-        return 4
-    first = reason.split("; ", 1)[0]
-    if first == REASON_MAIN_FILE:
-        return 1
-    if first == REASON_MAIN_GUARD:
-        return 2
-    if first.startswith(REASON_FILENAME_PREFIX):
-        return 3
-    return 0
-
-
 def entry_point_reasons(index: RepoIndex) -> dict[str, str]:
-    """Entry-point path -> human-readable reasons, strongest first, ``"; "``-joined.
+    """Indexed entry-point path -> its reasons, ``"; "``-joined (see :func:`find_entry_points`)."""
+    return {entry.path: entry.reason for entry in sorted(find_entry_points(index), key=lambda e: e.path)
+            if entry.indexed}
 
-    Heuristics, in order:
 
-    1. targets of ``[project.scripts]``, ``[project.gui-scripts]``,
-       ``[project.entry-points.*]`` and ``[tool.poetry.scripts]`` in any
-       ``pyproject.toml``, of ``entry_points=`` in ``setup.py`` and of
-       ``[options.entry_points]`` in ``setup.cfg`` (``pkg.mod:func`` is resolved
-       to a file relative to the project directory that declares it), and the
-       ``"bin"`` and ``"main"`` files of any ``package.json`` that are indexed
-       (compiled output such as ``dist/cli.js`` is traced back to its indexed
-       source, ``dist/cli.ts`` or ``src/cli.ts``);
-    2. ``__main__.py``;
-    3. a module-level ``if __name__ == "__main__":`` (Python files);
+def find_entry_points(index: RepoIndex) -> list[EntryPoint]:
+    """Every entry point of ``index``, highest score first, then by path.
+
+    Heuristics, with their scores (a file scores its strongest reason; its
+    reasons are kept in this order):
+
+    1. ``SCORE_DECLARED``: targets of ``[project.scripts]``,
+       ``[project.gui-scripts]``, ``[project.entry-points.*]`` and
+       ``[tool.poetry.scripts]`` in any ``pyproject.toml``, of ``entry_points=``
+       in ``setup.py`` and of ``[options.entry_points]`` in ``setup.cfg``
+       (``pkg.mod:func`` is resolved to a file relative to the project
+       directory that declares it), and the ``"bin"`` and ``"main"`` files of
+       any ``package.json`` (compiled output such as ``dist/cli.js`` is traced
+       back to its indexed source, ``dist/cli.ts`` or ``src/cli.ts``). A
+       ``"bin"`` file that exists on disk but is not indexed (``scripts/run.mjs``
+       while JavaScript is not parsed) is kept with ``indexed=False``;
+    2. ``SCORE_MAIN_FILE``: ``__main__.py``;
+    3. ``SCORE_MAIN_GUARD``: a module-level ``if __name__ == "__main__":`` (Python files);
     4. a conventional file name (:data:`ENTRY_FILENAMES`) or a file directly in
-       a ``bin/`` directory.
+       a ``bin/`` directory: ``SCORE_NAME_AT_SOURCE_ROOT`` when the file (or
+       its ``bin/``) sits at the repository root or directly in a ``src/``
+       directory, ``SCORE_NAME_NESTED`` deeper.
 
-    Test files only count through heuristic 1. Files that cannot be read are
-    skipped silently.
+    Files under a :data:`PERIPHERAL_DIRS` directory lose ``PERIPHERAL_PENALTY``.
+    Test files are never entry points. Files that cannot be read are skipped silently.
     """
     paths = sorted(f.path for f in index.files)
     root = Path(index.root) if index.root else None
     reasons: dict[str, list[str]] = {}
+    scores: dict[str, int] = {}
+    unindexed: set[str] = set()
 
-    def add(path: str, reason: str) -> None:
+    def add(path: str, reason: str, score: int, indexed: bool = True) -> None:
+        if is_test_path(path):
+            return
         bucket = reasons.setdefault(path, [])
         if reason not in bucket:
             bucket.append(reason)
+        scores[path] = max(scores.get(path, score), score)
+        if not indexed:
+            unindexed.add(path)
 
     if root is not None:
-        for target_path, reason in _declared_entry_points(root, paths):
-            add(target_path, reason)
+        for target_path, reason, indexed in _declared_entry_points(root, paths):
+            add(target_path, reason, SCORE_DECLARED, indexed)
 
     candidates = [p for p in paths if not is_test_path(p)]
     py_candidates = [p for p in candidates if p.endswith(".py")]
     for path in py_candidates:
         if path.rsplit("/", 1)[-1] == "__main__.py":
-            add(path, REASON_MAIN_FILE)
+            add(path, REASON_MAIN_FILE, SCORE_MAIN_FILE)
     if root is not None:
         for path in py_candidates:
             data = _read_bytes(root, path)
             if data and b"__main__" in data and _MAIN_GUARD_RE.search(data):
-                add(path, REASON_MAIN_GUARD)
+                add(path, REASON_MAIN_GUARD, SCORE_MAIN_GUARD)
     for path in candidates:
         parts = path.split("/")
         if parts[-1] in ENTRY_FILENAMES:
-            add(path, f"{REASON_FILENAME_PREFIX}`{parts[-1]}`")
+            add(path, f"{REASON_FILENAME_PREFIX}`{parts[-1]}`", _name_score(parts[:-1]))
         elif len(parts) > 1 and parts[-2] == BIN_DIR_NAME:
-            add(path, f"{REASON_FILENAME_PREFIX}`{BIN_DIR_NAME}/{parts[-1]}`")
+            add(path, f"{REASON_FILENAME_PREFIX}`{BIN_DIR_NAME}/{parts[-1]}`", _name_score(parts[:-2]))
 
-    return {path: "; ".join(reasons[path]) for path in sorted(reasons)}
+    entries = [
+        EntryPoint(path, "; ".join(reasons[path]), scores[path] - _peripheral_penalty(path), path not in unindexed)
+        for path in reasons
+    ]
+    entries.sort(key=lambda entry: (-entry.score, entry.path))
+    return entries
 
 
-def _read_bytes(root: Path, rel: str) -> Optional[bytes]:
+def _name_score(directory: list[str]) -> int:
+    """Score of a conventional file name found in ``directory`` (path components)."""
+    at_source_root = not directory or directory[-1] == SOURCE_DIR_NAME
+    return SCORE_NAME_AT_SOURCE_ROOT if at_source_root else SCORE_NAME_NESTED
+
+
+def _peripheral_penalty(path: str) -> int:
+    """PERIPHERAL_PENALTY when a directory of ``path`` matches :data:`PERIPHERAL_DIRS`, else 0."""
+    directory = path.split("/")[:-1]
+    for i in range(len(directory)):
+        for marker in _PERIPHERAL_PARTS:
+            if tuple(directory[i:i + len(marker)]) == marker:
+                return PERIPHERAL_PENALTY
+    return 0
+
+
+def _read_bytes(root: Path, rel: str, limit: int = MAX_READ_BYTES) -> Optional[bytes]:
     try:
         with open(root / rel, "rb") as handle:
-            return handle.read(MAX_READ_BYTES)
+            return handle.read(limit)
     except OSError:
         return None
 
@@ -401,9 +499,10 @@ def _project_dirs(root: Path, paths: list[str]) -> list[tuple[str, list[str]]]:
     return found
 
 
-def _declared_entry_points(root: Path, paths: list[str]) -> list[tuple[str, str]]:
-    """(target file, reason) for every packaging-declared entry point that resolves in the repo."""
-    out: list[tuple[str, str]] = []
+def _declared_entry_points(root: Path, paths: list[str]) -> list[tuple[str, str, bool]]:
+    """(target file, reason, indexed) for every packaging-declared entry point that resolves
+    in the repo; only package.json "bin" files can be unindexed (they must exist on disk)."""
+    out: list[tuple[str, str, bool]] = []
     path_set = set(paths)
     for directory, present in _project_dirs(root, paths):
         prefix = f"{directory}/" if directory else ""
@@ -413,7 +512,7 @@ def _declared_entry_points(root: Path, paths: list[str]) -> list[tuple[str, str]
             if text is None:
                 continue
             if filename == "package.json":
-                out.extend(_package_json_entries(text, prefix, path_set))
+                out.extend(_package_json_entries(text, prefix, path_set, root))
                 continue
             if filename == "pyproject.toml":
                 entries = _pyproject_entries(text)
@@ -425,7 +524,7 @@ def _declared_entry_points(root: Path, paths: list[str]) -> list[tuple[str, str]
                 target = resolver.resolve(spec.split(":", 1)[0])
                 if target is not None:
                     source = prefix + filename + (f" [{where}]" if where else "")
-                    out.append((target, f"{label} `{name}` = `{spec}` ({source})"))
+                    out.append((target, f"{label} `{name}` = `{spec}` ({source})", True))
     return out
 
 
@@ -445,9 +544,12 @@ class _ModuleResolver:
         return self._map.get(module)
 
 
-def _package_json_entries(text: str, prefix: str, path_set: set[str]) -> list[tuple[str, str]]:
-    """(target file, reason) for the ``"bin"`` and ``"main"`` entries of a
-    package.json in directory ``prefix`` whose file is indexed. Anything
+def _package_json_entries(
+    text: str, prefix: str, path_set: set[str], root: Path
+) -> list[tuple[str, str, bool]]:
+    """(target file, reason, indexed) for the ``"bin"`` and ``"main"`` entries of
+    a package.json in directory ``prefix`` whose file is indexed, plus the
+    ``"bin"`` files that exist under ``root`` but are not indexed. Anything
     malformed is ignored."""
     try:
         data = json.loads(text)
@@ -456,26 +558,59 @@ def _package_json_entries(text: str, prefix: str, path_set: set[str]) -> list[tu
     if not isinstance(data, dict):
         return []
     source = prefix + "package.json"
-    declared: list[tuple[str, str]] = []   # (reason head, declared path)
+    declared: list[tuple[str, str, bool]] = []   # (reason, declared path, is "bin")
     bin_field = data.get("bin")
     if isinstance(bin_field, str):
         package = data.get("name")
         command = package.rsplit("/", 1)[-1] if isinstance(package, str) and package else "bin"
-        declared.append((f"script `{command}` = `{bin_field}` ({source} [bin])", bin_field))
+        declared.append((f"script `{command}` = `{bin_field}` ({source} [bin])", bin_field, True))
     elif isinstance(bin_field, dict):
         for command in sorted(bin_field, key=str):
             value = bin_field[command]
             if isinstance(value, str):
-                declared.append((f"script `{command}` = `{value}` ({source} [bin])", value))
+                declared.append((f"script `{command}` = `{value}` ({source} [bin])", value, True))
     main = data.get("main")
     if isinstance(main, str):
-        declared.append((f"main `{main}` ({source})", main))
-    out: list[tuple[str, str]] = []
-    for reason, value in declared:
+        declared.append((f"main `{main}` ({source})", main, False))
+    out: list[tuple[str, str, bool]] = []
+    for reason, value, is_bin in declared:
         target = _package_target(prefix, value, path_set)
         if target is not None:
-            out.append((target, reason))
+            out.append((target, reason, True))
+            continue
+        path = _package_path(prefix, value) if is_bin else None
+        if path is not None and (root / path).is_file():
+            language = _unindexed_language(root, path)
+            out.append((path, REASON_UNINDEXED_BIN.format(
+                source=source, language=f": {language}" if language else ""), False))
     return out
+
+
+def _package_path(prefix: str, value: str) -> Optional[str]:
+    """Repository path of a package.json path value, or None if it is empty or leaves the repository."""
+    value = value.strip().replace("\\", "/")
+    if not value or value.startswith("/") or ":" in value:
+        return None
+    path = posixpath.normpath(prefix + value)
+    if path in (".", "..") or path.startswith("../"):
+        return None
+    return path
+
+
+def _unindexed_language(root: Path, path: str) -> Optional[str]:
+    """Language of a file that is not indexed: by extension, else by its ``#!`` interpreter."""
+    language = _UNINDEXED_LANGUAGES.get(posixpath.splitext(path)[1].lower())
+    if language is not None:
+        return language
+    head = _read_bytes(root, path, 256) or b""
+    if not head.startswith(b"#!"):
+        return None
+    words = [posixpath.basename(w) for w in head[2:].split(b"\n", 1)[0].decode("utf-8", "replace").split()]
+    if words and words[0] == "env":
+        words = [w for w in words[1:] if not w.startswith("-")]
+    if not words:
+        return None
+    return next((lang for name, lang in _SHEBANG_LANGUAGES if words[0].startswith(name)), None)
 
 
 def _package_target(prefix: str, value: str, path_set: set[str]) -> Optional[str]:
@@ -484,11 +619,8 @@ def _package_target(prefix: str, value: str, path_set: set[str]) -> Optional[str
     under ``src/`` when the path is in a build-output directory
     (``dist/cli.js`` -> ``src/cli.ts``). None if none is indexed or the path
     leaves the repository."""
-    value = value.strip().replace("\\", "/")
-    if not value or value.startswith("/") or ":" in value:
-        return None
-    path = posixpath.normpath(prefix + value)
-    if path == ".." or path.startswith("../"):
+    path = _package_path(prefix, value)
+    if path is None:
         return None
     stem, ext = posixpath.splitext(path)
     exts = (ext, *_COMPILED_TO_SOURCE.get(ext.lower(), ()))

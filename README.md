@@ -4,7 +4,7 @@
 RepoFinder helps you find your way around a large open-source project before
 you contribute to it. Give it a GitHub repository and it draws an architecture
 map and answers "where is feature X implemented?" with `path:start-end`
-citations into the code.
+citations into the code. It reads Python and TypeScript projects.
 
 ## Install
 
@@ -125,7 +125,7 @@ one model call per file (about 80 for Flask), so try `--limit 10` first.
 
 | Command | What it does |
 | --- | --- |
-| `repofinder index <source> [--refresh]` | Clone (for a URL) and index. `--refresh` rebuilds an existing index and keeps the summaries of files that still exist. |
+| `repofinder index <source> [--refresh]` | Clone (for a URL) and index the Python and TypeScript files. `--refresh` rebuilds an existing index and keeps the summaries of files that still exist. |
 | `repofinder map <source> [--out FILE] [--max-modules N]` | Architecture map in Markdown: entry points, core modules by fan-in, package layout, hot spots and where to start. |
 | `repofinder ask <source> "question" [-k N] [--show-context] [--decisions jev\|rules] [--candidates N] [--json]` | Answer with citations. `-k` sets how many search hits become context (default 8); `--show-context` lists the excerpts sent to Claude; `--decisions` picks the decision layer for this run (default: Jev when set up, else the rules); with Jev, one call reranks the first `--candidates` hits (default 16, at most 16) before the top `-k` become context; `--json` prints `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage`, `elapsed_s`, `decisions` (`name`, `calls`, `cost_usd`, `reranked`, `off_target`, `error`), `candidates` and `probabilities` (`path:start-end` to p). |
 | `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | A conversation about the code, one message per line from stdin (see [Chat mode](#chat-mode)). `-k` sets the search hits per search (default 8); `--decisions` picks the decision layer for this run. `/context` lists the excerpts of the last search, `/route` shows how the last message was routed, `/help` lists the commands, `/quit` or the end of input leaves. `--json` prints one JSON object per line for every turn (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). The `you>` prompt is shown only when you type in a terminal, so piped output stays clean. |
@@ -178,8 +178,8 @@ for under 0.02 cents per question ([details](eval/README.md#jev-in-the-pipeline-
 
 ## How it works
 
-Tree-sitter parses every Python file into classes, functions, methods and
-imports, which are stored in a SQLite database together with an import graph
+Tree-sitter parses every Python and TypeScript file into classes, functions,
+methods and imports, which are stored in a SQLite database together with an import graph
 (fan-in, fan-out, entry points). A question is answered by a lexical search
 (BM25 over symbol names, signatures, docstrings, paths and file summaries) that
 returns the best symbols and files. A symbol's name boost is scaled by how much
@@ -194,9 +194,24 @@ the class header for methods), about 36,000 characters in all. Claude answers
 from those excerpts only and cites `path:start-end`; the Sources list keeps
 only citations that fall inside the excerpts.
 
+### Languages
+
+Python (`.py`) and TypeScript (`.ts`, `.mts`, `.cts`, `.tsx`) are indexed.
+TypeScript symbols are functions, classes, methods, interfaces, types, enums,
+namespaces and arrow-function consts, with the JSDoc comment as the docstring.
+Relative imports are resolved (`./a.js` finds `a.ts` or `index.ts`), a file
+named `index.ts` names its directory, and `*.test.ts`, `*.spec.ts` and
+`__tests__/` count as tests. `node_modules`, `dist`, `build`, `third_party`,
+`licenses`, minified files and files over 2 MB are skipped. JavaScript
+(`.js`, `.mjs`) is not parsed yet. On morluto/rea (3,119 files, 747k lines)
+indexing took 5.4 s and produced 15,267 symbols in a 12.5 MB index, with 59
+files that did not parse (tree-sitter 0.23 cannot read
+`importOriginal<typeof import("x")>()`); search answers instantly.
+
 ## Limitations
 
-- Python only for now (other languages need a parser registration).
+- Python and TypeScript only for now; JavaScript is not parsed yet (other
+  languages need a parser registration).
 - Retrieval is lexical, not semantic: the question has to share words with
   the code (identifiers, docstrings, file names). If the answer looks wrong,
   `repofinder search` shows what was retrieved; rephrasing with the names you
