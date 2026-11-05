@@ -53,8 +53,8 @@ komutunu arar. Açıkça seçmek için `REPOFINDER_BACKEND=anthropic` ya da
 hangisinin kullanılacağını gösterir. İkisi de yoksa LLM komutları kurulum
 talimatlarını yazdırır ve 2 koduyla çıkar.
 
-Varsayılan olarak dosya başına özetler için `claude-sonnet-5-5`, yanıtlar ve
-genel bakış için `claude-opus-5-5` kullanılır; bunları `REPOFINDER_MODEL_FAST`
+Varsayılan olarak her iş (dosya başına özetler, yanıtlar ve genel bakış) için
+`claude-sonnet-5-5` kullanılır; bunları `REPOFINDER_MODEL_FAST`
 ve `REPOFINDER_MODEL_SMART` ile değiştirebilirsiniz.
 
 ### Kararlar (isteğe bağlı, Jev)

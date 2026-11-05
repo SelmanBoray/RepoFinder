@@ -53,8 +53,8 @@ command. To choose explicitly, set `REPOFINDER_BACKEND=anthropic` or
 would be used. If neither is available, the LLM commands print setup
 instructions and exit with code 2.
 
-Models default to `claude-sonnet-5-5` for per-file summaries and
-`claude-opus-5-5` for answers and the overview; override them with
+Models default to `claude-sonnet-5-5` for everything (per-file summaries,
+answers and the overview); override them with
 `REPOFINDER_MODEL_FAST` and `REPOFINDER_MODEL_SMART`.
 
 ### Decisions (optional, Jev)

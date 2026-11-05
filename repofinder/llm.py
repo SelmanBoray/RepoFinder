@@ -39,7 +39,7 @@ from .backends import (  # noqa: F401  (re-exported: part of this module's API)
 from .models import RepoIndex, Symbol
 
 DEFAULT_FAST_MODEL = "claude-sonnet-5-5"
-DEFAULT_SMART_MODEL = "claude-opus-5-5"
+DEFAULT_SMART_MODEL = "claude-sonnet-5-5"
 
 ENV_MODEL_FAST = "REPOFINDER_MODEL_FAST"
 ENV_MODEL_SMART = "REPOFINDER_MODEL_SMART"

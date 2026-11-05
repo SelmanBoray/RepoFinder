@@ -331,7 +331,7 @@ def test_model_defaults_env_and_arguments(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.delenv("REPOFINDER_MODEL_SMART", raising=False)
     plain = LLM(client=FakeClient())
     assert (plain.fast_model, plain.smart_model) == (DEFAULT_FAST_MODEL, DEFAULT_SMART_MODEL)
-    assert (DEFAULT_FAST_MODEL, DEFAULT_SMART_MODEL) == ("claude-sonnet-5-5", "claude-opus-5-5")
+    assert (DEFAULT_FAST_MODEL, DEFAULT_SMART_MODEL) == ("claude-sonnet-5-5", "claude-sonnet-5-5")
 
     monkeypatch.setenv("REPOFINDER_MODEL_FAST", "env-fast")
     monkeypatch.setenv("REPOFINDER_MODEL_SMART", "env-smart")
