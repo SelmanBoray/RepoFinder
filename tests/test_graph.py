@@ -619,3 +619,111 @@ def test_language_mix_and_top_level_directories() -> None:
         "src": ["src/a.ts", "src/ui/b.tsx"],
         "tools": ["tools/x.py"],
     }
+
+
+# --------------------------------------------------------------------------- #
+# Dart: test paths, module names, entry points, the "lib" source directory
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        ("test/widget_test.dart", True),
+        ("lib/src/foo_test.dart", False),
+        ("lib/test_golden.dart", False),
+        ("packages/flame_test/lib/flame_test.dart", False),
+        ("packages/flame_test/lib/src/test_golden.dart", False),
+        ("packages/flame_test/lib/src/expect_vector2.dart", False),
+        ("test/lib/x_test.dart", True),
+        ("test/foo_test.dart", True),
+        ("packages/a/test/x.dart", True),
+        ("integration_test/a.dart", True),
+        ("tool/foo_test.dart", True),
+        ("tool/test_foo.dart", True),
+        ("lib/test_x.py", True),
+        ("lib/x_test.py", True),
+        ("lib/x.test.ts", True),
+        ("integration_test/app_test.dart", True),
+        ("integration_test/helpers.dart", True),
+        ("packages/a/integration_test/x.dart", True),
+        ("lib/src/latest.dart", False),
+        ("lib/src/contest.dart", False),
+        ("lib/main.dart", False),
+    ],
+)
+def test_is_test_path_dart(path: str, expected: bool) -> None:
+    assert is_test_path(path) is expected
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "integration_test/conn.py",
+        "integration_test/flow.ts",
+        "integration_test/flow.tsx",
+        "integration_test/flow.js",
+        "pkg/integration_test/helpers.py",
+    ],
+)
+def test_integration_test_dir_is_not_a_test_dir_for_python_and_typescript(path: str) -> None:
+    assert is_test_path(path) is False
+
+
+@pytest.mark.parametrize("path", ["integration_test/conn_test.py", "integration_test/flow.test.ts", "integration_test/tests/x.py"])
+def test_integration_test_dir_keeps_other_test_rules(path: str) -> None:
+    assert is_test_path(path) is True
+
+
+def test_dart_module_names_and_language_mix() -> None:
+    assert path_module_name("lib/src/widgets/button.dart") == "lib/src/widgets/button"
+    assert split_source_extension("lib/main.dart") == ("lib/main", ".dart")
+    files = [FileRecord("lib/a.dart", "dart", 1, 30, True), FileRecord("tool/x.py", "python", 1, 2, True)]
+    assert language_mix(files) == [("Dart", 30), ("Python", 2)]
+
+
+def test_dart_entry_points_treat_lib_as_the_source_root() -> None:
+    files = [
+        "lib/main.dart",
+        "main.dart",
+        "packages/flame/lib/main.dart",
+        "packages/flame/lib/src/widgets/main.dart",
+        "examples/lib/main.dart",
+        "integration_test/main.dart",
+        "test/main.dart",
+        "lib/app.dart",
+    ]
+    index = RepoIndex("d", "Z:/does/not/exist", "d", files=[FileRecord(p, "dart", 1, 1, True) for p in files])
+    assert [(e.path, e.score) for e in find_entry_points(index)] == [
+        ("lib/main.dart", 80),
+        ("main.dart", 80),
+        ("packages/flame/lib/main.dart", 80),
+        ("packages/flame/lib/src/widgets/main.dart", 60),
+        ("examples/lib/main.dart", 50),  # 80 - 30: peripheral directory
+    ]
+
+
+def test_lib_is_not_a_source_root_for_other_languages() -> None:
+    # JavaScript/TypeScript/Python keep "lib" as an ordinary (nested) directory ...
+    files = ["lib/main.ts", "lib/main.py", "lib/index.ts", "src/main.ts"]
+    index = RepoIndex("r", "Z:/does/not/exist", "r", files=[FileRecord(p, "typescript", 1, 1, True) for p in files])
+    assert [(e.path, e.score) for e in find_entry_points(index)] == [
+        ("src/main.ts", 80),
+        ("lib/index.ts", 60),
+        ("lib/main.py", 60),
+        ("lib/main.ts", 60),
+    ]
+
+
+def test_package_json_build_output_lib_still_maps_to_src(make_repo: MakeRepo) -> None:
+    indexed = ["src/server.ts", "lib/server.ts"]
+    files: dict[str, str | bytes] = {p: "export {};\n" for p in indexed}
+    files["package.json"] = json.dumps({"main": "lib/server.js"})
+    root = make_repo(files)
+    index = RepoIndex("ts", str(root), "ts", files=[FileRecord(p, "typescript", 1, 1, True) for p in indexed])
+    # lib/server.js -> the indexed lib/server.ts first; with only src/ indexed it falls back to src/server.ts
+    assert "lib/server.ts" in entry_point_reasons(index)
+    only_src = RepoIndex("ts", str(root), "ts", files=[FileRecord("src/server.ts", "typescript", 1, 1, True)])
+    assert entry_point_reasons(only_src) == {
+        "src/server.ts": "main `lib/server.js` (package.json); conventional name `server.ts`"
+    }

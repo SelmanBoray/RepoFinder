@@ -35,12 +35,14 @@ from .parser import build_module_map
 ENTRY_FILENAMES = (
     "cli.py", "main.py", "app.py", "server.py", "wsgi.py", "asgi.py", "manage.py",
     "index.ts", "main.ts", "cli.ts", "server.ts", "app.ts", "index.mts",
+    "main.dart",
 )
 BIN_DIR_NAME = "bin"
 TEST_DIR_NAMES = frozenset({"tests", "test", "__tests__"})
+DART_TEST_DIR_NAMES = frozenset({"integration_test"})  # Flutter; counts for .dart files only
 
-PATH_MODULE_EXTENSIONS = (".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs")
-"""Extensions of the languages whose modules are named by path (TypeScript, JavaScript)."""
+PATH_MODULE_EXTENSIONS = (".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs", ".dart")
+"""Extensions of the languages whose modules are named by path (TypeScript, JavaScript, Dart)."""
 
 KNOWN_EXTENSIONS = (".py", *PATH_MODULE_EXTENSIONS)
 """Source extensions known without asking the parser; :func:`source_extensions`
@@ -51,6 +53,7 @@ _INDEX_BASENAME = "index"  # "pkg/index.ts" is the module "pkg", like "pkg/__ini
 
 # "foo.test.ts", "foo.spec.tsx", "foo.behavior.test.mts" (JavaScript too).
 _JS_TEST_FILE_RE = re.compile(r"\.(?:test|spec)\.(?:ts|tsx|mts|cts|js|jsx|mjs|cjs)$")
+_DART_TEST_FILE_RE = re.compile(r"_test\.dart$")  # "widget_test.dart"
 # package.json "main"/"bin" pointing at compiled output: source extensions to try instead.
 _COMPILED_TO_SOURCE = {".js": (".ts", ".tsx"), ".jsx": (".tsx",), ".mjs": (".mts",), ".cjs": (".cts",)}
 _BUILD_OUTPUT_DIRS = ("dist", "build", "out", "lib")  # tried as "src/" when the path itself is not indexed
@@ -74,11 +77,13 @@ PERIPHERAL_PENALTY = 30
 PERIPHERAL_DIRS = ("experiments", "examples", "scripts/fixtures", "benchmarks", "docs", "website")
 """Directories (matched at any depth) whose entry points are demos, fixtures or tooling."""
 SOURCE_DIR_NAME = "src"
+DART_SOURCE_DIR_NAME = "lib"  # Dart/Flutter source root (package:foo/ maps to lib/)
+_DART_EXTENSION = ".dart"
 _PERIPHERAL_PARTS = tuple(tuple(d.split("/")) for d in PERIPHERAL_DIRS)
 
 # Display names of FileRecord.language values (TSX is TypeScript).
-LANGUAGE_NAMES = {"python": "Python", "typescript": "TypeScript", "tsx": "TypeScript", "javascript": "JavaScript"}
-DIRECTORY_PACKAGE_LANGUAGES = frozenset({"TypeScript", "JavaScript"})
+LANGUAGE_NAMES = {"python": "Python", "typescript": "TypeScript", "tsx": "TypeScript", "javascript": "JavaScript", "dart": "Dart"}
+DIRECTORY_PACKAGE_LANGUAGES = frozenset({"TypeScript", "JavaScript", "Dart"})
 """Languages (display names) whose modules are grouped by directory rather than importable package."""
 
 # Language of a package.json "bin" target that is not indexed, by extension or shebang interpreter.
@@ -154,16 +159,24 @@ def path_module_name(path: str) -> Optional[str]:
 def is_test_path(path: str) -> bool:
     """True for test code: under a ``tests/``, ``test/`` or ``__tests__/`` dir,
     ``test_*.py``, ``*_test.py``, ``conftest.py``, and TypeScript/JavaScript
-    ``*.test.ts``/``*.spec.ts`` (any of their extensions: ``.tsx``, ``.mts``, ``.js``, ...)."""
+    ``*.test.ts``/``*.spec.ts`` (any of their extensions: ``.tsx``, ``.mts``, ``.js``, ...)
+    and Dart ``*_test.dart`` (also under ``integration_test/``)."""
     parts = path.split("/")
     base = parts[-1]
     if any(part in TEST_DIR_NAMES for part in parts[:-1]):
         return True
+    if base.endswith(_DART_EXTENSION) and any(part in DART_TEST_DIR_NAMES for part in parts[:-1]):
+        return True
+    if base.endswith(_DART_EXTENSION) and "lib" in parts[:-1]:
+        # Dart: library code under lib/ is product code even when named *_test.dart or
+        # test_*.dart (e.g. Flame's flame_test package); `dart test` scans test/ only.
+        return False
     return (
         base.startswith("test_")
         or base.endswith("_test.py")
         or base == "conftest.py"
         or _JS_TEST_FILE_RE.search(base) is not None
+        or _DART_TEST_FILE_RE.search(base) is not None
     )
 
 
@@ -434,9 +447,9 @@ def find_entry_points(index: RepoIndex) -> list[EntryPoint]:
     for path in candidates:
         parts = path.split("/")
         if parts[-1] in ENTRY_FILENAMES:
-            add(path, f"{REASON_FILENAME_PREFIX}`{parts[-1]}`", _name_score(parts[:-1]))
+            add(path, f"{REASON_FILENAME_PREFIX}`{parts[-1]}`", _name_score(parts[:-1], parts[-1]))
         elif len(parts) > 1 and parts[-2] == BIN_DIR_NAME:
-            add(path, f"{REASON_FILENAME_PREFIX}`{BIN_DIR_NAME}/{parts[-1]}`", _name_score(parts[:-2]))
+            add(path, f"{REASON_FILENAME_PREFIX}`{BIN_DIR_NAME}/{parts[-1]}`", _name_score(parts[:-2], parts[-1]))
 
     entries = [
         EntryPoint(path, "; ".join(reasons[path]), scores[path] - _peripheral_penalty(path), path not in unindexed)
@@ -446,9 +459,15 @@ def find_entry_points(index: RepoIndex) -> list[EntryPoint]:
     return entries
 
 
-def _name_score(directory: list[str]) -> int:
-    """Score of a conventional file name found in ``directory`` (path components)."""
+def _name_score(directory: list[str], filename: str = "") -> int:
+    """Score of a conventional file name found in ``directory`` (path components).
+
+    A Dart file in ``lib/`` counts as directly in the source root (``lib/main.dart``),
+    like a file in ``src/``; ``lib`` stays an ordinary directory for other languages.
+    """
     at_source_root = not directory or directory[-1] == SOURCE_DIR_NAME
+    if directory and directory[-1] == DART_SOURCE_DIR_NAME and filename.endswith(_DART_EXTENSION):
+        at_source_root = True
     return SCORE_NAME_AT_SOURCE_ROOT if at_source_root else SCORE_NAME_NESTED
 
 

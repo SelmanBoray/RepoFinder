@@ -401,3 +401,22 @@ def test_overview_counts_the_repository_root_apart_from_directories() -> None:
         "`r` has 1 source file, all TypeScript, in the repository root: the repository root (1 file). "
         "0 files are tests."
     )
+
+
+def test_dart_symbols_are_counted_and_listed() -> None:
+    def d(q: str, kind: str, s: int, e: int, parent: str | None = None) -> Symbol:
+        return Symbol(f"lib/a.dart::{q}", "lib/a.dart", q.rsplit(".", 1)[-1], q, kind, s, e, q, None, parent)
+
+    index = RepoIndex(
+        name="dartdemo", root="Z:/no/such/checkout", source="https://github.com/o/dartdemo",
+        files=[FileRecord("lib/a.dart", "dart", 400, 40, True)],
+        symbols=[
+            d("_Asset", "class", 1, 10), d("_Asset.value=", "method", 2, 3, "_Asset"),
+            d("_Asset.operator ==", "method", 4, 5, "_Asset"), d("on String", "class", 12, 20),
+            d("Color", "enum", 21, 25), d("Id", "type", 26, 26), d("main", "function", 27, 30),
+        ],
+    )
+    md = render_map(index, build_graph(index))
+    assert "7 symbols" in md
+    core = section(md, "## Core modules")
+    assert "`on String`, `Color`, `main`" in core  # private `_Asset` sorts last and is cut at three names

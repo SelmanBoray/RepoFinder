@@ -6,7 +6,8 @@ file extensions it handles, how to load its grammar, and an extractor that turns
 a syntax tree into :class:`Symbol` and :class:`ImportEdge` records, and a
 resolver that maps its import edges to repository files. Python (``.py``) and
 TypeScript (``typescript``: ``.ts``/``.mts``/``.cts``; ``tsx``: ``.tsx``) are
-implemented.
+implemented, and Dart (``.dart``, :mod:`repofinder.parser_dart`) when the optional
+language pack is installed.
 
 Public contract:
 
@@ -31,6 +32,13 @@ import tree_sitter_typescript
 from tree_sitter import Language, Node, Parser, Query, QueryCursor, Tree
 
 from .models import FileRecord, ImportEdge, RepoIndex, Symbol
+from .parser_dart import (
+    DartGrammarUnavailable,
+    dart_grammar,
+    dart_grammar_available,
+    dart_resolver,
+    extract_dart,
+)
 
 DOCSTRING_MAX_CHARS = 400
 _BOM = chr(0xFEFF)
@@ -125,7 +133,8 @@ def parse_file(root: Path, path: Path) -> tuple[FileRecord, list[Symbol], list[I
     as produced by ``root / "file.py"``. Syntax errors do not raise:
     tree-sitter always produces a tree, ``FileRecord.parse_ok`` is set to False
     when it contains errors, and whatever symbols were recovered are returned.
-    I/O errors and unsupported file types do raise.
+    A Dart file whose grammar cannot be downloaded also gets ``parse_ok=False``,
+    without symbols. I/O errors and unsupported file types do raise.
     """
     root = Path(root)
     path = Path(path)
@@ -148,7 +157,12 @@ def parse_file(root: Path, path: Path) -> tuple[FileRecord, list[Symbol], list[I
         text = text[len(_BOM):]
     data = text.encode("utf-8")
 
-    tree = _get_parser(spec.name).parse(data)
+    try:
+        parser = _get_parser(spec.name)
+    except DartGrammarUnavailable:  # warned once; the file stays indexed, without symbols
+        record = FileRecord(rel_path, spec.name, len(raw), count_lines(raw), parse_ok=False)
+        return record, [], []
+    tree = parser.parse(data)
     source = SourceFile(root=root_abs, abs_path=abs_path, rel_path=rel_path, data=data)
     symbols, imports = spec.extractor(source, tree)
 
@@ -1343,3 +1357,14 @@ register_language(
         resolver=_typescript_resolver,
     )
 )
+# Dart needs the optional language pack; without it ".dart" stays an unknown extension.
+if dart_grammar_available():
+    register_language(
+        LanguageSpec(
+            name="dart",
+            extensions=(".dart",),
+            grammar=dart_grammar,
+            extractor=extract_dart,
+            resolver=dart_resolver,
+        )
+    )

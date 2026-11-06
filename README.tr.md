@@ -4,7 +4,7 @@
 RepoFinder, büyük bir açık kaynak projeye katkıda bulunmadan önce o projede
 yolunuzu bulmanıza yardım eder. Ona bir GitHub deposu verdiğinizde bir mimari
 haritası çizer ve "X özelliği nerede uygulanmış?" sorusunu koda işaret eden
-`path:start-end` alıntılarıyla yanıtlar. Python ve TypeScript projelerini okur.
+`path:start-end` alıntılarıyla yanıtlar. Python ve TypeScript projelerini okur (Dart isteğe bağlı).
 
 ## Kurulum
 
@@ -130,7 +130,7 @@ yaklaşık 80), bu yüzden önce `--limit 10` ile deneyin.
 
 | Komut | Ne yapar |
 | --- | --- |
-| `repofinder index <source> [--refresh]` | Klonlar (URL ise) ve Python ile TypeScript dosyalarını indeksler. `--refresh` mevcut bir indeksi yeniden oluşturur ve hâlâ var olan dosyaların özetlerini korur. |
+| `repofinder index <source> [--refresh]` | Klonlar (URL ise) ve Python ile TypeScript dosyalarını (`dart` ekstrasıyla Dart da) indeksler. `--refresh` mevcut bir indeksi yeniden oluşturur ve hâlâ var olan dosyaların özetlerini korur. |
 | `repofinder map <source> [--out FILE] [--max-modules N]` | Markdown biçiminde mimari haritası: giriş noktaları, fan-in'e göre çekirdek modüller, paket düzeni, sıcak noktalar ve nereden başlanacağı. |
 | `repofinder ask <source> "question" [-k N] [--show-context] [--decisions jev\|rules] [--candidates N] [--json]` | Alıntılarla yanıt verir. `-k` kaç arama sonucunun bağlama gireceğini belirler (varsayılan 8); `--show-context` Claude'a gönderilen kesitleri listeler; `--decisions` bu çalıştırma için karar katmanını seçer (varsayılan: kuruluysa Jev, değilse kurallar); Jev ile, en üstteki `-k` sonuç bağlama girmeden önce tek bir çağrı ilk `--candidates` sonucu yeniden sıralar (varsayılan 16, en fazla 16); `--json` şunları yazdırır: `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage`, `elapsed_s`, `decisions` (`name`, `calls`, `cost_usd`, `reranked`, `off_target`, `error`), `candidates` ve `probabilities` (`path:start-end`'den p'ye). |
 | `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | Kod hakkında bir sohbet; stdin'den her satırda bir mesaj okunur (bkz. [Sohbet modu](#sohbet-modu)). `-k` arama başına sonuç sayısını belirler (varsayılan 8); `--decisions` bu çalıştırma için karar katmanını seçer. `/context` son aramanın kesitlerini listeler, `/route` son mesajın nasıl yönlendirildiğini gösterir, `/help` komutları listeler, `/quit` ya da girdinin sonu sohbetten çıkarır. `--json` her tur için satır başına bir JSON nesnesi yazdırır (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). `you>` istemi yalnızca terminalde yazarken gösterilir; böylece pipe ile aktarılan çıktı temiz kalır. |
@@ -186,7 +186,7 @@ requests'te 0.59'dan 0.88'e çıkarır
 
 ## Nasıl çalışır
 
-Tree-sitter her Python ve TypeScript dosyasını sınıflara, fonksiyonlara,
+Tree-sitter her Python ve TypeScript dosyasını (kuruluysa Dart da) sınıflara, fonksiyonlara,
 metotlara ve import'lara ayrıştırır; bunlar bir import grafiğiyle (fan-in, fan-out, giriş
 noktaları) birlikte bir SQLite veritabanında saklanır. Bir soru, en iyi
 sembolleri ve dosyaları döndüren sözcüksel bir aramayla (sembol adları,
@@ -219,9 +219,27 @@ indeksleme 5,4 sn sürdü ve 12,5 MB'lık indekste 15.267 sembol üretti; 59
 dosya ayrıştırılamadı (tree-sitter 0.23 `importOriginal<typeof import("x")>()`
 ifadesini okuyamıyor); arama anında yanıt verir.
 
+Dart (`.dart`) isteğe bağlıdır: `pip install -e ".[dart]"` ile kurulur. İlk
+`.dart` dosyası işlendiğinde gramer indirilir (yaklaşık 22 MB, tek sefer,
+sonra önbellekten), yani bu adım bir kez ağ gerektirir. Ekstra kurulu değilse
+`.dart` dosyaları atlanır; Python ve TypeScript etkilenmez. Dart 3.13
+sözdizimi okunur (primary constructor dahil). Üretilmiş dosyalar
+(`*.g.dart`, `*.freezed.dart`, `*.mocks.dart`, `*.gr.dart`, `*.pb.dart`)
+atlanır; liste yalnızca bunlardır, diğer üretilmiş Dart dosyaları indekslenir.
+Mixin, extension ve extension type sınıf olarak; getter, setter,
+operator ve kurucular metot olarak indekslenir. Üst düzey değişkenler sembol
+olarak çıkarılmaz. Dart'ta arama kalitesi henüz ölçülmedi.
+
+`dart` ekstrasının güven ve çevrimdışı kullanım açısından anlamı: gramer,
+`tree-sitter-language-pack`'in bir GitHub release'inden indirdiği ve yerel kod
+olarak yüklediği bir kütüphanedir. Sabitlenen `tree-sitter-language-pack==1.23.1`
+indirilen ikilinin baytlarını sabitlemez ve RepoFinder yüklemeden önce kendi
+özet denetimini yapmaz. Gramer indirilemezse `.dart` dosyaları indekse
+sembolsüz kaydedilir; bağlantı gelince `repofinder index --refresh` bunu düzeltir.
+
 ## Sınırlamalar
 
-- Şimdilik yalnızca Python ve TypeScript; JavaScript henüz ayrıştırılmıyor
+- Şimdilik yalnızca Python ve TypeScript (isteğe bağlı Dart); JavaScript henüz ayrıştırılmıyor
   (diğer diller için bir ayrıştırıcı kaydı gerekir).
 - Getirme işlemi anlamsal değil sözcükseldir: sorunun kodla ortak sözcükleri
   olmalıdır (tanımlayıcılar, docstring'ler, dosya adları). Yanıt yanlış

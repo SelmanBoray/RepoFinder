@@ -68,6 +68,10 @@ _BOM = "\ufeff"
 _LOCALS = ".<locals>."
 _PYTHON_SUFFIXES = (".py", ".pyi")
 _CLASS_KEYWORD_RE = re.compile(r"\bclass\b")
+# Dart's class-like declarations: ``mixin M {``, ``extension E on X {`` and ``enum`` headers have no
+# ``class`` keyword (``mixin class`` and ``extension type`` are matched by their first word).
+_DART_SUFFIXES = (".dart",)
+_DART_KEYWORDS = frozenset({"class", "mixin", "extension", "enum"})
 _COMMENT_PREFIXES = ("//", "/*", "*")
 
 
@@ -118,7 +122,8 @@ def build_chunks(ws_root: Path, index: RepoIndex, hits: list[Hit], max_chars: in
             if cls is not None and (cls.path, cls.start_line) not in headers_done:
                 end = class_header_end(lines, cls)
                 if end is not None and end - cls.start_line + 1 < CLASS_HEADER_MAX_LINES:
-                    header = _Range(cls.path, cls.start_line, end, f"{cls.qualname} (class header)")
+                    what = "enum" if cls.kind == "enum" else "class"
+                    header = _Range(cls.path, cls.start_line, end, f"{cls.qualname} ({what} header)")
         added_header = builder.add_group(header, symbol_ranges(target, lines))
         if added_header and header is not None:
             headers_done.add((header.path, header.start))
@@ -244,21 +249,81 @@ def _brace_header_end(lines: list[str], cls: Symbol) -> Optional[int]:
     the first ``{`` from the ``class`` keyword on (decorators and comment lines
     before it are skipped). ``None`` when there is none within
     ``HEADER_SCAN_LINES`` lines."""
+    if cls.path.endswith(_DART_SUFFIXES):
+        return _dart_header_end(lines, cls)
     start = cls.start_line
     stop = min(cls.end_line, start + HEADER_SCAN_LINES - 1, len(lines))
     seen_keyword = False
+    keyword_re = _CLASS_KEYWORD_RE
     for number in range(start, stop + 1):
         line = lines[number - 1]
         if not seen_keyword:
             if line.lstrip().startswith(_COMMENT_PREFIXES):
                 continue
-            keyword = _CLASS_KEYWORD_RE.search(line)
+            keyword = keyword_re.search(line)
             if keyword is None:
                 continue
             seen_keyword = True
             line = line[keyword.end():]
         if "{" in line:
             return number
+    return None
+
+
+def _dart_header_end(lines: list[str], cls: Symbol) -> Optional[int]:
+    """The line that ends a Dart class-like header: the ``{`` that opens the body, or the ``;`` of a
+    bodiless declaration (``sealed class A<T>(var T v);``). Braces inside ``(...)`` (named parameters,
+    default values), strings and comments do not count, so primary constructors such as
+    ``class const A({required this.x}) extends B {`` end on the real body brace."""
+    start = cls.start_line
+    stop = min(cls.end_line, start + HEADER_SCAN_LINES - 1, len(lines))
+    text = "\n".join(lines[start - 1 : stop])
+    n = len(text)
+    i = 0
+    line = start
+    depth = 0
+    seen_keyword = False
+    while i < n:
+        c = text[i]
+        if c == "\n":
+            line += 1
+        elif text.startswith("//", i):
+            j = text.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        elif text.startswith("/*", i):
+            j = text.find("*/", i + 2)
+            end = n if j < 0 else j + 2
+            line += text.count("\n", i, end)
+            i = end
+            continue
+        elif c in "'\"":
+            raw = i > 0 and text[i - 1] == "r"
+            quote = text[i:i + 3] if text.startswith(c * 3, i) else c
+            i += len(quote)
+            while i < n and not text.startswith(quote, i):
+                if text[i] == "\\" and not raw:
+                    i += 1
+                if i < n and text[i] == "\n":
+                    line += 1
+                i += 1
+            i += len(quote)
+            continue
+        elif c.isalpha() or c == "_":
+            j = i
+            while j < n and (text[j].isalnum() or text[j] in "_$"):
+                j += 1
+            if depth == 0 and text[i:j] in _DART_KEYWORDS:
+                seen_keyword = True
+            i = j
+            continue
+        elif c in "([":
+            depth += 1
+        elif c in ")]":
+            depth = max(0, depth - 1)
+        elif seen_keyword and depth == 0 and c in "{;":
+            return line
+        i += 1
     return None
 
 
@@ -301,7 +366,10 @@ class _SymbolTable:
     def enclosing_class(self, method: Symbol) -> Optional[Symbol]:
         if not method.parent:
             return None
-        return self._containing(method.path, method.parent, method, kind="class")
+        found = self._containing(method.path, method.parent, method, kind="class")
+        if found is None and method.path.endswith(_DART_SUFFIXES):  # Dart members of an enum
+            found = self._containing(method.path, method.parent, method, kind="enum")
+        return found
 
 
 # --------------------------------------------------------------------------- #

@@ -23,6 +23,8 @@ repofinder = "repofinder.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest"]
+# Dart is optional: the grammar revision is tied to the exact package version
+dart = ["tree-sitter-language-pack==1.23.1"]
 # kept for compatibility; typesafe-sdk is now a core dependency
 jev = []
 

@@ -376,3 +376,112 @@ def test_typescript_chunks_are_sliced_by_line_range(make_repo) -> None:
     ]
     assert chunks[0].text == "@sealed\nexport class Widget extends Base {"
     assert chunks[2].text.splitlines()[0] == "export function helper(a: string): string {"
+
+
+DART_MOD = """/// Assets.
+class _Asset<T extends Object>
+    extends Base
+    implements Other {
+  final int value;
+  int get size => value;
+}
+
+mixin Walker on Animal {
+  void walk() {}
+}
+
+extension StringX on String {
+  int get n => length;
+}
+
+enum Color { red, green }
+"""
+
+
+def _dart(qualname: str, kind: str, start: int, end: int, parent: str | None = None) -> Symbol:
+    name = qualname.rsplit(".", 1)[-1]
+    return Symbol(f"a.dart::{qualname}", "a.dart", name, qualname, kind, start, end, qualname, None, parent)
+
+
+def test_dart_class_header_ends_at_the_opening_brace() -> None:
+    lines = split_lines(DART_MOD)
+    assert class_header_end(lines, _dart("_Asset", "class", 2, 7)) == 4
+    assert class_header_end(lines, _dart("Walker", "class", 9, 11)) == 9
+    assert class_header_end(lines, _dart("on String", "class", 13, 15)) == 13
+    assert class_header_end(lines, _dart("Color", "enum", 17, 17)) == 17
+    # not a Python file: "mixin" only counts in Dart
+    ts = Symbol("a.ts::Walker", "a.ts", "Walker", "Walker", "class", 9, 11, "", None, None)
+    assert class_header_end(lines, ts) is None
+
+
+def test_dart_method_chunk_gets_class_header(make_repo) -> None:
+    root = make_repo({"a.dart": DART_MOD})
+    cls = _dart("Walker", "class", 9, 11)
+    walk = _dart("Walker.walk", "method", 10, 10, "Walker")
+    ops = _dart("Walker.operator ==", "method", 10, 10, "Walker")
+    index = RepoIndex("r", str(root), "r", files=[FileRecord("a.dart", "dart", len(DART_MOD), 18, True)],
+                      symbols=[cls, walk, ops])
+    chunks = build_chunks(root, index, [_hit(walk), _hit(ops)], 100_000)
+    assert chunks and "mixin Walker on Animal {" in chunks[0].text
+    assert "Walker (class header)" in chunks[0].label
+
+
+def test_dart_header_skips_braces_inside_parentheses_strings_and_comments() -> None:
+    def end(src: str, kind: str = "class") -> int | None:
+        lines = split_lines(src)
+        return class_header_end(lines, _dart("A", kind, 1, len(lines)))
+
+    flame = (
+        "class const AnchorPicker({\n"
+        "  required final String anchor,\n"
+        "  required final ValueChanged<String> onSelected,\n"
+        "  super.key,\n"
+        "}) extends StatelessWidget {\n"
+        "  final int x = 1;\n"
+        "}\n"
+    )
+    assert end(flame) == 5
+    assert end("sealed class _Asset<T>(var T value);\n") == 1
+    assert end("sealed class _Asset<T>(\n  var T value,\n);\n") == 3
+    assert end("extension type Foo({int x}) {\n  int get y => x;\n}\n", "class") == 1
+    assert end("extension type const Foo(int x) implements int {\n}\n") == 1
+    assert end("enum LayerFill() {\n  a;\n}\n", "enum") == 1
+    assert end("class A({String s = '{', Map m = const {}}) // {\n    extends B /* { */ {\n}\n") == 2
+    assert end("@Foo('class X {')\nclass A\n    extends B {\n}\n") == 3
+    assert end("class A extends B\n") is None
+
+
+DART_ENUM = """\
+/// Kinds.
+enum Kind {
+  a(0),
+  b(1);
+
+  const Kind(this.v);
+  final int v;
+
+  factory Kind.of(int v) => a;
+}
+"""
+
+
+def test_dart_enum_member_chunk_gets_enum_header(make_repo) -> None:
+    root = make_repo({"a.dart": DART_ENUM})
+    enum = _dart("Kind", "enum", 2, 11)
+    of = _dart("Kind.of", "method", 10, 10, "Kind")
+    index = RepoIndex("r", str(root), "r", files=[FileRecord("a.dart", "dart", len(DART_ENUM), 11, True)],
+                      symbols=[enum, of])
+    chunks = build_chunks(root, index, [_hit(of)], 100_000)
+    assert [c.label for c in chunks] == ["Kind (enum header)", "Kind.of"]
+    assert chunks[0].start_line == chunks[0].end_line == 2  # the header ends at the brace, values are not pulled in
+
+
+def test_non_dart_enum_parent_gets_no_header(make_repo) -> None:
+    src = "enum Kind {\n  A,\n  B,\n}\nfunction f() {}\n"
+    root = make_repo({"a.ts": src})
+    enum = Symbol("a.ts::Kind", "a.ts", "Kind", "Kind", "enum", 1, 4, "", None, None)
+    m = Symbol("a.ts::Kind.f", "a.ts", "f", "Kind.f", "method", 2, 2, "", None, "Kind")
+    index = RepoIndex("r", str(root), "r", files=[FileRecord("a.ts", "typescript", len(src), 5, True)],
+                      symbols=[enum, m])
+    chunks = build_chunks(root, index, [_hit(m)], 100_000)
+    assert [c.label for c in chunks] == ["Kind.f"]

@@ -353,3 +353,34 @@ def test_files_over_the_size_limit_are_counted_not_recorded(make_repo, caplog) -
         index = build_index(root, "r", str(root))
     assert [f.path for f in index.files] == ["ok.py"]
     assert "skipped 2 files larger than 2 MiB: big.py, pkg/huge.py" in caplog.text
+
+
+def test_dart_repo_skip_rules(make_repo, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(parser.LANGUAGES, "dart", _stub_language("dart", (".dart",)))
+    generated = ["a.g.dart", "a.freezed.dart", "a.mocks.dart", "a.gr.dart", "a.pb.dart"]
+    files: dict[str, str | bytes] = {f"lib/src/{n}": "// generated\n" for n in generated}
+    files.update(
+        {
+            ".dart_tool/package_config/x.dart": "void x() {}\n",   # dot directory
+            "build/app/outputs/gen.dart": "void g() {}\n",          # Flutter build output
+            "lib/main.dart": "void main() {}\n",
+            "lib/src/model.dart": "class M {}\n",
+            "lib/src/graph.dart": "class G {}\n",                  # "g.dart" is not a generated suffix
+            "test/widget_test.dart": "void main() {}\n",
+            "integration_test/app_test.dart": "void main() {}\n",
+            "android/app/src/main/Gen.kt": "class Gen\n",          # platform folders hold no .dart
+            "ios/Runner/AppDelegate.swift": "import UIKit\n",
+            "pubspec.yaml": "name: x\n",
+        }
+    )
+    root = make_repo(files)
+    got = [p.relative_to(root).as_posix() for p in iter_source_files(root)]
+    assert got == [
+        "integration_test/app_test.dart",
+        "lib/main.dart",
+        "lib/src/graph.dart",
+        "lib/src/model.dart",
+        "test/widget_test.dart",
+    ]
+    scan = ingest.scan_source_files(root)
+    assert scan.minified == sorted(f"lib/src/{n}" for n in generated)

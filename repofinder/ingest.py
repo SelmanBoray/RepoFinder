@@ -66,8 +66,12 @@ files: there it holds installed dependencies (npm, Go modules, Composer,
 Bundler). Elsewhere, e.g. in a Python project that vendors and patches code it
 imports, ``vendor/`` is indexed like any other directory."""
 
-SKIP_FILE_SUFFIXES = (".min.js", ".min.mjs", ".min.cjs")
-"""Minified bundles: never indexed, whatever languages are registered."""
+SKIP_FILE_SUFFIXES = (
+    ".min.js", ".min.mjs", ".min.cjs",
+    # generated Dart (build_runner, json_serializable, freezed, mockito, auto_route, protobuf)
+    ".g.dart", ".freezed.dart", ".mocks.dart", ".gr.dart", ".pb.dart",
+)
+"""Minified bundles and generated Dart code: never indexed, whatever languages are registered."""
 
 CLONE_TIMEOUT_SECONDS = 600
 

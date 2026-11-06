@@ -17,7 +17,7 @@ SymbolKind = Literal["function", "class", "method", "interface", "type", "enum",
 @dataclass
 class FileRecord:
     path: str          # repo-relative, POSIX separators ("src/flask/app.py")
-    language: str      # "python", "typescript", "tsx"
+    language: str      # "python", "typescript", "tsx", "dart"
     size: int          # bytes
     n_lines: int
     parse_ok: bool     # False if tree-sitter reported errors; symbols may be partial

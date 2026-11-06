@@ -448,7 +448,7 @@ _FENCE_LANGUAGES = {
     ".ts": "typescript", ".tsx": "tsx",
     ".go": "go", ".rs": "rust", ".java": "java", ".kt": "kotlin", ".rb": "ruby",
     ".c": "c", ".h": "c", ".cc": "cpp", ".cpp": "cpp", ".hpp": "cpp", ".cs": "csharp",
-    ".php": "php", ".swift": "swift", ".scala": "scala",
+    ".php": "php", ".swift": "swift", ".scala": "scala", ".dart": "dart",
     ".sh": "bash", ".bash": "bash", ".ps1": "powershell",
     ".toml": "toml", ".json": "json", ".yaml": "yaml", ".yml": "yaml",
     ".ini": "ini", ".cfg": "ini", ".md": "markdown", ".rst": "rst",
