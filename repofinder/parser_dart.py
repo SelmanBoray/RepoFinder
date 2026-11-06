@@ -4,7 +4,9 @@ The grammar comes from ``tree-sitter-language-pack``, an optional dependency
 (``repofinder[dart]``). Without the package ``dart`` is not registered and
 ``.dart`` files are skipped like any other unknown extension. With the package
 the grammar is fetched on first use, not on import: it is a native library the
-pack downloads from its GitHub release once and caches on disk.
+pack downloads from its GitHub release once and caches on disk. The pack only
+downloads it; this module checks the cached bytes against a SHA-256 in the code
+and loads the library itself, see :func:`dart_grammar`.
 
 This module imports nothing from :mod:`repofinder.parser`, which imports it.
 
@@ -23,17 +25,25 @@ ones get ``#2``, ``#3`` in source order (``C.operator -`` and ``C.operator -#2``
 
 from __future__ import annotations
 
+import contextlib
+import hashlib
+import os
+import platform
 import posixpath
 import re
 import sys
+import sysconfig
+import tempfile
 import threading
 from typing import TYPE_CHECKING, Iterator, Optional
 
-from tree_sitter import Node, Tree
+from tree_sitter import Language, Node, Tree
 
 from .models import FileRecord, ImportEdge, Symbol
 
 if TYPE_CHECKING:
+    import ctypes  # imported where it is used: not every Python build has it
+
     from .parser import Resolver, SourceFile
 
 # The limits of repofinder.parser, which cannot be imported from here.
@@ -47,15 +57,49 @@ _SIGNATURE_MAX_CHARS = 200
 
 
 class DartGrammarUnavailable(RuntimeError):
-    """The package is installed but the grammar cannot be loaded (no network on first use)."""
+    """The package is installed but the grammar cannot be loaded.
 
+    No network on first use, or the library failed the checks of :func:`dart_grammar`.
+    """
+
+
+# The only pack version the digests below are valid for. pyproject.toml pins the same.
+_PACK_VERSION = "1.23.1"
+
+# Platform name as in the pack's manifest -> library file in its cache, SHA-256 of that file.
+# These are digests of the library itself, the bytes that get loaded, not of the bundle
+# the pack downloads. Taken on 2026-11-06 from the assets parsers-<platform>.tar.zst of
+# https://github.com/xberg-io/tree-sitter-language-pack/releases/tag/v1.23.1 : each bundle
+# had the digest GitHub's release API reports and parsers.json lists, the library was
+# extracted from it and hashed, never run. The windows-x86_64 digest also equals the DLL
+# the pack had cached on 2026-11-05. The release is not immutable, so this says what the
+# release held on that day, not that its author built it; a later change no longer loads.
+# A new pack version needs a new table: until then every platform stays closed.
+_GRAMMAR_PINS = {
+    "linux-aarch64": ("libtree_sitter_dart.so", "ce369a2aca21685a509d6df49473aae64196ad77f334093712c6b92a8abc4136"),
+    "linux-x86_64": ("libtree_sitter_dart.so", "e07263ec181ae0d7559d2866f3ca172ca05bc77836bc865d3c7feec3def12999"),
+    "macos-arm64": ("libtree_sitter_dart.dylib", "82dad243a6a459f31df9b53eef441a8ee686669fd9d60716008cc52d2985de73"),
+    "macos-x86_64": ("libtree_sitter_dart.dylib", "16e5670d56f50ceebb7d5281932a947f53ed031098cbdd00bf8065c4b6b1dd26"),
+    "windows-aarch64": ("tree_sitter_dart.dll", "be8020f3241389624cbb89746c8545175f2ca10433ba27732f7871bedca68225"),
+    "windows-x86_64": ("tree_sitter_dart.dll", "9861a47cc5428a0ee66cba7d49d725ad249adfb0e2eb313ec4f2bd07565fbd63"),
+}
 
 _load_lock = threading.Lock()
-_language: object = None    # keeps the pack's Language object alive
+_library: object = None     # keeps the loaded grammar library alive
+_capsule: object = None
 _load_error: Optional[str] = None   # remembered so that a dead network is tried once per process
 
 # PyCapsule keeps a pointer to its name instead of copying it.
 _CAPSULE_NAME = b"tree_sitter.Language"
+
+# Where the pack looks for libraries besides its cache; see _download_without_loading.
+_LIBS_DIR_ENV = "TREE_SITTER_LANGUAGE_PACK_LIBS_DIR"
+
+# Windows API constants.
+_GENERIC_READ = 0x80000000
+_FILE_SHARE_READ = 0x00000001
+_OPEN_EXISTING = 3
+_LOAD_LIBRARY_SEARCH_SYSTEM32 = 0x00000800
 
 
 def dart_grammar_available() -> bool:
@@ -70,41 +114,194 @@ def dart_grammar_available() -> bool:
 def dart_grammar() -> object:
     """Grammar pointer for ``LanguageSpec.grammar``; the first call may download it.
 
-    Raises :class:`DartGrammarUnavailable`. The first failure prints one warning
+    This function loads the library only if the pack version is the expected one, the
+    platform has a pinned digest and the cached file has exactly that digest. Anything
+    else raises :class:`DartGrammarUnavailable`. The first failure prints one warning
     to stderr; later calls in the process raise at once without retrying.
+
+    The check stops a changed release asset and a changed or damaged file in the cache.
+    It is no defence against someone writing to this user's cache at the very moment
+    the file is checked or downloaded, see :func:`_download_without_loading` and
+    :func:`_hold_unchanged` for those limits.
     """
-    global _language, _load_error
+    global _library, _capsule, _load_error
     with _load_lock:
+        if _capsule is not None:
+            return _capsule
         if _load_error is not None:
             raise DartGrammarUnavailable(_load_error)
         try:
             import tree_sitter_language_pack as pack
 
-            language = pack.get_language("dart")
-            capsule = _language_capsule(language)
-        except Exception as exc:  # noqa: BLE001 - every pack error means "no grammar"
-            _load_error = f"cannot load the Dart grammar: {exc}"
+            library = _load_pinned_library(pack)
+            capsule = _language_capsule(library)
+            Language(capsule)  # a grammar this tree_sitter cannot use fails here, not in the parser
+        except Exception as exc:  # noqa: BLE001 - every pack or loader error means "no grammar"
+            reason = " ".join(str(exc).split())  # one warning, one line
+            _load_error = f"cannot load the Dart grammar: {reason}"
             print(f"repofinder: {_load_error}; .dart files get no symbols", file=sys.stderr)
             raise DartGrammarUnavailable(_load_error) from exc
-        _language = language
+        _library, _capsule = library, capsule
     return capsule
 
 
-def _language_capsule(language: object) -> object:
-    """Capsule around the pointer of a ``tree_sitter.Language``.
+def _load_pinned_library(pack: object) -> ctypes.CDLL:
+    """Load the pack's cached grammar library, after checking its bytes.
 
-    The pack hands out ``Language`` objects, but ``Language()`` in the parser
-    registry wants a capsule, like the ones from ``tree_sitter_python.language()``.
-    An int is no option: it overflows C ``long`` on Windows. The pointer is only
-    exposed as the hash; a wrong value would crash the process, hence the check
-    against the id in the repr. The pack's grammars stay loaded for the whole
-    process, so the capsule needs no destructor.
+    ``pack.get_language`` is not used: it loads whatever the cache holds, and on a
+    miss downloads and loads without asking. ``pack.download`` loads the file too if
+    it is there, and only extracts it if it is not, so it is called only for a missing
+    file. A file that fails the check stays where it is, the warning names it. The
+    bundle digest in the pack's ``parsers.json`` comes from the same place as the
+    bundle: it is no check here.
+    """
+    version = getattr(pack, "__version__", None)
+    if version != _PACK_VERSION:
+        raise RuntimeError(f"tree-sitter-language-pack {version} is installed, the grammar is pinned for {_PACK_VERSION}")
+    key = _platform_key()
+    pin = _GRAMMAR_PINS.get(key)
+    if pin is None:
+        raise RuntimeError(f"no pinned grammar digest for platform {key}")
+    filename, expected = pin
+    path = os.path.join(pack.cache_dir(), filename)  # type: ignore[attr-defined]
+    if not os.path.exists(path):
+        _download_without_loading(pack)
+        if not os.path.exists(path):
+            raise RuntimeError(f"{path} is missing after the download")
+    with _hold_unchanged(path) as (data, load_path):
+        actual = hashlib.sha256(data).hexdigest()
+        if actual != expected:
+            raise RuntimeError(
+                f"{path} has SHA-256 {actual}, expected {expected}: not loading it; "
+                "if it should be the release's file, delete it to download it again"
+            )
+        return _open_library(load_path)
+
+
+def _download_without_loading(pack: object) -> None:
+    """Have the pack extract the library into its cache, for a file found missing.
+
+    ``pack.download`` first tries to load the grammar, and only extracts it if that
+    finds nothing. It looks in ``$TREE_SITTER_LANGUAGE_PACK_LIBS_DIR``, else in a
+    directory fixed when the wheel was built. The variable also replaces that
+    directory, so it points to an empty one here. That works unless something in this
+    process has used the pack's registry before: it reads the variable once.
+
+    It also looks in the cache. Accepted limit: a file that appears there between the
+    caller's check and this call is loaded by the pack, unchecked, and its code runs
+    even though the digest check then refuses the file. This can happen whenever the
+    file is missing: on the first use of a cache, and again after a refused file was
+    deleted as the warning suggests. ``pack.download_all()`` and
+    ``pack.download_group("all")`` extract without trying to load, but no such call
+    exists for one language, and those two write all 372 libraries (512 MB on Windows).
+
+    Putting a file there at that moment takes write access to this user's cache
+    directory, so it normally means something already acts as this user or has been
+    given that directory. One case needs neither: if the release asset has changed and
+    two RepoFinder processes find the file missing at the same time, process B can load
+    what the pack just extracted for process A; A itself refuses it. The pin defends
+    against none of this. It stops a changed release asset outside that race, and a
+    damaged or replaced file that is already there when the check runs.
+    """
+    saved = os.environ.get(_LIBS_DIR_ENV)
+    with tempfile.TemporaryDirectory() as empty:
+        os.environ[_LIBS_DIR_ENV] = empty
+        try:
+            pack.download(["dart"])  # type: ignore[attr-defined]
+        finally:
+            if saved is None:
+                del os.environ[_LIBS_DIR_ENV]
+            else:
+                os.environ[_LIBS_DIR_ENV] = saved
+
+
+def _platform_key() -> str:
+    """This platform's name in the pack's manifest (``linux-x86_64``, ``macos-arm64``, ...).
+
+    The pack's name is fixed when its native module is compiled (``cfg!(target_arch)``
+    in ``DownloadManager::platform_key``), and pip picks the wheel by the interpreter,
+    so the interpreter's architecture counts, not the machine's. On Windows they differ
+    under emulation: ``platform.machine()`` says ARM64 for an x64 Python on ARM64, while
+    ``sysconfig.get_platform()`` tells how Python was built. Elsewhere ``uname`` follows
+    the process, also under Rosetta; only a 32-bit Python on a 64-bit kernel gets it
+    wrong, and no name with a 32-bit marker has a pin. A wrong name only keeps Dart closed.
+    """
+    system = {"win32": "windows", "darwin": "macos"}.get(sys.platform, sys.platform)
+    if sys.platform == "win32":
+        machine = sysconfig.get_platform().removeprefix("win-")  # amd64, arm64, win32
+    else:
+        machine = platform.machine().lower()
+        if sys.maxsize <= 2**32:
+            machine += "-32bit"
+    arch = {"amd64": "x86_64", "arm64": "aarch64"}.get(machine, machine)
+    if system == "macos" and arch == "aarch64":
+        arch = "arm64"
+    return f"{system}-{arch}"
+
+
+@contextlib.contextmanager
+def _hold_unchanged(path: str) -> Iterator[tuple[bytes, str]]:
+    """The bytes of ``path`` and the path to load them from, valid inside the block.
+
+    On Windows the handle allows others to read only, so until the block ends nobody
+    can write, rename or delete the file or rename a directory above it. The returned
+    path has no links left in it, so it leads to this same file. POSIX has no such
+    lock: between this read and ``dlopen`` someone with write access to the cache can
+    still swap the file, the same limit as in :func:`_download_without_loading`.
+    """
+    if sys.platform != "win32":
+        with open(path, "rb") as file:
+            yield file.read(), path
+        return
+
+    import ctypes
+    import msvcrt
+    from ctypes import wintypes
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)  # own instance: argtypes stay here
+    kernel32.CreateFileW.restype = wintypes.HANDLE
+    kernel32.CreateFileW.argtypes = (
+        wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p,
+        wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE,
+    )
+    kernel32.GetFinalPathNameByHandleW.restype = wintypes.DWORD
+    kernel32.GetFinalPathNameByHandleW.argtypes = (wintypes.HANDLE, wintypes.LPWSTR, wintypes.DWORD, wintypes.DWORD)
+
+    handle = kernel32.CreateFileW(path, _GENERIC_READ, _FILE_SHARE_READ, None, _OPEN_EXISTING, 0, None)
+    if handle == wintypes.HANDLE(-1).value:
+        raise OSError(f"cannot open {path}: {ctypes.FormatError(ctypes.get_last_error())}")
+    with os.fdopen(msvcrt.open_osfhandle(handle, os.O_RDONLY), "rb") as file:  # closes the handle
+        buffer = ctypes.create_unicode_buffer(32768)
+        if not kernel32.GetFinalPathNameByHandleW(handle, buffer, len(buffer), 0):
+            raise OSError(f"cannot resolve {path}: {ctypes.FormatError(ctypes.get_last_error())}")
+        yield file.read(), buffer.value
+
+
+def _open_library(path: str) -> ctypes.CDLL:
+    import ctypes
+
+    if sys.platform == "win32":
+        # The DLLs it imports come from System32 or are already loaded (vcruntime140 by
+        # Python itself), never from the cache directory next to it, which nothing checks.
+        return ctypes.CDLL(path, winmode=_LOAD_LIBRARY_SEARCH_SYSTEM32)
+    return ctypes.CDLL(path)
+
+
+def _language_capsule(library: ctypes.CDLL) -> object:
+    """Capsule around the grammar pointer, what ``Language()`` in the parser registry wants.
+
+    Like the ones from ``tree_sitter_python.language()``. An int is no option: it
+    overflows C ``long`` on Windows. :data:`_library` keeps the library loaded for
+    the whole process, so the capsule needs no destructor.
     """
     import ctypes
 
-    pointer = hash(language)
-    if f"id={pointer}," not in repr(language):
-        raise TypeError(f"unexpected tree_sitter.Language layout: {language!r}")
+    grammar = library.tree_sitter_dart
+    grammar.restype = ctypes.c_void_p
+    grammar.argtypes = ()
+    pointer = grammar()
+    if not pointer:
+        raise RuntimeError("tree_sitter_dart() returned NULL")
     new_capsule = ctypes.PYFUNCTYPE(ctypes.py_object, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_void_p)(
         ("PyCapsule_New", ctypes.pythonapi)
     )

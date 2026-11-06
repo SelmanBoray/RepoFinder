@@ -8,6 +8,11 @@ setters, operators, constructors) -> "method".
 
 from __future__ import annotations
 
+import hashlib
+import json
+import os
+import re
+import shutil
 import subprocess
 import sys
 import textwrap
@@ -35,22 +40,50 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Tests that run in separate processes do not need the grammar in this process.
 _NO_GRAMMAR_NEEDED = {
+    "test_without_ctypes_and_language_pack_python_and_typescript_work",
+    "test_without_ctypes_the_grammar_is_refused_and_python_works",
     "test_without_language_pack_dart_is_skipped_and_python_works",
     "test_import_parser_does_not_touch_the_network",
     "test_grammar_download_failure_gives_empty_record_and_one_warning",
 }
 
 
+# The pack's words for "the release could not be reached" (download.rs, v1.23.1). Its other
+# download errors, a changed bundle among them, mean something is wrong, not that we are offline.
+_NETWORK_FAILURES = (
+    "Failed to fetch manifest from",
+    "Failed to read manifest body",
+    "Failed to download ",
+    "Failed to read download body",
+)
+
+
 @pytest.fixture(autouse=True)
 def _require_grammar(request: pytest.FixtureRequest) -> None:
-    if request.node.name in _NO_GRAMMAR_NEEDED:
+    if request.node.name in _NO_GRAMMAR_NEEDED or request.node.name.startswith("test_pin_"):
         return
     if not parser_dart.dart_grammar_available():
         pytest.skip("Dart grammar unavailable: tree_sitter_language_pack cannot be imported")
     try:
-        parser_dart.dart_grammar()  # the first call may download the grammar
+        parser_dart.dart_grammar()  # like any first use, on a clean machine this downloads the verified grammar
     except parser_dart.DartGrammarUnavailable as exc:
-        pytest.skip(f"Dart grammar unavailable (download failed, no cache): {exc}")
+        _skip_or_fail_for_missing_grammar(exc)
+
+
+def _skip_or_fail_for_missing_grammar(error: parser_dart.DartGrammarUnavailable) -> None:
+    """Only a grammar that cannot be had may skip; a refused one must not look green."""
+    import tree_sitter_language_pack as pack
+
+    if pack.__version__ != parser_dart._PACK_VERSION:
+        pytest.fail(f"unexpected tree-sitter-language-pack version: {error}")
+    pin = parser_dart._GRAMMAR_PINS.get(parser_dart._platform_key())
+    if pin is None:
+        pytest.skip(f"Dart grammar unavailable (no pinned digest for this platform): {error}")
+    if (Path(pack.cache_dir()) / pin[0]).exists():
+        pytest.fail(f"the cached Dart grammar did not load: {error}")
+    if any(failure in str(error) for failure in _NETWORK_FAILURES):
+        pytest.skip(f"Dart grammar unavailable (download failed, no cache): {error}")
+    pytest.fail(f"the Dart grammar was not downloaded, and not for lack of a network: {error}")
 
 
 def _write(tmp_path: Path, source: str, name: str = "lib/a.dart") -> Path:
@@ -705,10 +738,11 @@ def test_empty_and_comment_only_files(tmp_path: Path) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def _run(code: str, *args: str) -> subprocess.CompletedProcess[str]:
+def _run(code: str, *args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, "-c", textwrap.dedent(code), *args],
         cwd=REPO_ROOT,
+        env=env,
         capture_output=True,
         text=True,
         timeout=120,
@@ -747,6 +781,57 @@ def test_without_language_pack_dart_is_skipped_and_python_works(tmp_path: Path) 
     )
     assert proc.returncode == 0, proc.stderr
     assert proc.stdout.strip() == "ok"
+
+
+def test_without_ctypes_and_language_pack_python_and_typescript_work(tmp_path: Path) -> None:
+    (tmp_path / "m.py").write_text("def f():\n    return 1\n", encoding="utf-8")
+    (tmp_path / "m.ts").write_text("export function g(): number { return 1; }\n", encoding="utf-8")
+    proc = _run(
+        """
+        import sys
+        sys.modules["ctypes"] = None  # a Python built without it
+        sys.modules["tree_sitter_language_pack"] = None
+        from pathlib import Path
+        import repofinder.parser as p
+        assert "dart" not in p.LANGUAGES, sorted(p.LANGUAGES)
+        root = Path(sys.argv[1])
+        rec, syms, _ = p.parse_file(root, root / "m.py")
+        assert rec.parse_ok and [s.qualname for s in syms] == ["f"]
+        rec, syms, _ = p.parse_file(root, root / "m.ts")
+        assert rec.parse_ok and [s.qualname for s in syms] == ["g"]
+        print("ok")
+        """,
+        str(tmp_path),
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert proc.stdout.strip() == "ok"
+
+
+def test_without_ctypes_the_grammar_is_refused_and_python_works(tmp_path: Path) -> None:
+    """With the pack installed: Dart stays closed, with one warning and without a crash."""
+    (tmp_path / "a.dart").write_bytes(b"class A {}\n")
+    (tmp_path / "m.py").write_bytes(b"def f():\n    return 1\n")
+    proc = _run(
+        """
+        import sys
+        import tree_sitter_language_pack  # imported first: only this module must do without ctypes
+        sys.modules["ctypes"] = None
+        from pathlib import Path
+        import repofinder.parser as p
+        root = Path(sys.argv[1])
+        rec, syms, edges = p.parse_file(root, root / "a.dart")
+        assert (rec.parse_ok, syms, edges) == (False, [], []), rec
+        rec, syms, _ = p.parse_file(root, root / "m.py")
+        assert rec.parse_ok and [s.qualname for s in syms] == ["f"]
+        print("ok")
+        """,
+        str(tmp_path),
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert proc.stdout.strip() == "ok"
+    warnings = [line for line in proc.stderr.splitlines() if line.strip()]
+    assert len(warnings) == 1, proc.stderr
+    assert "Dart" in warnings[0]
 
 
 def test_import_parser_does_not_touch_the_network() -> None:
@@ -805,6 +890,7 @@ def test_grammar_download_failure_gives_empty_record_and_one_warning(tmp_path: P
         print("ok")
         """,
         str(tmp_path),
+        env={**os.environ, "TREE_SITTER_LANGUAGE_PACK_CACHE_DIR": str(tmp_path / "empty_cache")},
     )
     assert proc.returncode == 0, proc.stderr
     assert proc.stdout.strip() == "ok"
@@ -1018,3 +1104,569 @@ def test_resolve_sdk_package_in_its_own_repository() -> None:
 )
 def test_resolve_known_limits_without_pubspec(files: list[str], src: str, uri: str, got: str | None) -> None:
     assert _resolve(files, src, uri) == got
+
+
+# --------------------------------------------------------------------------- #
+# Pinned grammar: only the exact expected bytes become native code (separate
+# processes, each with its own temporary cache; the real cache is only read)
+# --------------------------------------------------------------------------- #
+
+_PIN_PROBE = """
+    import ctypes, json, os, platform, shutil, sys
+    from pathlib import Path
+    import tree_sitter_language_pack as pack
+
+    root, libs, name = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+    library = libs / name
+    good = Path(sys.argv[4]) if sys.argv[4] else None
+
+    pack_loaders = []  # calling any of these would load without the check
+    for loader in ("get_language", "get_parser", "prefetch"):
+        setattr(pack, loader, lambda *a, _n=loader, **k: pack_loaders.append(_n))
+    downloads = []
+
+    opened = []
+    real_cdll = ctypes.CDLL
+    def spy_cdll(path, *args, **kwargs):
+        opened.append({"path": str(path), "kwargs": kwargs})
+        before_load(path)
+        return real_cdll(path, *args, **kwargs)
+    ctypes.CDLL = spy_cdll
+    def before_load(path):
+        pass
+
+    # SCENARIO
+
+    from repofinder import parser as p, parser_dart
+
+    try:
+        parser_dart.dart_grammar()
+        error = None
+    except parser_dart.DartGrammarUnavailable as exc:
+        error = str(exc)
+    rec, syms, _ = p.parse_file(root, root / "a.dart")
+    py_rec, py_syms, _ = p.parse_file(root, root / "m.py")
+
+    in_process = module_file = None
+    if os.name == "nt":  # what really happened, whatever the code above believes
+        kernel32 = ctypes.WinDLL("kernel32")
+        kernel32.GetModuleHandleW.restype = ctypes.c_void_p
+        kernel32.GetModuleHandleW.argtypes = (ctypes.c_wchar_p,)
+        handle = kernel32.GetModuleHandleW(name)
+        in_process = bool(handle)
+        if handle:
+            buffer = ctypes.create_unicode_buffer(32768)
+            kernel32.GetModuleFileNameW.argtypes = (ctypes.c_void_p, ctypes.c_wchar_p, ctypes.c_ulong)
+            kernel32.GetModuleFileNameW(handle, buffer, len(buffer))
+            module_file = buffer.value
+    print(json.dumps({
+        "error": error,
+        "opened": opened,
+        "pack_loaders": pack_loaders,
+        "downloads": downloads,
+        "in_process": in_process,
+        "module_file": module_file,
+        "parse_ok": rec.parse_ok,
+        "symbols": [s.qualname for s in syms],
+        "python_symbols": [s.qualname for s in py_syms],
+    }))
+"""
+
+
+def _pinned_grammar_file() -> Path:
+    """The real cached library, read-only, on a platform that has a pin."""
+    import tree_sitter_language_pack as pack
+
+    pin = parser_dart._GRAMMAR_PINS.get(parser_dart._platform_key())
+    if pin is None:
+        pytest.skip(f"no pin for {parser_dart._platform_key()}")
+    path = Path(pack.cache_dir()) / pin[0]
+    if not path.exists():
+        pytest.skip(f"{path} is not cached")
+    return path
+
+
+def _pin_probe(
+    tmp_path: Path,
+    content: bytes | None,
+    scenario: str = "",
+    good: Path | None = None,
+    env: dict[str, str] | None = None,
+) -> tuple[dict, list[str]]:
+    """Run the grammar in a new process on a cache holding ``content``; result, stderr lines."""
+    real = _pinned_grammar_file()
+    base = tmp_path / "cache"
+    libs = base / "tree-sitter-language-pack" / "v1.23.1" / "libs"
+    libs.mkdir(parents=True, exist_ok=True)
+    if content is not None:
+        (libs / real.name).write_bytes(content)
+    root = tmp_path / "repo"
+    root.mkdir()
+    (root / "a.dart").write_bytes(b"class A {}\n")
+    (root / "m.py").write_bytes(b"def f():\n    return 1\n")
+    code = textwrap.dedent(_PIN_PROBE).replace("# SCENARIO", textwrap.dedent(scenario))
+    proc = subprocess.run(
+        [sys.executable, "-c", code, str(root), str(libs), real.name, str(good) if good else ""],
+        cwd=REPO_ROOT,
+        env={**os.environ, "TREE_SITTER_LANGUAGE_PACK_CACHE_DIR": str(base), **(env or {})},
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert proc.returncode == 0, proc.stderr
+    return json.loads(proc.stdout), [line for line in proc.stderr.splitlines() if line.strip()]
+
+
+def _assert_not_loaded(result: dict, warnings: list[str]) -> None:
+    assert result["error"] is not None
+    assert result["opened"] == []
+    assert result["pack_loaders"] == []
+    assert result["in_process"] in (False, None)
+    # Indexing goes on: the file stays indexed, without symbols; other languages work.
+    assert (result["parse_ok"], result["symbols"]) == (False, [])
+    assert result["python_symbols"] == ["f"]
+    assert len(warnings) == 1, warnings
+    assert "Dart" in warnings[0]
+
+
+def _assert_loaded(result: dict, warnings: list[str]) -> None:
+    assert result["error"] is None
+    assert len(result["opened"]) == 1
+    assert result["pack_loaders"] == []
+    assert result["in_process"] in (True, None)
+    assert (result["parse_ok"], result["symbols"]) == (True, ["A"])
+    assert result["python_symbols"] == ["f"]
+    assert warnings == []
+
+
+def test_pin_the_real_cached_file_has_the_pinned_digest() -> None:
+    path = _pinned_grammar_file()
+    expected = parser_dart._GRAMMAR_PINS[parser_dart._platform_key()][1]
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == expected
+
+
+def test_pin_table_is_well_formed() -> None:
+    names = {"linux": "libtree_sitter_dart.so", "macos": "libtree_sitter_dart.dylib", "windows": "tree_sitter_dart.dll"}
+    assert parser_dart._PACK_VERSION == "1.23.1"
+    for key, (filename, digest) in parser_dart._GRAMMAR_PINS.items():
+        assert filename == names[key.partition("-")[0]]
+        assert re.fullmatch(r"[0-9a-f]{64}", digest), key
+    digests = [digest for _, digest in parser_dart._GRAMMAR_PINS.values()]
+    assert len(set(digests)) == len(digests)
+
+
+def test_pin_exact_file_is_loaded_and_downloads_nothing(tmp_path: Path) -> None:
+    good = _pinned_grammar_file().read_bytes()
+    result, warnings = _pin_probe(
+        tmp_path, good, "pack.download = lambda names: downloads.append(names)"
+    )
+    _assert_loaded(result, warnings)
+    assert result["downloads"] == []
+    libs = tmp_path / "cache" / "tree-sitter-language-pack" / "v1.23.1" / "libs"
+    assert Path(result["opened"][0]["path"]).samefile(libs / _pinned_grammar_file().name)
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        pytest.param(lambda b: b[:1000] + bytes([b[1000] ^ 1]) + b[1001:], id="one_bit_flipped"),
+        pytest.param(lambda b: b + b"\0", id="one_byte_appended"),
+        pytest.param(lambda b: b[:-1], id="one_byte_removed"),
+        pytest.param(lambda b: b"", id="empty"),
+    ],
+)
+def test_pin_changed_file_is_not_loaded_and_not_replaced(tmp_path: Path, change) -> None:
+    changed = change(_pinned_grammar_file().read_bytes())
+    # pack.download would load the file; it must not even be called.
+    result, warnings = _pin_probe(
+        tmp_path, changed, "pack.download = lambda names: downloads.append(names)"
+    )
+    _assert_not_loaded(result, warnings)
+    assert result["downloads"] == []
+    libs = tmp_path / "cache" / "tree-sitter-language-pack" / "v1.23.1" / "libs"
+    file = libs / _pinned_grammar_file().name
+    assert file.read_bytes() == changed
+    assert hashlib.sha256(changed).hexdigest() in warnings[0]
+    assert parser_dart._GRAMMAR_PINS[parser_dart._platform_key()][1] in warnings[0]
+
+
+def test_pin_missing_file_and_failing_download_is_not_loaded(tmp_path: Path) -> None:
+    result, warnings = _pin_probe(
+        tmp_path,
+        None,
+        """
+        def _fail(names):
+            downloads.append(names)
+            raise RuntimeError("simulated:\\n  no network")
+        pack.download = _fail
+        """,
+    )
+    _assert_not_loaded(result, warnings)
+    assert result["downloads"] == [["dart"]]
+    assert "simulated: no network" in warnings[0]
+
+
+def test_pin_download_that_leaves_no_file_is_not_loaded(tmp_path: Path) -> None:
+    result, warnings = _pin_probe(
+        tmp_path, None, "pack.download = lambda names: downloads.append(names)"
+    )
+    _assert_not_loaded(result, warnings)
+    assert "missing" in warnings[0]
+
+
+def test_pin_downloaded_file_is_checked_before_loading(tmp_path: Path) -> None:
+    (tmp_path / "bad").write_bytes(_pinned_grammar_file().read_bytes() + b"\0")
+    result, warnings = _pin_probe(
+        tmp_path,
+        None,
+        """
+        def _download(names):
+            downloads.append(names)
+            shutil.copyfile(good, library)
+        pack.download = _download
+        """,
+        good=tmp_path / "bad",
+    )
+    _assert_not_loaded(result, warnings)
+    assert result["downloads"] == [["dart"]]
+
+
+def test_pin_good_downloaded_file_is_loaded(tmp_path: Path) -> None:
+    result, warnings = _pin_probe(
+        tmp_path,
+        None,
+        """
+        def _download(names):
+            downloads.append(names)
+            shutil.copyfile(good, library)
+        pack.download = _download
+        """,
+        good=_pinned_grammar_file(),
+    )
+    _assert_loaded(result, warnings)
+    assert result["downloads"] == [["dart"]]
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="reads the module's path from Windows")
+def test_pin_real_download_does_not_load_from_the_libs_dir_override(tmp_path: Path) -> None:
+    """The pack's own download, offline from a copy of its cached bundle.
+
+    It tries to load the grammar first, also from this variable's directory: without
+    protection a changed file there runs, even if dart_grammar then reports a failure.
+    """
+    real = _pinned_grammar_file()
+    version_dir = real.parent.parent
+    bundles = list((version_dir / "bundles").glob("*.tar.zst"))
+    if not bundles or not (version_dir / "manifest.json").exists():
+        pytest.skip("the pack's bundle is not cached")
+    cached = tmp_path / "cache" / "tree-sitter-language-pack" / "v1.23.1"
+    (cached / "bundles").mkdir(parents=True)
+    shutil.copyfile(version_dir / "manifest.json", cached / "manifest.json")
+    shutil.copyfile(bundles[0], cached / "bundles" / bundles[0].name)
+    override = tmp_path / "override"
+    override.mkdir()
+    (override / real.name).write_bytes(real.read_bytes() + b"\0")
+
+    result, warnings = _pin_probe(tmp_path, None, env={"TREE_SITTER_LANGUAGE_PACK_LIBS_DIR": str(override)})
+
+    _assert_loaded(result, warnings)
+    assert Path(result["module_file"]).samefile(cached / "libs" / real.name)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="reads the module list from Windows")
+def test_pin_known_limit_file_appearing_just_before_the_download(tmp_path: Path) -> None:
+    """The documented limit: the pack's download loads what it finds. If this flips, drop the note."""
+    changed = tmp_path / "changed"
+    changed.write_bytes(_pinned_grammar_file().read_bytes() + b"\0")
+    result, warnings = _pin_probe(
+        tmp_path,
+        None,
+        """
+        real_download = pack.download
+        def _download(names):
+            shutil.copyfile(good, library)  # the instant between "missing" and the pack's own look
+            return real_download(names)
+        pack.download = _download
+        """,
+        good=changed,
+    )
+    assert result["error"] is not None and len(warnings) == 1  # dart_grammar refuses the file
+    assert result["opened"] == []  # and does not load it itself
+    assert result["in_process"] is True  # but the pack already has
+
+
+def test_pin_platform_without_a_pin_is_not_loaded(tmp_path: Path) -> None:
+    # The right bytes in the right place: only the platform has no digest.
+    result, warnings = _pin_probe(
+        tmp_path,
+        _pinned_grammar_file().read_bytes(),
+        """
+        import sysconfig
+        platform.machine = lambda: "riscv64"
+        sysconfig.get_platform = lambda: "win-riscv64"
+        pack.download = lambda names: downloads.append(names)
+        """,
+    )
+    _assert_not_loaded(result, warnings)
+    assert result["downloads"] == []
+    assert "riscv64" in warnings[0]
+
+
+@pytest.mark.parametrize("version", ["1.23.2", "1.23.0", None])
+def test_pin_other_package_version_is_not_loaded(tmp_path: Path, version: str | None) -> None:
+    result, warnings = _pin_probe(
+        tmp_path,
+        _pinned_grammar_file().read_bytes(),
+        f"""
+        pack.__version__ = {version!r}
+        pack.download = lambda names: downloads.append(names)
+        """,
+    )
+    _assert_not_loaded(result, warnings)
+    assert result["downloads"] == []
+
+
+def test_pin_failure_warns_once_for_many_files_and_calls(tmp_path: Path) -> None:
+    changed = _pinned_grammar_file().read_bytes() + b"\0"
+    result, warnings = _pin_probe(
+        tmp_path,
+        changed,
+        """
+        pack.download = lambda names: downloads.append(names)
+        for _ in range(3):
+            try:
+                __import__("repofinder.parser_dart").parser_dart.dart_grammar()
+            except RuntimeError:
+                pass
+        """,
+    )
+    _assert_not_loaded(result, warnings)
+
+
+@pytest.mark.parametrize(
+    ("system", "build", "machine", "pointer_bits", "key"),
+    [
+        # Windows: the build of Python counts; platform.machine() is the machine.
+        ("win32", "win-amd64", "AMD64", 64, "windows-x86_64"),
+        ("win32", "win-arm64", "ARM64", 64, "windows-aarch64"),
+        ("win32", "win-amd64", "ARM64", 64, "windows-x86_64"),  # x64 Python on Windows ARM64
+        # Linux and macOS: uname follows the process, so an emulated one reports its own.
+        ("linux", None, "x86_64", 64, "linux-x86_64"),
+        ("linux", None, "aarch64", 64, "linux-aarch64"),
+        ("darwin", None, "x86_64", 64, "macos-x86_64"),  # also x64 Python under Rosetta
+        ("darwin", None, "arm64", 64, "macos-arm64"),
+    ],
+)
+def test_pin_platform_key_is_the_one_the_pack_downloads_for(
+    monkeypatch: pytest.MonkeyPatch, system: str, build: str | None, machine: str, pointer_bits: int, key: str
+) -> None:
+    monkeypatch.setattr(parser_dart.platform, "machine", lambda: machine)
+    monkeypatch.setattr(parser_dart.sysconfig, "get_platform", lambda: build)
+    monkeypatch.setattr(parser_dart.sys, "maxsize", 2 ** (pointer_bits - 1) - 1)
+    monkeypatch.setattr(parser_dart.sys, "platform", system)
+    assert parser_dart._platform_key() == key
+    assert key in parser_dart._GRAMMAR_PINS
+
+
+@pytest.mark.parametrize(
+    ("system", "build", "machine", "pointer_bits"),
+    [
+        ("win32", "win32", "AMD64", 32),  # 32-bit Python on 64-bit Windows
+        ("win32", "win-arm32", "ARM64", 32),
+        ("linux", None, "x86_64", 32),  # 32-bit Python on a 64-bit kernel
+        ("linux", None, "aarch64", 32),
+        ("linux", None, "riscv64", 64),
+        ("freebsd14", None, "amd64", 64),
+    ],
+)
+def test_pin_interpreter_the_pack_has_no_build_for_has_no_pin(
+    monkeypatch: pytest.MonkeyPatch, system: str, build: str | None, machine: str, pointer_bits: int
+) -> None:
+    monkeypatch.setattr(parser_dart.platform, "machine", lambda: machine)
+    monkeypatch.setattr(parser_dart.sysconfig, "get_platform", lambda: build)
+    monkeypatch.setattr(parser_dart.sys, "maxsize", 2 ** (pointer_bits - 1) - 1)
+    monkeypatch.setattr(parser_dart.sys, "platform", system)
+    assert parser_dart._platform_key() not in parser_dart._GRAMMAR_PINS
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="the Windows branch of sysconfig")
+@pytest.mark.parametrize(
+    ("version", "key"),
+    [
+        ("3.12.10 (tags/v3.12.10, Apr  8 2025) [MSC v.1943 64 bit (AMD64)]", "windows-x86_64"),
+        ("3.12.10 (tags/v3.12.10, Apr  8 2025) [MSC v.1943 64 bit (ARM64)]", "windows-aarch64"),
+    ],
+)
+def test_pin_real_sysconfig_reads_the_build_of_python(
+    monkeypatch: pytest.MonkeyPatch, version: str, key: str
+) -> None:
+    monkeypatch.setattr(parser_dart.platform, "machine", lambda: "ARM64")  # must not matter
+    monkeypatch.setattr(parser_dart.sys, "version", version)
+    assert parser_dart._platform_key() == key
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows share modes")
+def test_pin_file_cannot_change_between_check_and_load(tmp_path: Path) -> None:
+    """The real race: something tries to swap the file at the last moment before loading."""
+    good = _pinned_grammar_file().read_bytes()
+    (tmp_path / "evil").write_bytes(b"MZ evil")
+    result, warnings = _pin_probe(
+        tmp_path,
+        good,
+        """
+        attempts = {}
+        def before_load(path):
+            for label, action in (
+                ("replace", lambda: os.replace(good, library)),
+                ("remove", lambda: os.remove(library)),
+                ("append", lambda: open(library, "ab").close()),
+                ("rename", lambda: os.rename(library, library.with_suffix(".away"))),
+                ("rename_directory", lambda: os.rename(libs, libs.with_name("moved"))),
+            ):
+                try:
+                    action()
+                    attempts[label] = "done"
+                except PermissionError:
+                    attempts[label] = "blocked"
+            print(json.dumps(attempts), file=sys.stderr)
+        """,
+        good=tmp_path / "evil",
+    )
+    # The probe's stderr carries the attempts instead of a warning.
+    assert json.loads(warnings[0]) == dict.fromkeys(
+        ("replace", "remove", "append", "rename", "rename_directory"), "blocked"
+    )
+    _assert_loaded(result, warnings[1:])
+    libs = tmp_path / "cache" / "tree-sitter-language-pack" / "v1.23.1" / "libs"
+    assert (libs / _pinned_grammar_file().name).read_bytes() == good
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows search paths")
+def test_pin_library_imports_are_not_searched_next_to_it(tmp_path: Path) -> None:
+    good = _pinned_grammar_file().read_bytes()
+    result, warnings = _pin_probe(tmp_path, good)
+    _assert_loaded(result, warnings)
+    assert result["opened"][0]["kwargs"] == {"winmode": 0x800}  # LOAD_LIBRARY_SEARCH_SYSTEM32
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="needs junctions")
+def test_pin_load_path_does_not_go_through_a_junction(tmp_path: Path) -> None:
+    """A junction is not protected by the lock, so the path to load must not use it."""
+    good = _pinned_grammar_file().read_bytes()
+    target = tmp_path / "target"
+    target.mkdir()
+    (target / "lib.dll").write_bytes(good)
+    junction = tmp_path / "junction"
+    subprocess.run(["cmd", "/c", "mklink", "/J", str(junction), str(target)], check=True, capture_output=True)
+    with parser_dart._hold_unchanged(str(junction / "lib.dll")) as (data, load_path):
+        assert data == good
+        assert "junction" not in load_path
+        assert Path(load_path).samefile(target / "lib.dll")
+
+
+def _inner_pytest(
+    tmp_path: Path, plugin: str = "", cache: Path | None = None, env: dict[str, str] | None = None
+) -> subprocess.CompletedProcess[str]:
+    """One grammar-dependent test of this file in a new pytest, with something broken."""
+    (tmp_path / "broken_setup.py").write_text(plugin, encoding="utf-8")
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(tmp_path),
+        "TREE_SITTER_LANGUAGE_PACK_CACHE_DIR": str(cache or tmp_path / "c"),
+        **(env or {}),
+    }
+    return subprocess.run(
+        [
+            sys.executable, "-m", "pytest", "tests/test_parser_dart.py", "-k", "test_file_record",
+            "-q", "-rs", "-p", "no:cacheprovider", "-p", "broken_setup",
+        ],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",  # the OS words an error in its own code page
+        timeout=120,
+    )
+
+
+def test_pin_suite_fails_on_a_changed_cached_grammar(tmp_path: Path) -> None:
+    real = _pinned_grammar_file()
+    cache = tmp_path / "cache"
+    libs = cache / "tree-sitter-language-pack" / "v1.23.1" / "libs"
+    libs.mkdir(parents=True)
+    (libs / real.name).write_bytes(real.read_bytes() + b"\0")
+    proc = _inner_pytest(tmp_path, cache=cache)
+    assert proc.returncode == 1, proc.stdout
+    assert "1 error" in proc.stdout.strip().splitlines()[-1]  # pytest.fail in the fixture
+    assert "did not load" in proc.stdout
+
+
+def test_pin_suite_fails_on_an_unexpected_package_version(tmp_path: Path) -> None:
+    proc = _inner_pytest(tmp_path, "import tree_sitter_language_pack as p\np.__version__ = '1.23.2'\n")
+    assert proc.returncode == 1, proc.stdout
+    assert "1 error" in proc.stdout.strip().splitlines()[-1]  # pytest.fail in the fixture
+    assert "version" in proc.stdout
+
+
+def test_pin_suite_skips_when_the_network_is_down(tmp_path: Path) -> None:
+    """The pack's own request, refused by a port nothing listens on."""
+    proc = _inner_pytest(tmp_path, env={"TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL": "http://127.0.0.1:9/parsers.json"})
+    assert proc.returncode == 0, proc.stdout
+    assert proc.stdout.strip().splitlines()[-1].startswith("1 skipped,")
+    assert "download failed, no cache" in proc.stdout
+
+
+def test_pin_suite_fails_when_the_release_bundle_has_changed(tmp_path: Path) -> None:
+    """The pack's own digest check: a bundle that does not match the manifest, offline through file://."""
+    real = _pinned_grammar_file()
+    manifest_file = real.parent.parent / "manifest.json"
+    if not manifest_file.exists():
+        pytest.skip("the pack's manifest is not cached")
+    bundle = tmp_path / "changed.tar.zst"
+    bundle.write_bytes(b"not the bundle")
+    manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+    manifest["platforms"][parser_dart._platform_key()] = {"url": f"file://{bundle}", "sha256": "0" * 64, "size": 14}
+    cache = tmp_path / "cache"
+    version = cache / "tree-sitter-language-pack" / "v1.23.1"
+    version.mkdir(parents=True)
+    (version / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    proc = _inner_pytest(tmp_path, cache=cache)
+    assert proc.returncode == 1, proc.stdout
+    assert "1 error" in proc.stdout.strip().splitlines()[-1]
+    assert "Checksum mismatch" in proc.stdout
+
+
+@pytest.mark.parametrize(
+    ("fake_download", "words"),
+    [
+        pytest.param("raise p.ChecksumMismatchError('simulated')", "simulated", id="checksum_mismatch"),
+        pytest.param("pass", "missing after the download", id="succeeds_but_leaves_no_file"),
+    ],
+)
+def test_pin_suite_fails_when_a_download_goes_wrong_without_a_network_failure(
+    tmp_path: Path, fake_download: str, words: str
+) -> None:
+    plugin = f"import tree_sitter_language_pack as p\ndef _fake(names):\n    {fake_download}\np.download = _fake\n"
+    proc = _inner_pytest(tmp_path, plugin)
+    assert proc.returncode == 1, proc.stdout
+    assert "1 error" in proc.stdout.strip().splitlines()[-1]
+    assert words in proc.stdout
+
+
+def test_pin_suite_skips_when_the_platform_has_no_pin(tmp_path: Path) -> None:
+    plugin = (
+        "import platform, sysconfig\n"
+        "platform.machine = lambda: 'riscv64'\n"
+        "sysconfig.get_platform = lambda: 'win-riscv64'\n"
+    )
+    proc = _inner_pytest(tmp_path, plugin)
+    assert proc.returncode == 0, proc.stdout
+    assert proc.stdout.strip().splitlines()[-1].startswith("1 skipped,")
+    assert "no pinned digest" in proc.stdout
+
+
+def test_pin_suite_skips_when_the_package_is_not_installed(tmp_path: Path) -> None:
+    proc = _inner_pytest(tmp_path, "import sys\nsys.modules['tree_sitter_language_pack'] = None\n")
+    assert proc.returncode in (0, 5), proc.stdout  # 5: with -k, nothing left to select after the module skip
+    assert proc.stdout.strip().splitlines()[-1].startswith("1 skipped")
+    assert "not installed" in proc.stdout

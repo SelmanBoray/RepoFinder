@@ -133,8 +133,8 @@ def parse_file(root: Path, path: Path) -> tuple[FileRecord, list[Symbol], list[I
     as produced by ``root / "file.py"``. Syntax errors do not raise:
     tree-sitter always produces a tree, ``FileRecord.parse_ok`` is set to False
     when it contains errors, and whatever symbols were recovered are returned.
-    A Dart file whose grammar cannot be downloaded also gets ``parse_ok=False``,
-    without symbols. I/O errors and unsupported file types do raise.
+    A Dart file whose grammar cannot be downloaded, or fails its digest check,
+    also gets ``parse_ok=False``, without symbols. I/O errors and unsupported file types do raise.
     """
     root = Path(root)
     path = Path(path)

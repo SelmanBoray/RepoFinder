@@ -232,10 +232,25 @@ olarak çıkarılmaz. Dart'ta arama kalitesi henüz ölçülmedi.
 
 `dart` ekstrasının güven ve çevrimdışı kullanım açısından anlamı: gramer,
 `tree-sitter-language-pack`'in bir GitHub release'inden indirdiği ve yerel kod
-olarak yüklediği bir kütüphanedir. Sabitlenen `tree-sitter-language-pack==1.23.1`
-indirilen ikilinin baytlarını sabitlemez ve RepoFinder yüklemeden önce kendi
-özet denetimini yapmaz. Gramer indirilemezse `.dart` dosyaları indekse
-sembolsüz kaydedilir; bağlantı gelince `repofinder index --refresh` bunu düzeltir.
+olarak yüklediği bir kütüphanedir. RepoFinder dosyayı yüklemeden önce, paket
+sürümü 1.23.1 için kodda sabit SHA-256 özetleriyle denetler. Özetler 6
+platformu kapsar: Windows x86_64 ve aarch64, Linux x86_64 ve aarch64, macOS
+arm64 ve x86_64. Yalnız Windows x86_64 çalıştırılarak denendi; diğerlerinde
+özetler release'e karşı doğrulandı ama gramer çalıştırılmadı. Paket sürümü
+1.23.1 değilse Dart grameri kapalı kalır. Önbellekteki dosyanın özeti
+uyuşmazsa, sürüm beklenen değilse ya da platformun özeti sabitlenmemişse gramer
+yüklenmez ve bir uyarı yazılır. Bu bir özet denetimidir, imza doğrulaması
+değildir; ikiliye, özetin sabitlendiği andaki haliyle güvenir. Denetim,
+değiştirilmiş bir release dosyasına ve önceden bozulmuş ya da değiştirilmiş bir
+önbellek dosyasına karşı korur; önbelleğinize aynı anda yazabilen birine karşı
+korumaz, çünkü ilk indirmede ve Linux/macOS'ta denetimle yükleme arasında çok
+kısa bir an kalır. Önbellekteki
+dosya denetimi geçmezse yerinde bırakılır ve uyarı onu adıyla anar; release'in
+dosyası olması gerekiyorsa yeniden inmesi için silinir. Hata süreç boyunca
+hatırlandığı için ardından `repofinder index --refresh` yeniden çalıştırılır.
+Gramer indirilemezse ya da yüklenmezse `.dart` dosyaları indekse sembolsüz
+kaydedilir; neden giderilince (ağ gelince ya da bozuk dosya silinince)
+`repofinder index --refresh` bunu düzeltir.
 
 ## Sınırlamalar
 

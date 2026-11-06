@@ -221,11 +221,26 @@ are not extracted as symbols. Dart search quality has not been measured yet.
 
 What the `dart` extra means for trust and offline use: the grammar is a native
 library that `tree-sitter-language-pack` downloads from a GitHub release and
-loads as native code. The pinned `tree-sitter-language-pack==1.23.1` does not
-pin the bytes of the downloaded binary, and RepoFinder does not run its own
-checksum check before loading it. If the grammar cannot be downloaded, the
-`.dart` files are still recorded in the index but without symbols; once the
-network is back, `repofinder index --refresh` fixes it.
+loads as native code. Before loading the file, RepoFinder checks it against
+SHA-256 digests hard-coded in its source for package version 1.23.1. The digests
+cover six platforms: Windows x86_64 and aarch64, Linux x86_64 and aarch64, macOS
+arm64 and x86_64. Only Windows x86_64 was actually run; on the others the digests
+were verified against the release but the grammar was not run. If the package
+version is not 1.23.1, the Dart grammar stays closed. If the cached file's digest
+does not match, the version is not the expected one, or the platform's digest is
+not pinned, the grammar is not loaded and a warning is printed. This is a digest
+check, not signature verification: it trusts the binary as it was at the moment
+the digest was pinned. The check protects against a modified release file and
+against a cache file that was already corrupted or modified; it does not protect
+against someone who can write to your cache at the same moment, because a very
+short gap remains on the first download, and on Linux/macOS between the check and
+the load. When the cached file fails the check, it is left in place
+and the warning names it; if it should be the release's file, delete it so that
+it is downloaded again. The failure is remembered for the rest of the process, so
+run `repofinder index --refresh` again afterwards. If the grammar cannot be
+downloaded or does not load, the `.dart` files are still recorded in the index
+but without symbols; once the cause is fixed (the network is back, or the bad
+file is deleted), `repofinder index --refresh` fixes it.
 
 ## Limitations
 
