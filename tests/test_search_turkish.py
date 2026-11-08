@@ -97,8 +97,55 @@ def test_derived_words_do_not_inherit_the_base_meaning(word: str, base_english: 
 
 def test_words_with_their_own_key_beat_the_base() -> None:
     assert _translate_tr("kullanıcı") == ("user",)
-    assert "encode" in (_translate_tr("kodlanıyor") or ())  # kodla: encode, not filler "kod"
     assert _translate_tr("kodları") == ()                   # plural of kod stays filler
+    assert _translate_tr("şifrele") == ("encrypt",)         # not password
+    assert _translate_tr("şifreler") == ("password",)       # plural of şifre
+
+
+@pytest.mark.parametrize(
+    "word, english",
+    [
+        # passive -l + aorist -ir / -ince: not the derivation -li
+        ("çevrilir", "convert"),
+        ("çevrilirken", "convert"),
+        ("çevrilince", "convert"),
+        ("çevrilirse", "convert"),
+        ("çevrilip", "convert"),
+        # conditional -sa/-se + plural -lar/-ler: not the derivation -sal/-sel
+        ("ekleseler", "add"),
+        ("silseler", "delete"),
+        ("bulsalar", "find"),
+        # -la + conditional / optative: not the derivation -laş
+        ("sorgulasalar", "query"),
+        ("sorgulasın", "query"),
+        # negative progressive of a verb whose verbal noun is a key of its own
+        ("uygulamıyor", "apply"),
+        ("uyguluyor", "apply"),
+        ("doğrulamıyor", "validate"),
+    ],
+)
+def test_inflection_sequences_that_look_like_derivations(word: str, english: str) -> None:
+    assert english in (_translate_tr(word) or ()), _translate_tr(word)
+
+
+def test_uygulamiyor_is_not_the_app() -> None:
+    assert "app" not in (_translate_tr("uygulamıyor") or ())
+
+
+def test_kod_with_la_is_the_instrumental_case() -> None:
+    # "hangi kodla açılıyor": with which code. Filler like "kod", as before.
+    assert _translate_tr("kodla") == ()
+    assert _translate_tr("kodlanıyor") == ()
+
+
+def test_ver_guards_keep_veri_plurals_unknown() -> None:
+    # Forms of "ver" (give) are filler ...
+    for word in ("verilir", "verilen", "verildi", "verilmiş", "verilecek", "verilebilir",
+                 "verilse", "verir", "veriyor", "verilince"):
+        assert _translate_tr(word) == (), word
+    # ... but "veri" (data) + -ler is not swallowed by them.
+    for word in ("veriler", "verileri", "verilerde", "verilerin"):
+        assert _translate_tr(word) is None, (word, _translate_tr(word))
 
 
 def test_turkish_phrases_with_inflection() -> None:

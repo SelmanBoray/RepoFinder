@@ -231,8 +231,10 @@ _ABBREVIATIONS: dict[str, tuple[str, ...]] = {
 # (:data:`_TR_DERIVATIONS`: "önce-lik" is priority, not before; "hata-sız",
 # "yol-cu", "sil-ici"). The verb-making -la/-le is let through: it mostly makes
 # the verb of the same thing ("liste-le-niyor" -> list, "sorgu-la" -> query);
-# where it makes a different word the lexicon has a key of its own ("kodla":
-# encode, and "kodlar", the plural of the filler "kod", too). A derived word
+# where it makes a different word the lexicon has a key of its own ("şifrele":
+# encrypt, and "şifreler", the plural of "şifre", too). Sequences of
+# inflections that start like a derivation are let through
+# (:data:`_TR_NOT_DERIVATIONS`: "çevri-lir", "ekle-seler"). A derived word
 # means what its base means only through a key of its own ("ayrıştırıcı":
 # parser, "okuyucu": reader, "öncelik": priority).
 _TR_FILLER = frozenset(
@@ -250,11 +252,14 @@ _TR_FILLER = frozenset(
 _TR_LEXICON: dict[str, tuple[str, ...]] = {
     # question words and words that only describe the question
     "nere": (), "tanım": (), "tanımlı": (), "fonksiyon": (), "metod": (), "metot": (),
-    "modül": (), "kod": (), "kodlar": (), "dosya": (), "kullan": (), "yapıl": (), "edil": (),
+    "modül": (), "kod": (), "dosya": (), "kullan": (), "yapıl": (), "edil": (),
     "ediyor": (), "olan": (), "oluyor": (), "gel": (), "döndür": (), "dönüş": (), "göster": (),
     # "yazılım" (software) is not "yaz" (write) + -ılım; forms of "ver" (give)
-    # that begin like "veri" (data): verilen, verir, veriyor
-    "yazılım": (), "veril": (), "verir": (), "veriyor": (),
+    # that begin like "veri" (data): verilir, verilen, verildi, verilmiş,
+    # verilecek, verilebilir, verilse, verir, veriyor. None is a prefix of
+    # "veri" + -ler (veriler, verileri), which stays a word of its own.
+    "yazılım": (), "verili": (), "verilen": (), "verild": (), "verilm": (), "verilec": (),
+    "verileb": (), "verils": (), "verir": (), "veriyor": (),
     "sınıf": ("class",),
     # code vocabulary
     "uygulama": ("app", "application"), "uygula": ("apply",), "fabrika": ("factory",),
@@ -304,7 +309,6 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     "oluşturucu": ("builder", "constructor"),
     "yükleyici": ("loader",), "yönlendirici": ("router",), "bulut": ("cloud",),
     "sayısal": ("numeric",),
-    "kodla": ("encode",),
 }
 # Two-word phrases: (first stem, second stem) -> English. The first word is
 # then filler and the second carries the translation ("zaman aşımı" -> timeout,
@@ -334,8 +338,14 @@ _TR_SUFFIX_START = frozenset("aeiouyndstmrkcl")
 # Derivational suffixes that make another word: -li/-lik (-lı, -lu, -lük, ...),
 # -laş/-leş, -ci/-cik (-çı, -cu, ...), -(y)ici/-(y)ucu, -siz/-suz, -sal/-sel.
 _TR_DERIVATIONS = ("li", "lu", "las", "les", "ci", "cu", "ici", "ucu", "yici", "yucu", "siz", "suz", "sal", "sel")
-# ... but -le + the progressive -iyor ("liste-liyor") only looks like -li.
-_TR_NOT_DERIVATIONS = ("liyor", "luyor")
+# ... but these inflection sequences only look like one: a passive -l (or -le)
+# + -iyor, aorist -ir, -ince, -ip ("liste-liyor", "çevri-lir", "çevri-lince");
+# -la/-le + conditional -sa or optative -sın ("sorgu-lasa", "sorgu-lasın");
+# conditional -sa + plural -lar ("ekle-seler", "bul-salar").
+_TR_NOT_DERIVATIONS = (
+    "liyor", "luyor", "lir", "lur", "lin", "lun", "lip", "lup",
+    "lasa", "lese", "lasin", "lesin", "salar", "seler",
+)
 # A verb stem ending in -a/-e narrows that vowel before -iyor: yükle -> yüklüyor.
 _TR_NARROWED = ("iyor", "uyor")
 
@@ -474,7 +484,8 @@ def _tr_keys(stem_: str) -> list[tuple[str, tuple[str, ...]]]:
     soft = _TR_SOFTEN.get(stem_[-1])
     if soft:
         keys.append((_fold(stem_[:-1] + soft), _TR_VOWELS))
-    if stem_[-1] in "ae" and len(stem_) > _TR_MIN_STEM:
+    # Not a verbal noun in -ma/-me: "uygulam-ıyor" is uygula + negative -ma + -iyor.
+    if stem_[-1] in "ae" and len(stem_) > _TR_MIN_STEM and not stem_.endswith(("ma", "me")):
         keys.append((_fold(stem_[:-1]), _TR_NARROWED))
     return keys
 
