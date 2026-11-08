@@ -60,7 +60,16 @@ abbreviation) never weighs more than the word itself: in the requests repo
 * class, kind ("which class ..."), test-file and nested-function adjustments;
 * type declarations: a TypeScript ``interface`` or ``type`` alias is a data
   shape, rarely what "where is X done" asks for: x :data:`TYPE_PENALTY` unless
-  the query mentions types or interfaces.
+  the query mentions types or interfaces;
+* auxiliary directories: code under ``examples/``, ``example/``, ``doc(s)/``,
+  ``benchmark(s)/``, ``benches/``, ``scripts/`` or ``experiments/`` at the
+  repository root or beside a package manifest (``packages/flame/example/``
+  next to its ``pubspec.yaml``; ``src/foo/scripts/`` is product code)
+  illustrates or maintains the product: x :data:`AUX_PENALTY` unless the
+  query asks for examples, tutorials, docs, benchmarks or scripts ("örnek").
+  A file the manifest declares as shipped (``package.json`` ``bin``/``main``,
+  ``[project.scripts]``, Cargo ``[[bin]]``) is exempt; a test there gets the
+  stronger of the two penalties, not both (see :class:`_AuxDirs`).
 
 Query words keep their case for one decision: a lowerCamel word
 (``ipcRenderer``) is code and splits into its parts like an identifier; an
@@ -76,7 +85,10 @@ library only.
 from __future__ import annotations
 
 import heapq
+import json
 import math
+import os
+import posixpath
 import re
 from collections import Counter
 from dataclasses import dataclass
@@ -86,6 +98,11 @@ from typing import Callable, Optional
 
 from .graph import PATH_MODULE_EXTENSIONS, is_test_path, module_names, path_module_name, split_source_extension
 from .models import RepoIndex, Symbol
+
+try:  # Python 3.11+; on 3.10 TOML manifests (Cargo, pyproject) declare no shipped files
+    import tomllib
+except ImportError:  # pragma: no cover
+    tomllib = None  # type: ignore[assignment]
 
 K1 = 1.5
 B = 0.75
@@ -98,6 +115,7 @@ CLASS_BOOST = 1.2
 KIND_BOOST = 3.0       # the query asks for a class ("which class ...") and this is one
 TEST_PENALTY = 0.5
 TYPE_PENALTY = 0.7     # TypeScript interface/type alias declarations, unless the query asks for a type
+AUX_PENALTY = 0.5      # examples/docs/benchmarks/scripts dirs (see _AuxDirs), unless the query asks for them
 BODY_WEIGHT = 1.0      # BM25F weight of the body field (function/method source) vs. the metadata field
 BODY_MAX_BYTES = 2 * 1024 * 1024  # files larger than this are not read for bodies
 NESTED_PENALTY = 0.5   # closures ("outer.<locals>.inner") are rarely what a reader wants
@@ -190,6 +208,37 @@ _TYPE_WORDS = frozenset(
     }
 )
 _TYPE_KINDS = frozenset({"interface", "type"})
+
+# Auxiliary directories (see :class:`_AuxDirs`): code that illustrates,
+# documents, measures or maintains the product rather than being it.
+# ``benches`` is Cargo's benchmark directory, ``experiments`` holds REA's
+# throw-away measurement scripts.
+_AUX_DIR_NAMES = frozenset(
+    {"example", "examples", "doc", "docs", "benchmark", "benchmarks", "benches", "script", "scripts", "experiments"}
+)
+# A directory with one of these files is a package root: an auxiliary directory
+# counts there and at the repository root only (``packages/flame/example/``
+# beside ``packages/flame/pubspec.yaml``, not ``src/foo/scripts/``).
+_MANIFEST_NAMES = (
+    "pubspec.yaml", "package.json", "Cargo.toml", "go.mod", "pom.xml", "build.gradle",
+    "build.gradle.kts", "pyproject.toml", "setup.py",
+)
+_MANIFEST_MAX_BYTES = 1024 * 1024
+# The manifests that can declare a shipped file (see :func:`_shipped_paths`).
+_SHIPPING_MANIFESTS = frozenset({"package.json", "pyproject.toml", "setup.py", "Cargo.toml"})
+# A query word from this set (ASCII-folded) or starting with one of the Turkish
+# prefixes lifts the auxiliary-directory penalty, unless it is part of a joined
+# identifier. "for example" and the Turkish adverb "örneğin" (for instance) do
+# not ask for examples.
+_AUX_WORDS = frozenset(
+    {
+        "example", "examples", "tutorial", "tutorials", "sample", "samples", "demo", "demos",
+        "doc", "docs", "documentation", "benchmark", "benchmarks", "bench", "benches",
+        "script", "scripts", "experiment", "experiments",
+    }
+)
+_AUX_TR_PREFIXES = ("ornek", "orneg", "ogretici", "belge", "dokuman", "betik", "betig")
+_AUX_NOT_ASKED = frozenset({"ornegin"})
 
 # Common abbreviations in identifiers, looked up by a query word or its stem.
 _ABBREVIATIONS: dict[str, tuple[str, ...]] = {
@@ -544,6 +593,181 @@ class _SourceLines:
         return raw.decode("utf-8", errors="replace").lstrip("\ufeff").split("\n")
 
 
+class _AuxDirs:
+    """Which files lie in an auxiliary directory (:data:`_AUX_DIR_NAMES`).
+
+    Such a directory counts at the repository root (``examples/``,
+    ``scripts/``) or directly beside a package manifest
+    (:data:`_MANIFEST_NAMES`: ``packages/flame/example/`` next to
+    ``packages/flame/pubspec.yaml``); elsewhere (``src/foo/scripts/``) it is
+    product code. Manifests are not indexed, so they are looked up in the
+    checkout, once per directory that holds a candidate; without a checkout
+    only the root rule applies.
+
+    A file the manifest beside the directory declares as shipped is exempt
+    (:func:`_shipped_paths`): it is part of the package, wherever it lives.
+    """
+
+    def __init__(self, root: str) -> None:
+        self.root: Optional[Path] = None
+        try:
+            if root and Path(root).is_dir():
+                self.root = Path(root).resolve()
+        except OSError:
+            pass
+        self._manifests: dict[str, tuple[str, ...]] = {}
+        self._shipped: dict[str, frozenset[str]] = {}
+
+    def is_aux(self, path: str) -> bool:
+        parts = path.split("/")
+        for i, part in enumerate(parts[:-1]):
+            if part.lower() not in _AUX_DIR_NAMES:
+                continue
+            home = "/".join(parts[:i])
+            if i and not self._manifests_in(home):
+                continue
+            # The outermost auxiliary directory decides: a shipped file is
+            # exempt, anything else under it is auxiliary.
+            return path not in self._shipped_from(home)
+        return False
+
+    def _dir(self, rel: str) -> Optional[Path]:
+        """The checkout directory ``rel`` (a lexical join: listing names is
+        harmless; a manifest is resolved before it is read)."""
+        if self.root is None:
+            return None
+        parts = rel.split("/") if rel else []
+        if any(p in ("", ".", "..") or ":" in p for p in parts):
+            return None
+        return self.root.joinpath(*parts)
+
+    def _manifests_in(self, rel: str) -> tuple[str, ...]:
+        found = self._manifests.get(rel)
+        if found is None:
+            directory = self._dir(rel)
+            present: set[str] = set()
+            if directory is not None:
+                try:
+                    with os.scandir(directory) as entries:
+                        present = {e.name for e in entries if e.name in _MANIFEST_NAMES and e.is_file()}
+                except OSError:
+                    pass
+            found = self._manifests[rel] = tuple(n for n in _MANIFEST_NAMES if n in present)
+        return found
+
+    def _shipped_from(self, rel: str) -> frozenset[str]:
+        shipped = self._shipped.get(rel)
+        if shipped is None:
+            directory = self._dir(rel)
+            shipped = frozenset()
+            if directory is not None:
+                prefix = f"{rel}/" if rel else ""
+                found: set[str] = set()
+                for name in self._manifests_in(rel):
+                    if name not in _SHIPPING_MANIFESTS:
+                        continue
+                    try:
+                        manifest = (directory / name).resolve()
+                    except OSError:
+                        continue
+                    if manifest.is_relative_to(self.root):  # not through a link out of the checkout
+                        found.update(_shipped_paths(manifest))
+                shipped = frozenset(prefix + p for p in found)
+            self._shipped[rel] = shipped
+        return shipped
+
+
+def _shipped_paths(manifest: Path) -> set[str]:
+    """Paths (relative to the manifest's directory) that a manifest declares
+    as shipped. Only explicit file declarations count:
+
+    * ``package.json``: ``bin``, ``main``, ``module``, ``browser``, ``types``,
+      the targets of ``exports`` and the plain file entries of ``files`` (a
+      directory or glob entry ships a whole tree, which says nothing about one
+      file);
+    * ``pyproject.toml``: the modules of ``[project.scripts]``,
+      ``[project.gui-scripts]`` and ``[tool.poetry.scripts]`` (``pkg.cli:main``
+      -> ``pkg/cli.py``, ``pkg/cli/__init__.py``, also under ``src/``) and
+      ``[tool.setuptools] script-files``;
+    * ``setup.py``: ``scripts=[...]`` and ``console_scripts`` modules;
+    * ``Cargo.toml``: the ``path`` of ``[lib]`` and ``[[bin]]`` (``[[example]]``
+      and ``[[bench]]`` do not ship).
+
+    Other manifests declare nothing here. An unreadable manifest declares nothing.
+    """
+    if manifest.name not in _SHIPPING_MANIFESTS:
+        return set()
+    try:
+        with open(manifest, "rb") as handle:
+            raw = handle.read(_MANIFEST_MAX_BYTES + 1)
+    except OSError:
+        return set()
+    if len(raw) > _MANIFEST_MAX_BYTES:
+        return set()
+    text = raw.decode("utf-8", errors="replace").lstrip("\ufeff")
+    files: list[str] = []
+    modules: list[str] = []
+    try:
+        if manifest.name == "package.json":
+            data = json.loads(text)
+            if isinstance(data, dict):
+                for field in ("bin", "main", "module", "browser", "types", "exports"):
+                    files.extend(_json_strings(data.get(field)))
+                entries = data.get("files")
+                if isinstance(entries, list):
+                    files.extend(e for e in entries if isinstance(e, str))
+        elif manifest.name == "pyproject.toml" and tomllib is not None:
+            data = tomllib.loads(text)
+            project = data.get("project") or {}
+            tool = data.get("tool") or {}
+            for table in (project.get("scripts"), project.get("gui-scripts"), (tool.get("poetry") or {}).get("scripts")):
+                if isinstance(table, dict):
+                    modules.extend(v.split(":", 1)[0] for v in table.values() if isinstance(v, str))
+            script_files = (tool.get("setuptools") or {}).get("script-files")
+            if isinstance(script_files, list):
+                files.extend(f for f in script_files if isinstance(f, str))
+        elif manifest.name == "setup.py":
+            listed = re.search(r"\bscripts\s*=\s*\[([^\]]*)\]", text)
+            if listed:
+                files.extend(re.findall(r"['\"]([^'\"]+)['\"]", listed.group(1)))
+            modules.extend(re.findall(r"['\"][\w.-]+\s*=\s*([\w.]+)\s*:", text))
+        elif manifest.name == "Cargo.toml" and tomllib is not None:
+            data = tomllib.loads(text)
+            lib = data.get("lib")
+            targets = [lib] if isinstance(lib, dict) else []
+            bins = data.get("bin")
+            if isinstance(bins, list):
+                targets.extend(b for b in bins if isinstance(b, dict))
+            files.extend(t["path"] for t in targets if isinstance(t.get("path"), str))
+    except (ValueError, AttributeError, TypeError):  # tomllib.TOMLDecodeError is a ValueError
+        return set()
+    out: set[str] = set()
+    for f in files:
+        if any(ch in f for ch in "*?[!"):
+            continue
+        norm = posixpath.normpath(f.replace("\\", "/"))
+        if norm and not norm.startswith(("..", "/")) and norm != ".":
+            out.add(norm)
+    for module in modules:
+        base = module.strip().replace(".", "/")
+        if base:
+            for root in ("", "src/"):
+                out.add(f"{root}{base}.py")
+                out.add(f"{root}{base}/__init__.py")
+    return out
+
+
+def _json_strings(value: object) -> list[str]:
+    """Every string inside a JSON value (``bin`` maps, nested ``exports``)."""
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [s for v in value.values() for s in _json_strings(v)]
+    if isinstance(value, list):
+        return [s for v in value for s in _json_strings(v)]
+    return []
+
+
 @dataclass
 class Hit:
     path: str
@@ -576,6 +800,7 @@ class _Doc:
     owner_whole: str = ""
     owner_parts: tuple[tuple[str, str], ...] = ()
     body_length: int = 0                        # body tokens (stems included)
+    is_aux: bool = False                        # in an examples/docs/benchmarks/scripts dir (see _AuxDirs)
 
 
 @dataclass
@@ -605,6 +830,7 @@ class _Query:
     mentions_tests: bool
     wants_class: bool
     wants_type: bool                   # the query mentions types/interfaces (no type penalty)
+    wants_aux: bool = False            # the query asks for examples/docs/scripts (no auxiliary-dir penalty)
 
 
 class SearchIndex:
@@ -627,8 +853,11 @@ class SearchIndex:
 
         names_by_file: dict[str, list[str]] = {}
         path_tokens: dict[str, list[str]] = {}
+        aux_dirs = _AuxDirs(index.root)
+        aux_paths: dict[str, bool] = {}
         for record in index.files:
             path_tokens[record.path] = tokenize(_path_text(record.path))
+            aux_paths[record.path] = aux_dirs.is_aux(record.path)
         # Lowercase names of the indexed files whose extension is also a common
         # member name ("main.go"): such a query term is a file name only then.
         self._file_names = frozenset(
@@ -674,6 +903,7 @@ class SearchIndex:
                     owner=owner,
                     owner_whole=_whole(owner) if owner else "",
                     owner_parts=_with_stems(_name_parts(owner)) if owner else (),
+                    is_aux=aux_paths[sym.path] if sym.path in aux_paths else aux_dirs.is_aux(sym.path),
                 ),
                 body,
             )
@@ -705,6 +935,7 @@ class SearchIndex:
                     is_nested=False,
                     whole=_whole(file_stem),
                     parts=_with_stems(_name_parts(file_stem)),
+                    is_aux=aux_paths[record.path],
                 ),
             )
 
@@ -871,6 +1102,14 @@ class SearchIndex:
             f *= TEST_PENALTY
             if why is not None:
                 why.append(f"test file x{TEST_PENALTY:g}")
+        if doc.is_aux and not q.wants_aux:
+            # A test of an example is penalised once, by the stronger of the
+            # two penalties: both say "not product code".
+            tested = doc.is_test and not q.mentions_tests
+            g = min(1.0, AUX_PENALTY / TEST_PENALTY) if tested else AUX_PENALTY
+            f *= g
+            if why is not None and g < 1.0:
+                why.append(f"auxiliary dir x{g:.2g}")
         return f
 
     @staticmethod
@@ -1108,6 +1347,7 @@ class SearchIndex:
             wants_class=bool(_CLASS_WORDS_FOLDED & {_fold(w) for w in raw})
             and not _CLASS_BASED_RE.search(query),
             wants_type=any(_fold(w) in _TYPE_WORDS_FOLDED for i, w in enumerate(raw) if i not in consumed),
+            wants_aux=_asks_for_aux(raw, consumed),
         )
 
     def _add_word(
@@ -1195,6 +1435,24 @@ class SearchIndex:
                 forms = [e for e in english if e not in drop]
                 return forms or None
         return [word]
+
+
+def _asks_for_aux(words: list[str], consumed: set[int]) -> bool:
+    """The query asks for examples, tutorials, docs, benchmarks or scripts
+    (:data:`_AUX_WORDS`; Turkish "örnek" and its inflections, "öğretici",
+    "belge", "doküman", "betik"), outside joined identifiers. "for example"
+    and the adverb "örneğin" (for instance) are not such a request."""
+    for i, w in enumerate(words):
+        if i in consumed:
+            continue
+        folded = _fold(w)
+        if folded in _AUX_WORDS:
+            if folded.startswith("example") and i and words[i - 1] == "for":
+                continue
+            return True
+        if folded not in _AUX_NOT_ASKED and folded.startswith(_AUX_TR_PREFIXES):
+            return True
+    return False
 
 
 def _dot_rust_paths(query: str) -> str:
