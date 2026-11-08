@@ -1,0 +1,3898 @@
+{
+  "meta": {
+    "repo": {
+      "name": "gson",
+      "source": "https://github.com/google/gson",
+      "commit": "65df6e5"
+    },
+    "source": "C:/Users/Selman/AppData/Local/Temp/claude/29abb69cf93759cc/a3feb6c6-0644-4b09-b6bb-2c4e21761226/scratchpad/repos/gson",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\29abb69cf93759cc\\a3feb6c6-0644-4b09-b6bb-2c4e21761226\\scratchpad\\repos\\gson",
+      "commit": "65df6e5a99747f73d386f3a61d887a0257255e0f",
+      "golden_commit": "65df6e5",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20"
+    ],
+    "started": "2026-11-08T23:33:00",
+    "open_workspace_s": 7.412,
+    "total_s": 7.629,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "pipeline": "search_baseline (build_index + SearchIndex; chunks = symbol-hit ranges)"
+  },
+  "summary": {
+    "overall": {
+      "n": 20,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 17,
+          "yes": 7,
+          "rate": 0.412
+        },
+        "hit@3": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "hit@k": {
+          "n": 17,
+          "yes": 12,
+          "rate": 0.706
+        },
+        "loose_hit@1": {
+          "n": 17,
+          "yes": 8,
+          "rate": 0.471
+        },
+        "loose_hit@3": {
+          "n": 17,
+          "yes": 11,
+          "rate": 0.647
+        },
+        "loose_hit@k": {
+          "n": 17,
+          "yes": 12,
+          "rate": 0.706
+        },
+        "mrr": 0.517,
+        "chunk_recall": {
+          "n": 17,
+          "yes": 8,
+          "rate": 0.471
+        },
+        "all@k": {
+          "n": 3,
+          "yes": 0,
+          "rate": 0.0
+        },
+        "pointer@k": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        }
+      },
+      "elapsed_s": {
+        "total": 0.215,
+        "mean": 0.011,
+        "median": 0.01,
+        "max": 0.019
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "hit@3": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "hit@k": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "loose_hit@1": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "loose_hit@3": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "loose_hit@k": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "mrr": 0.588,
+          "chunk_recall": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.078,
+          "mean": 0.01,
+          "median": 0.009,
+          "max": 0.014
+        }
+      },
+      "locate-feature": {
+        "n": 6,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 2,
+            "rate": 0.333
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 2,
+            "rate": 0.333
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "mrr": 0.292,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 2,
+            "rate": 0.333
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.074,
+          "mean": 0.012,
+          "median": 0.014,
+          "max": 0.015
+        }
+      },
+      "flow": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "hit@3": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@3": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "mrr": 0.778,
+          "chunk_recall": {
+            "n": 3,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "all@k": {
+            "n": 3,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.038,
+          "mean": 0.013,
+          "median": 0.013,
+          "max": 0.019
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.025,
+          "mean": 0.008,
+          "median": 0.01,
+          "max": 0.011
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 12,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 10,
+            "yes": 5,
+            "rate": 0.5
+          },
+          "hit@3": {
+            "n": 10,
+            "yes": 8,
+            "rate": 0.8
+          },
+          "hit@k": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "loose_hit@1": {
+            "n": 10,
+            "yes": 6,
+            "rate": 0.6
+          },
+          "loose_hit@3": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "loose_hit@k": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "mrr": 0.653,
+          "chunk_recall": {
+            "n": 10,
+            "yes": 6,
+            "rate": 0.6
+          },
+          "all@k": {
+            "n": 2,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.142,
+          "mean": 0.012,
+          "median": 0.011,
+          "max": 0.019
+        }
+      },
+      "tr": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "hit@3": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "hit@k": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "loose_hit@1": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "loose_hit@3": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "loose_hit@k": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "mrr": 0.321,
+          "chunk_recall": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "all@k": {
+            "n": 1,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.073,
+          "mean": 0.009,
+          "median": 0.008,
+          "max": 0.015
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is `Gson.getAdapter(TypeToken)` implemented, the lookup that asks every TypeAdapterFactory in order and caches the adapter it gets back?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/Gson.java",
+          "symbol": "Gson.getAdapter",
+          "start_line": 340,
+          "end_line": 399
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0139,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/Gson.java::Gson.getAdapter",
+            "start_line": 340,
+            "end_line": 399,
+            "kind": "symbol",
+            "score": 62.2198,
+            "match": "symbol",
+            "why": "name match: getAdapter x1.13 (explicit gson.getadapter); qualname/path match: gson.getadapter; bm25: getadapter, adapter, typetoken, get, gson; body: caches~, typeadapterfactory"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/Gson.java::Gson.getAdapter",
+            "start_line": 407,
+            "end_line": 409,
+            "kind": "symbol",
+            "score": 49.1753,
+            "match": "symbol",
+            "why": "name match: getAdapter x1.13 (explicit gson.getadapter); qualname/path match: gson.getadapter; bm25: getadapter, adapter, get, gson; body: typetoken"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/Gson.java::Gson.getDelegateAdapter",
+            "start_line": 472,
+            "end_line": 503,
+            "kind": "symbol",
+            "score": 23.4894,
+            "match": null,
+            "why": "name match: getDelegateAdapter x1.16 (adapter, gets); owner match: Gson x1.06; bm25: typeadapterfactory, adapter, typetoken, get, gson; body: getadapter"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.getCachedMethod",
+            "start_line": 432,
+            "end_line": 450,
+            "kind": "symbol",
+            "score": 21.2399,
+            "match": null,
+            "why": "name match: getCachedMethod x1.29 (caches, gets); owner match: ProtoTypeAdapter x1.03; bm25: caches~, adapter, get, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java::MapTypeAdapterFactory.getKeyAdapter",
+            "start_line": 155,
+            "end_line": 159,
+            "kind": "symbol",
+            "score": 18.869,
+            "match": null,
+            "why": "name match: getKeyAdapter x1.16 (adapter, gets); bm25: adapter, get, gson; body: getadapter, typetoken"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.get",
+            "start_line": 360,
+            "end_line": 362,
+            "kind": "symbol",
+            "score": 17.9696,
+            "match": null,
+            "why": "name match: get x1.16 (gets); owner match: TypeToken x1.06; bm25: gets, typetoken, get, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.FactorySupplier.get",
+            "start_line": 979,
+            "end_line": 979,
+            "kind": "symbol",
+            "score": 17.6787,
+            "match": null,
+            "why": "name match: get x1.16 (gets); bm25: typeadapterfactory, adapter, get, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.get",
+            "start_line": 355,
+            "end_line": 357,
+            "kind": "symbol",
+            "score": 17.5705,
+            "match": null,
+            "why": "name match: get x1.16 (gets); owner match: TypeToken x1.06; bm25: gets, typetoken, get, gson"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "start_line": 340,
+            "end_line": 399,
+            "label": "gson/src/main/java/com/google/gson/Gson.java::Gson.getAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "start_line": 407,
+            "end_line": 409,
+            "label": "gson/src/main/java/com/google/gson/Gson.java::Gson.getAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "start_line": 472,
+            "end_line": 503,
+            "label": "gson/src/main/java/com/google/gson/Gson.java::Gson.getDelegateAdapter"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "start_line": 432,
+            "end_line": 450,
+            "label": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.getCachedMethod"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java",
+            "start_line": 155,
+            "end_line": 159,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java::MapTypeAdapterFactory.getKeyAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "start_line": 360,
+            "end_line": 362,
+            "label": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.get"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "start_line": 979,
+            "end_line": 979,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.FactorySupplier.get"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "start_line": 355,
+            "end_line": 357,
+            "label": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.get"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "When I serialize an object that has a `Double.NaN` field, which method throws the error telling me to use `serializeSpecialFloatingPointValues()`?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+          "symbol": "TypeAdapters.checkValidFloatingPoint",
+          "start_line": 520,
+          "end_line": 527
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.01,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.serializeSpecialFloatingPointValues",
+            "start_line": 862,
+            "end_line": 866,
+            "kind": "symbol",
+            "score": 68.2092,
+            "match": null,
+            "why": "name match: serializeSpecialFloatingPointValues x1.16 (explicit serializespecialfloatingpointvalues); bm25: serializespecialfloatingpointvalues, serialize, special, floating, point, values, double, nan"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.checkValidFloatingPoint",
+            "start_line": 520,
+            "end_line": 527,
+            "kind": "symbol",
+            "score": 53.589,
+            "match": "symbol",
+            "why": "bm25: double, floating, point; body: serializespecialfloatingpointvalues, serialize, special, values, use, throws~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.doubleAdapter",
+            "start_line": 1021,
+            "end_line": 1023,
+            "kind": "symbol",
+            "score": 47.092,
+            "match": null,
+            "why": "bm25: double; body: serializespecialfloatingpointvalues, serialize, floating, special, point, values"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.floatAdapter",
+            "start_line": 1025,
+            "end_line": 1027,
+            "kind": "symbol",
+            "score": 34.9058,
+            "match": null,
+            "why": "bm25: body: serializespecialfloatingpointvalues, serialize, floating, special, point, values"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.GsonBuilder",
+            "start_line": 166,
+            "end_line": 187,
+            "kind": "symbol",
+            "score": 30.0598,
+            "match": null,
+            "why": "bm25: body: serialize, serializespecialfloatingpointvalues, floating, special, point, values, use, field, object"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.DoubleAdapter.write",
+            "start_line": 506,
+            "end_line": 517,
+            "kind": "symbol",
+            "score": 25.6563,
+            "match": null,
+            "why": "bm25: double, throws; body: floating, point"
+          },
+          {
+            "path": "gson/src/test/java/com/google/gson/functional/PrimitiveTest.java",
+            "symbol_id": "gson/src/test/java/com/google/gson/functional/PrimitiveTest.java::PrimitiveTest.testDoubleNaNSerialization",
+            "start_line": 543,
+            "end_line": 548,
+            "kind": "symbol",
+            "score": 25.288,
+            "match": null,
+            "why": "test code x0.5; bm25: double; body: nan, serializespecialfloatingpointvalues, serialize, floating, special, point, values"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1078,
+            "kind": "file",
+            "score": 24.4442,
+            "match": null,
+            "why": "bm25: serialize, double, serializespecialfloatingpointvalues, floating, special, field, point, values, object"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 862,
+            "end_line": 866,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.serializeSpecialFloatingPointValues"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "start_line": 520,
+            "end_line": 527,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.checkValidFloatingPoint"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 1021,
+            "end_line": 1023,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.doubleAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 1025,
+            "end_line": 1027,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.floatAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 166,
+            "end_line": 187,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.GsonBuilder"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "start_line": 506,
+            "end_line": 517,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.DoubleAdapter.write"
+          },
+          {
+            "path": "gson/src/test/java/com/google/gson/functional/PrimitiveTest.java",
+            "start_line": 543,
+            "end_line": 548,
+            "label": "gson/src/test/java/com/google/gson/functional/PrimitiveTest.java::PrimitiveTest.testDoubleNaNSerialization"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 2,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "How does `new TypeToken<List<String>>() {}` get `List<String>` back at runtime despite type erasure? Which method reads the type argument?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+          "symbol": "TypeToken.getTypeTokenTypeArgument",
+          "start_line": 95,
+          "end_line": 119
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0107,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken",
+            "start_line": 54,
+            "end_line": 452,
+            "kind": "symbol",
+            "score": 53.8668,
+            "match": "broad",
+            "why": "name match: TypeToken (explicit typetoken); class boost; bm25: runtime, typetoken, type"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.TypeToken",
+            "start_line": 72,
+            "end_line": 77,
+            "kind": "symbol",
+            "score": 51.2081,
+            "match": null,
+            "why": "name match: TypeToken (explicit typetoken); bm25: typetoken, type, new; body: argument, get"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.getParameterized",
+            "start_line": 385,
+            "end_line": 444,
+            "kind": "symbol",
+            "score": 34.5939,
+            "match": null,
+            "why": "name match: getParameterized x1.03 (get); owner match: TypeToken x1.01; bm25: argument, typeargument, type, typetoken, get; body: new"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.TypeToken",
+            "start_line": 80,
+            "end_line": 85,
+            "kind": "symbol",
+            "score": 34.2112,
+            "match": null,
+            "why": "name match: TypeToken (explicit typetoken); bm25: typetoken, type; body: get"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.getTypeTokenTypeArgument",
+            "start_line": 95,
+            "end_line": 119,
+            "kind": "symbol",
+            "score": 33.4803,
+            "match": "symbol",
+            "why": "name match: getTypeTokenTypeArgument x1.15 (argument, get, type); owner match: TypeToken x1.05; bm25: argument, typetoken, type, get; body: typeargument, new"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/GsonTypes.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/GsonTypes.java::GsonTypes.ParameterizedTypeImpl.getActualTypeArguments",
+            "start_line": 536,
+            "end_line": 539,
+            "kind": "symbol",
+            "score": 26.9304,
+            "match": null,
+            "why": "name match: getActualTypeArguments x1.14 (argument, get, type); bm25: argument, type, get; body: typeargument"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java::TypeAdapterRuntimeTypeWrapper.getRuntimeTypeIfMoreSpecific",
+            "start_line": 103,
+            "end_line": 121,
+            "kind": "symbol",
+            "score": 25.8358,
+            "match": null,
+            "why": "name match: getRuntimeTypeIfMoreSpecific x1.11 (get, runtime, type); bm25: runtime, type, get; body: argument"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/GsonTypes.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/GsonTypes.java::GsonTypes.ParameterizedTypeImpl.ParameterizedTypeImpl",
+            "start_line": 519,
+            "end_line": 534,
+            "kind": "symbol",
+            "score": 24.584,
+            "match": null,
+            "why": "name match: ParameterizedTypeImpl x1.02 (type); bm25: typeargument, argument, type; body: new"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "start_line": 54,
+            "end_line": 452,
+            "label": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "start_line": 72,
+            "end_line": 77,
+            "label": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.TypeToken"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "start_line": 385,
+            "end_line": 444,
+            "label": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.getParameterized"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "start_line": 80,
+            "end_line": 85,
+            "label": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.TypeToken"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "start_line": 95,
+            "end_line": 119,
+            "label": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.getTypeTokenTypeArgument"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/GsonTypes.java",
+            "start_line": 536,
+            "end_line": 539,
+            "label": "gson/src/main/java/com/google/gson/internal/GsonTypes.java::GsonTypes.ParameterizedTypeImpl.getActualTypeArguments"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java",
+            "start_line": 103,
+            "end_line": 121,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java::TypeAdapterRuntimeTypeWrapper.getRuntimeTypeIfMoreSpecific"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/GsonTypes.java",
+            "start_line": 519,
+            "end_line": 534,
+            "label": "gson/src/main/java/com/google/gson/internal/GsonTypes.java::GsonTypes.ParameterizedTypeImpl.ParameterizedTypeImpl"
+          }
+        ],
+        "rank": 5,
+        "loose_rank": 1,
+        "rr": 0.2,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where does Gson refuse to turn a huge number such as `1e1000000000` or a 50,000-digit literal into a BigDecimal, to avoid very slow parsing?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java",
+          "symbol": "NumberLimits.parseBigDecimal",
+          "start_line": 21,
+          "end_line": 30
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java",
+          "symbol": "NumberLimits.checkNumberStringLength",
+          "start_line": 15,
+          "end_line": 19
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.009,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/NumberLimits.java::NumberLimits.parseBigDecimal",
+            "start_line": 21,
+            "end_line": 30,
+            "kind": "symbol",
+            "score": 34.1643,
+            "match": "symbol",
+            "why": "name match: parseBigDecimal x1.08 (parsing); owner match: NumberLimits x1.01; bm25: bigdecimal, number, parsing~, gson; body: 000, avoid"
+          },
+          {
+            "path": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java",
+            "symbol_id": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java::UtcDateTypeAdapter.parseInt",
+            "start_line": 255,
+            "end_line": 280,
+            "kind": "symbol",
+            "score": 22.7848,
+            "match": null,
+            "why": "name match: parseInt x1.10 (parsing); bm25: number, parsing~, gson; body: digit"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java::ISO8601Utils.parseInt",
+            "start_line": 332,
+            "end_line": 357,
+            "kind": "symbol",
+            "score": 22.5151,
+            "match": null,
+            "why": "name match: parseInt x1.10 (parsing); bm25: parsing~, number, gson; body: digit"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.peekNumber",
+            "start_line": 815,
+            "end_line": 925,
+            "kind": "symbol",
+            "score": 17.6412,
+            "match": null,
+            "why": "name match: peekNumber x1.05 (number); bm25: number, gson; body: digit, literal"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.asBigDecimal",
+            "start_line": 39,
+            "end_line": 41,
+            "kind": "symbol",
+            "score": 17.5363,
+            "match": null,
+            "why": "bm25: bigdecimal, parsing~, number, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/NumberLimits.java::NumberLimits",
+            "start_line": 10,
+            "end_line": 36,
+            "kind": "symbol",
+            "score": 16.6232,
+            "match": "overlap",
+            "why": "name match: NumberLimits x1.05 (number); class boost; bm25: avoid, number, parsing~, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/JavaVersion.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/JavaVersion.java::JavaVersion.extractBeginningInt",
+            "start_line": 60,
+            "end_line": 75,
+            "kind": "symbol",
+            "score": 16.5136,
+            "match": null,
+            "why": "bm25: gson; body: number, digit, parsing~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.getAsBigDecimal",
+            "start_line": 181,
+            "end_line": 186,
+            "kind": "symbol",
+            "score": 15.7011,
+            "match": null,
+            "why": "bm25: bigdecimal, gson; body: parsing~, number"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java",
+            "start_line": 21,
+            "end_line": 30,
+            "label": "gson/src/main/java/com/google/gson/internal/NumberLimits.java::NumberLimits.parseBigDecimal"
+          },
+          {
+            "path": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java",
+            "start_line": 255,
+            "end_line": 280,
+            "label": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java::UtcDateTypeAdapter.parseInt"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java",
+            "start_line": 332,
+            "end_line": 357,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java::ISO8601Utils.parseInt"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 815,
+            "end_line": 925,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.peekNumber"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "start_line": 39,
+            "end_line": 41,
+            "label": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.asBigDecimal"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java",
+            "start_line": 10,
+            "end_line": 36,
+            "label": "gson/src/main/java/com/google/gson/internal/NumberLimits.java::NumberLimits"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/JavaVersion.java",
+            "start_line": 60,
+            "end_line": 75,
+            "label": "gson/src/main/java/com/google/gson/internal/JavaVersion.java::JavaVersion.extractBeginningInt"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "start_line": 181,
+            "end_line": 186,
+            "label": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.getAsBigDecimal"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Which method turns an escape sequence like `\\u00e9` or `\\n` inside a JSON string back into the real character while reading?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+          "symbol": "JsonReader.readEscapeCharacter",
+          "start_line": 1872,
+          "end_line": 1937
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0089,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.readEscapeCharacter",
+            "start_line": 1872,
+            "end_line": 1937,
+            "kind": "symbol",
+            "score": 74.7135,
+            "match": "symbol",
+            "why": "name match: readEscapeCharacter x1.32 (character, escape, reading); owner match: JsonReader x1.05; bm25: escape, character, reading~, json; body: sequence, string"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextQuotedValue",
+            "start_line": 1209,
+            "end_line": 1263,
+            "kind": "symbol",
+            "score": 34.9242,
+            "match": null,
+            "why": "bm25: character, escape, sequence~, reading~, string, json; body: like"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.skipQuotedValue",
+            "start_line": 1345,
+            "end_line": 1370,
+            "kind": "symbol",
+            "score": 33.9298,
+            "match": null,
+            "why": "bm25: json; body: like, character, escape, reading~, string"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.getCharacterOffset",
+            "start_line": 1861,
+            "end_line": 1863,
+            "kind": "symbol",
+            "score": 26.4949,
+            "match": null,
+            "why": "name match: getCharacterOffset x1.04 (character); owner match: JsonReader x1.01; bm25: character, reading, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/Streams.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/Streams.java::Streams.AppendableWriter.CurrentWrite.subSequence",
+            "start_line": 154,
+            "end_line": 157,
+            "kind": "symbol",
+            "score": 25.6935,
+            "match": null,
+            "why": "name match: subSequence x1.07 (sequence); bm25: sequence; body: string"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.JsonPrimitive",
+            "start_line": 81,
+            "end_line": 86,
+            "kind": "symbol",
+            "score": 25.1129,
+            "match": null,
+            "why": "name match: JsonPrimitive x1.01 (json); bm25: character, turns~, string, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.disableHtmlEscaping",
+            "start_line": 613,
+            "end_line": 617,
+            "kind": "symbol",
+            "score": 22.4158,
+            "match": null,
+            "why": "name match: disableHtmlEscaping x1.06 (escape); bm25: escape, character~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/Streams.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/Streams.java::Streams.AppendableWriter.write",
+            "start_line": 115,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 21.9451,
+            "match": null,
+            "why": "bm25: string; body: turns"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1872,
+            "end_line": 1937,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.readEscapeCharacter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1209,
+            "end_line": 1263,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextQuotedValue"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1345,
+            "end_line": 1370,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.skipQuotedValue"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1861,
+            "end_line": 1863,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.getCharacterOffset"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/Streams.java",
+            "start_line": 154,
+            "end_line": 157,
+            "label": "gson/src/main/java/com/google/gson/internal/Streams.java::Streams.AppendableWriter.CurrentWrite.subSequence"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "start_line": 81,
+            "end_line": 86,
+            "label": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.JsonPrimitive"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 613,
+            "end_line": 617,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.disableHtmlEscaping"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/Streams.java",
+            "start_line": 115,
+            "end_line": 120,
+            "label": "gson/src/main/java/com/google/gson/internal/Streams.java::Streams.AppendableWriter.write"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Java'daki camelCase alan adini JSON'da snake_case'e (someFieldName -> some_field_name) ceviren kod nerede?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java",
+          "symbol": "FieldNamingPolicy.separateCamelCase",
+          "start_line": 179,
+          "end_line": 189
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java",
+          "start_line": 114,
+          "end_line": 119
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0119,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java::FieldNamingPolicy.separateCamelCase",
+            "start_line": 179,
+            "end_line": 189,
+            "kind": "symbol",
+            "score": 26.0869,
+            "match": "symbol",
+            "why": "bm25: camel, case, name, convert, field, java"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeFieldName",
+            "start_line": 642,
+            "end_line": 665,
+            "kind": "symbol",
+            "score": 23.8141,
+            "match": null,
+            "why": "bm25: name, field, json, java; body: camel, case"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.readFieldName",
+            "start_line": 413,
+            "end_line": 439,
+            "kind": "symbol",
+            "score": 23.5126,
+            "match": null,
+            "why": "bm25: name, field, json, java; body: camel, case"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.newBuilder",
+            "start_line": 223,
+            "end_line": 225,
+            "kind": "symbol",
+            "score": 22.0413,
+            "match": null,
+            "why": "bm25: camel, case, convert, name, field, java"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.Builder.setFieldNameSerializationFormat",
+            "start_line": 128,
+            "end_line": 134,
+            "kind": "symbol",
+            "score": 18.1018,
+            "match": null,
+            "why": "bm25: case, name, field, convert, json, java"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.javaName",
+            "start_line": 199,
+            "end_line": 201,
+            "kind": "symbol",
+            "score": 17.6326,
+            "match": null,
+            "why": "name match: javaName x1.00 (java); bm25: name, java; body: camel, case"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 213,
+            "kind": "file",
+            "score": 16.9441,
+            "match": "file",
+            "why": "bm25: camel, case, field, java"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.Builder.Builder",
+            "start_line": 96,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 14.5964,
+            "match": null,
+            "why": "bm25: case, name, field, java; body: json"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java",
+            "start_line": 179,
+            "end_line": 189,
+            "label": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java::FieldNamingPolicy.separateCamelCase"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 642,
+            "end_line": 665,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeFieldName"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 413,
+            "end_line": 439,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.readFieldName"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "start_line": 223,
+            "end_line": 225,
+            "label": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.newBuilder"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "start_line": 128,
+            "end_line": 134,
+            "label": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.Builder.setFieldNameSerializationFormat"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 199,
+            "end_line": 201,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.javaName"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "start_line": 96,
+            "end_line": 105,
+            "label": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.Builder.Builder"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "transient ya da static alanlar JSON'a neden yazılmıyor; bu alanları eleyen kontrol hangi metotta?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/Excluder.java",
+          "symbol": "Excluder.excludeField",
+          "start_line": 158,
+          "end_line": 165
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/Excluder.java",
+          "symbol": "Excluder.isExcludedByModifier",
+          "start_line": 167,
+          "end_line": 169
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.008,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeField",
+            "start_line": 478,
+            "end_line": 487,
+            "kind": "symbol",
+            "score": 17.0246,
+            "match": null,
+            "why": "name match: writeField x1.64 (alanlar, alanları, yazılmıyor); bm25: write~, field, json"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeRepeatedField",
+            "start_line": 489,
+            "end_line": 496,
+            "kind": "symbol",
+            "score": 14.8533,
+            "match": null,
+            "why": "name match: writeRepeatedField x1.49 (alanlar, alanları, yazılmıyor); bm25: write~, field, json"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeMapField",
+            "start_line": 547,
+            "end_line": 586,
+            "kind": "symbol",
+            "score": 14.265,
+            "match": null,
+            "why": "name match: writeMapField x1.49 (alanlar, alanları, yazılmıyor); bm25: write~, field, json"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeOneofFields",
+            "start_line": 588,
+            "end_line": 621,
+            "kind": "symbol",
+            "score": 14.0241,
+            "match": null,
+            "why": "name match: writeOneofFields x1.49 (alanlar, alanları, yazılmıyor); bm25: write~, field, json"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeMessageField",
+            "start_line": 541,
+            "end_line": 545,
+            "kind": "symbol",
+            "score": 13.7617,
+            "match": null,
+            "why": "name match: writeMessageField x1.49 (alanlar, alanları, yazılmıyor); bm25: write~, field, json"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeSingleFieldValue",
+            "start_line": 498,
+            "end_line": 539,
+            "kind": "symbol",
+            "score": 12.9661,
+            "match": null,
+            "why": "name match: writeSingleFieldValue x1.42 (alanlar, alanları, yazılmıyor); bm25: write~, field, json"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeFieldName",
+            "start_line": 642,
+            "end_line": 665,
+            "kind": "symbol",
+            "score": 12.6537,
+            "match": null,
+            "why": "name match: writeFieldName x1.49 (alanlar, alanları, yazılmıyor); bm25: write~, field, json"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.write",
+            "start_line": 441,
+            "end_line": 476,
+            "kind": "symbol",
+            "score": 12.34,
+            "match": null,
+            "why": "name match: write x1.24 (yazılmıyor); bm25: write~, json; body: field"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 478,
+            "end_line": 487,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeField"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 489,
+            "end_line": 496,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeRepeatedField"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 547,
+            "end_line": 586,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeMapField"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 588,
+            "end_line": 621,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeOneofFields"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 541,
+            "end_line": 545,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeMessageField"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 498,
+            "end_line": 539,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeSingleFieldValue"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 642,
+            "end_line": 665,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeFieldName"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 441,
+            "end_line": 476,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.write"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Alanin tipi Animal ama icinde bir Dog nesnesi var; serialize ederken Dog'un alanlarini da yazmaya nerede karar veriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java",
+          "symbol": "TypeAdapterRuntimeTypeWrapper.write",
+          "start_line": 44,
+          "end_line": 78
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java",
+          "symbol": "TypeAdapterRuntimeTypeWrapper.getRuntimeTypeIfMoreSpecific",
+          "start_line": 103,
+          "end_line": 121
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0057,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeMapField",
+            "start_line": 547,
+            "end_line": 586,
+            "kind": "symbol",
+            "score": 22.1127,
+            "match": null,
+            "why": "name match: writeMapField x1.57 (alanlarini, yazmaya); bm25: write~, field, object; body: serialize"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.serialize",
+            "start_line": 254,
+            "end_line": 284,
+            "kind": "symbol",
+            "score": 21.7856,
+            "match": null,
+            "why": "name match: serialize x1.44 (serialize); bm25: serialize; body: field, object"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeField",
+            "start_line": 478,
+            "end_line": 487,
+            "kind": "symbol",
+            "score": 20.3448,
+            "match": null,
+            "why": "name match: writeField x1.74 (alanlarini, yazmaya); bm25: write~, field, object"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonSerializationContext.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonSerializationContext.java::JsonSerializationContext.serialize",
+            "start_line": 36,
+            "end_line": 36,
+            "kind": "symbol",
+            "score": 19.6676,
+            "match": null,
+            "why": "name match: serialize x1.44 (serialize); bm25: serialize, object"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonSerializationContext.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonSerializationContext.java::JsonSerializationContext.serialize",
+            "start_line": 48,
+            "end_line": 48,
+            "kind": "symbol",
+            "score": 18.839,
+            "match": null,
+            "why": "name match: serialize x1.44 (serialize); bm25: serialize, object"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.writeReplace",
+            "start_line": 84,
+            "end_line": 86,
+            "kind": "symbol",
+            "score": 18.713,
+            "match": null,
+            "why": "name match: writeReplace x1.27 (yazmaya); bm25: serialize, write~, object"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java::TreeTypeAdapter.GsonContextImpl.serialize",
+            "start_line": 193,
+            "end_line": 196,
+            "kind": "symbol",
+            "score": 18.5494,
+            "match": null,
+            "why": "name match: serialize x1.44 (serialize); bm25: serialize, object"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeRepeatedField",
+            "start_line": 489,
+            "end_line": 496,
+            "kind": "symbol",
+            "score": 18.4072,
+            "match": null,
+            "why": "name match: writeRepeatedField x1.57 (alanlarini, yazmaya); bm25: write~, field, object"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 547,
+            "end_line": 586,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeMapField"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "start_line": 254,
+            "end_line": 284,
+            "label": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.serialize"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 478,
+            "end_line": 487,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeField"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonSerializationContext.java",
+            "start_line": 36,
+            "end_line": 36,
+            "label": "gson/src/main/java/com/google/gson/JsonSerializationContext.java::JsonSerializationContext.serialize"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonSerializationContext.java",
+            "start_line": 48,
+            "end_line": 48,
+            "label": "gson/src/main/java/com/google/gson/JsonSerializationContext.java::JsonSerializationContext.serialize"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "start_line": 84,
+            "end_line": 86,
+            "label": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.writeReplace"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
+            "start_line": 193,
+            "end_line": 196,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java::TreeTypeAdapter.GsonContextImpl.serialize"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 489,
+            "end_line": 496,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeRepeatedField"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How does Gson guard JSON against being loaded as a script by another site with the `)]}'` prefix: where is the prefix written, and where is it skipped when reading?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/Gson.java",
+          "symbol": "Gson.newJsonWriter",
+          "start_line": 797,
+          "end_line": 807
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+          "symbol": "JsonReader.consumeNonExecutePrefix",
+          "start_line": 1963,
+          "end_line": 1984
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0147,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextNonWhitespace",
+            "start_line": 1639,
+            "end_line": 1726,
+            "kind": "symbol",
+            "score": 19.4213,
+            "match": null,
+            "why": "bm25: json, gson; body: loaded, skipped~, reading~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.skipValue",
+            "start_line": 1506,
+            "end_line": 1582,
+            "kind": "symbol",
+            "score": 17.6419,
+            "match": null,
+            "why": "name match: skipValue x1.07 (skipped); owner match: JsonReader x1.01; bm25: skipped, json, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.generateNonExecutableJson",
+            "start_line": 242,
+            "end_line": 246,
+            "kind": "symbol",
+            "score": 17.2542,
+            "match": null,
+            "why": "name match: generateNonExecutableJson x1.00 (json); owner match: GsonBuilder x1.00; bm25: script, site~, prefix, json, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.readObject",
+            "start_line": 88,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 14.5963,
+            "match": null,
+            "why": "name match: readObject x1.07 (reading); bm25: reading~, gson; body: written"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LinkedTreeMap.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/LinkedTreeMap.java::LinkedTreeMap.readObject",
+            "start_line": 672,
+            "end_line": 676,
+            "kind": "symbol",
+            "score": 14.5963,
+            "match": null,
+            "why": "name match: readObject x1.07 (reading); bm25: reading~, gson; body: written"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonWriter.java::JsonWriter.beforeValue",
+            "start_line": 805,
+            "end_line": 835,
+            "kind": "symbol",
+            "score": 14.3671,
+            "match": null,
+            "why": "bm25: another, json, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/ExclusionStrategy.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/ExclusionStrategy.java::ExclusionStrategy.shouldSkipField",
+            "start_line": 102,
+            "end_line": 102,
+            "kind": "symbol",
+            "score": 13.9405,
+            "match": null,
+            "why": "name match: shouldSkipField x1.06 (skipped); bm25: skipped, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java::JsonTreeReader.nextName",
+            "start_line": 191,
+            "end_line": 199,
+            "kind": "symbol",
+            "score": 13.1481,
+            "match": null,
+            "why": "bm25: skipped, json, gson"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1639,
+            "end_line": 1726,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextNonWhitespace"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1506,
+            "end_line": 1582,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.skipValue"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 242,
+            "end_line": 246,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.generateNonExecutableJson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "start_line": 88,
+            "end_line": 92,
+            "label": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.readObject"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LinkedTreeMap.java",
+            "start_line": 672,
+            "end_line": 676,
+            "label": "gson/src/main/java/com/google/gson/internal/LinkedTreeMap.java::LinkedTreeMap.readObject"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java",
+            "start_line": 805,
+            "end_line": 835,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonWriter.java::JsonWriter.beforeValue"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/ExclusionStrategy.java",
+            "start_line": 102,
+            "end_line": 102,
+            "label": "gson/src/main/java/com/google/gson/ExclusionStrategy.java::ExclusionStrategy.shouldSkipField"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java",
+            "start_line": 191,
+            "end_line": 199,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java::JsonTreeReader.nextName"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "If a Map's keys are objects (say a Point with x and y), when does Gson write the map as a JSON array of [key, value] pairs instead of a JSON object, and where is that decided?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java",
+          "symbol": "MapTypeAdapterFactory.Adapter.write",
+          "start_line": 216,
+          "end_line": 262
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0146,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java::MapTypeAdapterFactory.Adapter.write",
+            "start_line": 216,
+            "end_line": 262,
+            "kind": "symbol",
+            "score": 43.593,
+            "match": "symbol",
+            "why": "name match: write x1.05 (write); bm25: write, map, json, gson; body: keys, value, array, objects~"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeMapField",
+            "start_line": 547,
+            "end_line": 586,
+            "kind": "symbol",
+            "score": 33.3035,
+            "match": null,
+            "why": "name match: writeMapField x1.08 (map, write); bm25: write, value, map, objects, json, gson; body: keys~, maps"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonObject.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonObject.java::JsonObject.size",
+            "start_line": 156,
+            "end_line": 158,
+            "kind": "symbol",
+            "score": 30.8917,
+            "match": null,
+            "why": "bm25: pairs, jsonobject, keys~, value, objects~, json, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonObject.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonObject.java::JsonObject.asMap",
+            "start_line": 237,
+            "end_line": 240,
+            "kind": "symbol",
+            "score": 30.4631,
+            "match": null,
+            "why": "name match: asMap x1.04 (map); owner match: JsonObject x1.02; bm25: jsonobject, map, objects~, json, gson; body: keys, value~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonObject.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonObject.java::JsonObject.isEmpty",
+            "start_line": 166,
+            "end_line": 168,
+            "kind": "symbol",
+            "score": 29.6856,
+            "match": null,
+            "why": "bm25: pairs, jsonobject, keys~, value, objects~, json, gson"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.serialize",
+            "start_line": 254,
+            "end_line": 284,
+            "kind": "symbol",
+            "score": 28.7301,
+            "match": null,
+            "why": "bm25: json, gson; body: pairs~, value, jsonarray, jsonobject, array, map, objects~, keys~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/JsonElementTypeAdapter.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/JsonElementTypeAdapter.java::JsonElementTypeAdapter.write",
+            "start_line": 138,
+            "end_line": 170,
+            "kind": "symbol",
+            "score": 27.6284,
+            "match": null,
+            "why": "name match: write x1.05 (write); owner match: JsonElementTypeAdapter x1.00; bm25: write, value, json, gson; body: array, objects~, keys~, map"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.enableComplexMapKeySerialization",
+            "start_line": 359,
+            "end_line": 363,
+            "kind": "symbol",
+            "score": 27.6249,
+            "match": null,
+            "why": "name match: enableComplexMapKeySerialization x1.13 (key, keys, map); owner match: GsonBuilder x1.02; bm25: keys, map, objects, array, json, gson; body: value"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java",
+            "start_line": 216,
+            "end_line": 262,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java::MapTypeAdapterFactory.Adapter.write"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 547,
+            "end_line": 586,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.writeMapField"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonObject.java",
+            "start_line": 156,
+            "end_line": 158,
+            "label": "gson/src/main/java/com/google/gson/JsonObject.java::JsonObject.size"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonObject.java",
+            "start_line": 237,
+            "end_line": 240,
+            "label": "gson/src/main/java/com/google/gson/JsonObject.java::JsonObject.asMap"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonObject.java",
+            "start_line": 166,
+            "end_line": 168,
+            "label": "gson/src/main/java/com/google/gson/JsonObject.java::JsonObject.isEmpty"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java",
+            "start_line": 254,
+            "end_line": 284,
+            "label": "proto/src/main/java/com/google/gson/protobuf/ProtoTypeAdapter.java::ProtoTypeAdapter.serialize"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/JsonElementTypeAdapter.java",
+            "start_line": 138,
+            "end_line": 170,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/JsonElementTypeAdapter.java::JsonElementTypeAdapter.write"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 359,
+            "end_line": 363,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.enableComplexMapKeySerialization"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Java records have final fields and no no-args constructor. How does Gson deserialize a record then?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+          "symbol": "ReflectiveTypeAdapterFactory.RecordAdapter",
+          "start_line": 592,
+          "end_line": 693
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+          "symbol": "ReflectiveTypeAdapterFactory.RecordAdapter.finalize",
+          "start_line": 666,
+          "end_line": 692
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.014,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordNotSupportedHelper.getCanonicalRecordConstructor",
+            "start_line": 313,
+            "end_line": 317,
+            "kind": "symbol",
+            "score": 34.8635,
+            "match": null,
+            "why": "name match: getCanonicalRecordConstructor x1.57 (constructor, record, records); bm25: records, constructor, gson, java"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java::ReflectiveTypeAdapterFactory.RecordAdapter.RecordAdapter",
+            "start_line": 602,
+            "end_line": 627,
+            "kind": "symbol",
+            "score": 28.3732,
+            "match": "overlap",
+            "why": "name match: RecordAdapter x1.41 (record, records); bm25: fields, records~, gson, java; body: constructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.getCanonicalRecordConstructor",
+            "start_line": 195,
+            "end_line": 197,
+            "kind": "symbol",
+            "score": 23.0813,
+            "match": null,
+            "why": "name match: getCanonicalRecordConstructor x1.57 (constructor, record, records); bm25: records~, constructor, gson, java"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordSupportedHelper.getCanonicalRecordConstructor",
+            "start_line": 270,
+            "end_line": 284,
+            "kind": "symbol",
+            "score": 22.868,
+            "match": null,
+            "why": "name match: getCanonicalRecordConstructor x1.57 (constructor, record, records); bm25: records~, constructor, gson, java"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordHelper.getCanonicalRecordConstructor",
+            "start_line": 228,
+            "end_line": 228,
+            "kind": "symbol",
+            "score": 22.3551,
+            "match": null,
+            "why": "name match: getCanonicalRecordConstructor x1.57 (constructor, record, records); bm25: records~, constructor, gson, java"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordNotSupportedHelper",
+            "start_line": 300,
+            "end_line": 324,
+            "kind": "symbol",
+            "score": 22.2156,
+            "match": null,
+            "why": "name match: RecordNotSupportedHelper x1.27 (record, records); class boost; bm25: records, final, gson, java"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java::ReflectiveTypeAdapterFactory.getBoundFields",
+            "start_line": 341,
+            "end_line": 450,
+            "kind": "symbol",
+            "score": 22.0053,
+            "match": null,
+            "why": "name match: getBoundFields x1.08 (fields); bm25: fields, records, gson, java; body: deserialize"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordHelper",
+            "start_line": 223,
+            "end_line": 231,
+            "kind": "symbol",
+            "score": 21.5697,
+            "match": null,
+            "why": "name match: RecordHelper x1.41 (record, records); class boost; bm25: records, gson, java"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "start_line": 313,
+            "end_line": 317,
+            "label": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordNotSupportedHelper.getCanonicalRecordConstructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+            "start_line": 602,
+            "end_line": 627,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java::ReflectiveTypeAdapterFactory.RecordAdapter.RecordAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "start_line": 195,
+            "end_line": 197,
+            "label": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.getCanonicalRecordConstructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "start_line": 270,
+            "end_line": 284,
+            "label": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordSupportedHelper.getCanonicalRecordConstructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "start_line": 228,
+            "end_line": 228,
+            "label": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordHelper.getCanonicalRecordConstructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "start_line": 300,
+            "end_line": 324,
+            "label": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordNotSupportedHelper"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+            "start_line": 341,
+            "end_line": 450,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java::ReflectiveTypeAdapterFactory.getBoundFields"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java",
+            "start_line": 223,
+            "end_line": 231,
+            "label": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java::ReflectionHelper.RecordHelper"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 2,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.255,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Bir alana anotasyonla farkli bir JSON adi ve yedek (alternatif) adlar verdigimde, okurken bu adlar alana nerede eslestiriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+          "symbol": "ReflectiveTypeAdapterFactory.getFieldNames",
+          "start_line": 85,
+          "end_line": 107
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+          "symbol": "ReflectiveTypeAdapterFactory.getBoundFields",
+          "start_line": 341,
+          "end_line": 450
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0069,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.matches",
+            "start_line": 333,
+            "end_line": 337,
+            "kind": "symbol",
+            "score": 16.0548,
+            "match": null,
+            "why": "name match: matches x1.90 (eslestiriliyor); bm25: match"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.read",
+            "start_line": 208,
+            "end_line": 277,
+            "kind": "symbol",
+            "score": 15.1433,
+            "match": null,
+            "why": "name match: read x1.47 (okurken); bm25: read, json; body: match"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java::TreeTypeAdapter.newFactoryWithMatchRawType",
+            "start_line": 137,
+            "end_line": 142,
+            "kind": "symbol",
+            "score": 11.8321,
+            "match": null,
+            "why": "name match: newFactoryWithMatchRawType x1.30 (eslestiriliyor); bm25: match"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.readEscapeCharacter",
+            "start_line": 1872,
+            "end_line": 1937,
+            "kind": "symbol",
+            "score": 10.6291,
+            "match": null,
+            "why": "name match: readEscapeCharacter x1.25 (okurken); owner match: JsonReader x1.04; bm25: read, json; body: match"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/Gson.java::Gson.FutureTypeAdapter.read",
+            "start_line": 1267,
+            "end_line": 1270,
+            "kind": "symbol",
+            "score": 10.1256,
+            "match": null,
+            "why": "name match: read x1.47 (okurken); bm25: read, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java::TypeAdapterRuntimeTypeWrapper.read",
+            "start_line": 39,
+            "end_line": 42,
+            "kind": "symbol",
+            "score": 9.9283,
+            "match": null,
+            "why": "name match: read x1.47 (okurken); bm25: read, json"
+          },
+          {
+            "path": "test-shrinker/src/main/java/com/example/GenericClasses.java",
+            "symbol_id": "test-shrinker/src/main/java/com/example/GenericClasses.java::GenericClasses.DummyClass.Adapter.read",
+            "start_line": 57,
+            "end_line": 60,
+            "kind": "symbol",
+            "score": 9.8208,
+            "match": null,
+            "why": "name match: read x1.47 (okurken); bm25: read, json"
+          },
+          {
+            "path": "extras/src/main/java/com/google/gson/interceptors/InterceptorFactory.java",
+            "symbol_id": "extras/src/main/java/com/google/gson/interceptors/InterceptorFactory.java::InterceptorFactory.InterceptorAdapter.read",
+            "start_line": 59,
+            "end_line": 64,
+            "kind": "symbol",
+            "score": 9.8024,
+            "match": null,
+            "why": "name match: read x1.47 (okurken); bm25: read, json"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java",
+            "start_line": 333,
+            "end_line": 337,
+            "label": "gson/src/main/java/com/google/gson/reflect/TypeToken.java::TypeToken.matches"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java",
+            "start_line": 208,
+            "end_line": 277,
+            "label": "proto/src/main/java/com/google/gson/protobuf/LegacyProtoTypeAdapterFactory.java::LegacyProtoTypeAdapterFactory.Adapter.read"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
+            "start_line": 137,
+            "end_line": 142,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java::TreeTypeAdapter.newFactoryWithMatchRawType"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1872,
+            "end_line": 1937,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.readEscapeCharacter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "start_line": 1267,
+            "end_line": 1270,
+            "label": "gson/src/main/java/com/google/gson/Gson.java::Gson.FutureTypeAdapter.read"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java",
+            "start_line": 39,
+            "end_line": 42,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java::TypeAdapterRuntimeTypeWrapper.read"
+          },
+          {
+            "path": "test-shrinker/src/main/java/com/example/GenericClasses.java",
+            "start_line": 57,
+            "end_line": 60,
+            "label": "test-shrinker/src/main/java/com/example/GenericClasses.java::GenericClasses.DummyClass.Adapter.read"
+          },
+          {
+            "path": "extras/src/main/java/com/google/gson/interceptors/InterceptorFactory.java",
+            "start_line": 59,
+            "end_line": 64,
+            "label": "extras/src/main/java/com/google/gson/interceptors/InterceptorFactory.java::InterceptorFactory.InterceptorAdapter.read"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "JSON'u Map<String, Object>'e okuduğumda 1 gibi tam sayılar neden 1.0 (Double) oluyor; bu dönüşüm nerede yapılıyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/ObjectTypeAdapter.java",
+          "symbol": "ObjectTypeAdapter.readTerminal",
+          "start_line": 91,
+          "end_line": 106
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/ToNumberPolicy.java",
+          "start_line": 42,
+          "end_line": 47
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0153,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextDouble",
+            "start_line": 1084,
+            "end_line": 1131,
+            "kind": "symbol",
+            "score": 24.7632,
+            "match": null,
+            "why": "name match: nextDouble x1.19 (double); owner match: JsonReader x1.03; bm25: double, number, string, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.DoubleAdapter.read",
+            "start_line": 497,
+            "end_line": 504,
+            "kind": "symbol",
+            "score": 24.303,
+            "match": null,
+            "why": "name match: read x1.25 (okuduğumda); owner match: DoubleAdapter x1.04; bm25: double, read, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.getAsDouble",
+            "start_line": 173,
+            "end_line": 176,
+            "kind": "symbol",
+            "score": 23.9785,
+            "match": null,
+            "why": "name match: getAsDouble x1.15 (double); owner match: JsonPrimitive x1.03; bm25: double, json; body: number, string"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java::JsonTreeReader.nextDouble",
+            "start_line": 239,
+            "end_line": 261,
+            "kind": "symbol",
+            "score": 23.6761,
+            "match": null,
+            "why": "name match: nextDouble x1.19 (double); owner match: JsonTreeReader x1.02; bm25: double, json; body: number, string"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.doubleValue",
+            "start_line": 70,
+            "end_line": 73,
+            "kind": "symbol",
+            "score": 21.6567,
+            "match": null,
+            "why": "name match: doubleValue x1.19 (double); owner match: LazilyParsedNumber x1.02; bm25: double, number"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.hashOfDoubleValue",
+            "start_line": 297,
+            "end_line": 300,
+            "kind": "symbol",
+            "score": 20.487,
+            "match": null,
+            "why": "name match: hashOfDoubleValue x1.13 (double); owner match: JsonPrimitive x1.02; bm25: double, number, object, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.doubleAdapter",
+            "start_line": 1021,
+            "end_line": 1023,
+            "kind": "symbol",
+            "score": 20.3108,
+            "match": null,
+            "why": "name match: doubleAdapter x1.19 (double); bm25: double, number"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.equals",
+            "start_line": 306,
+            "end_line": 336,
+            "kind": "symbol",
+            "score": 19.4629,
+            "match": null,
+            "why": "bm25: object, json; body: double, number"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1084,
+            "end_line": 1131,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextDouble"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "start_line": 497,
+            "end_line": 504,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.DoubleAdapter.read"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "start_line": 173,
+            "end_line": 176,
+            "label": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.getAsDouble"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java",
+            "start_line": 239,
+            "end_line": 261,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java::JsonTreeReader.nextDouble"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "start_line": 70,
+            "end_line": 73,
+            "label": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.doubleValue"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "start_line": 297,
+            "end_line": 300,
+            "label": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.hashOfDoubleValue"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 1021,
+            "end_line": 1023,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.doubleAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "start_line": 306,
+            "end_line": 336,
+            "label": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.equals"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Lenient modda JSON içindeki // ve # ile başlayan yorum satırları ve /* */ blokları nerede atlanıyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+          "symbol": "JsonReader.nextNonWhitespace",
+          "start_line": 1639,
+          "end_line": 1726
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0084,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.skipToEndOfLine",
+            "start_line": 1739,
+            "end_line": 1750,
+            "kind": "symbol",
+            "score": 17.1554,
+            "match": null,
+            "why": "name match: skipToEndOfLine x1.17 (satırları); owner match: JsonReader x1.03; bm25: line~, json; body: start"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.locationString",
+            "start_line": 1779,
+            "end_line": 1783,
+            "kind": "symbol",
+            "score": 14.8704,
+            "match": null,
+            "why": "bm25: json; body: line~, start"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.fillBuffer",
+            "start_line": 1604,
+            "end_line": 1632,
+            "kind": "symbol",
+            "score": 13.9046,
+            "match": null,
+            "why": "bm25: json; body: start, line~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextNonWhitespace",
+            "start_line": 1639,
+            "end_line": 1726,
+            "kind": "symbol",
+            "score": 11.8598,
+            "match": "symbol",
+            "why": "bm25: json; body: line~, lenient, start"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextQuotedValue",
+            "start_line": 1209,
+            "end_line": 1263,
+            "kind": "symbol",
+            "score": 11.7862,
+            "match": null,
+            "why": "bm25: json; body: start, line~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.skipTo",
+            "start_line": 1755,
+            "end_line": 1772,
+            "kind": "symbol",
+            "score": 11.7156,
+            "match": null,
+            "why": "bm25: json; body: line~, start"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.checkLenient",
+            "start_line": 1728,
+            "end_line": 1733,
+            "kind": "symbol",
+            "score": 11.033,
+            "match": null,
+            "why": "name match: checkLenient x1.25 (lenient); owner match: JsonReader x1.04; bm25: lenient, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.setLenient",
+            "start_line": 340,
+            "end_line": 346,
+            "kind": "symbol",
+            "score": 10.9934,
+            "match": null,
+            "why": "name match: setLenient x1.25 (lenient); owner match: JsonReader x1.04; bm25: lenient, json"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1739,
+            "end_line": 1750,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.skipToEndOfLine"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1779,
+            "end_line": 1783,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.locationString"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1604,
+            "end_line": 1632,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.fillBuffer"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1639,
+            "end_line": 1726,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextNonWhitespace"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1209,
+            "end_line": 1263,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextQuotedValue"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1755,
+            "end_line": 1772,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.skipTo"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1728,
+            "end_line": 1733,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.checkLenient"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 340,
+            "end_line": 346,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.setLenient"
+          }
+        ],
+        "rank": 4,
+        "loose_rank": 4,
+        "rr": 0.25,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "flow",
+      "lang": "en",
+      "question": "What happens between `gson.fromJson(json, User.class)` and getting back a filled-in `User`: how does the JSON text become an object with its fields set?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/Gson.java",
+          "symbol": "Gson.fromJson",
+          "start_line": 1087,
+          "end_line": 1136
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+          "symbol": "ReflectiveTypeAdapterFactory.create",
+          "start_line": 109,
+          "end_line": 166
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+          "symbol": "ReflectiveTypeAdapterFactory.Adapter.read",
+          "start_line": 523,
+          "end_line": 551
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0188,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/Gson.java::Gson.fromJson",
+            "start_line": 850,
+            "end_line": 852,
+            "kind": "symbol",
+            "score": 31.102,
+            "match": "symbol",
+            "why": "name match: fromJson x1.04 (explicit gson.fromjson); qualname/path match: gson.fromjson; bm25: fromjson, from, fields, json, object, gson; body: getting~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.IntegerFieldsTypeAdapter",
+            "start_line": 851,
+            "end_line": 897,
+            "kind": "symbol",
+            "score": 30.8194,
+            "match": null,
+            "why": "name match: IntegerFieldsTypeAdapter x1.03 (fields); class boost; class asked x3; bm25: fields, set, json, gson"
+          },
+          {
+            "path": "test-shrinker/src/main/java/com/example/ClassWithNamedFields.java",
+            "symbol_id": "test-shrinker/src/main/java/com/example/ClassWithNamedFields.java::ClassWithNamedFields",
+            "start_line": 3,
+            "end_line": 10,
+            "kind": "symbol",
+            "score": 30.7725,
+            "match": null,
+            "why": "name match: ClassWithNamedFields x1.05 (fields); class boost; class asked x3; bm25: fields"
+          },
+          {
+            "path": "gson/src/test/java/com/google/gson/functional/JsonAdapterAnnotationOnFieldsTest.java",
+            "symbol_id": "gson/src/test/java/com/google/gson/functional/JsonAdapterAnnotationOnFieldsTest.java::JsonAdapterAnnotationOnFieldsTest.User",
+            "start_line": 174,
+            "end_line": 181,
+            "kind": "symbol",
+            "score": 29.2711,
+            "match": null,
+            "why": "name match: User x1.08 (explicit user); owner match: JsonAdapterAnnotationOnFieldsTest x1.01; class boost; class asked x3; test code x0.5; bm25: user, fields, json, gson"
+          },
+          {
+            "path": "metrics/src/main/java/com/google/gson/metrics/ParseBenchmark.java",
+            "symbol_id": "metrics/src/main/java/com/google/gson/metrics/ParseBenchmark.java::ParseBenchmark.User",
+            "start_line": 331,
+            "end_line": 373,
+            "kind": "symbol",
+            "score": 29.178,
+            "match": null,
+            "why": "name match: User x1.08 (explicit user); class boost; class asked x3; bm25: user, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/Gson.java::Gson.fromJson",
+            "start_line": 1087,
+            "end_line": 1136,
+            "kind": "symbol",
+            "score": 28.4506,
+            "match": "symbol",
+            "why": "name match: fromJson x1.04 (explicit gson.fromjson); qualname/path match: gson.fromjson; bm25: fromjson, from, object, getting~, json, gson; body: set"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java::ReflectiveTypeAdapterFactory.FieldsData",
+            "start_line": 312,
+            "end_line": 324,
+            "kind": "symbol",
+            "score": 28.4026,
+            "match": null,
+            "why": "name match: FieldsData x1.04 (fields); class boost; class asked x3; bm25: fields, gson"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/StructTypeAdapter.java",
+            "symbol_id": "proto/src/main/java/com/google/gson/protobuf/StructTypeAdapter.java::StructTypeAdapter",
+            "start_line": 45,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 27.0833,
+            "match": null,
+            "why": "class boost; class asked x3; bm25: between, object, json, gson"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "start_line": 850,
+            "end_line": 852,
+            "label": "gson/src/main/java/com/google/gson/Gson.java::Gson.fromJson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+            "start_line": 851,
+            "end_line": 897,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java::TypeAdapters.IntegerFieldsTypeAdapter"
+          },
+          {
+            "path": "test-shrinker/src/main/java/com/example/ClassWithNamedFields.java",
+            "start_line": 3,
+            "end_line": 10,
+            "label": "test-shrinker/src/main/java/com/example/ClassWithNamedFields.java::ClassWithNamedFields"
+          },
+          {
+            "path": "gson/src/test/java/com/google/gson/functional/JsonAdapterAnnotationOnFieldsTest.java",
+            "start_line": 174,
+            "end_line": 181,
+            "label": "gson/src/test/java/com/google/gson/functional/JsonAdapterAnnotationOnFieldsTest.java::JsonAdapterAnnotationOnFieldsTest.User"
+          },
+          {
+            "path": "metrics/src/main/java/com/google/gson/metrics/ParseBenchmark.java",
+            "start_line": 331,
+            "end_line": 373,
+            "label": "metrics/src/main/java/com/google/gson/metrics/ParseBenchmark.java::ParseBenchmark.User"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/Gson.java",
+            "start_line": 1087,
+            "end_line": 1136,
+            "label": "gson/src/main/java/com/google/gson/Gson.java::Gson.fromJson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java",
+            "start_line": 312,
+            "end_line": 324,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java::ReflectiveTypeAdapterFactory.FieldsData"
+          },
+          {
+            "path": "proto/src/main/java/com/google/gson/protobuf/StructTypeAdapter.java",
+            "start_line": 45,
+            "end_line": 95,
+            "label": "proto/src/main/java/com/google/gson/protobuf/StructTypeAdapter.java::StructTypeAdapter"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          1.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "flow",
+      "lang": "tr",
+      "question": "GsonBuilder.registerTypeAdapter ile kaydettiğim bir JsonDeserializer, fromJson çağrısı sırasında nasıl bulunuyor ve deserialize metodum nereden çağrılıyor?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+          "symbol": "GsonBuilder.registerTypeAdapter",
+          "start_line": 739,
+          "end_line": 771
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
+          "symbol": "TreeTypeAdapter.SingleTypeFactory.create",
+          "start_line": 177,
+          "end_line": 188
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
+          "symbol": "TreeTypeAdapter.read",
+          "start_line": 86,
+          "end_line": 96
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0125,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.registerTypeAdapter",
+            "start_line": 739,
+            "end_line": 771,
+            "kind": "symbol",
+            "score": 90.7101,
+            "match": "symbol",
+            "why": "name match: registerTypeAdapter x1.24 (explicit gsonbuilder.registertypeadapter); qualname/path match: gsonbuilder.registertypeadapter; bm25: jsondeserializer, register, gsonbuilder, registertypeadapter, adapter, deserialize~, type, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.registerTypeHierarchyAdapter",
+            "start_line": 818,
+            "end_line": 841,
+            "kind": "symbol",
+            "score": 36.0186,
+            "match": null,
+            "why": "name match: registerTypeHierarchyAdapter x1.05 (kaydettiğim); owner match: GsonBuilder x1.02; bm25: jsondeserializer, register, gsonbuilder, adapter, deserialize~, type, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonDeserializer.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonDeserializer.java::JsonDeserializer.deserialize",
+            "start_line": 94,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 33.4382,
+            "match": null,
+            "why": "name match: deserialize x1.12 (deserialize); owner match: JsonDeserializer x1.04; bm25: jsondeserializer, deserialize, call, type, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonDeserializer.java",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 96,
+            "kind": "file",
+            "score": 29.9968,
+            "match": null,
+            "why": "path match: jsondeserializer x1.10 (jsondeserializer); bm25: jsondeserializer, deserialize, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonDeserializer.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonDeserializer.java::JsonDeserializer",
+            "start_line": 77,
+            "end_line": 96,
+            "kind": "symbol",
+            "score": 29.0305,
+            "match": null,
+            "why": "name match: JsonDeserializer x1.16 (explicit jsondeserializer); type declaration x0.7; bm25: jsondeserializer, register, deserialize~, gsonbuilder, registertypeadapter, type, adapter, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonDeserializationContext.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonDeserializationContext.java::JsonDeserializationContext.deserialize",
+            "start_line": 42,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 25.8948,
+            "match": null,
+            "why": "name match: deserialize x1.12 (deserialize); bm25: deserialize, jsondeserializer, call, type, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.registerTypeAdapterFactory",
+            "start_line": 795,
+            "end_line": 800,
+            "kind": "symbol",
+            "score": 25.8773,
+            "match": null,
+            "why": "name match: registerTypeAdapterFactory x1.05 (kaydettiğim); owner match: GsonBuilder x1.02; bm25: register, gsonbuilder, adapter, type"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java::TreeTypeAdapter.GsonContextImpl.deserialize",
+            "start_line": 203,
+            "end_line": 207,
+            "kind": "symbol",
+            "score": 22.4814,
+            "match": null,
+            "why": "name match: deserialize x1.12 (deserialize); bm25: deserialize, type, adapter, json; body: fromjson, from"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 739,
+            "end_line": 771,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.registerTypeAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 818,
+            "end_line": 841,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.registerTypeHierarchyAdapter"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonDeserializer.java",
+            "start_line": 94,
+            "end_line": 95,
+            "label": "gson/src/main/java/com/google/gson/JsonDeserializer.java::JsonDeserializer.deserialize"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonDeserializer.java",
+            "start_line": 77,
+            "end_line": 96,
+            "label": "gson/src/main/java/com/google/gson/JsonDeserializer.java::JsonDeserializer"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonDeserializationContext.java",
+            "start_line": 42,
+            "end_line": 43,
+            "label": "gson/src/main/java/com/google/gson/JsonDeserializationContext.java::JsonDeserializationContext.deserialize"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 795,
+            "end_line": 800,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.registerTypeAdapterFactory"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
+            "start_line": 203,
+            "end_line": 207,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java::TreeTypeAdapter.GsonContextImpl.deserialize"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          1.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "flow",
+      "lang": "en",
+      "question": "With `new GsonBuilder().setPrettyPrinting().create()`, how does that setting travel to the writer, and where are the newlines and two-space indents actually written?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "gson/src/main/java/com/google/gson/Gson.java",
+          "symbol": "Gson.newJsonWriter",
+          "start_line": 797,
+          "end_line": 807
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java",
+          "symbol": "JsonWriter.setFormattingStyle",
+          "start_line": 266,
+          "end_line": 283
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java",
+          "symbol": "JsonWriter.newline",
+          "start_line": 775,
+          "end_line": 784
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0066,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/FormattingStyle.java::FormattingStyle.withNewline",
+            "start_line": 95,
+            "end_line": 97,
+            "kind": "symbol",
+            "score": 49.1384,
+            "match": null,
+            "why": "name match: withNewline x1.15 (newlines); bm25: newlines~, setting, set, create~; body: space, indents~, new"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.setPrettyPrinting",
+            "start_line": 548,
+            "end_line": 551,
+            "kind": "symbol",
+            "score": 48.2742,
+            "match": null,
+            "why": "name match: setPrettyPrinting x1.11 (explicit setprettyprinting); owner match: GsonBuilder x1.04; bm25: setprettyprinting, pretty, printing, gsonbuilder, set"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonWriter.java::JsonWriter.setFormattingStyle",
+            "start_line": 266,
+            "end_line": 283,
+            "kind": "symbol",
+            "score": 42.0543,
+            "match": "symbol",
+            "why": "name match: setFormattingStyle x1.08 (setting); owner match: JsonWriter x1.01; bm25: set, writer; body: space, newlines~, indents~, written"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/FormattingStyle.java::FormattingStyle.withIndent",
+            "start_line": 108,
+            "end_line": 110,
+            "kind": "symbol",
+            "score": 41.5519,
+            "match": null,
+            "why": "name match: withIndent x1.16 (indents); bm25: indents~, create~; body: space, newlines~, new"
+          },
+          {
+            "path": "metrics/src/main/java/com/google/gson/metrics/SerializationBenchmark.java",
+            "symbol_id": "metrics/src/main/java/com/google/gson/metrics/SerializationBenchmark.java::SerializationBenchmark.setUp",
+            "start_line": 40,
+            "end_line": 44,
+            "kind": "symbol",
+            "score": 41.5384,
+            "match": null,
+            "why": "name match: setUp x1.10 (setting); bm25: set; body: pretty, setprettyprinting, gsonbuilder, printing, create, new"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/FormattingStyle.java::FormattingStyle.FormattingStyle",
+            "start_line": 66,
+            "end_line": 80,
+            "kind": "symbol",
+            "score": 40.8597,
+            "match": null,
+            "why": "bm25: space, indents~, newlines~; body: new"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/FormattingStyle.java::FormattingStyle.withSpaceAfterSeparators",
+            "start_line": 124,
+            "end_line": 126,
+            "kind": "symbol",
+            "score": 40.7235,
+            "match": null,
+            "why": "name match: withSpaceAfterSeparators x1.08 (space); bm25: space, create~; body: indents~, newlines~, new"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 156,
+            "kind": "file",
+            "score": 34.151,
+            "match": null,
+            "why": "bm25: space, indents~, newlines~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "start_line": 95,
+            "end_line": 97,
+            "label": "gson/src/main/java/com/google/gson/FormattingStyle.java::FormattingStyle.withNewline"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 548,
+            "end_line": 551,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.setPrettyPrinting"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java",
+            "start_line": 266,
+            "end_line": 283,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonWriter.java::JsonWriter.setFormattingStyle"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "start_line": 108,
+            "end_line": 110,
+            "label": "gson/src/main/java/com/google/gson/FormattingStyle.java::FormattingStyle.withIndent"
+          },
+          {
+            "path": "metrics/src/main/java/com/google/gson/metrics/SerializationBenchmark.java",
+            "start_line": 40,
+            "end_line": 44,
+            "label": "metrics/src/main/java/com/google/gson/metrics/SerializationBenchmark.java::SerializationBenchmark.setUp"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "start_line": 66,
+            "end_line": 80,
+            "label": "gson/src/main/java/com/google/gson/FormattingStyle.java::FormattingStyle.FormattingStyle"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/FormattingStyle.java",
+            "start_line": 124,
+            "end_line": 126,
+            "label": "gson/src/main/java/com/google/gson/FormattingStyle.java::FormattingStyle.withSpaceAfterSeparators"
+          }
+        ],
+        "rank": 3,
+        "loose_rank": 3,
+        "rr": 0.3333333333333333,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "I see Gson calling `allocateInstance` to create objects of classes without a no-args constructor, without running any constructor. Where is `allocateInstance` itself implemented?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java",
+          "symbol": "UnsafeAllocator.create",
+          "start_line": 48,
+          "end_line": 128
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java",
+          "symbol": "ConstructorConstructor.newUnsafeAllocator",
+          "start_line": 361,
+          "end_line": 395
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0101,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java::UnsafeAllocator",
+            "start_line": 30,
+            "end_line": 129,
+            "kind": "symbol",
+            "score": 74.766,
+            "match": "overlap",
+            "why": "class boost; class asked x3; bm25: allocate, objects, without, constructor, gson"
+          },
+          {
+            "path": "test-shrinker/src/main/java/com/example/ClassWithHasArgsConstructor.java",
+            "symbol_id": "test-shrinker/src/main/java/com/example/ClassWithHasArgsConstructor.java::ClassWithHasArgsConstructor",
+            "start_line": 6,
+            "end_line": 14,
+            "kind": "symbol",
+            "score": 51.555,
+            "match": null,
+            "why": "name match: ClassWithHasArgsConstructor x1.13 (classes, constructor); class boost; class asked x3; bm25: constructor, without, classes~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java::ConstructorConstructor.InstanceCreatorConstructor",
+            "start_line": 428,
+            "end_line": 441,
+            "kind": "symbol",
+            "score": 48.8125,
+            "match": null,
+            "why": "name match: InstanceCreatorConstructor x1.05 (constructor); class boost; class asked x3; bm25: constructor, instance, objects~, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder",
+            "start_line": 93,
+            "end_line": 1078,
+            "kind": "symbol",
+            "score": 48.6325,
+            "match": null,
+            "why": "name match: GsonBuilder x1.00 (gson); class boost; class asked x3; bm25: calling, create, instance, gson"
+          },
+          {
+            "path": "test-shrinker/src/main/java/com/example/ClassWithUnreferencedHasArgsConstructor.java",
+            "symbol_id": "test-shrinker/src/main/java/com/example/ClassWithUnreferencedHasArgsConstructor.java::ClassWithUnreferencedHasArgsConstructor",
+            "start_line": 10,
+            "end_line": 18,
+            "kind": "symbol",
+            "score": 45.6691,
+            "match": null,
+            "why": "name match: ClassWithUnreferencedHasArgsConstructor x1.12 (classes, constructor); class boost; class asked x3; bm25: constructor, without, classes~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java::ConstructorConstructor",
+            "start_line": 45,
+            "end_line": 442,
+            "kind": "symbol",
+            "score": 38.6182,
+            "match": "broad",
+            "why": "name match: ConstructorConstructor x1.08 (constructor); class boost; class asked x3; bm25: constructor, instance, gson"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java::UnsafeAllocator.create",
+            "start_line": 48,
+            "end_line": 128,
+            "kind": "symbol",
+            "score": 38.5993,
+            "match": "symbol",
+            "why": "name match: create x1.06 (create); bm25: create, gson; body: allocate, allocateinstance, instance, constructor, classes~, objects~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java::ConstructorConstructor.ThrowingObjectConstructor",
+            "start_line": 411,
+            "end_line": 426,
+            "kind": "symbol",
+            "score": 38.3311,
+            "match": null,
+            "why": "name match: ThrowingObjectConstructor x1.15 (constructor, objects); class boost; class asked x3; bm25: constructor, objects~, gson"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java",
+            "start_line": 30,
+            "end_line": 129,
+            "label": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java::UnsafeAllocator"
+          },
+          {
+            "path": "test-shrinker/src/main/java/com/example/ClassWithHasArgsConstructor.java",
+            "start_line": 6,
+            "end_line": 14,
+            "label": "test-shrinker/src/main/java/com/example/ClassWithHasArgsConstructor.java::ClassWithHasArgsConstructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java",
+            "start_line": 428,
+            "end_line": 441,
+            "label": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java::ConstructorConstructor.InstanceCreatorConstructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 93,
+            "end_line": 1078,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder"
+          },
+          {
+            "path": "test-shrinker/src/main/java/com/example/ClassWithUnreferencedHasArgsConstructor.java",
+            "start_line": 10,
+            "end_line": 18,
+            "label": "test-shrinker/src/main/java/com/example/ClassWithUnreferencedHasArgsConstructor.java::ClassWithUnreferencedHasArgsConstructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java",
+            "start_line": 45,
+            "end_line": 442,
+            "label": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java::ConstructorConstructor"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java",
+            "start_line": 48,
+            "end_line": 128,
+            "label": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java::UnsafeAllocator.create"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java",
+            "start_line": 411,
+            "end_line": 426,
+            "label": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java::ConstructorConstructor.ThrowingObjectConstructor"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q19",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where is the algorithm that converts the decimal digits of a JSON number such as `3.14159e-2` into the correctly rounded `double`?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+          "symbol": "JsonReader.nextDouble",
+          "start_line": 1084,
+          "end_line": 1131
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+          "symbol": "LazilyParsedNumber.doubleValue",
+          "start_line": 70,
+          "end_line": 73
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/ToNumberPolicy.java",
+          "start_line": 84,
+          "end_line": 96
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0109,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.equals",
+            "start_line": 306,
+            "end_line": 336,
+            "kind": "symbol",
+            "score": 22.0962,
+            "match": null,
+            "why": "bm25: json; body: double, decimal, number"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.peekNumber",
+            "start_line": 815,
+            "end_line": 925,
+            "kind": "symbol",
+            "score": 22.0325,
+            "match": null,
+            "why": "name match: peekNumber x1.07 (number); owner match: JsonReader x1.01; bm25: number, json; body: digits~, decimal, double, converts~"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.getAsDouble",
+            "start_line": 173,
+            "end_line": 176,
+            "kind": "symbol",
+            "score": 21.2185,
+            "match": null,
+            "why": "name match: getAsDouble x1.09 (double); owner match: JsonPrimitive x1.02; bm25: double, json; body: number"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextDouble",
+            "start_line": 1084,
+            "end_line": 1131,
+            "kind": "symbol",
+            "score": 20.1826,
+            "match": "symbol",
+            "why": "name match: nextDouble x1.08 (double); owner match: JsonReader x1.01; bm25: double, number, json"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java::JsonTreeReader.nextDouble",
+            "start_line": 239,
+            "end_line": 261,
+            "kind": "symbol",
+            "score": 19.8873,
+            "match": null,
+            "why": "name match: nextDouble x1.08 (double); owner match: JsonTreeReader x1.01; bm25: double, json; body: number"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.doubleValue",
+            "start_line": 70,
+            "end_line": 73,
+            "kind": "symbol",
+            "score": 19.4134,
+            "match": "symbol",
+            "why": "name match: doubleValue x1.08 (double); owner match: LazilyParsedNumber x1.01; bm25: double, number"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/stream/JsonWriter.java::JsonWriter.alwaysCreatesValidJsonNumber",
+            "start_line": 730,
+            "end_line": 741,
+            "kind": "symbol",
+            "score": 18.7381,
+            "match": null,
+            "why": "name match: alwaysCreatesValidJsonNumber x1.07 (json, number); bm25: number, json; body: double, decimal"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.hashCode",
+            "start_line": 260,
+            "end_line": 284,
+            "kind": "symbol",
+            "score": 18.5048,
+            "match": null,
+            "why": "bm25: json; body: double, number, decimal"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "start_line": 306,
+            "end_line": 336,
+            "label": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.equals"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 815,
+            "end_line": 925,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.peekNumber"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "start_line": 173,
+            "end_line": 176,
+            "label": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.getAsDouble"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+            "start_line": 1084,
+            "end_line": 1131,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonReader.java::JsonReader.nextDouble"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java",
+            "start_line": 239,
+            "end_line": 261,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/JsonTreeReader.java::JsonTreeReader.nextDouble"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java",
+            "start_line": 70,
+            "end_line": 73,
+            "label": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java::LazilyParsedNumber.doubleValue"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java",
+            "start_line": 730,
+            "end_line": 741,
+            "label": "gson/src/main/java/com/google/gson/stream/JsonWriter.java::JsonWriter.alwaysCreatesValidJsonNumber"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+            "start_line": 260,
+            "end_line": 284,
+            "label": "gson/src/main/java/com/google/gson/JsonPrimitive.java::JsonPrimitive.hashCode"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 4,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q20",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "setDateFormat(\"yyyy-MM-dd HH:mm\") verdigimde desendeki yyyy, MM, HH harfleri tarih okunurken nerede yorumlaniyor?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/DefaultDateTypeAdapter.java",
+          "symbol": "DefaultDateTypeAdapter.deserializeToDate",
+          "start_line": 165,
+          "end_line": 187
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/DefaultDateTypeAdapter.java",
+          "symbol": "DefaultDateTypeAdapter.DefaultDateTypeAdapter",
+          "start_line": 120,
+          "end_line": 126
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+          "symbol": "GsonBuilder.setDateFormat",
+          "start_line": 638,
+          "end_line": 650
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0041,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.setDateFormat",
+            "start_line": 638,
+            "end_line": 650,
+            "kind": "symbol",
+            "score": 102.7555,
+            "match": "symbol",
+            "why": "name match: setDateFormat (explicit setdateformat); bm25: date, setdateformat, format, set"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.setDateFormat",
+            "start_line": 672,
+            "end_line": 678,
+            "kind": "symbol",
+            "score": 101.4683,
+            "match": "symbol",
+            "why": "name match: setDateFormat (explicit setdateformat); bm25: date, setdateformat, format, set"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.setDateFormat",
+            "start_line": 696,
+            "end_line": 702,
+            "kind": "symbol",
+            "score": 100.458,
+            "match": "symbol",
+            "why": "name match: setDateFormat (explicit setdateformat); bm25: date, setdateformat, format, set"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java::ISO8601Utils.parse",
+            "start_line": 147,
+            "end_line": 309,
+            "kind": "symbol",
+            "score": 57.8223,
+            "match": null,
+            "why": "bm25: date, mm, hh, yyyy, hhmm, yyyymmdd, dd, format; body: set"
+          },
+          {
+            "path": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java",
+            "symbol_id": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java::UtcDateTypeAdapter.parse",
+            "start_line": 140,
+            "end_line": 232,
+            "kind": "symbol",
+            "score": 57.2295,
+            "match": null,
+            "why": "bm25: date, mm, hh, yyyy, hhmm, yyyymmdd, dd, format; body: set"
+          },
+          {
+            "path": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java",
+            "symbol_id": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java::UtcDateTypeAdapter.format",
+            "start_line": 75,
+            "end_line": 114,
+            "kind": "symbol",
+            "score": 53.6271,
+            "match": null,
+            "why": "bm25: date, mm, hh, dd, yyyy, format; body: set"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java::ISO8601Utils.format",
+            "start_line": 91,
+            "end_line": 130,
+            "kind": "symbol",
+            "score": 53.5638,
+            "match": null,
+            "why": "bm25: date, mm, hh, dd, yyyy, format; body: set"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java",
+            "symbol_id": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java::ISO8601Utils.format",
+            "start_line": 79,
+            "end_line": 81,
+            "kind": "symbol",
+            "score": 39.5877,
+            "match": null,
+            "why": "bm25: date, mm, format, dd, yyyy"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 638,
+            "end_line": 650,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.setDateFormat"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 672,
+            "end_line": 678,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.setDateFormat"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/GsonBuilder.java",
+            "start_line": 696,
+            "end_line": 702,
+            "label": "gson/src/main/java/com/google/gson/GsonBuilder.java::GsonBuilder.setDateFormat"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java",
+            "start_line": 147,
+            "end_line": 309,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java::ISO8601Utils.parse"
+          },
+          {
+            "path": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java",
+            "start_line": 140,
+            "end_line": 232,
+            "label": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java::UtcDateTypeAdapter.parse"
+          },
+          {
+            "path": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java",
+            "start_line": 75,
+            "end_line": 114,
+            "label": "extras/src/main/java/com/google/gson/typeadapters/UtcDateTypeAdapter.java::UtcDateTypeAdapter.format"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java",
+            "start_line": 91,
+            "end_line": 130,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java::ISO8601Utils.format"
+          },
+          {
+            "path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java",
+            "start_line": 79,
+            "end_line": 81,
+            "label": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java::ISO8601Utils.format"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    }
+  ]
+}

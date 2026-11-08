@@ -1,0 +1,3885 @@
+{
+  "meta": {
+    "repo": {
+      "name": "flame",
+      "source": "https://github.com/flame-engine/flame",
+      "commit": "88c0438"
+    },
+    "source": "C:/Users/Selman/AppData/Local/Temp/claude/29abb69cf93759cc/a3feb6c6-0644-4b09-b6bb-2c4e21761226/scratchpad/repos/flame",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\29abb69cf93759cc\\a3feb6c6-0644-4b09-b6bb-2c4e21761226\\scratchpad\\repos\\flame",
+      "commit": "88c043804b0bcc288ee9e6b0f89b3181d737a0dc",
+      "golden_commit": "88c0438",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20"
+    ],
+    "started": "2026-11-08T23:32:35",
+    "open_workspace_s": 9.042,
+    "total_s": 9.376,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "pipeline": "search_baseline (build_index + SearchIndex; chunks = symbol-hit ranges)"
+  },
+  "summary": {
+    "overall": {
+      "n": 20,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 17,
+          "yes": 5,
+          "rate": 0.294
+        },
+        "hit@3": {
+          "n": 17,
+          "yes": 6,
+          "rate": 0.353
+        },
+        "hit@k": {
+          "n": 17,
+          "yes": 9,
+          "rate": 0.529
+        },
+        "loose_hit@1": {
+          "n": 17,
+          "yes": 6,
+          "rate": 0.353
+        },
+        "loose_hit@3": {
+          "n": 17,
+          "yes": 7,
+          "rate": 0.412
+        },
+        "loose_hit@k": {
+          "n": 17,
+          "yes": 11,
+          "rate": 0.647
+        },
+        "mrr": 0.36,
+        "chunk_recall": {
+          "n": 17,
+          "yes": 11,
+          "rate": 0.647
+        },
+        "all@k": null,
+        "pointer@k": {
+          "n": 3,
+          "yes": 1,
+          "rate": 0.333
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 1,
+          "rate": 0.333
+        }
+      },
+      "elapsed_s": {
+        "total": 0.332,
+        "mean": 0.017,
+        "median": 0.015,
+        "max": 0.043
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "hit@3": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "hit@k": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "loose_hit@1": {
+            "n": 8,
+            "yes": 5,
+            "rate": 0.625
+          },
+          "loose_hit@3": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "loose_hit@k": {
+            "n": 8,
+            "yes": 7,
+            "rate": 0.875
+          },
+          "mrr": 0.594,
+          "chunk_recall": {
+            "n": 8,
+            "yes": 7,
+            "rate": 0.875
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.12,
+          "mean": 0.015,
+          "median": 0.012,
+          "max": 0.043
+        }
+      },
+      "locate-feature": {
+        "n": 6,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 1,
+            "rate": 0.167
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 2,
+            "rate": 0.333
+          },
+          "mrr": 0.021,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 2,
+            "rate": 0.333
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.129,
+          "mean": 0.022,
+          "median": 0.022,
+          "max": 0.033
+        }
+      },
+      "flow": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "hit@3": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "hit@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@1": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "loose_hit@3": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "loose_hit@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "mrr": 0.417,
+          "chunk_recall": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "elapsed_s": {
+          "total": 0.071,
+          "mean": 0.024,
+          "median": 0.028,
+          "max": 0.032
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          }
+        },
+        "elapsed_s": {
+          "total": 0.012,
+          "mean": 0.004,
+          "median": 0.005,
+          "max": 0.006
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 12,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 10,
+            "yes": 3,
+            "rate": 0.3
+          },
+          "hit@3": {
+            "n": 10,
+            "yes": 3,
+            "rate": 0.3
+          },
+          "hit@k": {
+            "n": 10,
+            "yes": 4,
+            "rate": 0.4
+          },
+          "loose_hit@1": {
+            "n": 10,
+            "yes": 4,
+            "rate": 0.4
+          },
+          "loose_hit@3": {
+            "n": 10,
+            "yes": 4,
+            "rate": 0.4
+          },
+          "loose_hit@k": {
+            "n": 10,
+            "yes": 6,
+            "rate": 0.6
+          },
+          "mrr": 0.312,
+          "chunk_recall": {
+            "n": 10,
+            "yes": 6,
+            "rate": 0.6
+          },
+          "all@k": null,
+          "pointer@k": {
+            "n": 2,
+            "yes": 1,
+            "rate": 0.5
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 1,
+            "rate": 0.5
+          }
+        },
+        "elapsed_s": {
+          "total": 0.266,
+          "mean": 0.022,
+          "median": 0.024,
+          "max": 0.043
+        }
+      },
+      "tr": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "hit@3": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "hit@k": {
+            "n": 7,
+            "yes": 5,
+            "rate": 0.714
+          },
+          "loose_hit@1": {
+            "n": 7,
+            "yes": 2,
+            "rate": 0.286
+          },
+          "loose_hit@3": {
+            "n": 7,
+            "yes": 3,
+            "rate": 0.429
+          },
+          "loose_hit@k": {
+            "n": 7,
+            "yes": 5,
+            "rate": 0.714
+          },
+          "mrr": 0.429,
+          "chunk_recall": {
+            "n": 7,
+            "yes": 5,
+            "rate": 0.714
+          },
+          "all@k": null,
+          "pointer@k": {
+            "n": 1,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 0,
+            "rate": 0.0
+          }
+        },
+        "elapsed_s": {
+          "total": 0.066,
+          "mean": 0.008,
+          "median": 0.009,
+          "max": 0.015
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is the `dt` that my component's `update(double dt)` receives actually computed from the frame timestamps?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/game/game_loop.dart",
+          "symbol": "GameLoop._tick",
+          "start_line": 42,
+          "end_line": 47
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0258,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame_3d/lib/src/components/light_component.dart",
+            "symbol_id": "packages/flame_3d/lib/src/components/light_component.dart::LightComponent.update",
+            "start_line": 57,
+            "end_line": 63,
+            "kind": "symbol",
+            "score": 49.0393,
+            "match": null,
+            "why": "name match: update x1.06 (update); owner match: LightComponent x1.01; bm25: update, dt, double, components, component; body: computed"
+          },
+          {
+            "path": "packages/flame_tiled/lib/src/renderable_tile_map.dart",
+            "symbol_id": "packages/flame_tiled/lib/src/renderable_tile_map.dart::RenderableTiledMap.update",
+            "start_line": 660,
+            "end_line": 665,
+            "kind": "symbol",
+            "score": 46.7948,
+            "match": null,
+            "why": "name match: update x1.06 (update); bm25: frame, update, dt, double, component"
+          },
+          {
+            "path": "packages/flame_tiled/lib/src/tile_animation.dart",
+            "symbol_id": "packages/flame_tiled/lib/src/tile_animation.dart::TileAnimation.update",
+            "start_line": 20,
+            "end_line": 25,
+            "kind": "symbol",
+            "score": 46.3679,
+            "match": null,
+            "why": "name match: update x1.06 (update); bm25: update, double, dt; body: frame"
+          },
+          {
+            "path": "packages/flame_tiled/lib/src/tile_animation.dart",
+            "symbol_id": "packages/flame_tiled/lib/src/tile_animation.dart::TileFrames.update",
+            "start_line": 42,
+            "end_line": 52,
+            "kind": "symbol",
+            "score": 45.6882,
+            "match": null,
+            "why": "name match: update x1.06 (update); owner match: TileFrames x1.01; bm25: frame, update, dt, double"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_animation_ticker.dart",
+            "symbol_id": "packages/flame/lib/src/sprite_animation_ticker.dart::SpriteAnimationTicker.update",
+            "start_line": 122,
+            "end_line": 155,
+            "kind": "symbol",
+            "score": 41.998,
+            "match": null,
+            "why": "name match: update x1.06 (update); bm25: update, dt, double; body: frame"
+          },
+          {
+            "path": "packages/flame/lib/src/post_process/post_process.dart",
+            "symbol_id": "packages/flame/lib/src/post_process/post_process.dart::PostProcess.update",
+            "start_line": 79,
+            "end_line": 79,
+            "kind": "symbol",
+            "score": 39.8017,
+            "match": null,
+            "why": "name match: update x1.06 (update); bm25: update, frame, double, dt, component"
+          },
+          {
+            "path": "packages/flame/lib/src/components/parallax_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/parallax_component.dart::ParallaxComponent.update",
+            "start_line": 118,
+            "end_line": 122,
+            "kind": "symbol",
+            "score": 33.666,
+            "match": null,
+            "why": "name match: update x1.06 (update); owner match: ParallaxComponent x1.01; bm25: update, dt, double, components, component"
+          },
+          {
+            "path": "packages/flame/lib/src/components/timer_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/timer_component.dart::TimerComponent.update",
+            "start_line": 53,
+            "end_line": 60,
+            "kind": "symbol",
+            "score": 33.0846,
+            "match": null,
+            "why": "name match: update x1.06 (update); owner match: TimerComponent x1.01; bm25: update, dt, double, components, component"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame_3d/lib/src/components/light_component.dart",
+            "start_line": 57,
+            "end_line": 63,
+            "label": "packages/flame_3d/lib/src/components/light_component.dart::LightComponent.update"
+          },
+          {
+            "path": "packages/flame_tiled/lib/src/renderable_tile_map.dart",
+            "start_line": 660,
+            "end_line": 665,
+            "label": "packages/flame_tiled/lib/src/renderable_tile_map.dart::RenderableTiledMap.update"
+          },
+          {
+            "path": "packages/flame_tiled/lib/src/tile_animation.dart",
+            "start_line": 20,
+            "end_line": 25,
+            "label": "packages/flame_tiled/lib/src/tile_animation.dart::TileAnimation.update"
+          },
+          {
+            "path": "packages/flame_tiled/lib/src/tile_animation.dart",
+            "start_line": 42,
+            "end_line": 52,
+            "label": "packages/flame_tiled/lib/src/tile_animation.dart::TileFrames.update"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_animation_ticker.dart",
+            "start_line": 122,
+            "end_line": 155,
+            "label": "packages/flame/lib/src/sprite_animation_ticker.dart::SpriteAnimationTicker.update"
+          },
+          {
+            "path": "packages/flame/lib/src/post_process/post_process.dart",
+            "start_line": 79,
+            "end_line": 79,
+            "label": "packages/flame/lib/src/post_process/post_process.dart::PostProcess.update"
+          },
+          {
+            "path": "packages/flame/lib/src/components/parallax_component.dart",
+            "start_line": 118,
+            "end_line": 122,
+            "label": "packages/flame/lib/src/components/parallax_component.dart::ParallaxComponent.update"
+          },
+          {
+            "path": "packages/flame/lib/src/components/timer_component.dart",
+            "start_line": 53,
+            "end_line": 60,
+            "label": "packages/flame/lib/src/components/timer_component.dart::TimerComponent.update"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is a saved string like \"center\" or \"Anchor(0.3, 0.7)\" turned back into an `Anchor` object?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/anchor.dart",
+          "symbol": "Anchor.valueOf",
+          "start_line": 107,
+          "end_line": 119
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0154,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/anchor.dart",
+            "symbol_id": "packages/flame/lib/src/anchor.dart::Anchor",
+            "start_line": 18,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 33.4564,
+            "match": "broad",
+            "why": "name match: Anchor (explicit anchor); class boost; bm25: anchor, object"
+          },
+          {
+            "path": "packages/flame_studio/lib/repositories/component_repository/models/component_anchor.dart",
+            "symbol_id": "packages/flame_studio/lib/repositories/component_repository/models/component_anchor.dart::ComponentAnchor.fromJson",
+            "start_line": 25,
+            "end_line": 31,
+            "kind": "symbol",
+            "score": 26.5182,
+            "match": null,
+            "why": "bm25: saved, anchor, object, back; body: string"
+          },
+          {
+            "path": "packages/flame_cli/lib/src/commands/set_command.dart",
+            "symbol_id": "packages/flame_cli/lib/src/commands/set_command.dart::SetCommand._anchor",
+            "start_line": 120,
+            "end_line": 137,
+            "kind": "symbol",
+            "score": 26.334,
+            "match": null,
+            "why": "name match: _anchor x1.10 (anchor); bm25: anchor, string; body: like, center"
+          },
+          {
+            "path": "packages/flame_studio/lib/component_editor/bloc/component_editor_state.dart",
+            "symbol_id": "packages/flame_studio/lib/component_editor/bloc/component_editor_state.dart::ComponentEditorStatus.isSaved",
+            "start_line": 31,
+            "end_line": 32,
+            "kind": "symbol",
+            "score": 25.459,
+            "match": null,
+            "why": "name match: isSaved x1.20 (saved); bm25: saved"
+          },
+          {
+            "path": "packages/flame_studio/lib/palette/bloc/palette_state.dart",
+            "symbol_id": "packages/flame_studio/lib/palette/bloc/palette_state.dart::PaletteStatus.isSaved",
+            "start_line": 31,
+            "end_line": 32,
+            "kind": "symbol",
+            "score": 25.459,
+            "match": null,
+            "why": "name match: isSaved x1.20 (saved); bm25: saved"
+          },
+          {
+            "path": "packages/flame_cli/lib/src/commands/input_commands.dart",
+            "symbol_id": "packages/flame_cli/lib/src/commands/input_commands.dart::InputTarget.parse",
+            "start_line": 303,
+            "end_line": 323,
+            "kind": "symbol",
+            "score": 25.1528,
+            "match": null,
+            "why": "bm25: anchor, string; body: like, center"
+          },
+          {
+            "path": "packages/flame/lib/src/devtools/connectors/input_connector.dart",
+            "symbol_id": "packages/flame/lib/src/devtools/connectors/input_connector.dart::InputConnector.parseAnchor",
+            "start_line": 277,
+            "end_line": 291,
+            "kind": "symbol",
+            "score": 24.0499,
+            "match": null,
+            "why": "name match: parseAnchor x1.07 (anchor); bm25: like, anchor, center, string"
+          },
+          {
+            "path": "packages/flame/lib/src/components/core/recycled_queue.dart",
+            "symbol_id": "packages/flame/lib/src/components/core/recycled_queue.dart::RecycledQueue.toString",
+            "start_line": 324,
+            "end_line": 334,
+            "kind": "symbol",
+            "score": 23.6867,
+            "match": null,
+            "why": "name match: toString x1.05 (string); bm25: string; body: saved"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/anchor.dart",
+            "start_line": 18,
+            "end_line": 120,
+            "label": "packages/flame/lib/src/anchor.dart::Anchor"
+          },
+          {
+            "path": "packages/flame_studio/lib/repositories/component_repository/models/component_anchor.dart",
+            "start_line": 25,
+            "end_line": 31,
+            "label": "packages/flame_studio/lib/repositories/component_repository/models/component_anchor.dart::ComponentAnchor.fromJson"
+          },
+          {
+            "path": "packages/flame_cli/lib/src/commands/set_command.dart",
+            "start_line": 120,
+            "end_line": 137,
+            "label": "packages/flame_cli/lib/src/commands/set_command.dart::SetCommand._anchor"
+          },
+          {
+            "path": "packages/flame_studio/lib/component_editor/bloc/component_editor_state.dart",
+            "start_line": 31,
+            "end_line": 32,
+            "label": "packages/flame_studio/lib/component_editor/bloc/component_editor_state.dart::ComponentEditorStatus.isSaved"
+          },
+          {
+            "path": "packages/flame_studio/lib/palette/bloc/palette_state.dart",
+            "start_line": 31,
+            "end_line": 32,
+            "label": "packages/flame_studio/lib/palette/bloc/palette_state.dart::PaletteStatus.isSaved"
+          },
+          {
+            "path": "packages/flame_cli/lib/src/commands/input_commands.dart",
+            "start_line": 303,
+            "end_line": 323,
+            "label": "packages/flame_cli/lib/src/commands/input_commands.dart::InputTarget.parse"
+          },
+          {
+            "path": "packages/flame/lib/src/devtools/connectors/input_connector.dart",
+            "start_line": 277,
+            "end_line": 291,
+            "label": "packages/flame/lib/src/devtools/connectors/input_connector.dart::InputConnector.parseAnchor"
+          },
+          {
+            "path": "packages/flame/lib/src/components/core/recycled_queue.dart",
+            "start_line": 324,
+            "end_line": 334,
+            "label": "packages/flame/lib/src/components/core/recycled_queue.dart::RecycledQueue.toString"
+          }
+        ],
+        "rank": null,
+        "loose_rank": 1,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "How does `JoystickComponent` decide whether the knob is pushed up, upRight, left and so on?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+          "symbol": "JoystickComponent.direction",
+          "start_line": 139,
+          "end_line": 170
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0055,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.direction",
+            "start_line": 139,
+            "end_line": 170,
+            "kind": "symbol",
+            "score": 36.3426,
+            "match": "symbol",
+            "why": "bm25: joystickcomponent; body: knob, up, right, upright, left"
+          },
+          {
+            "path": "packages/flame_behavior_tree/behavior_tree/lib/src/composites/parallel.dart",
+            "symbol_id": "packages/flame_behavior_tree/behavior_tree/lib/src/composites/parallel.dart::Parallel._decide",
+            "start_line": 43,
+            "end_line": 52,
+            "kind": "symbol",
+            "score": 31.815,
+            "match": null,
+            "why": "name match: _decide x1.19 (decide); bm25: decide"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.JoystickComponent",
+            "start_line": 54,
+            "end_line": 69,
+            "kind": "symbol",
+            "score": 27.5189,
+            "match": null,
+            "why": "name match: JoystickComponent x1.17 (explicit joystickcomponent); bm25: knob, joystickcomponent"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent",
+            "start_line": 19,
+            "end_line": 171,
+            "kind": "symbol",
+            "score": 25.34,
+            "match": "broad",
+            "why": "name match: JoystickComponent x1.17 (explicit joystickcomponent); class boost; bm25: joystickcomponent, knob"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.update",
+            "start_line": 90,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 21.1626,
+            "match": null,
+            "why": "bm25: joystickcomponent; body: knob"
+          },
+          {
+            "path": "packages/flame_tiled/lib/src/renderable_layers/tile_layers/tile_chunk.dart",
+            "symbol_id": "packages/flame_tiled/lib/src/renderable_layers/tile_layers/tile_chunk.dart::TileChunk.isVisibleIn",
+            "start_line": 79,
+            "end_line": 85,
+            "kind": "symbol",
+            "score": 21.1115,
+            "match": null,
+            "why": "bm25: whether; body: right, left"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.onMount",
+            "start_line": 71,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 20.894,
+            "match": null,
+            "why": "bm25: joystickcomponent; body: knob"
+          },
+          {
+            "path": "packages/flame/lib/src/components/router/route.dart",
+            "symbol_id": "packages/flame/lib/src/components/router/route.dart::Route.didPush",
+            "start_line": 129,
+            "end_line": 134,
+            "kind": "symbol",
+            "score": 20.1502,
+            "match": null,
+            "why": "name match: didPush x1.14 (pushed); bm25: pushed"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "start_line": 139,
+            "end_line": 170,
+            "label": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.direction"
+          },
+          {
+            "path": "packages/flame_behavior_tree/behavior_tree/lib/src/composites/parallel.dart",
+            "start_line": 43,
+            "end_line": 52,
+            "label": "packages/flame_behavior_tree/behavior_tree/lib/src/composites/parallel.dart::Parallel._decide"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "start_line": 54,
+            "end_line": 69,
+            "label": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.JoystickComponent"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "start_line": 19,
+            "end_line": 171,
+            "label": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "start_line": 90,
+            "end_line": 105,
+            "label": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.update"
+          },
+          {
+            "path": "packages/flame_tiled/lib/src/renderable_layers/tile_layers/tile_chunk.dart",
+            "start_line": 79,
+            "end_line": 85,
+            "label": "packages/flame_tiled/lib/src/renderable_layers/tile_layers/tile_chunk.dart::TileChunk.isVisibleIn"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "start_line": 71,
+            "end_line": 88,
+            "label": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.onMount"
+          },
+          {
+            "path": "packages/flame/lib/src/components/router/route.dart",
+            "start_line": 129,
+            "end_line": 134,
+            "label": "packages/flame/lib/src/components/router/route.dart::Route.didPush"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "In flame_forge2d, after each physics step, which code hands the begin/end contact events to `beginContact`/`endContact` of the body or shape whose userData is a `ContactCallbacks`?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+          "symbol": "ContactEventsDispatcher.dispatch",
+          "start_line": 34,
+          "end_line": 56
+        },
+        {
+          "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+          "symbol": "ContactEventsDispatcher._dispatch",
+          "start_line": 79,
+          "end_line": 91
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0429,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher.dispatch",
+            "start_line": 34,
+            "end_line": 56,
+            "kind": "symbol",
+            "score": 110.1891,
+            "match": "symbol",
+            "why": "bm25: contactevents, contact, events, physics, forge, step, after, flame_forge2d, flame; body: shape, begin, endcontact, begincontact, end"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher.endContact",
+            "start_line": 72,
+            "end_line": 77,
+            "kind": "symbol",
+            "score": 109.2487,
+            "match": null,
+            "why": "name match: endContact x1.26 (explicit endcontact); owner match: ContactEventsDispatcher x1.06; bm25: contactcallbacks, endcontact, contact, end, events, body, flame_forge2d, forge, shape~, flame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher.beginContact",
+            "start_line": 60,
+            "end_line": 68,
+            "kind": "symbol",
+            "score": 95.7298,
+            "match": null,
+            "why": "name match: beginContact x1.10 (explicit begincontact); owner match: ContactEventsDispatcher x1.02; bm25: contactcallbacks, begincontact, contact, begin, events, body, flame_forge2d, forge, shape~, flame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher",
+            "start_line": 31,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 94.7697,
+            "match": "overlap",
+            "why": "name match: ContactEventsDispatcher x1.10 (contact, events); class boost; bm25: contactcallbacks, contact, events, shape, physics, userdata, body, user, flame_forge2d, forge, data, flame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/body_component.dart",
+            "symbol_id": "packages/flame_forge2d/lib/body_component.dart::BodyComponent.createBody",
+            "start_line": 92,
+            "end_line": 108,
+            "kind": "symbol",
+            "score": 89.5213,
+            "match": null,
+            "why": "name match: createBody x1.04 (body); bm25: contactcallbacks, shape, contact, userdata, body, events, user, forge, data, flame_forge2d, flame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_callbacks.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact_callbacks.dart::ContactCallbacks",
+            "start_line": 16,
+            "end_line": 34,
+            "kind": "symbol",
+            "score": 88.2068,
+            "match": null,
+            "why": "name match: ContactCallbacks x1.10 (explicit contactcallbacks); class boost; bm25: contactcallbacks, contact, shape, events, userdata, forge, user, body, flame_forge2d, data, flame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_callbacks.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact_callbacks.dart::ContactCallbacks.endContact",
+            "start_line": 27,
+            "end_line": 29,
+            "kind": "symbol",
+            "score": 83.3894,
+            "match": null,
+            "why": "name match: endContact x1.26 (explicit endcontact); owner match: ContactCallbacks x1.09; bm25: endcontact, contactcallbacks, contact, end, shape, flame_forge2d, forge, flame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact.dart::Contact",
+            "start_line": 11,
+            "end_line": 106,
+            "kind": "symbol",
+            "score": 81.8124,
+            "match": null,
+            "why": "name match: Contact x1.08 (contact); class boost; bm25: contactcallbacks, contact, events, endcontact, begincontact, forge, begin, after, flame_forge2d, end, step, data, flame"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "start_line": 34,
+            "end_line": 56,
+            "label": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher.dispatch"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "start_line": 72,
+            "end_line": 77,
+            "label": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher.endContact"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "start_line": 60,
+            "end_line": 68,
+            "label": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher.beginContact"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "start_line": 31,
+            "end_line": 92,
+            "label": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/body_component.dart",
+            "start_line": 92,
+            "end_line": 108,
+            "label": "packages/flame_forge2d/lib/body_component.dart::BodyComponent.createBody"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_callbacks.dart",
+            "start_line": 16,
+            "end_line": 34,
+            "label": "packages/flame_forge2d/lib/contact_callbacks.dart::ContactCallbacks"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_callbacks.dart",
+            "start_line": 27,
+            "end_line": 29,
+            "label": "packages/flame_forge2d/lib/contact_callbacks.dart::ContactCallbacks.endContact"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact.dart",
+            "start_line": 11,
+            "end_line": 106,
+            "label": "packages/flame_forge2d/lib/contact.dart::Contact"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Döngüsüz (loop: false) bir sprite animasyonunda sıradaki kareye geçiş ve son karede onComplete çağrısı nerede yapılıyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/sprite_animation_ticker.dart",
+          "symbol": "SpriteAnimationTicker.update",
+          "start_line": 122,
+          "end_line": 155
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0155,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/sprite_animation_ticker.dart",
+            "symbol_id": "packages/flame/lib/src/sprite_animation_ticker.dart::SpriteAnimationTicker.update",
+            "start_line": 122,
+            "end_line": 155,
+            "kind": "symbol",
+            "score": 32.068,
+            "match": "symbol",
+            "why": "bm25: sprite; body: complete, call, oncomplete, loop, on"
+          },
+          {
+            "path": "packages/flame/lib/src/widgets/animation_widget.dart",
+            "symbol_id": "packages/flame/lib/src/widgets/animation_widget.dart::SpriteAnimationWidget.SpriteAnimationWidget",
+            "start_line": 40,
+            "end_line": 51,
+            "kind": "symbol",
+            "score": 26.602,
+            "match": null,
+            "why": "name match: SpriteAnimationWidget x1.11 (sprite); bm25: sprite; body: oncomplete, complete, on"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/effect.dart::Effect.onFinish",
+            "start_line": 198,
+            "end_line": 203,
+            "kind": "symbol",
+            "score": 25.5577,
+            "match": null,
+            "why": "bm25: call, on; body: complete, oncomplete"
+          },
+          {
+            "path": "packages/flame_behavior_tree/lib/src/nodes/play_effect.dart",
+            "symbol_id": "packages/flame_behavior_tree/lib/src/nodes/play_effect.dart::PlayEffect.onEnter",
+            "start_line": 48,
+            "end_line": 61,
+            "kind": "symbol",
+            "score": 25.285,
+            "match": null,
+            "why": "bm25: on; body: oncomplete, complete, call"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_animation.dart",
+            "symbol_id": "packages/flame/lib/src/sprite_animation.dart::SpriteAnimation.spriteList",
+            "start_line": 151,
+            "end_line": 160,
+            "kind": "symbol",
+            "score": 24.0059,
+            "match": null,
+            "why": "name match: spriteList x1.14 (sprite); bm25: sprite, loop"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_animation.dart",
+            "symbol_id": "packages/flame/lib/src/sprite_animation.dart::SpriteAnimation.variableSpriteList",
+            "start_line": 164,
+            "end_line": 180,
+            "kind": "symbol",
+            "score": 22.6124,
+            "match": null,
+            "why": "name match: variableSpriteList x1.11 (sprite); bm25: sprite, loop"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_animation.dart",
+            "symbol_id": "packages/flame/lib/src/sprite_animation.dart::SpriteAnimationData.SpriteAnimationData",
+            "start_line": 29,
+            "end_line": 29,
+            "kind": "symbol",
+            "score": 22.5092,
+            "match": null,
+            "why": "name match: SpriteAnimationData x1.11 (sprite); bm25: sprite, loop"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/anchor_by_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/anchor_by_effect.dart::AnchorByEffect.AnchorByEffect",
+            "start_line": 28,
+            "end_line": 28,
+            "kind": "symbol",
+            "score": 22.3853,
+            "match": null,
+            "why": "bm25: oncomplete, complete, on"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/sprite_animation_ticker.dart",
+            "start_line": 122,
+            "end_line": 155,
+            "label": "packages/flame/lib/src/sprite_animation_ticker.dart::SpriteAnimationTicker.update"
+          },
+          {
+            "path": "packages/flame/lib/src/widgets/animation_widget.dart",
+            "start_line": 40,
+            "end_line": 51,
+            "label": "packages/flame/lib/src/widgets/animation_widget.dart::SpriteAnimationWidget.SpriteAnimationWidget"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/effect.dart",
+            "start_line": 198,
+            "end_line": 203,
+            "label": "packages/flame/lib/src/effects/effect.dart::Effect.onFinish"
+          },
+          {
+            "path": "packages/flame_behavior_tree/lib/src/nodes/play_effect.dart",
+            "start_line": 48,
+            "end_line": 61,
+            "label": "packages/flame_behavior_tree/lib/src/nodes/play_effect.dart::PlayEffect.onEnter"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_animation.dart",
+            "start_line": 151,
+            "end_line": 160,
+            "label": "packages/flame/lib/src/sprite_animation.dart::SpriteAnimation.spriteList"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_animation.dart",
+            "start_line": 164,
+            "end_line": 180,
+            "label": "packages/flame/lib/src/sprite_animation.dart::SpriteAnimation.variableSpriteList"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_animation.dart",
+            "start_line": 29,
+            "end_line": 29,
+            "label": "packages/flame/lib/src/sprite_animation.dart::SpriteAnimationData.SpriteAnimationData"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/anchor_by_effect.dart",
+            "start_line": 28,
+            "end_line": 28,
+            "label": "packages/flame/lib/src/effects/anchor_by_effect.dart::AnchorByEffect.AnchorByEffect"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "EffectController(duration: 1, alternate: true, infinite: true) yazinca bu parametreler hangi controller zincirine donusturuluyor, bu nerede kuruluyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+          "symbol": "EffectController.EffectController",
+          "start_line": 81,
+          "end_line": 231
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0044,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+            "symbol_id": "packages/flame/lib/src/effects/controllers/effect_controller.dart::EffectController.EffectController",
+            "start_line": 81,
+            "end_line": 231,
+            "kind": "symbol",
+            "score": 167.1675,
+            "match": "symbol",
+            "why": "name match: EffectController (explicit effectcontroller); bm25: controller, effectcontroller, infinite, alternate, duration"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+            "symbol_id": "packages/flame/lib/src/effects/controllers/effect_controller.dart::EffectController",
+            "start_line": 46,
+            "end_line": 290,
+            "kind": "symbol",
+            "score": 87.6013,
+            "match": "overlap",
+            "why": "name match: EffectController (explicit effectcontroller); class boost; bm25: effectcontroller, controller"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/sequence_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/sequence_effect.dart::_createController",
+            "start_line": 7,
+            "end_line": 24,
+            "kind": "symbol",
+            "score": 71.0317,
+            "match": null,
+            "why": "name match: _createController x1.07 (controller); bm25: alternate, infinite, effectcontroller, controller"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/combined_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/combined_effect.dart::_createController",
+            "start_line": 64,
+            "end_line": 84,
+            "kind": "symbol",
+            "score": 69.4526,
+            "match": null,
+            "why": "name match: _createController x1.07 (controller); bm25: alternate, infinite, controller, effectcontroller"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/controllers/infinite_effect_controller.dart",
+            "symbol_id": "packages/flame/lib/src/effects/controllers/infinite_effect_controller.dart::InfiniteEffectController",
+            "start_line": 5,
+            "end_line": 50,
+            "kind": "symbol",
+            "score": 57.1054,
+            "match": null,
+            "why": "name match: InfiniteEffectController x1.22 (controller, infinite); class boost; bm25: infinite, controller, effectcontroller"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/combined_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/combined_effect.dart::CombinedEffect.CombinedEffect",
+            "start_line": 28,
+            "end_line": 44,
+            "kind": "symbol",
+            "score": 53.8137,
+            "match": null,
+            "why": "bm25: alternate, infinite; body: controller, parameter~"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/sequence_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/sequence_effect.dart::SequenceEffect.SequenceEffect",
+            "start_line": 57,
+            "end_line": 73,
+            "kind": "symbol",
+            "score": 53.8137,
+            "match": null,
+            "why": "bm25: alternate, infinite; body: controller, parameter~"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+            "symbol_id": "packages/flame/lib/src/effects/controllers/effect_controller.dart::EffectController.isInfinite",
+            "start_line": 234,
+            "end_line": 234,
+            "kind": "symbol",
+            "score": 51.5412,
+            "match": null,
+            "why": "name match: isInfinite x1.11 (infinite); owner match: EffectController x1.04; bm25: infinite, controller, effectcontroller; body: duration"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+            "start_line": 81,
+            "end_line": 231,
+            "label": "packages/flame/lib/src/effects/controllers/effect_controller.dart::EffectController.EffectController"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+            "start_line": 46,
+            "end_line": 290,
+            "label": "packages/flame/lib/src/effects/controllers/effect_controller.dart::EffectController"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/sequence_effect.dart",
+            "start_line": 7,
+            "end_line": 24,
+            "label": "packages/flame/lib/src/effects/sequence_effect.dart::_createController"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/combined_effect.dart",
+            "start_line": 64,
+            "end_line": 84,
+            "label": "packages/flame/lib/src/effects/combined_effect.dart::_createController"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/controllers/infinite_effect_controller.dart",
+            "start_line": 5,
+            "end_line": 50,
+            "label": "packages/flame/lib/src/effects/controllers/infinite_effect_controller.dart::InfiniteEffectController"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/combined_effect.dart",
+            "start_line": 28,
+            "end_line": 44,
+            "label": "packages/flame/lib/src/effects/combined_effect.dart::CombinedEffect.CombinedEffect"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/sequence_effect.dart",
+            "start_line": 57,
+            "end_line": 73,
+            "label": "packages/flame/lib/src/effects/sequence_effect.dart::SequenceEffect.SequenceEffect"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+            "start_line": 234,
+            "end_line": 234,
+            "label": "packages/flame/lib/src/effects/controllers/effect_controller.dart::EffectController.isInfinite"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Kamera bir oyuncuyu takip ederken maxSpeed sınırına göre her karede ne kadar yaklaşacağı nerede hesaplanıyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart",
+          "symbol": "FollowBehavior.update",
+          "start_line": 54,
+          "end_line": 69
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.003,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart",
+            "symbol_id": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart::FollowBehavior.maxSpeed",
+            "start_line": 38,
+            "end_line": 38,
+            "kind": "symbol",
+            "score": 93.6666,
+            "match": null,
+            "why": "name match: maxSpeed; bm25: maxspeed, speed, max"
+          },
+          {
+            "path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart",
+            "symbol_id": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart::FollowBehavior.FollowBehavior",
+            "start_line": 29,
+            "end_line": 34,
+            "kind": "symbol",
+            "score": 30.6106,
+            "match": null,
+            "why": "bm25: maxspeed, speed, max"
+          },
+          {
+            "path": "packages/flame/lib/src/camera/camera_component.dart",
+            "symbol_id": "packages/flame/lib/src/camera/camera_component.dart::CameraComponent.follow",
+            "start_line": 371,
+            "end_line": 391,
+            "kind": "symbol",
+            "score": 27.3679,
+            "match": null,
+            "why": "bm25: maxspeed, speed, max"
+          },
+          {
+            "path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart",
+            "symbol_id": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart::FollowBehavior",
+            "start_line": 20,
+            "end_line": 70,
+            "kind": "symbol",
+            "score": 19.424,
+            "match": "overlap",
+            "why": "class boost; bm25: maxspeed, speed, max"
+          },
+          {
+            "path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 70,
+            "kind": "file",
+            "score": 16.3894,
+            "match": "file",
+            "why": "bm25: maxspeed, speed, max"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+            "symbol_id": "packages/flame/lib/src/effects/controllers/effect_controller.dart::EffectController.EffectController",
+            "start_line": 81,
+            "end_line": 231,
+            "kind": "symbol",
+            "score": 13.7646,
+            "match": null,
+            "why": "bm25: speed; body: max"
+          },
+          {
+            "path": "packages/flame_steering_behaviors/lib/src/steering/pursue.dart",
+            "symbol_id": "packages/flame_steering_behaviors/lib/src/steering/pursue.dart::Pursue.getSteering",
+            "start_line": 16,
+            "end_line": 34,
+            "kind": "symbol",
+            "score": 13.3213,
+            "match": null,
+            "why": "bm25: body: speed, max"
+          },
+          {
+            "path": "examples/lib/stories/input/joystick_advanced_example.dart",
+            "symbol_id": "examples/lib/stories/input/joystick_advanced_example.dart::JoystickAdvancedExample.update",
+            "start_line": 199,
+            "end_line": 208,
+            "kind": "symbol",
+            "score": 10.7163,
+            "match": null,
+            "why": "auxiliary dir x0.5; bm25: body: maxspeed, speed, max"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart",
+            "start_line": 38,
+            "end_line": 38,
+            "label": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart::FollowBehavior.maxSpeed"
+          },
+          {
+            "path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart",
+            "start_line": 29,
+            "end_line": 34,
+            "label": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart::FollowBehavior.FollowBehavior"
+          },
+          {
+            "path": "packages/flame/lib/src/camera/camera_component.dart",
+            "start_line": 371,
+            "end_line": 391,
+            "label": "packages/flame/lib/src/camera/camera_component.dart::CameraComponent.follow"
+          },
+          {
+            "path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart",
+            "start_line": 20,
+            "end_line": 70,
+            "label": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart::FollowBehavior"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/controllers/effect_controller.dart",
+            "start_line": 81,
+            "end_line": 231,
+            "label": "packages/flame/lib/src/effects/controllers/effect_controller.dart::EffectController.EffectController"
+          },
+          {
+            "path": "packages/flame_steering_behaviors/lib/src/steering/pursue.dart",
+            "start_line": 16,
+            "end_line": 34,
+            "label": "packages/flame_steering_behaviors/lib/src/steering/pursue.dart::Pursue.getSteering"
+          },
+          {
+            "path": "examples/lib/stories/input/joystick_advanced_example.dart",
+            "start_line": 199,
+            "end_line": 208,
+            "label": "examples/lib/stories/input/joystick_advanced_example.dart::JoystickAdvancedExample.update"
+          }
+        ],
+        "rank": 4,
+        "loose_rank": 4,
+        "rr": 0.25,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Bir bilesene timeScale = 0.5 verip agir cekim yapinca dt nerede bu oranla carpiliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+          "symbol": "HasTimeScale.updateSubtree",
+          "start_line": 31,
+          "end_line": 37
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0078,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "symbol_id": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.timeScale",
+            "start_line": 19,
+            "end_line": 19,
+            "kind": "symbol",
+            "score": 84.3956,
+            "match": null,
+            "why": "name match: timeScale (explicit timescale); bm25: timescale, time, scale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "symbol_id": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.updateSubtree",
+            "start_line": 31,
+            "end_line": 37,
+            "kind": "symbol",
+            "score": 32.0526,
+            "match": "symbol",
+            "why": "bm25: dt, time, scale; body: timescale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "symbol_id": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.timeScale=",
+            "start_line": 24,
+            "end_line": 29,
+            "kind": "symbol",
+            "score": 27.0361,
+            "match": null,
+            "why": "bm25: timescale, time, scale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "symbol_id": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.resume",
+            "start_line": 46,
+            "end_line": 50,
+            "kind": "symbol",
+            "score": 26.2113,
+            "match": null,
+            "why": "bm25: time, scale; body: timescale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "symbol_id": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.pause",
+            "start_line": 40,
+            "end_line": 42,
+            "kind": "symbol",
+            "score": 24.122,
+            "match": null,
+            "why": "bm25: time, scale; body: timescale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "symbol_id": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale",
+            "start_line": 11,
+            "end_line": 51,
+            "kind": "symbol",
+            "score": 23.3165,
+            "match": "overlap",
+            "why": "class boost; bm25: timescale, time, scale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/router/route.dart",
+            "symbol_id": "packages/flame/lib/src/components/router/route.dart::Route.resumeTime",
+            "start_line": 96,
+            "end_line": 96,
+            "kind": "symbol",
+            "score": 23.0868,
+            "match": null,
+            "why": "bm25: time; body: timescale, scale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/router/route.dart",
+            "symbol_id": "packages/flame/lib/src/components/router/route.dart::Route.stopTime",
+            "start_line": 92,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 23.059,
+            "match": null,
+            "why": "bm25: time; body: timescale, scale"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "start_line": 19,
+            "end_line": 19,
+            "label": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.timeScale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "start_line": 31,
+            "end_line": 37,
+            "label": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.updateSubtree"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "start_line": 24,
+            "end_line": 29,
+            "label": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.timeScale="
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "start_line": 46,
+            "end_line": 50,
+            "label": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.resume"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "start_line": 40,
+            "end_line": 42,
+            "label": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale.pause"
+          },
+          {
+            "path": "packages/flame/lib/src/components/mixins/has_time_scale.dart",
+            "start_line": 11,
+            "end_line": 51,
+            "label": "packages/flame/lib/src/components/mixins/has_time_scale.dart::HasTimeScale"
+          },
+          {
+            "path": "packages/flame/lib/src/components/router/route.dart",
+            "start_line": 96,
+            "end_line": 96,
+            "label": "packages/flame/lib/src/components/router/route.dart::Route.resumeTime"
+          },
+          {
+            "path": "packages/flame/lib/src/components/router/route.dart",
+            "start_line": 92,
+            "end_line": 92,
+            "label": "packages/flame/lib/src/components/router/route.dart::Route.stopTime"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 2,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "After an effect such as a MoveToEffect finishes, where does it remove itself from the component it was added to?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/effects/effect.dart",
+          "symbol": "Effect.update",
+          "start_line": 116,
+          "end_line": 138
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0229,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/effects/move_to_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/move_to_effect.dart::MoveToEffect.MoveToEffect",
+            "start_line": 29,
+            "end_line": 31,
+            "kind": "symbol",
+            "score": 51.0472,
+            "match": null,
+            "why": "name match: MoveToEffect (explicit movetoeffect); bm25: movetoeffect, effect"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/move_to_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/move_to_effect.dart::MoveToEffect",
+            "start_line": 22,
+            "end_line": 57,
+            "kind": "symbol",
+            "score": 47.9934,
+            "match": null,
+            "why": "name match: MoveToEffect (explicit movetoeffect); class boost; bm25: movetoeffect, effect"
+          },
+          {
+            "path": "packages/flame/lib/src/components/core/component.dart",
+            "symbol_id": "packages/flame/lib/src/components/core/component.dart::Component.remove",
+            "start_line": 896,
+            "end_line": 896,
+            "kind": "symbol",
+            "score": 38.0702,
+            "match": null,
+            "why": "name match: remove x1.10 (remove); owner match: Component x1.04; bm25: finishes, remove, added, component"
+          },
+          {
+            "path": "packages/flame/lib/src/components/core/component.dart",
+            "symbol_id": "packages/flame/lib/src/components/core/component.dart::Component._finishLoading",
+            "start_line": 1213,
+            "end_line": 1219,
+            "kind": "symbol",
+            "score": 34.5471,
+            "match": null,
+            "why": "name match: _finishLoading x1.17 (finishes); owner match: Component x1.06; bm25: finishes, added, component; body: after"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/remove_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/remove_effect.dart::RemoveEffect",
+            "start_line": 5,
+            "end_line": 21,
+            "kind": "symbol",
+            "score": 30.7078,
+            "match": null,
+            "why": "name match: RemoveEffect x1.21 (effect, remove); class boost; bm25: remove, effect, after, component"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/effect.dart::Effect.Effect",
+            "start_line": 37,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 26.5846,
+            "match": null,
+            "why": "name match: Effect x1.10 (effect); bm25: effect; body: remove, finishes~"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/effect.dart::Effect.onFinish",
+            "start_line": 198,
+            "end_line": 203,
+            "kind": "symbol",
+            "score": 25.4599,
+            "match": null,
+            "why": "name match: onFinish x1.17 (finishes); owner match: Effect x1.06; bm25: finishes~, effect, after, remove~"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/effect.dart::Effect.update",
+            "start_line": 116,
+            "end_line": 138,
+            "kind": "symbol",
+            "score": 24.5372,
+            "match": "symbol",
+            "why": "bm25: effect, component; body: remove, finishes~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/effects/move_to_effect.dart",
+            "start_line": 29,
+            "end_line": 31,
+            "label": "packages/flame/lib/src/effects/move_to_effect.dart::MoveToEffect.MoveToEffect"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/move_to_effect.dart",
+            "start_line": 22,
+            "end_line": 57,
+            "label": "packages/flame/lib/src/effects/move_to_effect.dart::MoveToEffect"
+          },
+          {
+            "path": "packages/flame/lib/src/components/core/component.dart",
+            "start_line": 896,
+            "end_line": 896,
+            "label": "packages/flame/lib/src/components/core/component.dart::Component.remove"
+          },
+          {
+            "path": "packages/flame/lib/src/components/core/component.dart",
+            "start_line": 1213,
+            "end_line": 1219,
+            "label": "packages/flame/lib/src/components/core/component.dart::Component._finishLoading"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/remove_effect.dart",
+            "start_line": 5,
+            "end_line": 21,
+            "label": "packages/flame/lib/src/effects/remove_effect.dart::RemoveEffect"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/effect.dart",
+            "start_line": 37,
+            "end_line": 43,
+            "label": "packages/flame/lib/src/effects/effect.dart::Effect.Effect"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/effect.dart",
+            "start_line": 198,
+            "end_line": 203,
+            "label": "packages/flame/lib/src/effects/effect.dart::Effect.onFinish"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/effect.dart",
+            "start_line": 116,
+            "end_line": 138,
+            "label": "packages/flame/lib/src/effects/effect.dart::Effect.update"
+          }
+        ],
+        "rank": 8,
+        "loose_rank": 8,
+        "rr": 0.125,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "When the image cache goes over its memory budget, how does Flame choose which images to dispose of?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/cache/images.dart",
+          "symbol": "Images._enforceBudget",
+          "start_line": 383,
+          "end_line": 401
+        },
+        {
+          "path": "packages/flame/lib/src/cache/images.dart",
+          "symbol": "Images._evictionCandidates",
+          "start_line": 374,
+          "end_line": 381
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0333,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/sprite_batch.dart",
+            "symbol_id": "packages/flame/lib/src/sprite_batch.dart::SpriteBatch.imageCache",
+            "start_line": 255,
+            "end_line": 255,
+            "kind": "symbol",
+            "score": 60.9823,
+            "match": null,
+            "why": "name match: imageCache x1.20 (cache, image, image cache); bm25: cache, imagecache, image, images, flame"
+          },
+          {
+            "path": "packages/flame_svg/lib/svg.dart",
+            "symbol_id": "packages/flame_svg/lib/svg.dart::Svg._emptyCache",
+            "start_line": 204,
+            "end_line": 209,
+            "kind": "symbol",
+            "score": 60.7379,
+            "match": null,
+            "why": "name match: _emptyCache x1.07 (cache); bm25: cache, image, images, flame; body: imagecache, dispose"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "symbol_id": "packages/flame/lib/src/cache/images.dart::Images.add",
+            "start_line": 166,
+            "end_line": 170,
+            "kind": "symbol",
+            "score": 54.2918,
+            "match": null,
+            "why": "bm25: dispose, image, cache, images, flame; body: budget"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "symbol_id": "packages/flame/lib/src/cache/images.dart::_ImageAsset.dispose",
+            "start_line": 461,
+            "end_line": 472,
+            "kind": "symbol",
+            "score": 54.1913,
+            "match": null,
+            "why": "name match: dispose x1.12 (dispose); owner match: _ImageAsset x1.02; bm25: dispose, image, cache, images, flame"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "symbol_id": "packages/flame/lib/src/cache/images.dart::Images",
+            "start_line": 40,
+            "end_line": 408,
+            "kind": "symbol",
+            "score": 53.9764,
+            "match": "broad",
+            "why": "name match: Images x1.10 (images); class boost; bm25: cache, image, goes, images, memory, dispose~, flame"
+          },
+          {
+            "path": "packages/flame_svg/lib/svg.dart",
+            "symbol_id": "packages/flame_svg/lib/svg.dart::Svg._getImage",
+            "start_line": 152,
+            "end_line": 181,
+            "kind": "symbol",
+            "score": 50.1385,
+            "match": null,
+            "why": "name match: _getImage x1.06 (image); bm25: image, flame; body: cache, imagecache, dispose"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "symbol_id": "packages/flame/lib/src/cache/images.dart::_ImageAsset",
+            "start_line": 414,
+            "end_line": 473,
+            "kind": "symbol",
+            "score": 48.6337,
+            "match": null,
+            "why": "name match: _ImageAsset x1.06 (image); class boost; bm25: image, cache, dispose, images, flame"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "symbol_id": "packages/flame/lib/src/cache/images.dart::Images.clearCache",
+            "start_line": 210,
+            "end_line": 214,
+            "kind": "symbol",
+            "score": 48.3394,
+            "match": null,
+            "why": "name match: clearCache x1.07 (cache); owner match: Images x1.03; bm25: cache, dispose, image, images, flame"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/sprite_batch.dart",
+            "start_line": 255,
+            "end_line": 255,
+            "label": "packages/flame/lib/src/sprite_batch.dart::SpriteBatch.imageCache"
+          },
+          {
+            "path": "packages/flame_svg/lib/svg.dart",
+            "start_line": 204,
+            "end_line": 209,
+            "label": "packages/flame_svg/lib/svg.dart::Svg._emptyCache"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "start_line": 166,
+            "end_line": 170,
+            "label": "packages/flame/lib/src/cache/images.dart::Images.add"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "start_line": 461,
+            "end_line": 472,
+            "label": "packages/flame/lib/src/cache/images.dart::_ImageAsset.dispose"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "start_line": 40,
+            "end_line": 408,
+            "label": "packages/flame/lib/src/cache/images.dart::Images"
+          },
+          {
+            "path": "packages/flame_svg/lib/svg.dart",
+            "start_line": 152,
+            "end_line": 181,
+            "label": "packages/flame_svg/lib/svg.dart::Svg._getImage"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "start_line": 414,
+            "end_line": 473,
+            "label": "packages/flame/lib/src/cache/images.dart::_ImageAsset"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "start_line": 210,
+            "end_line": 214,
+            "label": "packages/flame/lib/src/cache/images.dart::Images.clearCache"
+          }
+        ],
+        "rank": null,
+        "loose_rank": 5,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "With `CameraComponent.withFixedResolution(width: 320, height: 180)` on a wider screen, where is the scale factor computed and where is it decided that the game area is centered with empty bars on the sides?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/camera/viewports/fixed_resolution_viewport.dart",
+          "symbol": "FixedResolutionViewport.onViewportResize",
+          "start_line": 38,
+          "end_line": 46
+        },
+        {
+          "path": "packages/flame/lib/src/camera/viewports/fixed_aspect_ratio_viewport.dart",
+          "symbol": "FixedAspectRatioViewport._handleResize",
+          "start_line": 38,
+          "end_line": 47
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0272,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/camera/camera_component.dart",
+            "symbol_id": "packages/flame/lib/src/camera/camera_component.dart::CameraComponent.withFixedResolution",
+            "start_line": 84,
+            "end_line": 101,
+            "kind": "symbol",
+            "score": 140.2453,
+            "match": null,
+            "why": "name match: withFixedResolution x1.13 (explicit cameracomponent.withfixedresolution); qualname/path match: cameracomponent.withfixedresolution; bm25: resolution, withfixedresolution, fixed, cameracomponent, sides, height, width, centered, with, game"
+          },
+          {
+            "path": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart",
+            "symbol_id": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart::_ScaleState.scaleFactor",
+            "start_line": 581,
+            "end_line": 581,
+            "kind": "symbol",
+            "score": 48.4931,
+            "match": null,
+            "why": "name match: scaleFactor x1.10 (factor, scale, scale factor); bm25: scalefactor, scale, factor; body: with"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_batch.dart",
+            "symbol_id": "packages/flame/lib/src/sprite_batch.dart::SpriteBatch._computeBleedTransform",
+            "start_line": 340,
+            "end_line": 374,
+            "kind": "symbol",
+            "score": 42.9077,
+            "match": null,
+            "why": "name match: _computeBleedTransform x1.04 (computed); bm25: scale, computed~, factor; body: height, width, fixed, centered~"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/scale_effect.dart",
+            "symbol_id": "packages/flame/lib/src/effects/scale_effect.dart::ScaleEffect.onStart",
+            "start_line": 39,
+            "end_line": 45,
+            "kind": "symbol",
+            "score": 37.2152,
+            "match": null,
+            "why": "bm25: scale; body: scalefactor, factor"
+          },
+          {
+            "path": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart",
+            "symbol_id": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart::MultiDragScaleGestureRecognizer._checkScaleGestureThreshold",
+            "start_line": 305,
+            "end_line": 339,
+            "kind": "symbol",
+            "score": 36.2152,
+            "match": null,
+            "why": "name match: _checkScaleGestureThreshold x1.02 (scale); bm25: scale; body: scalefactor, factor, computed~"
+          },
+          {
+            "path": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart",
+            "symbol_id": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart::_ScaleState.resetPanZoomBaseline",
+            "start_line": 603,
+            "end_line": 613,
+            "kind": "symbol",
+            "score": 35.3258,
+            "match": null,
+            "why": "bm25: scale, factor; body: scalefactor, empty"
+          },
+          {
+            "path": "packages/flame/lib/src/extensions/path.dart",
+            "symbol_id": "packages/flame/lib/src/extensions/path.dart::PathExtension.resizeTo",
+            "start_line": 27,
+            "end_line": 50,
+            "kind": "symbol",
+            "score": 35.1656,
+            "match": null,
+            "why": "bm25: scale, centered, height, width"
+          },
+          {
+            "path": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart",
+            "symbol_id": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart::MultiDragScaleGestureRecognizer._computeRotationFactor",
+            "start_line": 417,
+            "end_line": 440,
+            "kind": "symbol",
+            "score": 33.3844,
+            "match": null,
+            "why": "name match: _computeRotationFactor x1.12 (computed, factor); owner match: MultiDragScaleGestureRecognizer x1.01; bm25: factor, scale, computed~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/camera/camera_component.dart",
+            "start_line": 84,
+            "end_line": 101,
+            "label": "packages/flame/lib/src/camera/camera_component.dart::CameraComponent.withFixedResolution"
+          },
+          {
+            "path": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart",
+            "start_line": 581,
+            "end_line": 581,
+            "label": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart::_ScaleState.scaleFactor"
+          },
+          {
+            "path": "packages/flame/lib/src/sprite_batch.dart",
+            "start_line": 340,
+            "end_line": 374,
+            "label": "packages/flame/lib/src/sprite_batch.dart::SpriteBatch._computeBleedTransform"
+          },
+          {
+            "path": "packages/flame/lib/src/effects/scale_effect.dart",
+            "start_line": 39,
+            "end_line": 45,
+            "label": "packages/flame/lib/src/effects/scale_effect.dart::ScaleEffect.onStart"
+          },
+          {
+            "path": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart",
+            "start_line": 305,
+            "end_line": 339,
+            "label": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart::MultiDragScaleGestureRecognizer._checkScaleGestureThreshold"
+          },
+          {
+            "path": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart",
+            "start_line": 603,
+            "end_line": 613,
+            "label": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart::_ScaleState.resetPanZoomBaseline"
+          },
+          {
+            "path": "packages/flame/lib/src/extensions/path.dart",
+            "start_line": 27,
+            "end_line": 50,
+            "label": "packages/flame/lib/src/extensions/path.dart::PathExtension.resizeTo"
+          },
+          {
+            "path": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart",
+            "start_line": 417,
+            "end_line": 440,
+            "label": "packages/flame/lib/src/events/multi_drag_scale_recognizer.dart::MultiDragScaleGestureRecognizer._computeRotationFactor"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "With `debugMode = true`, where are the component's outline rectangle, the small cross at its anchor and the x:/y: coordinate labels drawn?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/components/position_component.dart",
+          "symbol": "PositionComponent.renderDebugMode",
+          "start_line": 486,
+          "end_line": 516
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0218,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame_behaviors/lib/src/behaviors/behavior.dart",
+            "symbol_id": "packages/flame_behaviors/lib/src/behaviors/behavior.dart::Behavior.debugMode",
+            "start_line": 34,
+            "end_line": 35,
+            "kind": "symbol",
+            "score": 87.3768,
+            "match": null,
+            "why": "name match: debugMode (explicit debugmode); bm25: debugmode, debug, mode"
+          },
+          {
+            "path": "examples/lib/stories/experimental/layout_component_example_1.dart",
+            "symbol_id": "examples/lib/stories/experimental/layout_component_example_1.dart::LayoutComponentExample1.debugMode",
+            "start_line": 63,
+            "end_line": 66,
+            "kind": "symbol",
+            "score": 71.7173,
+            "match": null,
+            "why": "name match: debugMode (explicit debugmode); owner match: LayoutComponentExample1 x1.14; auxiliary dir x0.5; bm25: debugmode, debug, mode, component; body: rectangle, components"
+          },
+          {
+            "path": "examples/lib/stories/experimental/layout_component_example_2.dart",
+            "symbol_id": "examples/lib/stories/experimental/layout_component_example_2.dart::LayoutComponentExample2.debugMode",
+            "start_line": 56,
+            "end_line": 59,
+            "kind": "symbol",
+            "score": 71.7173,
+            "match": null,
+            "why": "name match: debugMode (explicit debugmode); owner match: LayoutComponentExample2 x1.14; auxiliary dir x0.5; bm25: debugmode, debug, mode, component; body: rectangle, components"
+          },
+          {
+            "path": "examples/lib/stories/experimental/layout_component_example_3.dart",
+            "symbol_id": "examples/lib/stories/experimental/layout_component_example_3.dart::LayoutComponentExample3.debugMode",
+            "start_line": 48,
+            "end_line": 51,
+            "kind": "symbol",
+            "score": 71.7173,
+            "match": null,
+            "why": "name match: debugMode (explicit debugmode); owner match: LayoutComponentExample3 x1.14; auxiliary dir x0.5; bm25: debugmode, debug, mode, component; body: rectangle, components"
+          },
+          {
+            "path": "packages/flame/test/components/position_component_test.dart",
+            "symbol_id": "packages/flame/test/components/position_component_test.dart::_MyDebugComponent.debugMode",
+            "start_line": 1374,
+            "end_line": 1375,
+            "kind": "symbol",
+            "score": 54.7676,
+            "match": null,
+            "why": "name match: debugMode (explicit debugmode); owner match: _MyDebugComponent x1.14; test code x0.5; bm25: debugmode, debug, mode, components, component"
+          },
+          {
+            "path": "doc/tutorials/klondike/app/lib/step2/components/foundation.dart",
+            "symbol_id": "doc/tutorials/klondike/app/lib/step2/components/foundation.dart::Foundation.debugMode",
+            "start_line": 4,
+            "end_line": 5,
+            "kind": "symbol",
+            "score": 46.7694,
+            "match": null,
+            "why": "name match: debugMode (explicit debugmode); auxiliary dir x0.5; bm25: debugmode, debug, mode, components, component"
+          },
+          {
+            "path": "doc/tutorials/klondike/app/lib/step2/components/stock.dart",
+            "symbol_id": "doc/tutorials/klondike/app/lib/step2/components/stock.dart::Stock.debugMode",
+            "start_line": 4,
+            "end_line": 5,
+            "kind": "symbol",
+            "score": 46.7694,
+            "match": null,
+            "why": "name match: debugMode (explicit debugmode); auxiliary dir x0.5; bm25: debugmode, debug, mode, components, component"
+          },
+          {
+            "path": "doc/tutorials/klondike/app/lib/step3/components/foundation.dart",
+            "symbol_id": "doc/tutorials/klondike/app/lib/step3/components/foundation.dart::Foundation.debugMode",
+            "start_line": 4,
+            "end_line": 5,
+            "kind": "symbol",
+            "score": 46.7694,
+            "match": null,
+            "why": "name match: debugMode (explicit debugmode); auxiliary dir x0.5; bm25: debugmode, debug, mode, components, component"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame_behaviors/lib/src/behaviors/behavior.dart",
+            "start_line": 34,
+            "end_line": 35,
+            "label": "packages/flame_behaviors/lib/src/behaviors/behavior.dart::Behavior.debugMode"
+          },
+          {
+            "path": "examples/lib/stories/experimental/layout_component_example_1.dart",
+            "start_line": 63,
+            "end_line": 66,
+            "label": "examples/lib/stories/experimental/layout_component_example_1.dart::LayoutComponentExample1.debugMode"
+          },
+          {
+            "path": "examples/lib/stories/experimental/layout_component_example_2.dart",
+            "start_line": 56,
+            "end_line": 59,
+            "label": "examples/lib/stories/experimental/layout_component_example_2.dart::LayoutComponentExample2.debugMode"
+          },
+          {
+            "path": "examples/lib/stories/experimental/layout_component_example_3.dart",
+            "start_line": 48,
+            "end_line": 51,
+            "label": "examples/lib/stories/experimental/layout_component_example_3.dart::LayoutComponentExample3.debugMode"
+          },
+          {
+            "path": "packages/flame/test/components/position_component_test.dart",
+            "start_line": 1374,
+            "end_line": 1375,
+            "label": "packages/flame/test/components/position_component_test.dart::_MyDebugComponent.debugMode"
+          },
+          {
+            "path": "doc/tutorials/klondike/app/lib/step2/components/foundation.dart",
+            "start_line": 4,
+            "end_line": 5,
+            "label": "doc/tutorials/klondike/app/lib/step2/components/foundation.dart::Foundation.debugMode"
+          },
+          {
+            "path": "doc/tutorials/klondike/app/lib/step2/components/stock.dart",
+            "start_line": 4,
+            "end_line": 5,
+            "label": "doc/tutorials/klondike/app/lib/step2/components/stock.dart::Stock.debugMode"
+          },
+          {
+            "path": "doc/tutorials/klondike/app/lib/step3/components/foundation.dart",
+            "start_line": 4,
+            "end_line": 5,
+            "label": "doc/tutorials/klondike/app/lib/step3/components/foundation.dart::Foundation.debugMode"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Uygulama arka plana alındığında oyun nerede otomatik olarak duraklatılıyor, tekrar öne gelince nerede devam ettiriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/game/flame_game.dart",
+          "symbol": "FlameGame.lifecycleStateChange",
+          "start_line": 367,
+          "end_line": 385
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0098,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/game/mixins/single_game_instance.dart",
+            "symbol_id": "packages/flame/lib/src/game/mixins/single_game_instance.dart::SingleGameInstance",
+            "start_line": 17,
+            "end_line": 29,
+            "kind": "symbol",
+            "score": 17.3973,
+            "match": null,
+            "why": "name match: SingleGameInstance x1.06 (oyun); class boost; bm25: application, app, game~"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/sprite_component.dart::SpriteComponent.autoResize",
+            "start_line": 86,
+            "end_line": 86,
+            "kind": "symbol",
+            "score": 16.133,
+            "match": null,
+            "why": "name match: autoResize x1.45 (otomatik); bm25: auto"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_animation_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/sprite_animation_component.dart::SpriteAnimationComponent.autoResize",
+            "start_line": 102,
+            "end_line": 102,
+            "kind": "symbol",
+            "score": 16.1,
+            "match": null,
+            "why": "name match: autoResize x1.45 (otomatik); bm25: auto"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_group_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/sprite_group_component.dart::SpriteGroupComponent.autoResize",
+            "start_line": 75,
+            "end_line": 75,
+            "kind": "symbol",
+            "score": 16.1,
+            "match": null,
+            "why": "name match: autoResize x1.45 (otomatik); bm25: auto"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_animation_group_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/sprite_animation_group_component.dart::SpriteAnimationGroupComponent.autoResize",
+            "start_line": 184,
+            "end_line": 184,
+            "kind": "symbol",
+            "score": 16.0684,
+            "match": null,
+            "why": "name match: autoResize x1.45 (otomatik); bm25: auto"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/sprite_component.dart::SpriteComponent.autoResize=",
+            "start_line": 90,
+            "end_line": 93,
+            "kind": "symbol",
+            "score": 15.5015,
+            "match": null,
+            "why": "name match: autoResize= x1.45 (otomatik); bm25: auto"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_animation_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/sprite_animation_component.dart::SpriteAnimationComponent.autoResize=",
+            "start_line": 106,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 15.4591,
+            "match": null,
+            "why": "name match: autoResize= x1.45 (otomatik); bm25: auto"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_group_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/sprite_group_component.dart::SpriteGroupComponent.autoResize=",
+            "start_line": 114,
+            "end_line": 117,
+            "kind": "symbol",
+            "score": 15.4591,
+            "match": null,
+            "why": "name match: autoResize= x1.45 (otomatik); bm25: auto"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/game/mixins/single_game_instance.dart",
+            "start_line": 17,
+            "end_line": 29,
+            "label": "packages/flame/lib/src/game/mixins/single_game_instance.dart::SingleGameInstance"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_component.dart",
+            "start_line": 86,
+            "end_line": 86,
+            "label": "packages/flame/lib/src/components/sprite_component.dart::SpriteComponent.autoResize"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_animation_component.dart",
+            "start_line": 102,
+            "end_line": 102,
+            "label": "packages/flame/lib/src/components/sprite_animation_component.dart::SpriteAnimationComponent.autoResize"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_group_component.dart",
+            "start_line": 75,
+            "end_line": 75,
+            "label": "packages/flame/lib/src/components/sprite_group_component.dart::SpriteGroupComponent.autoResize"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_animation_group_component.dart",
+            "start_line": 184,
+            "end_line": 184,
+            "label": "packages/flame/lib/src/components/sprite_animation_group_component.dart::SpriteAnimationGroupComponent.autoResize"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_component.dart",
+            "start_line": 90,
+            "end_line": 93,
+            "label": "packages/flame/lib/src/components/sprite_component.dart::SpriteComponent.autoResize="
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_animation_component.dart",
+            "start_line": 106,
+            "end_line": 109,
+            "label": "packages/flame/lib/src/components/sprite_animation_component.dart::SpriteAnimationComponent.autoResize="
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_group_component.dart",
+            "start_line": 114,
+            "end_line": 117,
+            "label": "packages/flame/lib/src/components/sprite_group_component.dart::SpriteGroupComponent.autoResize="
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Oyun calisirken bir bilesenin priority degerini degistirince kardesleri arasinda yeniden siralama nerede yapiliyor, ayni priority'deki bilesenlerin sirasi nasil korunuyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/components/core/component_list.dart",
+          "symbol": "ComponentList._rebalance",
+          "start_line": 271,
+          "end_line": 305
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0143,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/components/core/component_tree_root.dart",
+            "symbol_id": "packages/flame/lib/src/components/core/component_tree_root.dart::ComponentTreeRoot._enqueuePriorityChange",
+            "start_line": 145,
+            "end_line": 154,
+            "kind": "symbol",
+            "score": 22.3854,
+            "match": null,
+            "why": "name match: _enqueuePriorityChange x1.65 (degistirince, priority); bm25: priority, change~"
+          },
+          {
+            "path": "packages/flame/lib/src/components/core/component.dart",
+            "symbol_id": "packages/flame/lib/src/components/core/component.dart::Component.priority=",
+            "start_line": 1083,
+            "end_line": 1092,
+            "kind": "symbol",
+            "score": 21.4798,
+            "match": null,
+            "why": "name match: priority= x1.29 (priority); bm25: priority; body: change~, game~"
+          },
+          {
+            "path": "packages/flame_cli/lib/src/commands/control_commands.dart",
+            "symbol_id": "packages/flame_cli/lib/src/commands/control_commands.dart::ReloadCommand.ReloadCommand",
+            "start_line": 20,
+            "end_line": 46,
+            "kind": "symbol",
+            "score": 16.902,
+            "match": null,
+            "why": "bm25: body: run, change~, value~, game~"
+          },
+          {
+            "path": "packages/flame/lib/src/game/overlay_manager.dart",
+            "symbol_id": "packages/flame/lib/src/game/overlay_manager.dart::OverlayManager.add",
+            "start_line": 37,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 16.5879,
+            "match": null,
+            "why": "bm25: priority, game~; body: change~"
+          },
+          {
+            "path": "packages/flame_studio/lib/palette/bloc/palette_bloc.dart",
+            "symbol_id": "packages/flame_studio/lib/palette/bloc/palette_bloc.dart::PaletteBloc._onColorValueChanged",
+            "start_line": 102,
+            "end_line": 112,
+            "kind": "symbol",
+            "score": 16.328,
+            "match": null,
+            "why": "name match: _onColorValueChanged x1.45 (degerini, degistirince); bm25: change~, value~"
+          },
+          {
+            "path": "packages/flame_3d/lib/src/game/unmodifiable_vector3.dart",
+            "symbol_id": "packages/flame_3d/lib/src/game/unmodifiable_vector3.dart::UnmodifiableVector3.setValues",
+            "start_line": 38,
+            "end_line": 41,
+            "kind": "symbol",
+            "score": 16.2992,
+            "match": null,
+            "why": "name match: setValues x1.13 (degerini); bm25: value~, game~; body: modify"
+          },
+          {
+            "path": "packages/flame_studio/lib/palette/bloc/palette_event.dart",
+            "symbol_id": "packages/flame_studio/lib/palette/bloc/palette_event.dart::PaletteColorValueChanged",
+            "start_line": 40,
+            "end_line": 52,
+            "kind": "symbol",
+            "score": 16.1798,
+            "match": null,
+            "why": "name match: PaletteColorValueChanged x1.45 (degerini, degistirince); class boost; bm25: change~, value~"
+          },
+          {
+            "path": "packages/flame_devtools/lib/widgets/component_priority_form.dart",
+            "symbol_id": "packages/flame_devtools/lib/widgets/component_priority_form.dart::ComponentPriorityForm.build",
+            "start_line": 11,
+            "end_line": 33,
+            "kind": "symbol",
+            "score": 15.3637,
+            "match": null,
+            "why": "bm25: priority; body: value~, change~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/components/core/component_tree_root.dart",
+            "start_line": 145,
+            "end_line": 154,
+            "label": "packages/flame/lib/src/components/core/component_tree_root.dart::ComponentTreeRoot._enqueuePriorityChange"
+          },
+          {
+            "path": "packages/flame/lib/src/components/core/component.dart",
+            "start_line": 1083,
+            "end_line": 1092,
+            "label": "packages/flame/lib/src/components/core/component.dart::Component.priority="
+          },
+          {
+            "path": "packages/flame_cli/lib/src/commands/control_commands.dart",
+            "start_line": 20,
+            "end_line": 46,
+            "label": "packages/flame_cli/lib/src/commands/control_commands.dart::ReloadCommand.ReloadCommand"
+          },
+          {
+            "path": "packages/flame/lib/src/game/overlay_manager.dart",
+            "start_line": 37,
+            "end_line": 43,
+            "label": "packages/flame/lib/src/game/overlay_manager.dart::OverlayManager.add"
+          },
+          {
+            "path": "packages/flame_studio/lib/palette/bloc/palette_bloc.dart",
+            "start_line": 102,
+            "end_line": 112,
+            "label": "packages/flame_studio/lib/palette/bloc/palette_bloc.dart::PaletteBloc._onColorValueChanged"
+          },
+          {
+            "path": "packages/flame_3d/lib/src/game/unmodifiable_vector3.dart",
+            "start_line": 38,
+            "end_line": 41,
+            "label": "packages/flame_3d/lib/src/game/unmodifiable_vector3.dart::UnmodifiableVector3.setValues"
+          },
+          {
+            "path": "packages/flame_studio/lib/palette/bloc/palette_event.dart",
+            "start_line": 40,
+            "end_line": 52,
+            "label": "packages/flame_studio/lib/palette/bloc/palette_event.dart::PaletteColorValueChanged"
+          },
+          {
+            "path": "packages/flame_devtools/lib/widgets/component_priority_form.dart",
+            "start_line": 11,
+            "end_line": 33,
+            "label": "packages/flame_devtools/lib/widgets/component_priority_form.dart::ComponentPriorityForm.build"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "flow",
+      "lang": "en",
+      "question": "When the player taps the screen, how does the touch get from Flutter's gesture recognizer to my component's `onTapDown`, and how is the component under the finger chosen?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart",
+          "symbol": "MultiTapDispatcher.onMount",
+          "start_line": 159,
+          "end_line": 176
+        },
+        {
+          "path": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart",
+          "symbol": "MultiTapDispatcher.onTapDown",
+          "start_line": 32,
+          "end_line": 41
+        },
+        {
+          "path": "packages/flame/lib/src/events/messages/location_context_event.dart",
+          "symbol": "LocationContextEvent.deliverAtPoint",
+          "start_line": 42,
+          "end_line": 62
+        },
+        {
+          "path": "packages/flame/lib/src/components/core/component.dart",
+          "symbol": "Component.componentsAtLocation",
+          "start_line": 1025,
+          "end_line": 1061
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.028,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart",
+            "symbol_id": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart::MultiTapDispatcher.onTapDown",
+            "start_line": 32,
+            "end_line": 41,
+            "kind": "symbol",
+            "score": 139.223,
+            "match": "symbol",
+            "why": "name match: onTapDown (explicit ontapdown); owner match: MultiTapDispatcher x1.14; bm25: ontapdown, down, taps~, touch, finger, on, screen, component, components"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/button_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/button_component.dart::ButtonComponent.onTapDown",
+            "start_line": 51,
+            "end_line": 59,
+            "kind": "symbol",
+            "score": 108.0479,
+            "match": null,
+            "why": "name match: onTapDown (explicit ontapdown); owner match: ButtonComponent x1.22; bm25: ontapdown, down, taps~, on, components, component"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/sprite_button_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/sprite_button_component.dart::SpriteButtonComponent.onTapDown",
+            "start_line": 72,
+            "end_line": 76,
+            "kind": "symbol",
+            "score": 99.351,
+            "match": null,
+            "why": "name match: onTapDown (explicit ontapdown); owner match: SpriteButtonComponent x1.14; bm25: ontapdown, down, taps~, on, components, component"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/advanced_button_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/advanced_button_component.dart::AdvancedButtonComponent.onTapDown",
+            "start_line": 86,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 98.3563,
+            "match": null,
+            "why": "name match: onTapDown (explicit ontapdown); owner match: AdvancedButtonComponent x1.14; bm25: ontapdown, down, taps~, on, components, component"
+          },
+          {
+            "path": "packages/flame/lib/src/events/callbacks/tap_callbacks.dart",
+            "symbol_id": "packages/flame/lib/src/events/callbacks/tap_callbacks.dart::TapCallbacks.onTapDown",
+            "start_line": 16,
+            "end_line": 16,
+            "kind": "symbol",
+            "score": 95.3984,
+            "match": null,
+            "why": "name match: onTapDown (explicit ontapdown); owner match: TapCallbacks x1.22; bm25: ontapdown, down, taps~, on"
+          },
+          {
+            "path": "examples/lib/stories/input/gesture_hitboxes_example.dart",
+            "symbol_id": "examples/lib/stories/input/gesture_hitboxes_example.dart::MyPathComponent.onTapDown",
+            "start_line": 116,
+            "end_line": 119,
+            "kind": "symbol",
+            "score": 72.2196,
+            "match": null,
+            "why": "name match: onTapDown (explicit ontapdown); owner match: MyPathComponent x1.31; auxiliary dir x0.5; bm25: gesture, ontapdown, down, taps~, on, component"
+          },
+          {
+            "path": "examples/lib/stories/input/gesture_hitboxes_example.dart",
+            "symbol_id": "examples/lib/stories/input/gesture_hitboxes_example.dart::MyShapeComponent.onTapDown",
+            "start_line": 152,
+            "end_line": 155,
+            "kind": "symbol",
+            "score": 71.8749,
+            "match": null,
+            "why": "name match: onTapDown (explicit ontapdown); owner match: MyShapeComponent x1.31; auxiliary dir x0.5; bm25: gesture, ontapdown, down, taps~, on, component"
+          },
+          {
+            "path": "examples/lib/stories/input/gesture_hitboxes_example.dart",
+            "symbol_id": "examples/lib/stories/input/gesture_hitboxes_example.dart::_GestureHitboxesWorld.onTapDown",
+            "start_line": 85,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 66.6296,
+            "match": null,
+            "why": "name match: onTapDown (explicit ontapdown); owner match: _GestureHitboxesWorld x1.14; auxiliary dir x0.5; bm25: gesture, ontapdown, down, taps~, on"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart",
+            "start_line": 32,
+            "end_line": 41,
+            "label": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart::MultiTapDispatcher.onTapDown"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/button_component.dart",
+            "start_line": 51,
+            "end_line": 59,
+            "label": "packages/flame/lib/src/components/input/button_component.dart::ButtonComponent.onTapDown"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/sprite_button_component.dart",
+            "start_line": 72,
+            "end_line": 76,
+            "label": "packages/flame/lib/src/components/input/sprite_button_component.dart::SpriteButtonComponent.onTapDown"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/advanced_button_component.dart",
+            "start_line": 86,
+            "end_line": 95,
+            "label": "packages/flame/lib/src/components/input/advanced_button_component.dart::AdvancedButtonComponent.onTapDown"
+          },
+          {
+            "path": "packages/flame/lib/src/events/callbacks/tap_callbacks.dart",
+            "start_line": 16,
+            "end_line": 16,
+            "label": "packages/flame/lib/src/events/callbacks/tap_callbacks.dart::TapCallbacks.onTapDown"
+          },
+          {
+            "path": "examples/lib/stories/input/gesture_hitboxes_example.dart",
+            "start_line": 116,
+            "end_line": 119,
+            "label": "examples/lib/stories/input/gesture_hitboxes_example.dart::MyPathComponent.onTapDown"
+          },
+          {
+            "path": "examples/lib/stories/input/gesture_hitboxes_example.dart",
+            "start_line": 152,
+            "end_line": 155,
+            "label": "examples/lib/stories/input/gesture_hitboxes_example.dart::MyShapeComponent.onTapDown"
+          },
+          {
+            "path": "examples/lib/stories/input/gesture_hitboxes_example.dart",
+            "start_line": 85,
+            "end_line": 88,
+            "label": "examples/lib/stories/input/gesture_hitboxes_example.dart::_GestureHitboxesWorld.onTapDown"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "flow",
+      "lang": "tr",
+      "question": "Her karede carpismalar nasil tespit ediliyor ve sonunda benim bilesenimin onCollision metodu nasil cagriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/collisions/has_collision_detection.dart",
+          "symbol": "HasCollisionDetection.update",
+          "start_line": 25,
+          "end_line": 29
+        },
+        {
+          "path": "packages/flame/lib/src/collisions/collision_detection.dart",
+          "symbol": "CollisionDetection.run",
+          "start_line": 33,
+          "end_line": 70
+        },
+        {
+          "path": "packages/flame/lib/src/collisions/broadphase/sweep/sweep.dart",
+          "symbol": "Sweep.query",
+          "start_line": 30,
+          "end_line": 63
+        },
+        {
+          "path": "packages/flame/lib/src/collisions/standard_collision_detection.dart",
+          "symbol": "StandardCollisionDetection.handleCollision",
+          "start_line": 48,
+          "end_line": 56
+        },
+        {
+          "path": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart",
+          "symbol": "ShapeHitbox.onCollision",
+          "start_line": 229,
+          "end_line": 241
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0106,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/collisions/collision_callbacks.dart",
+            "symbol_id": "packages/flame/lib/src/collisions/collision_callbacks.dart::GenericCollisionCallbacks.onCollision",
+            "start_line": 55,
+            "end_line": 58,
+            "kind": "symbol",
+            "score": 85.1181,
+            "match": null,
+            "why": "name match: onCollision (explicit oncollision); bm25: oncollision, collision, call, on"
+          },
+          {
+            "path": "packages/flame/lib/src/collisions/collision_callbacks.dart",
+            "symbol_id": "packages/flame/lib/src/collisions/collision_callbacks.dart::CollisionCallbacks.onCollision",
+            "start_line": 115,
+            "end_line": 119,
+            "kind": "symbol",
+            "score": 82.563,
+            "match": null,
+            "why": "name match: onCollision (explicit oncollision); bm25: oncollision, collision, on; body: call"
+          },
+          {
+            "path": "packages/flame/lib/src/collisions/collision_passthrough.dart",
+            "symbol_id": "packages/flame/lib/src/collisions/collision_passthrough.dart::CollisionPassthrough.onCollision",
+            "start_line": 23,
+            "end_line": 28,
+            "kind": "symbol",
+            "score": 82.2139,
+            "match": null,
+            "why": "name match: onCollision (explicit oncollision); bm25: oncollision, collision, on; body: call"
+          },
+          {
+            "path": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart",
+            "symbol_id": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart::ShapeHitbox.onCollision",
+            "start_line": 229,
+            "end_line": 241,
+            "kind": "symbol",
+            "score": 80.8704,
+            "match": "symbol",
+            "why": "name match: onCollision (explicit oncollision); bm25: oncollision, collision, on; body: call"
+          },
+          {
+            "path": "packages/flame_behaviors/lib/src/behaviors/propagating_collision_behavior.dart",
+            "symbol_id": "packages/flame_behaviors/lib/src/behaviors/propagating_collision_behavior.dart::PropagatingCollisionBehavior.onCollision",
+            "start_line": 137,
+            "end_line": 151,
+            "kind": "symbol",
+            "score": 77.3984,
+            "match": null,
+            "why": "name match: onCollision (explicit oncollision); bm25: oncollision, collision, on; body: call"
+          },
+          {
+            "path": "packages/flame_behaviors/lib/src/behaviors/propagating_collision_behavior.dart",
+            "symbol_id": "packages/flame_behaviors/lib/src/behaviors/propagating_collision_behavior.dart::CollisionBehavior.onCollision",
+            "start_line": 19,
+            "end_line": 19,
+            "kind": "symbol",
+            "score": 74.1867,
+            "match": null,
+            "why": "name match: onCollision (explicit oncollision); bm25: oncollision, collision, on, call"
+          },
+          {
+            "path": "packages/flame_behaviors/test/src/behaviors/propagating_collision_behavior_test.dart",
+            "symbol_id": "packages/flame_behaviors/test/src/behaviors/propagating_collision_behavior_test.dart::_CollisionBehavior.onCollision",
+            "start_line": 36,
+            "end_line": 40,
+            "kind": "symbol",
+            "score": 41.2718,
+            "match": null,
+            "why": "name match: onCollision (explicit oncollision); test code x0.5; bm25: oncollision, collision, on; body: call"
+          },
+          {
+            "path": "packages/flame_behaviors/test/src/behaviors/screen_collision_behavior_test.dart",
+            "symbol_id": "packages/flame_behaviors/test/src/behaviors/screen_collision_behavior_test.dart::_TrackingScreenCollisionBehavior.onCollision",
+            "start_line": 26,
+            "end_line": 30,
+            "kind": "symbol",
+            "score": 40.6388,
+            "match": null,
+            "why": "name match: onCollision (explicit oncollision); test code x0.5; bm25: oncollision, collision, on; body: call"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/collisions/collision_callbacks.dart",
+            "start_line": 55,
+            "end_line": 58,
+            "label": "packages/flame/lib/src/collisions/collision_callbacks.dart::GenericCollisionCallbacks.onCollision"
+          },
+          {
+            "path": "packages/flame/lib/src/collisions/collision_callbacks.dart",
+            "start_line": 115,
+            "end_line": 119,
+            "label": "packages/flame/lib/src/collisions/collision_callbacks.dart::CollisionCallbacks.onCollision"
+          },
+          {
+            "path": "packages/flame/lib/src/collisions/collision_passthrough.dart",
+            "start_line": 23,
+            "end_line": 28,
+            "label": "packages/flame/lib/src/collisions/collision_passthrough.dart::CollisionPassthrough.onCollision"
+          },
+          {
+            "path": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart",
+            "start_line": 229,
+            "end_line": 241,
+            "label": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart::ShapeHitbox.onCollision"
+          },
+          {
+            "path": "packages/flame_behaviors/lib/src/behaviors/propagating_collision_behavior.dart",
+            "start_line": 137,
+            "end_line": 151,
+            "label": "packages/flame_behaviors/lib/src/behaviors/propagating_collision_behavior.dart::PropagatingCollisionBehavior.onCollision"
+          },
+          {
+            "path": "packages/flame_behaviors/lib/src/behaviors/propagating_collision_behavior.dart",
+            "start_line": 19,
+            "end_line": 19,
+            "label": "packages/flame_behaviors/lib/src/behaviors/propagating_collision_behavior.dart::CollisionBehavior.onCollision"
+          },
+          {
+            "path": "packages/flame_behaviors/test/src/behaviors/propagating_collision_behavior_test.dart",
+            "start_line": 36,
+            "end_line": 40,
+            "label": "packages/flame_behaviors/test/src/behaviors/propagating_collision_behavior_test.dart::_CollisionBehavior.onCollision"
+          },
+          {
+            "path": "packages/flame_behaviors/test/src/behaviors/screen_collision_behavior_test.dart",
+            "start_line": 26,
+            "end_line": 30,
+            "label": "packages/flame_behaviors/test/src/behaviors/screen_collision_behavior_test.dart::_TrackingScreenCollisionBehavior.onCollision"
+          }
+        ],
+        "rank": 4,
+        "loose_rank": 4,
+        "rr": 0.25,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "flow",
+      "lang": "en",
+      "question": "When I call `add(enemy)` while the game is running, at which points do `enemy.onLoad()` and `enemy.onMount()` actually run?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "packages/flame/lib/src/components/core/component.dart",
+          "symbol": "Component._addChild",
+          "start_line": 849,
+          "end_line": 885
+        },
+        {
+          "path": "packages/flame/lib/src/components/core/component_tree_root.dart",
+          "symbol": "ComponentTreeRoot._processLifecycleEvents",
+          "start_line": 252,
+          "end_line": 300
+        },
+        {
+          "path": "packages/flame/lib/src/components/core/component.dart",
+          "symbol": "Component._handleLifecycleEventAdd",
+          "start_line": 1098,
+          "end_line": 1124
+        },
+        {
+          "path": "packages/flame/lib/src/components/core/component.dart",
+          "symbol": "Component._startLoading",
+          "start_line": 1185,
+          "end_line": 1208
+        },
+        {
+          "path": "packages/flame/lib/src/components/core/component.dart",
+          "symbol": "Component._mount",
+          "start_line": 1323,
+          "end_line": 1359
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "elapsed_s": 0.0321,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame/lib/src/components/core/component.dart",
+            "symbol_id": "packages/flame/lib/src/components/core/component.dart::Component.onMount",
+            "start_line": 586,
+            "end_line": 586,
+            "kind": "symbol",
+            "score": 44.0214,
+            "match": null,
+            "why": "name match: onMount x1.12 (explicit onmount); bm25: onmount, mount, running~, on, load, onload, add, game, call, points~"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.onMount",
+            "start_line": 71,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 37.551,
+            "match": null,
+            "why": "name match: onMount x1.12 (explicit onmount); bm25: onmount, mount, on; body: call, onload, add, load"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/button_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/input/button_component.dart::ButtonComponent.onMount",
+            "start_line": 35,
+            "end_line": 49,
+            "kind": "symbol",
+            "score": 37.5438,
+            "match": null,
+            "why": "name match: onMount x1.12 (explicit onmount); bm25: onmount, mount, on; body: call, onload, load, add"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_group_component.dart",
+            "symbol_id": "packages/flame/lib/src/components/sprite_group_component.dart::SpriteGroupComponent.onMount",
+            "start_line": 123,
+            "end_line": 135,
+            "kind": "symbol",
+            "score": 37.5346,
+            "match": null,
+            "why": "name match: onMount x1.12 (explicit onmount); bm25: onmount, mount, on; body: onload, load, call"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/body_component.dart",
+            "symbol_id": "packages/flame_forge2d/lib/body_component.dart::BodyComponent.onMount",
+            "start_line": 122,
+            "end_line": 133,
+            "kind": "symbol",
+            "score": 37.3978,
+            "match": null,
+            "why": "name match: onMount x1.12 (explicit onmount); bm25: onmount, mount, on; body: running~, game, onload, load"
+          },
+          {
+            "path": "packages/flame/lib/src/timer.dart",
+            "symbol_id": "packages/flame/lib/src/timer.dart::Timer.isRunning",
+            "start_line": 38,
+            "end_line": 38,
+            "kind": "symbol",
+            "score": 36.8394,
+            "match": null,
+            "why": "name match: isRunning x1.20 (is running, running); bm25: running, isrunning"
+          },
+          {
+            "path": "packages/flame_behavior_tree/behavior_tree/lib/src/node.dart",
+            "symbol_id": "packages/flame_behavior_tree/behavior_tree/lib/src/node.dart::Node.isRunning",
+            "start_line": 34,
+            "end_line": 34,
+            "kind": "symbol",
+            "score": 36.8016,
+            "match": null,
+            "why": "name match: isRunning x1.20 (is running, running); bm25: running, isrunning"
+          },
+          {
+            "path": "packages/flame_riverpod/lib/src/consumer.dart",
+            "symbol_id": "packages/flame_riverpod/lib/src/consumer.dart::RiverpodComponentMixin.onMount",
+            "start_line": 78,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 36.3959,
+            "match": null,
+            "why": "name match: onMount x1.12 (explicit onmount); bm25: onmount, mount, on; body: game, call, add"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame/lib/src/components/core/component.dart",
+            "start_line": 586,
+            "end_line": 586,
+            "label": "packages/flame/lib/src/components/core/component.dart::Component.onMount"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/joystick_component.dart",
+            "start_line": 71,
+            "end_line": 88,
+            "label": "packages/flame/lib/src/components/input/joystick_component.dart::JoystickComponent.onMount"
+          },
+          {
+            "path": "packages/flame/lib/src/components/input/button_component.dart",
+            "start_line": 35,
+            "end_line": 49,
+            "label": "packages/flame/lib/src/components/input/button_component.dart::ButtonComponent.onMount"
+          },
+          {
+            "path": "packages/flame/lib/src/components/sprite_group_component.dart",
+            "start_line": 123,
+            "end_line": 135,
+            "label": "packages/flame/lib/src/components/sprite_group_component.dart::SpriteGroupComponent.onMount"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/body_component.dart",
+            "start_line": 122,
+            "end_line": 133,
+            "label": "packages/flame_forge2d/lib/body_component.dart::BodyComponent.onMount"
+          },
+          {
+            "path": "packages/flame/lib/src/timer.dart",
+            "start_line": 38,
+            "end_line": 38,
+            "label": "packages/flame/lib/src/timer.dart::Timer.isRunning"
+          },
+          {
+            "path": "packages/flame_behavior_tree/behavior_tree/lib/src/node.dart",
+            "start_line": 34,
+            "end_line": 34,
+            "label": "packages/flame_behavior_tree/behavior_tree/lib/src/node.dart::Node.isRunning"
+          },
+          {
+            "path": "packages/flame_riverpod/lib/src/consumer.dart",
+            "start_line": 78,
+            "end_line": 88,
+            "label": "packages/flame_riverpod/lib/src/consumer.dart::RiverpodComponentMixin.onMount"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where is the physics solver that resolves contacts and integrates body velocities on each step when I use Forge2DGame?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+          "symbol": "Forge2DWorld.update",
+          "start_line": 105,
+          "end_line": 112
+        },
+        {
+          "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+          "symbol": "Forge2DWorld.physicsWorld",
+          "start_line": 46,
+          "end_line": 67
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0056,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_game.dart",
+            "symbol_id": "packages/flame_forge2d/lib/forge2d_game.dart::Forge2DGame",
+            "start_line": 9,
+            "end_line": 102,
+            "kind": "symbol",
+            "score": 106.6549,
+            "match": null,
+            "why": "name match: Forge2DGame (explicit forge2dgame); class boost; bm25: physics, forge2dgame, forge, contacts~, use"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_game.dart",
+            "symbol_id": "packages/flame_forge2d/lib/forge2d_game.dart::Forge2DGame.Forge2DGame",
+            "start_line": 42,
+            "end_line": 66,
+            "kind": "symbol",
+            "score": 71.9766,
+            "match": null,
+            "why": "name match: Forge2DGame (explicit forge2dgame); bm25: contacts~, forge, forge2dgame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+            "symbol_id": "packages/flame_forge2d/lib/forge2d_world.dart::Forge2DWorld.physicsWorld",
+            "start_line": 46,
+            "end_line": 67,
+            "kind": "symbol",
+            "score": 47.9269,
+            "match": "symbol",
+            "why": "name match: physicsWorld x1.09 (physics); bm25: physics, forge, forge2dgame, use; body: step"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+            "symbol_id": "packages/flame_forge2d/lib/forge2d_world.dart::Forge2DWorld.update",
+            "start_line": 105,
+            "end_line": 112,
+            "kind": "symbol",
+            "score": 43.8541,
+            "match": "symbol",
+            "why": "bm25: forge; body: physics, contacts~, step"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+            "symbol_id": "packages/flame_forge2d/lib/forge2d_world.dart::Forge2DWorld.preSolveCallback=",
+            "start_line": 173,
+            "end_line": 177,
+            "kind": "symbol",
+            "score": 40.7807,
+            "match": null,
+            "why": "bm25: physics, contacts, forge, step"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher",
+            "start_line": 31,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 39.5772,
+            "match": null,
+            "why": "name match: ContactEventsDispatcher x1.09 (contacts); class boost; bm25: contacts, physics, body, forge"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_callbacks.dart",
+            "symbol_id": "packages/flame_forge2d/lib/contact_callbacks.dart::ContactCallbacks",
+            "start_line": 16,
+            "end_line": 34,
+            "kind": "symbol",
+            "score": 36.9346,
+            "match": null,
+            "why": "name match: ContactCallbacks x1.11 (contacts); class boost; bm25: contacts, forge, body, use"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+            "symbol_id": "packages/flame_forge2d/lib/forge2d_world.dart::Forge2DWorld.createBody",
+            "start_line": 114,
+            "end_line": 118,
+            "kind": "symbol",
+            "score": 34.7701,
+            "match": null,
+            "why": "name match: createBody x1.06 (body); bm25: body, forge; body: physics"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_game.dart",
+            "start_line": 9,
+            "end_line": 102,
+            "label": "packages/flame_forge2d/lib/forge2d_game.dart::Forge2DGame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_game.dart",
+            "start_line": 42,
+            "end_line": 66,
+            "label": "packages/flame_forge2d/lib/forge2d_game.dart::Forge2DGame.Forge2DGame"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+            "start_line": 46,
+            "end_line": 67,
+            "label": "packages/flame_forge2d/lib/forge2d_world.dart::Forge2DWorld.physicsWorld"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+            "start_line": 105,
+            "end_line": 112,
+            "label": "packages/flame_forge2d/lib/forge2d_world.dart::Forge2DWorld.update"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+            "start_line": 173,
+            "end_line": 177,
+            "label": "packages/flame_forge2d/lib/forge2d_world.dart::Forge2DWorld.preSolveCallback="
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart",
+            "start_line": 31,
+            "end_line": 92,
+            "label": "packages/flame_forge2d/lib/contact_events_dispatcher.dart::ContactEventsDispatcher"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/contact_callbacks.dart",
+            "start_line": 16,
+            "end_line": 34,
+            "label": "packages/flame_forge2d/lib/contact_callbacks.dart::ContactCallbacks"
+          },
+          {
+            "path": "packages/flame_forge2d/lib/forge2d_world.dart",
+            "start_line": 114,
+            "end_line": 118,
+            "label": "packages/flame_forge2d/lib/forge2d_world.dart::Forge2DWorld.createBody"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 3,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q19",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "Aynı ses efektinin üst üste çalabilmesi için birden fazla AudioPlayer'ı hazır tutan AudioPool sınıfı nerede yazılmış?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "packages/flame_audio/lib/flame_audio.dart",
+          "symbol": "FlameAudio.createPool",
+          "start_line": 147,
+          "end_line": 163
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.001,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame_cli/lib/src/merge/merge.dart",
+            "symbol_id": "packages/flame_cli/lib/src/merge/merge.dart::WriteSource",
+            "start_line": 79,
+            "end_line": 79,
+            "kind": "symbol",
+            "score": 34.4043,
+            "match": null,
+            "why": "name match: WriteSource x1.19 (yazılmış); class boost; class asked x3; bm25: write~"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "symbol_id": "packages/flame_audio/lib/bgm.dart::Bgm.play",
+            "start_line": 64,
+            "end_line": 76,
+            "kind": "symbol",
+            "score": 26.398,
+            "match": null,
+            "why": "bm25: body: audioplayer"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "symbol_id": "packages/flame_audio/lib/bgm.dart::Bgm.didChangeAppLifecycleState",
+            "start_line": 102,
+            "end_line": 111,
+            "kind": "symbol",
+            "score": 25.2082,
+            "match": null,
+            "why": "bm25: body: audioplayer"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "symbol_id": "packages/flame_audio/lib/bgm.dart::Bgm.stop",
+            "start_line": 79,
+            "end_line": 82,
+            "kind": "symbol",
+            "score": 22.666,
+            "match": null,
+            "why": "bm25: body: audioplayer"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "symbol_id": "packages/flame_audio/lib/bgm.dart::Bgm.resume",
+            "start_line": 85,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 22.2879,
+            "match": null,
+            "why": "bm25: body: audioplayer"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "symbol_id": "packages/flame_audio/lib/bgm.dart::Bgm.pause",
+            "start_line": 92,
+            "end_line": 95,
+            "kind": "symbol",
+            "score": 22.2879,
+            "match": null,
+            "why": "bm25: body: audioplayer"
+          },
+          {
+            "path": "packages/flame_audio/lib/flame_audio.dart",
+            "symbol_id": "packages/flame_audio/lib/flame_audio.dart::FlameAudio._preparePlayer",
+            "start_line": 45,
+            "end_line": 64,
+            "kind": "symbol",
+            "score": 20.4691,
+            "match": null,
+            "why": "bm25: audioplayer"
+          },
+          {
+            "path": "packages/flame_audio/lib/flame_audio.dart",
+            "symbol_id": "packages/flame_audio/lib/flame_audio.dart::FlameAudio.loop",
+            "start_line": 90,
+            "end_line": 104,
+            "kind": "symbol",
+            "score": 20.207,
+            "match": null,
+            "why": "bm25: audioplayer"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame_cli/lib/src/merge/merge.dart",
+            "start_line": 79,
+            "end_line": 79,
+            "label": "packages/flame_cli/lib/src/merge/merge.dart::WriteSource"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "start_line": 64,
+            "end_line": 76,
+            "label": "packages/flame_audio/lib/bgm.dart::Bgm.play"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "start_line": 102,
+            "end_line": 111,
+            "label": "packages/flame_audio/lib/bgm.dart::Bgm.didChangeAppLifecycleState"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "start_line": 79,
+            "end_line": 82,
+            "label": "packages/flame_audio/lib/bgm.dart::Bgm.stop"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "start_line": 85,
+            "end_line": 88,
+            "label": "packages/flame_audio/lib/bgm.dart::Bgm.resume"
+          },
+          {
+            "path": "packages/flame_audio/lib/bgm.dart",
+            "start_line": 92,
+            "end_line": 95,
+            "label": "packages/flame_audio/lib/bgm.dart::Bgm.pause"
+          },
+          {
+            "path": "packages/flame_audio/lib/flame_audio.dart",
+            "start_line": 45,
+            "end_line": 64,
+            "label": "packages/flame_audio/lib/flame_audio.dart::FlameAudio._preparePlayer"
+          },
+          {
+            "path": "packages/flame_audio/lib/flame_audio.dart",
+            "start_line": 90,
+            "end_line": 104,
+            "label": "packages/flame_audio/lib/flame_audio.dart::FlameAudio.loop"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": null,
+        "pointer_at_k": false,
+        "pointer_chunk_recall": false
+      }
+    },
+    {
+      "id": "q20",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where is the code that decodes a PNG file's bytes into the pixels of a `ui.Image`?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "packages/flame/lib/src/cache/images.dart",
+          "symbol": "Images._fetchToMemory",
+          "start_line": 341,
+          "end_line": 346
+        },
+        {
+          "path": "packages/flame/lib/src/cache/images.dart",
+          "symbol": "Images._fetchFromBase64",
+          "start_line": 335,
+          "end_line": 339
+        }
+      ],
+      "error": null,
+      "elapsed_s": 0.0055,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "packages/flame_studio/lib/component_editor/widgets/component_preview.dart",
+            "symbol_id": "packages/flame_studio/lib/component_editor/widgets/component_preview.dart::_ComponentPreviewState._decodeImages",
+            "start_line": 59,
+            "end_line": 78,
+            "kind": "symbol",
+            "score": 66.0315,
+            "match": null,
+            "why": "name match: _decodeImages x1.48 (decodes, image); bm25: decodes, image; body: bytes, ui"
+          },
+          {
+            "path": "packages/flame_studio/lib/sprite_editor/widgets/sprite_canvas.dart",
+            "symbol_id": "packages/flame_studio/lib/sprite_editor/widgets/sprite_canvas.dart::_SpriteCanvasState._decode",
+            "start_line": 69,
+            "end_line": 94,
+            "kind": "symbol",
+            "score": 60.2661,
+            "match": null,
+            "why": "name match: _decode x1.33 (decodes); bm25: bytes, decodes~; body: image, ui"
+          },
+          {
+            "path": "packages/flame_devtools/lib/widgets/component_snapshot.dart",
+            "symbol_id": "packages/flame_devtools/lib/widgets/component_snapshot.dart::_Base64ImageState._decode",
+            "start_line": 93,
+            "end_line": 107,
+            "kind": "symbol",
+            "score": 59.6073,
+            "match": null,
+            "why": "name match: _decode x1.33 (decodes); owner match: _Base64ImageState x1.03; bm25: image, decodes~, ui; body: bytes"
+          },
+          {
+            "path": "packages/flame/lib/src/extensions/image.dart",
+            "symbol_id": "packages/flame/lib/src/extensions/image.dart::ImageExtension.fromPixels",
+            "start_line": 20,
+            "end_line": 31,
+            "kind": "symbol",
+            "score": 54.3599,
+            "match": null,
+            "why": "name match: fromPixels x1.14 (pixels); owner match: ImageExtension x1.02; bm25: pixels, image, bytes; body: decodes~"
+          },
+          {
+            "path": "packages/flame_cli/lib/src/commands/snapshot_command.dart",
+            "symbol_id": "packages/flame_cli/lib/src/commands/snapshot_command.dart::_pngInfo",
+            "start_line": 281,
+            "end_line": 287,
+            "kind": "symbol",
+            "score": 49.3011,
+            "match": null,
+            "why": "name match: _pngInfo x1.11 (png); bm25: bytes, decodes~, png; body: image"
+          },
+          {
+            "path": "packages/flame_studio/lib/sprite_editor/bloc/sprite_editor_cubit.dart",
+            "symbol_id": "packages/flame_studio/lib/sprite_editor/bloc/sprite_editor_cubit.dart::SpriteEditorCubit.imageDecoded",
+            "start_line": 83,
+            "end_line": 102,
+            "kind": "symbol",
+            "score": 42.5284,
+            "match": null,
+            "why": "name match: imageDecoded x1.48 (decodes, image); bm25: image, decodes~, pixels"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "symbol_id": "packages/flame/lib/src/cache/images.dart::Images.sizeBytes",
+            "start_line": 83,
+            "end_line": 89,
+            "kind": "symbol",
+            "score": 40.5929,
+            "match": null,
+            "why": "name match: sizeBytes x1.12 (bytes); owner match: Images x1.04; bm25: bytes, image, decodes~, pixels~"
+          },
+          {
+            "path": "packages/flame/lib/src/extensions/image.dart",
+            "symbol_id": "packages/flame/lib/src/extensions/image.dart::ImageExtension.pixelsInUint8",
+            "start_line": 36,
+            "end_line": 38,
+            "kind": "symbol",
+            "score": 39.2426,
+            "match": null,
+            "why": "name match: pixelsInUint8 x1.11 (pixels); owner match: ImageExtension x1.02; bm25: pixels, image, bytes~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "packages/flame_studio/lib/component_editor/widgets/component_preview.dart",
+            "start_line": 59,
+            "end_line": 78,
+            "label": "packages/flame_studio/lib/component_editor/widgets/component_preview.dart::_ComponentPreviewState._decodeImages"
+          },
+          {
+            "path": "packages/flame_studio/lib/sprite_editor/widgets/sprite_canvas.dart",
+            "start_line": 69,
+            "end_line": 94,
+            "label": "packages/flame_studio/lib/sprite_editor/widgets/sprite_canvas.dart::_SpriteCanvasState._decode"
+          },
+          {
+            "path": "packages/flame_devtools/lib/widgets/component_snapshot.dart",
+            "start_line": 93,
+            "end_line": 107,
+            "label": "packages/flame_devtools/lib/widgets/component_snapshot.dart::_Base64ImageState._decode"
+          },
+          {
+            "path": "packages/flame/lib/src/extensions/image.dart",
+            "start_line": 20,
+            "end_line": 31,
+            "label": "packages/flame/lib/src/extensions/image.dart::ImageExtension.fromPixels"
+          },
+          {
+            "path": "packages/flame_cli/lib/src/commands/snapshot_command.dart",
+            "start_line": 281,
+            "end_line": 287,
+            "label": "packages/flame_cli/lib/src/commands/snapshot_command.dart::_pngInfo"
+          },
+          {
+            "path": "packages/flame_studio/lib/sprite_editor/bloc/sprite_editor_cubit.dart",
+            "start_line": 83,
+            "end_line": 102,
+            "label": "packages/flame_studio/lib/sprite_editor/bloc/sprite_editor_cubit.dart::SpriteEditorCubit.imageDecoded"
+          },
+          {
+            "path": "packages/flame/lib/src/cache/images.dart",
+            "start_line": 83,
+            "end_line": 89,
+            "label": "packages/flame/lib/src/cache/images.dart::Images.sizeBytes"
+          },
+          {
+            "path": "packages/flame/lib/src/extensions/image.dart",
+            "start_line": 36,
+            "end_line": 38,
+            "label": "packages/flame/lib/src/extensions/image.dart::ImageExtension.pixelsInUint8"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": null,
+        "pointer_at_k": false,
+        "pointer_chunk_recall": false
+      }
+    }
+  ]
+}

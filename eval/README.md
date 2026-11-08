@@ -880,3 +880,79 @@ gson and `true` in ripgrep and flame (the authors' choice); this affects only
 comparable across the sets.
 
 These rows are first baselines, not the result of tuning.
+
+## Search v5 (2026-11-08): Rust inline tests, auxiliary directories, Turkish suffix boundary
+
+Three changes, tuned only on the development sets (flask, requests, rea, ripgrep,
+flame). httpx, axios, gin and gson are held out and were measured once, at the end.
+
+1. **Rust inline tests.** Items in `#[cfg(test)]` modules, `#[test]` / `#[x::test]`
+   functions, and files that are the body of a `#[cfg(test)] mod x;` declaration count
+   as test code and take the existing test penalty. Test attributes are kept at the
+   front of the Rust signature and on `mod` import edges, so there is no schema change;
+   stored indexes are rebuilt automatically through a new index format version ("2",
+   meta key `index.format`). ripgrep top-8 test share: 30% -> 2.5%.
+2. **Auxiliary directories.** `AUX_PENALTY` 0.5 for examples, example, doc, docs,
+   benchmark(s), benches, script(s) and experiments at the repo root or next to a
+   package manifest (pubspec.yaml, package.json, Cargo.toml, go.mod, pom.xml,
+   build.gradle(.kts), pyproject.toml, setup.py). Files a manifest declares as shipped
+   are exempt. Queries asking for examples, docs, benchmarks or scripts (also Turkish
+   örnek / belge / betik) lift it. The stronger of the test and aux penalty applies.
+   The grid 0.3-1.0 was flat for 0.4-0.7; 0.5 was chosen (0.3 gained one flame
+   question, not taken to avoid tuning to one question). `experiments` and `benches`
+   were added beyond the planned list on dev evidence (REA's diagnosis, ripgrep's
+   `crates/ignore/benches`), which carries some risk of fitting REA. Top-8 aux share:
+   flame 29% -> 6%, rea 23% -> 0%. Manifest reading never breaks indexing: any parse
+   failure means no exemption, 256 KiB cap, a linear-time line-based TOML reader that
+   works without tomllib on Python 3.10.
+3. **Turkish suffix boundary.** A lexicon key matches only when the rest of the word
+   reads as an inflection, not a derivational suffix (-li/-lik, -laş, -ci, -(y)ici,
+   -siz, -sel), so "öncelik" is priority, not "önce" (before). 35 keys were added that
+   the rule needs (derived words with their own meaning, ver-/yaz- guards). Of 8,844
+   generated inflected forms of the original 132 keys, none that translated before is
+   lost. A broad vocabulary expansion (293 keys, 45 phrases, chosen without reading
+   golden questions) was measured and dropped: on the dev sets Turkish hit@8 went
+   .77 -> .74 with English unchanged, and the fix alone was identical to v4 on every
+   dev question. The expansion is kept on branch `tr-sozluk-genisleme` for a later
+   attempt together with scoring of translated terms.
+
+### Results, search only (v4 -> v5)
+
+Strict, k=8 (hit@1 / hit@3 / hit@8, MRR):
+
+| set | status | v4 | v5 |
+| --- | --- | --- | --- |
+| flask | dev | .74 / .85 / .93, .81 | same |
+| requests | dev | .59 / .77 / .88, .69 | same |
+| rea | dev | .35 / .47 / .65, .44 | .41 / .47 / .71, .49 |
+| ripgrep | dev | .12 / .23 / .53, .24 | .18 / .29 / .59, .30 |
+| flame | dev | .23 / .35 / .47, .31 | .29 / .35 / .53, .36 |
+| httpx | held out | .35 / .59 / .77, .47 | identical to v4 |
+| axios | held out | .59 / .71 / .77, .65 | identical to v4 |
+| gin | held out | .35 / .71 / .82, .54 | identical to v4 |
+| gson | held out | .41 / .59 / .71, .52 | identical to v4 |
+
+### With Jev, 16 candidates
+
+Changed dev sets (hit@1 / hit@3 / hit@8, MRR):
+
+| set | v4 + Jev | v5 + Jev |
+| --- | --- | --- |
+| rea | .53 / .65 / .71, .59 | .65 / .77 / .77, .69 |
+| ripgrep | .59 / .59 / .59, .59 | .71 / .71 / .71, .71 |
+| flame | .59 / .59 / .59, .59 | same |
+
+The held-out search top-8 lists were identical to v4, so Jev was not rerun on them.
+
+### Open
+
+- gson Turkish hit@8 is still .43 (English .90). The vocabulary gap there needs the
+  parked expansion plus a scoring change, measured on new dev data.
+- Known limits: inner `#![cfg(test)]`, `#[rstest]` / `#[bench]`, and `#[path]` inside
+  inline modules are not recognised. Derived -laş forms with -ecek/-ebil still inherit
+  the base meaning ("otomatikleşecek" -> automatic), as in v4.
+
+Reports (in `results/`): `<set>-search-v5-<commit>-k8.json` for flask (`d086db8`),
+requests (`611c6162`), rea (`fe2a398`), ripgrep (`91f5d22`), flame (`88c0438`),
+httpx (`b5addb6`), axios (`a81d62a`), gin (`0f09c3a`) and gson (`65df6e5`); with Jev,
+`<set>-pipeline-jev-c16-searchv5-<commit>-k8.json` for rea, ripgrep and flame.
