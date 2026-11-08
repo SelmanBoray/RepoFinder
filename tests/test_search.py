@@ -209,11 +209,11 @@ def test_test_files_are_penalized_unless_the_query_mentions_tests(test_path: str
     hits = search.search("parse_header")
     assert hits[0].path == "pkg/core.py"
     assert hits[1].path == test_path
-    assert "test file x0.5" in hits[1].why
+    assert "test code x0.5" in hits[1].why
     assert hits[1].score < hits[0].score
 
     hits = search.search("tests for parse_header")
-    assert all("test file" not in h.why for h in hits)
+    assert all("test code" not in h.why for h in hits)
 
 
 def test_nested_functions_rank_below_their_owner() -> None:
@@ -392,9 +392,9 @@ def test_test_word_inside_a_joined_identifier_keeps_the_test_penalty() -> None:
     )
     search = SearchIndex(index)
     by_path = {h.path: h for h in search.search("test client")}
-    assert "test file x0.5" in by_path["tests/conftest.py"].why  # "test client" -> test_client
+    assert "test code x0.5" in by_path["tests/conftest.py"].why  # "test client" -> test_client
     by_path = {h.path: h for h in search.search("tests for the test client")}
-    assert "test file" not in by_path["tests/conftest.py"].why
+    assert "test code" not in by_path["tests/conftest.py"].why
 
 
 def test_find_is_a_content_word() -> None:
@@ -580,7 +580,7 @@ def test_a_partial_name_match_does_not_lift_a_test_over_the_code() -> None:
     hits = search.search("How can I point the client at a custom CA bundle with an environment variable?")
     assert hits[0].symbol_id == "src/pkg/sessions.py::Session.merge_environment_settings"
     test_hit = next(h for h in hits if h.path == "tests/test_pkg.py")
-    assert "name match" not in test_hit.why and "test file x0.5" in test_hit.why
+    assert "name match" not in test_hit.why and "test code x0.5" in test_hit.why
     # Asked about tests, the test's name counts again.
     test_hit = next(h for h in search.search("tests for environment cert bundles") if h.path == "tests/test_pkg.py")
     assert "name match: test_env_cert_bundles" in test_hit.why
@@ -766,7 +766,7 @@ def test_typescript_index_file_name_and_test_penalty() -> None:
     hits = search.search("parseSource", k=5)
     assert hits[0].symbol_id == "src/parser/index.ts::parseSource"
     test_hit = next(h for h in hits if h.path == "src/parser/parse.test.ts")
-    assert "test file x0.5" in test_hit.why
+    assert "test code x0.5" in test_hit.why
     file_hit = next(h for h in search.search("parser", k=10) if h.kind == "file" and h.path == "src/parser/index.ts")
     assert "path match: parser" in file_hit.why
 
