@@ -43,7 +43,11 @@ segment as written (``crate``/``self``/``super`` kept), ``names`` the last segme
 ``use a::{B, c::D as E, f::*}`` gives ``a`` [B], ``a::c`` [D], ``a::f`` [*];
 ``use a::{self}`` and ``use a;`` give ``a`` []. A leading ``::`` stays in
 ``dst_module`` (``use ::std::io`` gives ``::std`` [io]). ``mod m;`` gives
-``self::m`` [] and ``extern crate x;`` gives ``x`` []. ``use`` declarations inside
+``self::m`` [] and ``extern crate x;`` gives ``x`` []. The ``names`` of a ``mod m;``
+edge are its test attributes (as for signatures, see above) and ``#[path = "..."]``
+attributes, as written, in source order: ``#[cfg(test)] mod testutil;`` gives
+``self::testutil`` [``#[cfg(test)]``] (:func:`is_test_module_edge`); no imported
+name starts with ``#[``. ``use`` declarations inside
 function bodies and inline modules count; those inside macro invocations are not seen.
 
 Inside inline ``mod`` blocks a leading ``self``/``super`` is rewritten so that
@@ -63,7 +67,9 @@ Resolution (:func:`rust_resolver`) follows Rust's module tree by file paths:
   ``[[example]]`` and ``[[bench]]`` in ``Cargo.toml``. Below a crate root's
   directory ``a.rs`` or ``a/mod.rs`` is module ``a``, ``a/b.rs`` is ``a::b``.
 * ``mod m;`` (``self::m``) is ``m.rs`` or ``m/mod.rs`` next to a crate root or
-  ``mod.rs`` file, ``x/m.rs`` or ``x/m/mod.rs`` for any other ``x.rs``.
+  ``mod.rs`` file, ``x/m.rs`` or ``x/m/mod.rs`` for any other ``x.rs``. With
+  ``#[path = "p"]`` outside inline modules it is ``p`` relative to the declaring
+  file's directory, None when that file is not indexed.
 * ``crate::``, ``self::`` and ``super::`` are resolved from the importing file's
   module. A path that starts with the name of a crate of the repository resolves
   into that crate's library root. ``std``, ``core``, ``alloc`` and crates that are
@@ -83,9 +89,10 @@ mtime. Without a root, or without manifests, packages are guessed from the paths
 ``main.rs``), so ``crate``/``self``/``super`` and ``mod`` still resolve, but no
 path resolves into another crate.
 
-Limits: ``#[cfg]`` decides no symbol, every item counts (``#[cfg(test)]`` only
-marks the signature, see above); inner ``#![cfg(test)]`` attributes and a
-``#[cfg(test)] mod m;`` declaration mark nothing. ``#[path = "..."]`` is ignored.
+Limits: ``#[cfg]`` decides no symbol or edge, every item counts (test attributes
+only mark signatures and ``mod m;`` edges, see above); inner ``#![cfg(test)]``
+attributes mark nothing. ``#[path = "..."]`` on a ``mod m;`` inside an inline
+module, and on an inline module, is ignored, as is ``#[cfg_attr(..., path = "...")]``.
 Re-exports are not followed: ``use crate::Foo`` resolves to the crate root that
 re-exports ``Foo``, not to the file that defines it. Inline modules are not module
 files: ``use crate::a::inner::X`` with an inline ``inner``, and ``use self::X``
@@ -161,6 +168,8 @@ class _RustExtractor:
         self.path = source.rel_path
         self.symbols: list[Symbol] = []
         self.imports: list[ImportEdge] = []
+        # start_byte of a ``mod m;`` -> its test and path attributes, from _items.
+        self._mod_marks: dict[int, list[str]] = {}
 
     def run(self, tree: Tree) -> tuple[list[Symbol], list[ImportEdge]]:
         self._items(tree.root_node, None)
@@ -202,6 +211,10 @@ class _RustExtractor:
                     qualname = self._add(children, index, "namespace", prefix, inherited)
                     if qualname is not None:
                         self._items(body, qualname)
+                else:  # its test and path attributes become the names of its edge
+                    marks = [*inherited, *self._test_attributes(_preamble(children, index), paths=True)]
+                    if marks:
+                        self._mod_marks[node.start_byte] = marks
             elif ntype == "foreign_mod_item":  # extern "C" { fn f(); }
                 body = node.child_by_field_name("body")
                 if body is not None:
@@ -218,13 +231,14 @@ class _RustExtractor:
             elif node.type in _FUNCTIONS:
                 self._add(children, index, "method", owner, inherited)
 
-    def _test_attributes(self, preamble: list[Node]) -> list[str]:
-        """Test attributes (:func:`_is_test_attribute`) of a preamble, in source order."""
+    def _test_attributes(self, preamble: list[Node], paths: bool = False) -> list[str]:
+        """Test attributes (:func:`_is_test_attribute`) of a preamble, in source
+        order; with ``paths`` also ``#[path = "..."]`` attributes."""
         found: list[str] = []
         for node in reversed(preamble):
             if node.type == "attribute_item":
                 text = self._text_without_comments(node, node.start_byte, node.end_byte)
-                if _is_test_attribute(text):
+                if _is_test_attribute(text) or (paths and _path_attribute(text) is not None):
                     found.append(text)
         return found
 
@@ -316,7 +330,8 @@ class _RustExtractor:
                 name = _name(node.child_by_field_name("name"))
                 if name is not None:
                     dst_module = "::".join(["self", *scope, name])
-                    self.imports.append(ImportEdge(self.path, dst_module, None, [], line))
+                    marks = list(self._mod_marks.get(node.start_byte, ()))
+                    self.imports.append(ImportEdge(self.path, dst_module, None, marks, line))
             else:  # mod m { ... }: what follows up to its end is inside it
                 open_modules.append((node.end_byte, _name(node.child_by_field_name("name")) or "_"))
 
@@ -490,6 +505,22 @@ def is_test_signature(signature: str) -> bool:
     themselves; :func:`repofinder.graph.is_test_symbol` finds them by range.
     """
     return signature.startswith("#[")
+
+
+def is_test_module_edge(edge: ImportEdge) -> bool:
+    """True for the edge of a ``mod m;`` declaration that carries a test
+    attribute (``#[cfg(test)] mod testutil;``): the module file it resolves to,
+    and every module below it, is test-only code."""
+    return any(_is_test_attribute(name) for name in edge.names)
+
+
+_PATH_ATTRIBUTE_RE = re.compile(r'^#\[\s*path\s*=\s*"((?:[^"\\]|\\.)*)"\s*\]$')
+
+
+def _path_attribute(text: str) -> Optional[str]:
+    """The path of a ``#[path = "..."]`` attribute, None for any other attribute."""
+    found = _PATH_ATTRIBUTE_RE.match(text)
+    return found.group(1) if found is not None else None
 
 
 def _is_test_attribute(text: str) -> bool:
@@ -960,8 +991,16 @@ class _ModuleMap:
         segments = edge.dst_module.split("::")
         importer = edge.src_path
         first = segments[0]
+        # The attributes of a ``mod m;`` edge are no imported names.
+        names = [name for name in edge.names if not name.startswith("#[")]
+        if first == "self" and len(segments) == 2 and len(names) < len(edge.names):
+            # ``#[path = "x.rs"] mod m;`` outside inline modules: relative to the file's directory.
+            target = next((p for p in map(_path_attribute, edge.names) if p is not None), None)
+            if target is not None:
+                joined = _join_relative(posixpath.dirname(importer), target)
+                return joined if joined is not None and joined in self.files else None
         if first == "":  # ::name, always another crate
-            return self._in_crate(segments[1:], edge.names, importer) if len(segments) > 1 else None
+            return self._in_crate(segments[1:], names, importer) if len(segments) > 1 else None
         if first in _BUILTIN_CRATES:
             return None
         if first in ("crate", "$crate"):
@@ -979,8 +1018,8 @@ class _ModuleMap:
                     return None
                 rest = rest[1:]
         else:
-            return self._in_crate(segments, edge.names, importer)
-        return self._most_specific(position, rest, edge.names)
+            return self._in_crate(segments, names, importer)
+        return self._most_specific(position, rest, names)
 
     def _in_crate(self, segments: list[str], names: list[str], importer: str) -> Optional[str]:
         if not segments:
