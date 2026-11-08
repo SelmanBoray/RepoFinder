@@ -57,7 +57,9 @@ META_INDEX_FORMAT = "index.format"
 # that output changes in a way an already stored index cannot express (new or
 # reshaped symbol signatures, new extracted fields, ...): indexes saved with a
 # different or missing value are rebuilt automatically when opened.
-# 2: the Rust parser puts test attributes (#[test], #[cfg(test)]) at the front of signatures.
+# 2: (a) the Rust parser puts test attributes (#[test], #[cfg(test)]) at the front of
+#    symbol signatures; (b) `mod m;` import edges of Rust files carry the declaration's
+#    test and #[path] attributes in ImportEdge.names (e.g. ["#[cfg(test)]"]).
 INDEX_FORMAT_VERSION = "2"
 
 DEFAULT_K = 8
