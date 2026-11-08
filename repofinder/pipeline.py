@@ -52,6 +52,13 @@ ENV_HOME = "REPOFINDER_HOME"
 DB_FILENAME = "index.db"
 CHECKOUT_DIRNAME = "checkout"
 META_BUILT_AT = "index.built_at"
+META_INDEX_FORMAT = "index.format"
+# Version of what parsing/indexing writes into a stored index. Bump it whenever
+# that output changes in a way an already stored index cannot express (new or
+# reshaped symbol signatures, new extracted fields, ...): indexes saved with a
+# different or missing value are rebuilt automatically when opened.
+# 2: the Rust parser puts test attributes (#[test], #[cfg(test)]) at the front of signatures.
+INDEX_FORMAT_VERSION = "2"
 
 DEFAULT_K = 8
 DEFAULT_MAX_CHARS = 36_000
@@ -281,10 +288,16 @@ def open_workspace(source: str, data_dir: Optional[Path] = None, refresh: bool =
         stored_source = store.get_meta(META_INDEX_SOURCE) if store.has_index() else None
         if stored_source is not None and stored_source != canonical:
             log.warning("replacing the index of %s stored in %s with %s", stored_source, ws_dir, canonical)
-        if refresh or stored_source != canonical:
+        stored_format = store.get_meta(META_INDEX_FORMAT) if store.has_index() else None
+        outdated = stored_source == canonical and stored_format != INDEX_FORMAT_VERSION
+        if outdated:
+            log.warning("rebuilding the index of %s: stored format %s is not the current %s",
+                        canonical, stored_format or "(none)", INDEX_FORMAT_VERSION)
+        if refresh or outdated or stored_source != canonical:
             index = build_index(root, name, canonical)
             store.save_index(index)
             store.set_meta(META_BUILT_AT, _now())
+            store.set_meta(META_INDEX_FORMAT, INDEX_FORMAT_VERSION)
             built = True
         else:
             index = store.load_index()

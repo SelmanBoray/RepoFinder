@@ -143,6 +143,39 @@ def test_refresh_rebuilds(home: Path, monkeypatch: pytest.MonkeyPatch):
     assert len(calls) == 1
 
 
+def test_building_writes_the_index_format(home: Path):
+    with open_workspace(str(SAMPLE_REPO), data_dir=home) as ws:
+        assert ws.store.get_meta(pipeline.META_INDEX_FORMAT) == pipeline.INDEX_FORMAT_VERSION
+
+
+@pytest.mark.parametrize("stored", [None, "0", "1"])
+def test_index_with_a_missing_or_old_format_is_rebuilt(home: Path, monkeypatch: pytest.MonkeyPatch, stored):
+    with open_workspace(str(SAMPLE_REPO), data_dir=home) as ws:
+        if stored is None:
+            with ws.store.conn:
+                ws.store.conn.execute("DELETE FROM meta WHERE key = ?", (pipeline.META_INDEX_FORMAT,))
+        else:
+            ws.store.set_meta(pipeline.META_INDEX_FORMAT, stored)
+    calls = []
+    real = pipeline.build_index
+    monkeypatch.setattr(pipeline, "build_index", lambda *a, **k: calls.append(a) or real(*a, **k))
+    with open_workspace(str(SAMPLE_REPO), data_dir=home) as ws:
+        assert ws.built is True
+        assert ws.store.get_meta(pipeline.META_INDEX_FORMAT) == pipeline.INDEX_FORMAT_VERSION
+    assert len(calls) == 1
+    with open_workspace(str(SAMPLE_REPO), data_dir=home) as ws:   # now current: loaded as is
+        assert ws.built is False
+    assert len(calls) == 1
+
+
+def test_index_with_the_current_format_is_loaded(home: Path, monkeypatch: pytest.MonkeyPatch):
+    open_workspace(str(SAMPLE_REPO), data_dir=home).close()
+    monkeypatch.setattr(pipeline, "build_index",
+                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("must not rebuild")))
+    with open_workspace(str(SAMPLE_REPO), data_dir=home) as ws:
+        assert ws.built is False
+
+
 def test_refresh_keeps_summaries_of_the_same_source(home: Path):
     with open_workspace(str(SAMPLE_REPO), data_dir=home) as ws:
         ws.store.save_summary("mypkg/core.py", "Core engine.")
