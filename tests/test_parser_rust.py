@@ -329,9 +329,10 @@ def test_signature_struct():
 
 
 def test_signature_has_no_attributes():
+    # Only test attributes lead a signature (see the next section).
     src = """
         #[derive(Debug)]
-        #[cfg(test)]
+        #[cfg(unix)]
         pub struct Config {
             a: u32,
         }
@@ -344,6 +345,179 @@ def test_signature_has_no_attributes():
     assert "derive" not in syms["Config"].signature
     assert "#[" not in syms["f"].signature
     assert "fn f" in syms["f"].signature
+
+
+# --------------------------------------------------------------------------- #
+# inline tests: test attributes lead the signature
+# --------------------------------------------------------------------------- #
+
+
+def _test_flags(text: str) -> dict[str, bool]:
+    from repofinder.graph import inline_test_scopes, is_test_symbol
+
+    syms, _ = _extract(text)
+    scopes = inline_test_scopes(syms)
+    return {s.qualname: is_test_symbol(s, scopes) for s in syms}
+
+
+def test_cfg_test_mod_and_its_functions_are_tests():
+    src = """
+        pub fn product() {}
+
+        #[cfg(test)]
+        mod tests {
+            use super::*;
+
+            fn helper() {}
+
+            #[test]
+            fn works() {}
+        }
+        """
+    syms = _symbols(src)
+    assert syms["tests"].signature == "#[cfg(test)] mod tests"
+    assert syms["tests.helper"].signature == "fn helper()"  # the module carries the marker
+    assert syms["tests.works"].signature == "#[test] fn works()"
+    assert syms["product"].signature == "pub fn product()"
+    assert _test_flags(src) == {"product": False, "tests": True, "tests.helper": True, "tests.works": True}
+
+
+def test_nested_items_of_a_test_mod_are_tests_whatever_the_mod_name():
+    src = """
+        #[cfg(test)]
+        mod checks {
+            mod inner {
+                fn deep() {}
+            }
+            struct Fixture;
+            impl Fixture {
+                fn build(&self) {}
+            }
+            trait Probe {
+                fn probe(&self);
+            }
+        }
+        """
+    flags = _test_flags(src)
+    assert set(flags) == {
+        "checks", "checks.inner", "checks.inner.deep", "checks.Fixture",
+        "checks.Fixture.build", "checks.Probe", "checks.Probe.probe",
+    }
+    assert all(flags.values())
+
+
+@pytest.mark.parametrize(
+    "attribute",
+    ["#[test]", "#[tokio::test]", '#[tokio::test(flavor = "multi_thread")]', "#[async_std::test]"],
+)
+def test_test_function_outside_a_test_mod(attribute):
+    src = f"""
+        fn product() {{}}
+
+        #[inline]
+        {attribute}
+        #[ignore]
+        async fn standalone() {{}}
+        """
+    syms = _symbols(src)
+    assert syms["standalone"].signature == f"{attribute} async fn standalone()"
+    assert _test_flags(src) == {"product": False, "standalone": True}
+
+
+def test_product_code_beside_tests_stays_product():
+    src = """
+        pub struct Searcher;
+
+        impl Searcher {
+            pub fn search(&self) {}
+        }
+
+        #[cfg(test)]
+        mod tests {
+            #[test]
+            fn search() {}
+        }
+
+        pub fn after_tests() {}
+        """
+    assert _test_flags(src) == {
+        "Searcher": False, "Searcher.search": False, "tests": True, "tests.search": True, "after_tests": False,
+    }
+
+
+@pytest.mark.parametrize(
+    "cfg",
+    [
+        '#[cfg(feature = "pcre2")]',
+        "#[cfg(not(test))]",
+        '#[cfg(any(test, feature = "x"))]',
+        "#[cfg(unix)]",
+        "#[cfg_attr(test, derive(Debug))]",
+        "#[test_case(1)]",
+    ],
+)
+def test_non_test_cfg_mod_stays_product(cfg):
+    src = f"""
+        {cfg}
+        mod feature {{
+            pub fn run() {{}}
+        }}
+        """
+    syms = _symbols(src)
+    assert "#[" not in syms["feature"].signature
+    assert _test_flags(src) == {"feature": False, "feature.run": False}
+
+
+@pytest.mark.parametrize("cfg", ["#[cfg(all(test, unix))]", "#[cfg(all(unix, any(test, all(test))))]", "#[cfg( test )]"])
+def test_cfg_predicates_that_imply_test(cfg):
+    src = f"""
+        {cfg}
+        mod t {{
+            fn f() {{}}
+        }}
+        """
+    syms = _symbols(src)
+    assert syms["t"].signature.startswith("#[cfg(")
+    assert syms["t"].signature.endswith(" mod t")
+    assert _test_flags(src) == {"t": True, "t.f": True}
+
+
+def test_cfg_test_impl_marks_its_methods():
+    src = """
+        struct S;
+
+        impl S {
+            pub fn real(&self) {}
+        }
+
+        #[cfg(test)]
+        impl S {
+            fn for_tests(&self) {}
+        }
+        """
+    syms = _symbols(src)
+    assert syms["S.for_tests"].signature == "#[cfg(test)] fn for_tests(&self)"
+    assert syms["S.real"].signature == "pub fn real(&self)"
+    assert _test_flags(src) == {"S": False, "S.real": False, "S.for_tests": True}
+
+
+def test_cfg_test_twin_marks_only_itself():
+    src = """
+        #[cfg(not(test))]
+        fn clock() -> u64 { 0 }
+
+        #[cfg(test)]
+        fn clock() -> u64 { 1 }
+        """
+    syms, _ = _extract(src)
+    from repofinder.graph import inline_test_scopes, is_test_symbol
+
+    scopes = inline_test_scopes(syms)
+    assert [(s.start_line, is_test_symbol(s, scopes)) for s in syms] == [(1, False), (4, True)]
+
+
+def test_mod_named_tests_without_cfg_test_stays_product():
+    assert _test_flags("mod tests {\n    fn helper() {}\n}\n") == {"tests": False, "tests.helper": False}
 
 
 # --------------------------------------------------------------------------- #

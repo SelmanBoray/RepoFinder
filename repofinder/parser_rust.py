@@ -22,7 +22,17 @@ to. Declarations with the same qualname all stay, with the same id: ``fmt`` of
 Ranges start at the first outer attribute (``#[...]``) attached to the item, else
 at the item; doc comments are never part of a range. The signature is the item's
 text up to the ``{`` of its body, or the whole item without its ``;``, with
-comments removed and whitespace collapsed. The docstring is the nearest run of
+comments removed and whitespace collapsed. Attributes are not part of it, except
+test attributes: ``#[test]``, ``#[x::test]`` (``#[tokio::test]``, arguments
+allowed) and ``#[cfg(p)]`` with a predicate ``p`` that holds only under test
+(``test``, ``all(test, unix)``; not ``not(test)`` or ``any(test, feature = "x")``)
+lead the signature as written, in source order, whitespace collapsed:
+``#[cfg(test)] mod tests``, ``#[tokio::test] async fn runs()``. A method of a
+``#[cfg(test)] impl`` block, and an item of a ``#[cfg(test)] extern`` block, gets
+the block's test attributes in front of its own (the block is not a symbol). So a
+Rust signature starts with ``#[`` exactly when the item is test-only
+(:func:`is_test_signature`); items nested in a marked item stay unmarked, they are
+found by range (:func:`repofinder.graph.is_test_symbol`). The docstring is the nearest run of
 ``///`` lines, or the nearest ``/** */`` block, above the item (attributes and
 plain comments may sit in between), markers and one following space removed, up to
 the first blank doc line. ``#[doc = "..."]`` attributes and ``//!`` inner docs are
@@ -73,7 +83,9 @@ mtime. Without a root, or without manifests, packages are guessed from the paths
 ``main.rs``), so ``crate``/``self``/``super`` and ``mod`` still resolve, but no
 path resolves into another crate.
 
-Limits: ``#[cfg]`` is ignored, every item counts. ``#[path = "..."]`` is ignored.
+Limits: ``#[cfg]`` decides no symbol, every item counts (``#[cfg(test)]`` only
+marks the signature, see above); inner ``#![cfg(test)]`` attributes and a
+``#[cfg(test)] mod m;`` declaration mark nothing. ``#[path = "..."]`` is ignored.
 Re-exports are not followed: ``use crate::Foo`` resolves to the crate root that
 re-exports ``Foo``, not to the file that defines it. Inline modules are not module
 files: ``use crate::a::inner::X`` with an inline ``inner``, and ``use self::X``
@@ -161,45 +173,69 @@ class _RustExtractor:
     # answers ``Node.prev_sibling`` and ``Node.parent`` by scanning from the first
     # child (of the parent, of the root), so calling them per item is quadratic.
 
-    def _items(self, container: Node, prefix: Optional[str]) -> None:
-        """Items of a file or an inline module body; ``prefix`` is the module qualname."""
+    def _items(self, container: Node, prefix: Optional[str], inherited: tuple[str, ...] = ()) -> None:
+        """Items of a file or an inline module body; ``prefix`` is the module qualname.
+
+        ``inherited``: test attributes of an enclosing block that is not a symbol
+        (``#[cfg(test)] extern "C" { }``), put in front of each item's own.
+        """
         children = container.children
         for index, node in enumerate(children):
             ntype = node.type
             if ntype == "ERROR":  # recoverable code of a file with syntax errors
-                self._items(node, prefix)
+                self._items(node, prefix, inherited)
             elif ntype in _FUNCTIONS:
-                self._add(children, index, "function", prefix)
+                self._add(children, index, "function", prefix, inherited)
             elif ntype in _TYPE_KINDS:
-                qualname = self._add(children, index, _TYPE_KINDS[ntype], prefix)
+                qualname = self._add(children, index, _TYPE_KINDS[ntype], prefix, inherited)
                 if ntype == "trait_item" and qualname is not None:
                     self._methods(node.child_by_field_name("body"), qualname)
             elif ntype == "impl_item":
                 owner = _type_base_name(node.child_by_field_name("type"))
                 if owner is not None:
-                    self._methods(node.child_by_field_name("body"), _qualify(prefix, owner))
+                    # The impl block is not a symbol: its test attributes go to its methods.
+                    marks = (*inherited, *self._test_attributes(_preamble(children, index)))
+                    self._methods(node.child_by_field_name("body"), _qualify(prefix, owner), marks)
             elif ntype == "mod_item":
                 body = node.child_by_field_name("body")
                 if body is not None:  # ``mod m;`` is an import, not a symbol
-                    qualname = self._add(children, index, "namespace", prefix)
+                    qualname = self._add(children, index, "namespace", prefix, inherited)
                     if qualname is not None:
                         self._items(body, qualname)
             elif ntype == "foreign_mod_item":  # extern "C" { fn f(); }
                 body = node.child_by_field_name("body")
                 if body is not None:
-                    self._items(body, prefix)
+                    marks = (*inherited, *self._test_attributes(_preamble(children, index)))
+                    self._items(body, prefix, marks)
 
-    def _methods(self, body: Optional[Node], owner: str) -> None:
+    def _methods(self, body: Optional[Node], owner: str, inherited: tuple[str, ...] = ()) -> None:
         if body is None:
             return
         children = body.children
         for index, node in enumerate(children):
             if node.type == "ERROR":
-                self._methods(node, owner)
+                self._methods(node, owner, inherited)
             elif node.type in _FUNCTIONS:
-                self._add(children, index, "method", owner)
+                self._add(children, index, "method", owner, inherited)
 
-    def _add(self, siblings: list[Node], index: int, kind: str, parent: Optional[str]) -> Optional[str]:
+    def _test_attributes(self, preamble: list[Node]) -> list[str]:
+        """Test attributes (:func:`_is_test_attribute`) of a preamble, in source order."""
+        found: list[str] = []
+        for node in reversed(preamble):
+            if node.type == "attribute_item":
+                text = self._text_without_comments(node, node.start_byte, node.end_byte)
+                if _is_test_attribute(text):
+                    found.append(text)
+        return found
+
+    def _add(
+        self,
+        siblings: list[Node],
+        index: int,
+        kind: str,
+        parent: Optional[str],
+        inherited: tuple[str, ...] = (),
+    ) -> Optional[str]:
         """Symbol for the item ``siblings[index]``; its qualname, None if it has no name."""
         node = siblings[index]
         name = _name(node.child_by_field_name("name"))
@@ -208,6 +244,10 @@ class _RustExtractor:
         qualname = _qualify(parent, name)
         preamble = _preamble(siblings, index)
         start_line = min([_line(node), *(_line(p) for p in preamble if p.type == "attribute_item")])
+        signature = self._signature(node)
+        marks = [*inherited, *self._test_attributes(preamble)]
+        if marks:
+            signature = " ".join([*marks, signature])[:_SIGNATURE_MAX_CHARS].rstrip()
         self.symbols.append(
             Symbol(
                 id=f"{self.path}::{qualname}",
@@ -217,7 +257,7 @@ class _RustExtractor:
                 kind=kind,  # type: ignore[arg-type]
                 start_line=start_line,
                 end_line=_end_line(node),
-                signature=self._signature(node),
+                signature=signature,
                 docstring=_docstring(preamble),
                 parent=parent,
             )
@@ -429,6 +469,100 @@ def _preamble(siblings: list[Node], index: int) -> list[Node]:
         found.append(siblings[position])
         position -= 1
     return found
+
+
+# --------------------------------------------------------------------------- #
+# Test attributes
+# --------------------------------------------------------------------------- #
+
+# String literals, identifiers, ``::`` and any other single character.
+_ATTRIBUTE_TOKEN_RE = re.compile(r'"(?:[^"\\]|\\.)*"|[A-Za-z_][A-Za-z0-9_]*|::|\S')
+_IDENTIFIER_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+def is_test_signature(signature: str) -> bool:
+    """True when the signature of a Rust symbol marks the item itself as test-only.
+
+    :func:`extract_rust` puts an item's test attributes (and those of its
+    enclosing ``impl`` or ``extern`` block) in front of its signature and no other
+    attribute, so a Rust signature starts with ``#[`` exactly then. Items inside
+    a marked item (the functions of a ``#[cfg(test)] mod tests``) are not marked
+    themselves; :func:`repofinder.graph.is_test_symbol` finds them by range.
+    """
+    return signature.startswith("#[")
+
+
+def _is_test_attribute(text: str) -> bool:
+    """``#[test]``, ``#[x::test]`` (``#[tokio::test(flavor = "...")]``), or
+    ``#[cfg(p)]`` where ``p`` holds only under test (:func:`_cfg_implies_test`)."""
+    if not (text.startswith("#[") and text.endswith("]")):
+        return False
+    tokens = _ATTRIBUTE_TOKEN_RE.findall(text[2:-1])
+    split = next((i for i, t in enumerate(tokens) if t in ("(", "=", "[", "{")), len(tokens))
+    path, rest = tokens[:split], tokens[split:]
+    if path and path[0] == "::":
+        path = path[1:]
+    if path == ["cfg"]:
+        if len(rest) < 2 or rest[0] != "(" or rest[-1] != ")":
+            return False
+        return _cfg_implies_test(rest[1:-1])
+    names, separators = path[0::2], path[1::2]
+    return (
+        bool(names)
+        and names[-1] == "test"
+        and all(_IDENTIFIER_RE.fullmatch(n) for n in names)
+        and all(s == "::" for s in separators)
+        and len(names) == len(separators) + 1
+        and (not rest or rest[0] == "(")
+    )
+
+
+def _cfg_implies_test(tokens: list[str]) -> bool:
+    """True when the ``cfg`` predicate ``tokens`` can hold only with ``test`` set.
+
+    ``test`` does; ``all(...)`` does when one of its parts does; ``any(...)`` when
+    all its parts do; ``not(...)``, ``key = "value"`` and any other option do not.
+    A predicate that is not well formed does not.
+    """
+    pos = 0
+
+    def predicate() -> bool:
+        nonlocal pos
+        if pos >= len(tokens) or not _IDENTIFIER_RE.fullmatch(tokens[pos]):
+            raise ValueError
+        name = tokens[pos]
+        pos += 1
+        if pos < len(tokens) and tokens[pos] == "=":
+            if pos + 1 >= len(tokens) or not tokens[pos + 1].startswith('"'):
+                raise ValueError
+            pos += 2
+            return False
+        if pos < len(tokens) and tokens[pos] == "(":
+            if name not in ("all", "any", "not"):
+                raise ValueError
+            pos += 1
+            parts: list[bool] = []
+            while pos < len(tokens) and tokens[pos] != ")":
+                parts.append(predicate())
+                if pos < len(tokens) and tokens[pos] == ",":
+                    pos += 1
+                elif pos < len(tokens) and tokens[pos] != ")":
+                    raise ValueError
+            if pos >= len(tokens):
+                raise ValueError
+            pos += 1
+            if name == "all":
+                return any(parts)
+            if name == "any":
+                return bool(parts) and all(parts)
+            return False
+        return name == "test"
+
+    try:
+        value = predicate()
+    except ValueError:
+        return False
+    return value and pos == len(tokens)
 
 
 def _is_outer_doc(node: Node) -> bool:

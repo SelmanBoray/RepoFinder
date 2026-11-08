@@ -28,8 +28,9 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from . import parser
-from .models import FileRecord, RepoIndex
+from .models import FileRecord, RepoIndex, Symbol
 from .parser import build_module_map
+from .parser_rust import is_test_signature
 
 # File names that conventionally start an application, a command or (Rust
 # ``lib.rs``) a crate. A file in a ``bin/`` directory counts too, and Go
@@ -224,7 +225,8 @@ def is_test_path(path: str) -> bool:
 
     Java under ``src/test/`` and Rust integration tests under ``tests/`` are covered by
     the directory rule. Rust unit tests inline in a source file (``#[cfg(test)] mod
-    tests { ... }``) cannot be told apart by path and stay product code."""
+    tests { ... }``, ``#[test] fn``) cannot be told apart by path: the file stays
+    product code here, and :func:`is_test_symbol` tells its test symbols apart."""
     parts = path.split("/")
     base = parts[-1]
     if any(part in TEST_DIR_NAMES for part in parts[:-1]):
@@ -246,6 +248,50 @@ def is_test_path(path: str) -> bool:
         or _JAVA_TEST_FILE_RE.search(base) is not None
         or base == _RUST_TEST_BASENAME
     )
+
+
+TestScopes = dict[str, list[tuple[int, int, str]]]
+
+
+def inline_test_scopes(symbols: Iterable[Symbol]) -> TestScopes:
+    """Path -> ``(start_line, end_line, qualname + ".")`` of every symbol marked
+    test-only in its own declaration, for :func:`is_test_symbol`.
+
+    Rust only: a symbol whose signature carries a test attribute
+    (:func:`repofinder.parser_rust.is_test_signature`: ``#[cfg(test)] mod tests``,
+    ``#[test] fn``). Pass every symbol of the files whose symbols will be asked about.
+    """
+    scopes: TestScopes = {}
+    for symbol in symbols:
+        if symbol.path.endswith(_RUST_EXTENSION) and is_test_signature(symbol.signature):
+            scopes.setdefault(symbol.path, []).append((symbol.start_line, symbol.end_line, symbol.qualname + "."))
+    return scopes
+
+
+def is_test_symbol(symbol: Symbol, scopes: Optional[TestScopes] = None) -> bool:
+    """True for a symbol of test code: one in a test file (:func:`is_test_path`),
+    or a Rust unit test inline in a source file.
+
+    A Rust symbol is a test when its own signature is marked (see
+    :func:`inline_test_scopes`), or when it lies inside a marked symbol of the same
+    file: within its lines and below its qualname (``tests.helper``,
+    ``tests.nested.f``, ``tests.Fixture.build`` in ``#[cfg(test)] mod tests``).
+    Both conditions together keep a ``#[cfg(not(test))]`` twin of a
+    ``#[cfg(test)]`` item, and product code beside a test module, product code.
+    ``scopes`` comes from :func:`inline_test_scopes`; without it only the symbol's
+    own marker counts. Everything here is read from what the store keeps, so a
+    loaded index gives the same answer as a freshly built one.
+    """
+    if is_test_path(symbol.path):
+        return True
+    if not symbol.path.endswith(_RUST_EXTENSION):
+        return False
+    if is_test_signature(symbol.signature):
+        return True
+    for start, end, prefix in (scopes or {}).get(symbol.path, ()):
+        if start <= symbol.start_line and symbol.end_line <= end and symbol.qualname.startswith(prefix):
+            return True
+    return False
 
 
 @dataclass(frozen=True)
