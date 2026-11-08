@@ -485,3 +485,163 @@ def test_non_dart_enum_parent_gets_no_header(make_repo) -> None:
                       symbols=[enum, m])
     chunks = build_chunks(root, index, [_hit(m)], 100_000)
     assert [c.label for c in chunks] == ["Kind.f"]
+
+
+# --- Java / Go / Rust owner headers -------------------------------------------------------------------------------
+
+
+def _owner_chunks(make_repo, path: str, lang: str, src: str, syms: list[Symbol], target: Symbol):
+    root = make_repo({path: src})
+    n = len(src.split("\n"))
+    index = RepoIndex("r", str(root), "r", files=[FileRecord(path, lang, len(src), n, True)], symbols=syms)
+    return build_chunks(root, index, [_hit(target)], 100_000)
+
+
+def _msym(path: str, qualname: str, kind: str, start: int, end: int, parent: str | None = None) -> Symbol:
+    return Symbol(f"{path}::{qualname}", path, qualname.rsplit(".", 1)[-1], qualname, kind, start, end,
+                  qualname, None, parent)
+
+
+def _java_case(make_repo, src: str, type_q: str, type_kind: str, t_range: tuple[int, int],
+               method_q: str, m_range: tuple[int, int], parent: str):
+    p = "src/A.java"
+    t = _msym(p, type_q, type_kind, *t_range, parent=None)
+    m = _msym(p, method_q, "method", *m_range, parent=parent)
+    return _owner_chunks(make_repo, p, "java", src, [t, m], m)
+
+
+def test_java_class_method_gets_class_header(make_repo) -> None:
+    src = "package a;\n\n@Deprecated\npublic final class Gson {\n  int f;\n  public void toJson() {\n  }\n}\n"
+    chunks = _java_case(make_repo, src, "Gson", "class", (3, 8), "Gson.toJson", (6, 7), "Gson")
+    assert chunks and "public final class Gson {" in chunks[0].text
+    assert "@Deprecated" in chunks[0].text
+    assert chunks[0].start_line == 3 and chunks[0].end_line == 4
+    assert "header" in chunks[0].label
+    assert chunks[-1].label == "Gson.toJson"
+
+
+def test_java_interface_method_gets_header(make_repo) -> None:
+    src = "package a;\n\npublic interface JsonSerializer<T> {\n  void serialize(T t);\n}\n"
+    chunks = _java_case(make_repo, src, "JsonSerializer", "interface", (3, 5), "JsonSerializer.serialize", (4, 4),
+                        "JsonSerializer")
+    assert chunks and "public interface JsonSerializer<T> {" in chunks[0].text
+    assert chunks[0].end_line == 3
+
+
+def test_java_enum_method_gets_header_without_constants(make_repo) -> None:
+    src = ("public enum FieldNamingPolicy implements FieldNamingStrategy {\n  IDENTITY,\n  UPPER;\n\n"
+           "  public String translate() {\n    return null;\n  }\n}\n")
+    chunks = _java_case(make_repo, src, "FieldNamingPolicy", "enum", (1, 8), "FieldNamingPolicy.translate", (5, 7),
+                        "FieldNamingPolicy")
+    assert chunks and "public enum FieldNamingPolicy implements FieldNamingStrategy {" in chunks[0].text
+    assert "IDENTITY" not in chunks[0].text
+    assert chunks[0].end_line == 1
+
+
+def test_java_record_method_gets_header(make_repo) -> None:
+    src = "public record Point(int x, int y) {\n  int sum() {\n    return x + y;\n  }\n}\n"
+    chunks = _java_case(make_repo, src, "Point", "class", (1, 5), "Point.sum", (2, 4), "Point")
+    assert chunks and "public record Point(int x, int y) {" in chunks[0].text
+
+
+def test_java_multiline_header_includes_both_lines(make_repo) -> None:
+    src = ("public final class Excluder\n    implements TypeAdapterFactory, Cloneable {\n  int f;\n"
+           "  public Excluder clone() {\n    return this;\n  }\n}\n")
+    chunks = _java_case(make_repo, src, "Excluder", "class", (1, 7), "Excluder.clone", (4, 6), "Excluder")
+    assert chunks
+    assert "public final class Excluder\n    implements TypeAdapterFactory, Cloneable {" in chunks[0].text
+    assert (chunks[0].start_line, chunks[0].end_line) == (1, 2)
+
+
+def test_java_nested_method_gets_inner_header_not_outer(make_repo) -> None:
+    src = "public class Outer {\n  int a;\n  static class Inner {\n    void m() {\n    }\n  }\n}\n"
+    p = "src/A.java"
+    outer = _msym(p, "Outer", "class", 1, 7)
+    inner = _msym(p, "Outer.Inner", "class", 3, 6, "Outer")
+    m = _msym(p, "Outer.Inner.m", "method", 4, 5, "Outer.Inner")
+    chunks = _owner_chunks(make_repo, p, "java", src, [outer, inner, m], m)
+    assert chunks and "static class Inner {" in chunks[0].text
+    assert "public class Outer {" not in chunks[0].text
+    assert chunks[0].start_line == 3
+
+
+def test_go_method_gets_struct_header(make_repo) -> None:
+    src = "package s\n\ntype Server struct {\n\tAddr string\n}\n\nfunc (s *Server) Run() error {\n\treturn nil\n}\n"
+    p = "s.go"
+    t = _msym(p, "Server", "class", 3, 5)
+    m = _msym(p, "Server.Run", "method", 7, 9, "Server")
+    chunks = _owner_chunks(make_repo, p, "go", src, [t, m], m)
+    assert chunks and "type Server struct {" in chunks[0].text
+    assert chunks[-1].label == "Server.Run"
+    assert "func (s *Server) Run" in chunks[-1].text
+
+
+def test_go_method_on_named_type_gets_type_line(make_repo) -> None:
+    src = 'package s\n\ntype ID int\n\nfunc (i ID) String() string {\n\treturn ""\n}\n'
+    p = "s.go"
+    t = _msym(p, "ID", "type", 3, 3)
+    m = _msym(p, "ID.String", "method", 5, 7, "ID")
+    chunks = _owner_chunks(make_repo, p, "go", src, [t, m], m)
+    assert chunks and "type ID int" in chunks[0].text
+    assert chunks[-1].label == "ID.String"
+
+
+def test_go_receiver_declared_elsewhere_gets_no_header(make_repo) -> None:
+    src = "package s\n\nfunc (s *Server) Run() error {\n\treturn nil\n}\n"
+    p = "s2.go"
+    m = _msym(p, "Server.Run", "method", 3, 5, "Server")
+    chunks = _owner_chunks(make_repo, p, "go", src, [m], m)
+    assert [c.label for c in chunks] == ["Server.Run"]
+
+
+def test_rust_impl_method_gets_impl_line(make_repo) -> None:
+    src = ("pub struct StandardSink<'s, M> {\n    m: M,\n}\n\n"
+           "impl<'s, M: Matcher> Sink for StandardSink<'s, M> {\n    fn matched(&mut self) -> bool {\n"
+           "        true\n    }\n}\n")
+    p = "src/sink.rs"
+    t = _msym(p, "StandardSink", "class", 1, 3)
+    m = _msym(p, "StandardSink.matched", "method", 6, 8, "StandardSink")
+    chunks = _owner_chunks(make_repo, p, "rust", src, [t, m], m)
+    assert chunks and "impl<'s, M: Matcher> Sink for StandardSink<'s, M> {" in chunks[0].text
+    assert chunks[-1].label == "StandardSink.matched"
+
+
+def test_rust_impl_header_includes_cfg_test_attribute(make_repo) -> None:
+    src = ("pub struct S {\n}\n\n#[cfg(test)]\nimpl<'s, M: Matcher> Sink for S<'s, M> {\n"
+           "    fn matched(&mut self) -> bool {\n        true\n    }\n}\n")
+    p = "src/sink.rs"
+    t = _msym(p, "S", "class", 1, 2)
+    m = _msym(p, "S.matched", "method", 6, 8, "S")
+    chunks = _owner_chunks(make_repo, p, "rust", src, [t, m], m)
+    assert chunks
+    assert "#[cfg(test)]" in chunks[0].text
+    assert "impl<'s, M: Matcher> Sink for S<'s, M> {" in chunks[0].text
+
+
+def test_rust_trait_method_gets_trait_line(make_repo) -> None:
+    src = "pub trait Sink {\n    fn matched(&mut self) -> bool;\n}\n"
+    p = "src/sink.rs"
+    t = _msym(p, "Sink", "interface", 1, 3)
+    m = _msym(p, "Sink.matched", "method", 2, 2, "Sink")
+    chunks = _owner_chunks(make_repo, p, "rust", src, [t, m], m)
+    assert chunks and "pub trait Sink {" in chunks[0].text
+    assert chunks[-1].label == "Sink.matched"
+
+
+def test_typescript_interface_member_still_gets_no_header(make_repo) -> None:
+    src = "export interface Opts {\n  run(): void;\n}\n"
+    p = "a.ts"
+    t = _msym(p, "Opts", "interface", 1, 3)
+    m = _msym(p, "Opts.run", "method", 2, 2, "Opts")
+    chunks = _owner_chunks(make_repo, p, "typescript", src, [t, m], m)
+    assert [c.label for c in chunks] == ["Opts.run"]
+
+
+def test_python_method_still_gets_class_header_unchanged(make_repo) -> None:
+    src = "class A:\n    def f(self):\n        return 1\n"
+    p = "a.py"
+    t = _msym(p, "A", "class", 1, 3)
+    m = _msym(p, "A.f", "method", 2, 3, "A")
+    chunks = _owner_chunks(make_repo, p, "python", src, [t, m], m)
+    assert [c.label for c in chunks] == ["A (class header)", "A.f"]
+    assert chunks[0].text == "class A:"

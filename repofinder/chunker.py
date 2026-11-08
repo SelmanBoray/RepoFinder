@@ -22,7 +22,11 @@ Rules, applied to the hits in rank order:
   separate chunk, once per class, when it is shorter than
   :data:`CLASS_HEADER_MAX_LINES` lines. Outside Python (TypeScript, ...) the
   header runs from the class's first line to the line that opens its body
-  (``{``).
+  (``{``). A Java method gets the header of its class, interface, enum or
+  record; a Go method that of its receiver type when the type is declared in
+  the same file; a Rust method that of its trait, or else the ``impl ... {``
+  lines (with the attributes above them) of the block it sits in. In Java, Go
+  and Rust no header is added when it shares a line with the method.
 * A file hit becomes the first :data:`MODULE_HEAD_LINES` lines of the file
   (``label="module head"``).
 * Overlapping ranges of the same file are merged into one chunk (adjacent ones
@@ -44,7 +48,7 @@ import re
 import tokenize
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Iterator, Optional
 
 from .llm import ContextChunk
 from .models import RepoIndex, Symbol
@@ -73,6 +77,19 @@ _CLASS_KEYWORD_RE = re.compile(r"\bclass\b")
 _DART_SUFFIXES = (".dart",)
 _DART_KEYWORDS = frozenset({"class", "mixin", "extension", "enum"})
 _COMMENT_PREFIXES = ("//", "/*", "*")
+# Java, Go and Rust are read by one small tokenizer (:func:`_c_tokens`).
+_JAVA_SUFFIXES = (".java",)
+_GO_SUFFIXES = (".go",)
+_RUST_SUFFIXES = (".rs",)
+_JAVA_TYPE_KEYWORDS = frozenset({"class", "interface", "enum", "record"})  # `@interface` too
+_RUST_TYPE_KEYWORDS = frozenset({"struct", "enum", "union", "trait"})
+_CLASS_KINDS = frozenset({"class"})
+_ENUM_KINDS = frozenset({"enum"})
+_TYPE_OWNER_KINDS = frozenset({"class", "interface", "enum"})  # Java types and Rust traits
+_GO_RECEIVER_KINDS = frozenset({"class", "interface", "type"})
+_DECORATOR_PREFIXES = ("@",)
+_RUST_DECORATOR_PREFIXES = ("@", "#[")  # outer attributes count as decorators (``#![...]`` does not)
+_C_TOKEN_RE = re.compile(r"(?P<space>\s+)|(?P<line_comment>//[^\n]*)|(?P<block_comment>/\*)|(?P<word>[\w$]+)|.", re.S)
 
 
 @dataclass
@@ -100,6 +117,7 @@ def build_chunks(ws_root: Path, index: RepoIndex, hits: list[Hit], max_chars: in
     symbols = _SymbolTable(index)
     builder = _Builder(files, max_chars)
     headers_done: set[tuple[str, int]] = set()
+    impl_owners: dict[str, list[Optional[tuple[int, int]]]] = {}  # per Rust file, see _rust_impl_owners
 
     for hit in hits:
         lines = files.lines(hit.path)
@@ -118,12 +136,9 @@ def build_chunks(ws_root: Path, index: RepoIndex, hits: list[Hit], max_chars: in
         target = symbols.context_symbol(sym)
         header: Optional[_Range] = None
         if target.kind == "method":
-            cls = symbols.enclosing_class(target)
-            if cls is not None and (cls.path, cls.start_line) not in headers_done:
-                end = class_header_end(lines, cls)
-                if end is not None and end - cls.start_line + 1 < CLASS_HEADER_MAX_LINES:
-                    what = "enum" if cls.kind == "enum" else "class"
-                    header = _Range(cls.path, cls.start_line, end, f"{cls.qualname} ({what} header)")
+            header = _owner_header(symbols, target, lines, impl_owners)
+            if header is not None and (header.path, header.start) in headers_done:
+                header = None
         added_header = builder.add_group(header, symbol_ranges(target, lines))
         if added_header and header is not None:
             headers_done.add((header.path, header.start))
@@ -140,6 +155,41 @@ def build_chunks(ws_root: Path, index: RepoIndex, hits: list[Hit], max_chars: in
     ]
 
 
+def _owner_header(
+    symbols: _SymbolTable,
+    method: Symbol,
+    lines: list[str],
+    impl_owners: dict[str, list[Optional[tuple[int, int]]]],
+) -> Optional[_Range]:
+    """The header range that names ``method``'s owner, or None: the enclosing
+    class's header (see :func:`class_header_end`) or, in Rust, the ``impl ... {``
+    lines of the block the method sits in. ``impl_owners`` caches
+    :func:`_rust_impl_owners` per file."""
+    lang = _c_lang(method.path)
+    cls = symbols.enclosing_class(method)
+    if cls is not None:
+        end = class_header_end(lines, cls)
+        if end is None or end - cls.start_line + 1 >= CLASS_HEADER_MAX_LINES:
+            return None
+        what = cls.kind if cls.kind in ("enum", "interface", "type") else "class"
+        header = _Range(cls.path, cls.start_line, end, f"{cls.qualname} ({what} header)")
+    elif lang == "rust":
+        if method.path not in impl_owners:
+            impl_owners[method.path] = _rust_impl_owners(lines)
+        owners = impl_owners[method.path]
+        span = owners[method.start_line] if 0 < method.start_line < len(owners) else None
+        # The block is found by a whole-file pass, so HEADER_SCAN_LINES does not bound it; the
+        # stricter CLASS_HEADER_MAX_LINES rule does.
+        if span is None or span[1] - span[0] + 1 >= CLASS_HEADER_MAX_LINES:
+            return None
+        header = _Range(method.path, span[0], span[1], f"{method.parent or 'impl'} (impl header)")
+    else:
+        return None
+    if lang is not None and header.start <= method.end_line and method.start_line <= header.end:
+        return None  # a one-line type or impl: the method's own lines already show the owner
+    return header
+
+
 # --------------------------------------------------------------------------- #
 # Ranges for one symbol
 # --------------------------------------------------------------------------- #
@@ -153,7 +203,8 @@ def symbol_ranges(sym: Symbol, lines: list[str]) -> list[_Range]:
     n = end - start + 1
     if n <= LONG_SYMBOL_LINES:
         return [_Range(sym.path, start, end, sym.qualname)]
-    windows = split_windows(lines, start, end)
+    decorators = _RUST_DECORATOR_PREFIXES if sym.path.endswith(_RUST_SUFFIXES) else _DECORATOR_PREFIXES
+    windows = split_windows(lines, start, end, decorators)
     if sym.kind == "class":
         a, b = windows[0]
         label = f"{sym.qualname} (first {b - a + 1} of {n} lines)"
@@ -165,23 +216,27 @@ def symbol_ranges(sym: Symbol, lines: list[str]) -> list[_Range]:
     ]
 
 
-def split_windows(lines: list[str], start: int, end: int) -> list[tuple[int, int]]:
+def split_windows(
+    lines: list[str], start: int, end: int, decorators: tuple[str, ...] = _DECORATOR_PREFIXES
+) -> list[tuple[int, int]]:
     """Split ``start..end`` (1-based, inclusive) into consecutive windows of
-    ``WINDOW_MIN_LINES``-``WINDOW_MAX_LINES`` lines; only the last may be shorter."""
+    ``WINDOW_MIN_LINES``-``WINDOW_MAX_LINES`` lines; only the last may be shorter.
+    ``decorators`` are the prefixes of decorator lines (see :func:`_best_cut`)."""
     windows: list[tuple[int, int]] = []
     a = start
     while end - a + 1 > WINDOW_MAX_LINES:
-        b = _best_cut(lines, a, end)
+        b = _best_cut(lines, a, end, decorators)
         windows.append((a, b))
         a = b + 1
     windows.append((a, end))
     return windows
 
 
-def _best_cut(lines: list[str], a: int, end: int) -> int:
+def _best_cut(lines: list[str], a: int, end: int, decorators: tuple[str, ...] = _DECORATOR_PREFIXES) -> int:
     """Last line of the window starting at ``a``: the next window should start at
-    a statement with the shallowest indentation, not inside a decorator stack,
-    as close to ``WINDOW_TARGET_LINES`` as possible."""
+    a statement with the shallowest indentation, not inside a decorator stack
+    (lines starting with one of ``decorators``: ``@``, and in Rust ``#[``), as
+    close to ``WINDOW_TARGET_LINES`` as possible."""
     lo = a + WINDOW_MIN_LINES - 1
     hi = min(a + WINDOW_MAX_LINES - 1, end - 1)
     target = a + WINDOW_TARGET_LINES - 1
@@ -191,7 +246,7 @@ def _best_cut(lines: list[str], a: int, end: int) -> int:
         nxt = lines[b] if b < len(lines) else ""
         indent = _indent(nxt) if nxt.strip() else 10_000  # never start a window on a blank line
         cost = (
-            1 if last.lstrip().startswith("@") else 0,      # do not split a decorator stack
+            1 if last.lstrip().startswith(decorators) else 0,  # do not split a decorator stack
             indent,
             0 if not last.strip() else 1,                   # prefer ending on a blank line
             abs(b - target),
@@ -210,8 +265,8 @@ def class_header_end(lines: list[str], cls: Symbol) -> Optional[int]:
     if any. ``None`` when it cannot be found within ``HEADER_SCAN_LINES`` lines
     (e.g. a docstring longer than that).
 
-    A class outside a Python file (TypeScript, ...) is read by
-    :func:`_brace_header_end` instead: Python's tokenizer means nothing there."""
+    A class outside a Python file (TypeScript, Dart, Java, Go, Rust, ...) is read
+    by :func:`_brace_header_end` instead: Python's tokenizer means nothing there."""
     if not cls.path.endswith(_PYTHON_SUFFIXES):
         return _brace_header_end(lines, cls)
     start = cls.start_line
@@ -248,9 +303,12 @@ def _brace_header_end(lines: list[str], cls: Symbol) -> Optional[int]:
     """The line that opens the body (``{``) of a class in a brace language:
     the first ``{`` from the ``class`` keyword on (decorators and comment lines
     before it are skipped). ``None`` when there is none within
-    ``HEADER_SCAN_LINES`` lines."""
+    ``HEADER_SCAN_LINES`` lines. Dart, Java, Go and Rust have readers of their own."""
     if cls.path.endswith(_DART_SUFFIXES):
         return _dart_header_end(lines, cls)
+    lang = _c_lang(cls.path)
+    if lang is not None:
+        return _c_header_end(lines, cls, lang)
     start = cls.start_line
     stop = min(cls.end_line, start + HEADER_SCAN_LINES - 1, len(lines))
     seen_keyword = False
@@ -328,6 +386,230 @@ def _dart_header_end(lines: list[str], cls: Symbol) -> Optional[int]:
 
 
 # --------------------------------------------------------------------------- #
+# Java, Go and Rust
+# --------------------------------------------------------------------------- #
+
+def _c_lang(path: str) -> Optional[str]:
+    """``"java"``, ``"go"`` or ``"rust"`` for a file read by :func:`_c_tokens`, else None."""
+    if path.endswith(_JAVA_SUFFIXES):
+        return "java"
+    if path.endswith(_GO_SUFFIXES):
+        return "go"
+    if path.endswith(_RUST_SUFFIXES):
+        return "rust"
+    return None
+
+
+def _c_header_end(lines: list[str], cls: Symbol, lang: str) -> Optional[int]:
+    """The line that opens the body (``{``) of a Java, Go or Rust type.
+
+    Java and Rust: the first ``{`` after the type keyword (``class``,
+    ``interface``, ``@interface``, ``enum``, ``record``; ``struct``, ``enum``,
+    ``union``, ``trait``), so annotations and ``#[...]`` attributes before it are
+    skipped; a bodiless Rust item (``struct Unit;``) ends at its ``;``. Go: the
+    first ``{`` from the type's start line (a spec inside ``type ( ... )`` has no
+    keyword of its own); a type without one (``type ID int``) ends where the
+    symbol ends. Braces inside ``(...)``, ``[...]``, strings and comments do not
+    count. ``None`` when there is none within ``HEADER_SCAN_LINES`` lines."""
+    start = cls.start_line
+    stop = min(cls.end_line, start + HEADER_SCAN_LINES - 1, len(lines))
+    if start > stop:
+        return None
+    keywords = _JAVA_TYPE_KEYWORDS if lang == "java" else _RUST_TYPE_KEYWORDS if lang == "rust" else None
+    seen_keyword = keywords is None
+    depth = 0
+    prev = ""
+    for tok, line in _c_tokens("\n".join(lines[start - 1 : stop]), start, lang):
+        if tok in ("(", "["):
+            depth += 1
+        elif tok in (")", "]"):
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            if not seen_keyword:
+                # `@Foo` is an annotation, `@interface` an annotation type
+                seen_keyword = tok in keywords and (prev != "@" or tok == "interface")
+            elif tok == "{" or (tok == ";" and lang == "rust"):
+                return line
+        prev = tok
+    if lang == "go" and stop == cls.end_line:
+        return cls.end_line
+    return None
+
+
+def _rust_impl_owners(lines: list[str]) -> list[Optional[tuple[int, int]]]:
+    """For each line number (index 0 is unused): ``(first header line, line of
+    the opening brace)`` of the ``impl`` block whose body directly encloses the
+    start of that line, else None.
+
+    One pass over the file. An ``impl`` counts when it starts an item (after
+    ``{``, ``}``, ``;``, outer attributes, ``unsafe`` or ``default``), so
+    ``-> impl Trait`` and ``x: impl Fn()`` do not; its header ends at the first
+    ``{`` outside ``(...)``, ``[...]`` and ``<...>``. Outer attributes directly
+    above the ``impl`` belong to the header."""
+    owners: list[Optional[tuple[int, int]]] = [None] * (len(lines) + 2)
+    stack: list[Optional[tuple[int, int]]] = []  # one entry per open brace; impl bodies carry their header
+    filled = 0                                   # owners[1..filled] are set
+    item_start = True                            # the next token may begin an item
+    attr_line: Optional[int] = None              # first outer-attribute line of the coming item
+    modifier_line: Optional[int] = None          # line of a leading `unsafe` / `default`
+    attr_depth = 0                               # bracket depth inside #[...] / #![...]
+    attr_resume = True                           # item_start to restore after the attribute
+    hash_state = 0                               # 1 after `#`, 2 after `#!`
+    hash_line = 0
+    impl_start: Optional[int] = None             # first header line, between `impl` and its body
+    nest = angle = 0
+    prev = ""
+    for tok, line in _c_tokens("\n".join(lines), 1, "rust"):
+        while filled < line:
+            filled += 1
+            owners[filled] = stack[-1] if stack else None
+        if attr_depth:
+            if tok == "[":
+                attr_depth += 1
+            elif tok == "]":
+                attr_depth -= 1
+                if not attr_depth:
+                    item_start = attr_resume
+            continue
+        if tok == "#":
+            hash_state, hash_line, attr_resume = 1, line, item_start
+            continue
+        if tok == "!" and hash_state == 1:
+            hash_state = 2
+            continue
+        if tok == "[" and hash_state:
+            if hash_state == 1 and attr_resume and impl_start is None and attr_line is None:
+                attr_line = hash_line
+            attr_depth, hash_state = 1, 0
+            continue
+        hash_state = 0
+        if impl_start is not None:
+            if tok in ("(", "["):
+                nest += 1
+            elif tok in (")", "]"):
+                nest = max(0, nest - 1)
+            elif tok == "<":
+                angle += 1
+            elif tok == ">" and prev not in ("-", "="):  # not `->` / `=>`
+                angle = max(0, angle - 1)
+            elif tok == "{":
+                if nest or angle:
+                    stack.append(None)  # a const-generic block, not the body
+                else:
+                    stack.append((impl_start, line))
+                    impl_start = None
+                    item_start = True
+            elif tok == "}":
+                if stack:
+                    stack.pop()
+            elif tok == ";" and not nest:
+                impl_start = None  # not an impl block after all
+                item_start = True
+            prev = tok
+            continue
+        if tok in ("{", "}", ";"):
+            if tok == "{":
+                stack.append(None)
+            elif tok == "}" and stack:
+                stack.pop()
+            item_start, attr_line, modifier_line = True, None, None
+        elif item_start and tok == "impl":
+            impl_start = attr_line or modifier_line or line
+            nest = angle = 0
+            attr_line = modifier_line = None
+        elif item_start and tok in ("unsafe", "default"):
+            modifier_line = modifier_line or line
+        else:
+            item_start, attr_line, modifier_line = False, None, None
+        prev = tok
+    while filled < len(lines):
+        filled += 1
+        owners[filled] = stack[-1] if stack else None
+    return owners
+
+
+def _c_tokens(text: str, line: int, lang: str) -> Iterator[tuple[str, int]]:
+    """Tokens of Java, Go or Rust source with their line numbers, counted from
+    ``line``: words (identifiers, keywords, numbers) and single punctuation
+    characters. Comments are dropped (Rust block comments nest) and each string
+    or character literal becomes one ``"`` token: Java text blocks, Go raw
+    strings, Rust raw strings (``r#"..."#``). A Rust lifetime (``'a``) is a ``'``
+    token followed by its name."""
+    rust = lang == "rust"
+    n = len(text)
+    i = 0
+    while i < n:
+        m = _C_TOKEN_RE.match(text, i)
+        assert m is not None  # the last alternative matches any character
+        kind, tok, j = m.lastgroup, m.group(), m.end()
+        if kind == "space":
+            line += tok.count("\n")
+        elif kind == "line_comment":
+            pass
+        elif kind == "block_comment":
+            j = _block_comment_end(text, i, nested=rust)
+            line += text.count("\n", i, j)
+        elif kind == "word":
+            if rust and tok in ("r", "br", "cr") and j < n and text[j] in '#"':
+                k = j
+                while k < n and text[k] == "#":
+                    k += 1
+                if k < n and text[k] == '"':
+                    close = '"' + "#" * (k - j)
+                    e = text.find(close, k + 1)
+                    j = n if e < 0 else e + len(close)
+                    yield '"', line
+                    line += text.count("\n", i, j)
+                    i = j
+                    continue
+            yield tok, line
+        elif tok == '"' or (tok == "`" and lang == "go") or (tok == "'" and not (rust and _is_lifetime(text, i))):
+            quote = '"""' if lang == "java" and text.startswith('"""', i) else tok
+            j = _quoted_end(text, i, quote, escapes=tok != "`")
+            yield '"', line
+            line += text.count("\n", i, j)
+        else:
+            yield tok, line
+        i = j
+
+
+def _block_comment_end(text: str, i: int, nested: bool) -> int:
+    """Index just past the block comment that starts at ``i``."""
+    n = len(text)
+    depth = 0
+    j = i
+    while j < n:
+        if text.startswith("/*", j) and (nested or depth == 0):
+            depth += 1
+            j += 2
+        elif text.startswith("*/", j):
+            depth -= 1
+            j += 2
+            if depth == 0:
+                return j
+        else:
+            j += 1
+    return n
+
+
+def _quoted_end(text: str, i: int, quote: str, escapes: bool) -> int:
+    """Index just past the literal that opens with ``quote`` at ``i``."""
+    n = len(text)
+    j = i + len(quote)
+    while j < n and not text.startswith(quote, j):
+        if escapes and text[j] == "\\":
+            j += 1
+        j += 1
+    return min(n, j + len(quote))
+
+
+def _is_lifetime(text: str, i: int) -> bool:
+    """True if the ``'`` at ``i`` starts a Rust lifetime or label (``'a``), not a
+    character literal (``'a'``, ``'\\n'``)."""
+    return not (text.startswith("\\", i + 1) or text.startswith("'", i + 2))
+
+
+# --------------------------------------------------------------------------- #
 # Symbol lookups
 # --------------------------------------------------------------------------- #
 
@@ -342,11 +624,13 @@ class _SymbolTable:
     def get(self, symbol_id: str, start_line: int) -> Optional[Symbol]:
         return self._by_key.get((symbol_id, start_line))
 
-    def _containing(self, path: str, qualname: str, inner: Symbol, kind: Optional[str] = None) -> Optional[Symbol]:
+    def _containing(
+        self, path: str, qualname: str, inner: Symbol, kinds: Optional[frozenset[str]] = None
+    ) -> Optional[Symbol]:
         found = [
             s for s in self._by_qualname.get((path, qualname), [])
             if s.start_line <= inner.start_line and inner.end_line <= s.end_line
-            and (kind is None or s.kind == kind)
+            and (kinds is None or s.kind in kinds)
         ]
         if not found:
             return None
@@ -364,11 +648,21 @@ class _SymbolTable:
         return outer
 
     def enclosing_class(self, method: Symbol) -> Optional[Symbol]:
+        """The type whose header names ``method``'s owner: the class (Dart: or
+        enum) of that qualname containing it; in Java any type, in Rust a trait
+        (an ``impl`` block is not a symbol, see :func:`_rust_impl_owners`); in Go
+        the receiver type declared anywhere in the same file."""
         if not method.parent:
             return None
-        found = self._containing(method.path, method.parent, method, kind="class")
-        if found is None and method.path.endswith(_DART_SUFFIXES):  # Dart members of an enum
-            found = self._containing(method.path, method.parent, method, kind="enum")
+        path = method.path
+        if path.endswith(_GO_SUFFIXES):  # methods are declared outside their receiver type
+            found = [s for s in self._by_qualname.get((path, method.parent), []) if s.kind in _GO_RECEIVER_KINDS]
+            return min(found, key=lambda s: s.start_line) if found else None
+        if path.endswith(_JAVA_SUFFIXES + _RUST_SUFFIXES):
+            return self._containing(path, method.parent, method, _TYPE_OWNER_KINDS)
+        found = self._containing(path, method.parent, method, _CLASS_KINDS)
+        if found is None and path.endswith(_DART_SUFFIXES):  # Dart members of an enum
+            found = self._containing(path, method.parent, method, _ENUM_KINDS)
         return found
 
 
