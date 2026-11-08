@@ -5,6 +5,9 @@ manifest rank below product code, unless the query asks for them."""
 from __future__ import annotations
 
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -213,3 +216,161 @@ def test_a_test_in_an_aux_dir_gets_the_stronger_penalty_not_both(monkeypatch: py
             boost_of(si, "load config tests", PRODUCT) * penalty)
         assert boost_of(si, "load config example", aux_test) == pytest.approx(
             boost_of(si, "load config example", "tests/test_loader.py"))
+
+
+# --------------------------------------------------------------------------- #
+# hostile manifests never break indexing
+# --------------------------------------------------------------------------- #
+
+DEEP = 5000  # far past the default recursion limit
+
+
+@pytest.mark.parametrize("rel, content", [
+    ("package.json", '{"main": ' + "[" * DEEP + "]" * DEEP + "}"),
+    ("package.json", '{"exports": ' + '{"a": ' * DEEP + '"./scripts/x.js"' + "}" * DEEP + "}"),
+    ("Cargo.toml", "[lib]\nx = " + "[" * DEEP + "]" * DEEP + "\n"),
+    ("Cargo.toml", "[lib]\nx = " + "{a = " * DEEP + "1" + "}" * DEEP + "\n"),
+    ("pyproject.toml", "[project]\nx = " + "[" * DEEP + "]" * DEEP + "\n"),
+    ("package.json", b"\xff\xfe\x00{\x00\x80 not json"),
+    ("Cargo.toml", b"[lib]\npath = \"\xff\xfe\"\n\x00\x00"),
+    ("pyproject.toml", "project = 'not a table'\ntool = 3\n"),
+    ("package.json", '{"bin": 5, "main": null, "files": "scripts/a.py", "exports": [1, null, {"b": 2}]}'),
+    ("package.json", "[1, 2, 3]"),
+    ("setup.py", "setup(scripts=[" + "'x', " * 20000),
+    ("setup.py", "scripts=[" * 20000),
+], ids=[
+    "json-deep-array", "json-deep-object", "cargo-deep-array", "cargo-deep-inline-table",
+    "pyproject-deep-array", "json-binary", "cargo-binary", "pyproject-wrong-shapes",
+    "json-wrong-shapes", "json-not-an-object", "setup-unclosed-list", "setup-repeated-opening",
+])
+def test_a_hostile_manifest_gives_no_exemption_and_never_breaks_indexing(
+    tmp_path: Path, rel: str, content: str | bytes
+) -> None:
+    full = tmp_path / rel
+    if isinstance(content, bytes):
+        full.write_bytes(content)
+    else:
+        full.write_text(content, encoding="utf-8")
+    si = pair(tmp_path, "scripts/a.py")  # builds: the manifest beside scripts/ is read
+    assert order(si, "load config") == [PRODUCT, "scripts/a.py"]
+    assert _AuxDirs(str(tmp_path)).is_aux("scripts/a.py")
+
+
+def test_an_oversized_manifest_is_not_read(tmp_path: Path) -> None:
+    padding = " " * (search._MANIFEST_MAX_BYTES + 1)
+    write(tmp_path, "package.json", json.dumps({"main": "scripts/a.py"}) + padding)
+    assert _shipped_paths(tmp_path / "package.json") == set()
+    assert _AuxDirs(str(tmp_path)).is_aux("scripts/a.py")
+
+
+def test_a_manifest_that_is_a_directory_is_ignored(tmp_path: Path) -> None:
+    (tmp_path / "packages" / "x" / "package.json").mkdir(parents=True)
+    aux = _AuxDirs(str(tmp_path))
+    assert not aux.is_aux("packages/x/examples/a.py")  # no manifest file: not a package root
+    assert aux.is_aux("examples/a.py")
+
+
+# --------------------------------------------------------------------------- #
+# TOML manifests without tomllib (Python 3.10)
+# --------------------------------------------------------------------------- #
+
+CARGO = """\
+[package]
+name = "x"
+description = '''
+[[bin]]
+path = "not/a/target.rs"
+'''
+
+[lib]
+path = "examples/lib.rs"   # a comment with "quotes"
+
+[[bin]]
+name = "tool"
+path = 'scripts/tool.rs'
+
+[[bin]]
+name = "other"
+path = "benches/other.rs"
+
+[[example]]
+name = "demo"
+path = "examples/demo.rs"
+
+[[bench]]
+name = "speed"
+path = "benches/speed.rs"
+"""
+
+PYPROJECT = """\
+[project]
+name = "pkg"
+gui-scripts = { gui = "scripts.gui:main" }
+dependencies = [
+    "requests>=2",  # not a script
+]
+
+[project.scripts]
+tool = "scripts.tool:main"
+"quoted-name" = 'scripts.quoted:run'
+
+[tool.poetry.scripts]
+poet = "scripts.poet:main"
+
+[tool.setuptools]
+script-files = [
+    "scripts/run.sh",
+    'scripts/other.sh',
+]
+"""
+
+CARGO_SHIPPED = {"examples/lib.rs", "scripts/tool.rs", "benches/other.rs"}
+PYPROJECT_SHIPPED = {
+    f"{root}scripts/{name}{suffix}"
+    for root in ("", "src/")
+    for name in ("gui", "tool", "quoted", "poet")
+    for suffix in (".py", "/__init__.py")
+} | {"scripts/run.sh", "scripts/other.sh"}
+
+
+def test_toml_manifests_are_read_by_line(tmp_path: Path) -> None:
+    write(tmp_path, "Cargo.toml", CARGO)
+    write(tmp_path, "pyproject.toml", PYPROJECT)
+    assert _shipped_paths(tmp_path / "Cargo.toml") == CARGO_SHIPPED
+    assert _shipped_paths(tmp_path / "pyproject.toml") == PYPROJECT_SHIPPED
+
+
+def test_the_toml_samples_mean_what_tomllib_says() -> None:
+    tomllib = pytest.importorskip("tomllib")
+    cargo = tomllib.loads(CARGO)
+    assert {cargo["lib"]["path"]} | {b["path"] for b in cargo["bin"]} == CARGO_SHIPPED
+    py = tomllib.loads(PYPROJECT)
+    modules = [*py["project"]["scripts"].values(), *py["project"]["gui-scripts"].values(),
+               *py["tool"]["poetry"]["scripts"].values()]
+    assert {m.split(":")[0] for m in modules} == {f"scripts.{n}" for n in ("gui", "tool", "quoted", "poet")}
+    assert set(py["tool"]["setuptools"]["script-files"]) == {"scripts/run.sh", "scripts/other.sh"}
+
+
+def test_toml_exemptions_hold_without_tomllib(tmp_path: Path) -> None:
+    """Python 3.10 has no tomllib: the same files are exempt."""
+    write(tmp_path, "Cargo.toml", CARGO)
+    write(tmp_path, "py/pyproject.toml", PYPROJECT)
+    code = (
+        "import json, sys\n"
+        "sys.modules['tomllib'] = None  # import tomllib -> ImportError\n"
+        "from pathlib import Path\n"
+        "import repofinder.search as s\n"
+        "root = Path(sys.argv[1])\n"
+        "aux = s._AuxDirs(str(root))\n"
+        "print(json.dumps([sorted(s._shipped_paths(root / 'Cargo.toml')),\n"
+        "                  sorted(s._shipped_paths(root / 'py' / 'pyproject.toml')),\n"
+        "                  aux.is_aux('scripts/tool.rs'), aux.is_aux('scripts/build.rs')]))\n"
+    )
+    env = dict(os.environ, PYTHONPATH=str(Path(search.__file__).resolve().parents[1]))
+    done = subprocess.run([sys.executable, "-c", code, str(tmp_path)], capture_output=True, text=True,
+                          env=env, timeout=120)
+    assert done.returncode == 0, done.stderr
+    cargo, py, tool_aux, build_aux = json.loads(done.stdout)
+    assert set(cargo) == CARGO_SHIPPED
+    assert set(py) == PYPROJECT_SHIPPED
+    assert (tool_aux, build_aux) == (False, True)
