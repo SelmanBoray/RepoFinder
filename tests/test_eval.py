@@ -1128,3 +1128,146 @@ def test_validate_golden_typescript_negatives(ts_repo):
     # declaration exists in the window but the range starts earlier
     _, warnings = run_eval.validate_golden(_src_golden(loc("src/a.ts", 1, 3, "loadAll")), ts_repo)
     assert any("does not start at the definition" in w for w in warnings)
+
+
+# ---- Go / Rust / Java / Dart declarations (extended declaration check) --------------- #
+
+def _decl_check(make_repo, path: str, lines: list[str], start: int, end: int, symbol: str):
+    root = make_repo({path: "\n".join(lines) + "\n"})
+    _write_git_head(root, "abc1234def5678")
+    return run_eval.validate_golden(_src_golden(loc(path, start, end, symbol)), root)
+
+
+_DECL_CASES = [
+    # Go
+    ("go", "Next", "func Next() {"),
+    ("go", "Map", "func Map[T any](xs []T) []T {"),
+    ("go", "Context.JSON", "func (c *Context) JSON(code int, obj any) {"),
+    ("go", "List.Len", "func (l *List[T]) Len() int {"),
+    ("go", "Context", "type Context struct {"),
+    ("go", "Store", "type Store interface {"),
+    ("go", "Alias", "type Alias = Server"),
+    # Rust
+    ("rs", "helper", "fn helper() {"),
+    ("rs", "Searcher.search_path",
+     "pub fn search_path<P: AsRef<Path>>(&mut self, path: P) -> io::Result<()> {"),
+    ("rs", "run", "pub(crate) async fn run(&self) {"),
+    ("rs", "raw", 'pub const unsafe extern "C" fn raw() {'),
+    ("rs", "Config", "pub struct Config {"),
+    ("rs", "Mode", "pub(crate) enum Mode {"),
+    ("rs", "Sink", "pub trait Sink {"),
+    ("rs", "Result", "pub type Result<T> = std::result::Result<T, Error>;"),
+    ("rs", "tests", "mod tests {"),
+    # Java
+    ("java", "Gson", "public final class Gson {"),
+    ("java", "Helper", "class Helper {"),
+    ("java", "JsonSerializer", "public interface JsonSerializer<T> {"),
+    ("java", "FieldNamingPolicy", "public enum FieldNamingPolicy implements FieldNamingStrategy {"),
+    ("java", "Point", "public record Point(int x, int y) {"),
+    ("java", "Since", "public @interface Since {"),
+    ("java", "Gson.Gson", "public Gson() {"),
+    ("java", "Gson.Gson", "Gson(Excluder excluder) {"),
+    ("java", "JsonAdapter.write", "void write(JsonWriter out) {"),
+    ("java", "Names.names", "List<String> names() {"),
+    ("java", "Gson.fromJson", "public <T> T fromJson(String json, Class<T> classOfT) {"),
+    # Dart
+    ("dart", "Component", "class Component {"),
+    ("dart", "PositionComponent", "abstract class PositionComponent extends Component {"),
+    ("dart", "HasGameRef", "mixin HasGameRef<T extends FlameGame> on Component {"),
+    ("dart", "Vector2Ext", "extension Vector2Ext on Vector2 {"),
+    ("dart", "Component.update", "void update(double dt) {"),
+    ("dart", "Component.onLoad", "Future<void> onLoad() async {"),
+    ("dart", "PositionComponent.size", "Vector2 get size => _size;"),
+    ("dart", "PositionComponent.size=", "set size(Vector2 value) {"),
+    ("dart", "Vector2Ext.operator ==", "bool operator ==(Object other) {"),
+    ("dart", "PositionComponent.fromSize", "PositionComponent.fromSize(Vector2 size) {"),
+    ("dart", "Anchor.valueOf", "factory Anchor.valueOf(String name) {"),
+]
+
+
+@pytest.mark.parametrize("ext, symbol, line", _DECL_CASES)
+def test_validate_golden_recognises_extended_declarations(make_repo, ext, symbol, line):
+    path = f"src/x.{ext}"
+    errors, warnings = _decl_check(make_repo, path, ["// head", line, "    body;", "}"], 2, 4, symbol)
+    assert errors == [] and warnings == []
+
+
+def test_validate_golden_recognises_go_grouped_spec_and_interface_method(make_repo):
+    lines = ["package p", "type (", "\tHandlerFunc func(*Context)", ")",
+             "type Store interface {", "\tGet(key string) (string, error)", "}"]
+    assert _decl_check(make_repo, "p/a.go", lines, 3, 3, "HandlerFunc") == ([], [])
+    assert _decl_check(make_repo, "p/a.go", lines, 6, 6, "Store.Get") == ([], [])
+
+
+def test_validate_golden_rust_attribute_start_is_accepted(make_repo):
+    lines = ["use std::io;", "#[derive(Debug)]", "pub struct Config {", "    a: u8,", "}"]
+    assert _decl_check(make_repo, "src/lib.rs", lines, 2, 5, "Config") == ([], [])
+
+
+@pytest.mark.parametrize("ext, symbol, lines", [
+    ("go", "Context.JSON", ["package p", "func f() {", "\tx.JSON(200, obj)", "}"]),
+    ("rs", "helper", ["fn f() {", "    return helper();", "}"]),
+    ("java", "helper", ["class A {", "    int f() { return helper(); }", "}"]),
+    ("dart", "helper", ["void f() {", "  return helper();", "}"]),
+])
+def test_validate_golden_call_site_only_still_warns_not_declared(make_repo, ext, symbol, lines):
+    # range covers only the call line, never a declaration of the name
+    start = next(i for i, ln in enumerate(lines, 1) if "helper()" in ln or "JSON(" in ln)
+    errors, warnings = _decl_check(make_repo, f"src/x.{ext}", lines, start, start, symbol)
+    name = symbol.rsplit(".", 1)[-1]
+    assert errors == []
+    assert any("no 'def/class" in w for w in warnings)
+    assert any(f"no 'def/class {name}'" in w for w in warnings)
+
+
+def test_validate_golden_go_build_constraint_above_func_warns_start(make_repo):
+    lines = ["package p", "//go:build !nomsgpack", "func init() {", "}"]
+    errors, warnings = _decl_check(make_repo, "p/init.go", lines, 2, 4, "init")
+    assert errors == []
+    assert any("does not start at the definition of" in w for w in warnings)
+    assert not any("no 'def/class" in w for w in warnings)
+
+
+@pytest.mark.parametrize("ext, symbol, line", [
+    ("py", "foo", "if foo(x):"),
+    ("py", "foo", "assert foo(x)"),
+    ("py", "ValueError", 'raise ValueError("bad")'),
+    ("py", "Flask.run", "Flask.run(app)"),
+    ("go", "cleanup", "defer cleanup()"),
+    ("go", "worker", "go worker(ch)"),
+    ("go", "New", "engine = New()"),
+    ("rs", "parse", "match parse(input) {"),
+    ("java", "compute", "default: return compute(x);"),
+    ("java", "handle", "default -> handle(x);"),
+    ("java", "Gson.Gson", "Gson gson = new Gson();"),
+    ("java", "requireNonNull", "Objects.requireNonNull(x);"),
+    ("java", "sort", "Collections.sort(list);"),
+])
+def test_validate_golden_call_or_statement_line_is_not_a_declaration(make_repo, ext, symbol, line):
+    errors, warnings = _decl_check(make_repo, f"src/x.{ext}", [line], 1, 1, symbol)
+    assert errors == []
+    assert any("no 'def/class" in w for w in warnings)
+
+
+@pytest.mark.parametrize("ext, symbol, line", [
+    ("go", "debugPrint", "\tdebugPrint(x)"),
+    ("rs", "helper", "    helper();"),
+    ("java", "init", "    init();"),
+    ("dart", "helper", "  helper();"),
+])
+def test_validate_golden_bare_call_statement_is_not_a_declaration(make_repo, ext, symbol, line):
+    errors, warnings = _decl_check(make_repo, f"src/x.{ext}", [line], 1, 1, symbol)
+    assert errors == []
+    assert any("no 'def/class" in w for w in warnings)
+
+
+@pytest.mark.parametrize("ext, symbol, head, line", [
+    ("go", "Store.Get", "type Store interface {", "\tGet(key string) (string, error)"),
+    ("java", "Gson.Gson", "public final class Gson {", "    Gson(Excluder excluder) {"),
+    ("dart", "Foo.Foo", "class Foo {", "  Foo(this.x);"),
+])
+def test_validate_golden_member_declarations_stay_accepted(make_repo, ext, symbol, head, line):
+    errors, warnings = _decl_check(make_repo, f"src/x.{ext}", [head, line, "}"], 2, 2, symbol)
+    assert errors == []
+    assert not any("no 'def/class" in w for w in warnings)
+    assert not any("does not start at the definition" in w for w in warnings)

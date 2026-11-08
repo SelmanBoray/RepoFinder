@@ -244,13 +244,13 @@ def _check_location(
         return
     if symbol:
         name = symbol.split(".")[-1]
-        decl_res = _declaration_patterns(name)
+        decl_res = _declaration_patterns(name, path, symbol.split(".")[-2] if "." in symbol else "")
         window = lines[start - 1 : end]
         if not any(_is_declaration(line, decl_res) for line in window):
-            warnings.append(f"{where}: no 'def/class {name}' (or TS/JS/Java declaration) within {path}:{start}-{end}")
+            warnings.append(f"{where}: no 'def/class {name}' (or a TS/JS/Java/Go/Rust/Dart declaration) within {path}:{start}-{end}")
         else:
             first = next((line.strip() for line in window if line.strip()), "")
-            if not (first.startswith("@") or _is_declaration(first, decl_res)):
+            if not (first.startswith(("@", "#[")) or _is_declaration(first, decl_res)):
                 warnings.append(
                     f"{where}: {path}:{start} does not start at the definition of {symbol}"
                     f" or its decorators (it starts with {first[:40]!r})"
@@ -260,23 +260,116 @@ def _check_location(
 _TS_MODS = r"(?:(?:export|default|declare|abstract|async|public|private|protected|static|readonly|override|get|set)\s+)*"
 
 
-def _declaration_patterns(name: str) -> list["re.Pattern[str]"]:
-    """Line patterns that declare ``name``: Python, TypeScript/JavaScript, and Java-style methods."""
+_NOT_A_TYPE = (
+    "return|new|throw|else|case|yield|await|typeof|delete|in|is|as|var|let|const|import|export|"
+    "if|assert|raise|defer|go|match|while|for|switch|catch|do|try|with|print|from|lambda|del|pass|"
+    "elif|except|finally|not|and|or|extends|implements|package|using|goto|default"
+)
+_GET_SET_MODS = r"(?:(?:static|external|abstract|override)\s+)*(?:[\w$.]+(?:<[^()]*>)?\??\s+)?"
+
+
+def _language(path: str) -> str:
+    """Language family of ``path`` by extension ('' when unknown)."""
+    base = path.rsplit("/", 1)[-1]
+    ext = base.rsplit(".", 1)[-1].lower() if "." in base else ""
+    if ext in ("py", "pyi"):
+        return "py"
+    if ext in ("ts", "tsx", "js", "jsx", "mjs", "cjs", "mts", "cts"):
+        return "js"
+    return {"java": "java", "go": "go", "rs": "rust", "dart": "dart"}.get(ext, "")
+
+
+def _declaration_patterns(name: str, path: str = "", owner: str = "") -> list["re.Pattern[str]"]:
+    """Line patterns that declare ``name``.
+
+    Python, TS/JS, Java, Go, Rust and Dart. With a ``path`` only the patterns of that file's
+    language apply (``.py``/TS/JS: exactly the original set); without one, all of them.
+    ``owner`` (the qualname segment before ``name``) enables unprefixed Dart named
+    constructors ``Owner.name(``."""
     n = re.escape(name)
-    patterns = [
-        # Python (unchanged)
+    lang = _language(path)
+    py = [
         rf"^\s*(?:async\s+def|def|class)\s+{n}\b",
-        # TypeScript / JavaScript
         rf"^\s*(?:export\s+)?(?:default\s+)?(?:declare\s+)?(?:async\s+)?function\s*\*?\s*{n}\b",
         rf"^\s*(?:export\s+)?(?:default\s+)?(?:declare\s+)?(?:abstract\s+)?class\s+{n}\b",
         rf"^\s*(?:export\s+)?(?:declare\s+)?(?:const\s+)?(?:interface|type|enum|namespace|module)\s+{n}\b",
         rf"^\s*(?:export\s+)?(?:declare\s+)?(?:const|let|var)\s+{n}\b\s*(?::[^=]+)?=",
         # class members: name(, async name(, static name(, get name(, private readonly name = (...
+        # (also Go interface method elements and Dart/Java constructors)
         rf"^\s*{_TS_MODS}\*?\s*{n}\s*[(<]",
         rf"^\s*{_TS_MODS}{n}\s*[?!]?\s*(?::[^=]+)?=\s*(?:async\b|function\b|\(|<|[A-Za-z_$][\w$]*\s*=>)",
         # Java-style method: modifiers, return type, name(
         rf"^\s*(?:public|private|protected|static|final|abstract|synchronized)\b[^=;(]*?\b{n}\s*\(",
     ]
+    if lang in ("py", "js"):
+        return [re.compile(p) for p in py]
+    patterns = list(py)
+    if lang:
+        # A bare `N(...)` statement is a call, not a member: drop the loose member pattern (py[5])
+        # and accept only member shapes that carry declaration evidence.
+        del patterns[5]
+        mods = r"(?:(?:public|protected|private|static|final|abstract|synchronized|override|@\w+)\s+)*"
+        typed = r"[^()\"']*[\w>\]?]\s+\w+\s*[,)]"  # `Type name,` / `Type name)`
+        if lang == "go":
+            patterns += [
+                rf"^\s*{n}\s*\(\s*\)\s*[\w*\[(]",  # interface element `Close() error`
+                rf"^\s*{n}\s*\([^()\"'`]*\b\w+\s+(?:\*|\[|\.\.\.|<-|[A-Za-z_])",  # `Get(key string) ...`
+            ]
+        elif lang == "java":
+            patterns += [
+                rf"^\s*{mods}{n}\s*\(.*\)\s*(?:throws\s+[\w.,\s]+)?\{{\s*(?://.*)?$",  # constructor with body
+                rf"^\s*{mods}{n}\s*\({typed}",  # constructor with typed parameters
+            ]
+        elif lang == "dart":
+            patterns += [
+                rf"^\s*{mods}{n}\s*\((?:[^()]*\b(?:this|super)\.\w+|{typed})",  # `Foo(this.x)`, `m(int x)`
+                rf"^\s*{mods}{n}\s*\(.*\)\s*(?:async\*?\s*|sync\*\s*)?(?:\{{|=>|:)",  # body / initializers
+                rf"^\s*(?:const|factory|external)\s+{n}\s*\(",  # `const Foo();`
+            ]
+    if lang in ("", "java", "dart"):
+        # method with a return type and no (or Dart-only) modifier: `void N(`, `List<String> N(`
+        patterns.append(
+            rf"^\s*(?:@\w+\s+)*(?:(?:static|external|abstract|late|final|const)\s+)*"
+            rf"(?!(?:{_NOT_A_TYPE})\b)"
+            rf"[\w$.]+(?:<[^()]*>)?\??(?:\[\])*\??\s+{n}\s*[(<]"
+        )
+    if lang in ("", "java"):
+        patterns.append(
+            rf"^\s*(?:(?:public|protected|private|static|final|abstract|sealed|non-sealed|strictfp)\s+)*"
+            rf"(?:class|interface|enum|record|@interface)\s+{n}\b"
+        )
+        # interface default methods: `default [<T>] Type N(`; native methods
+        patterns.append(rf"^\s*default\s+(?:<[^>]*>\s+)?[\w$.]+(?:<[^()]*>)?(?:\[\])*\s+{n}\s*\(")
+        patterns.append(rf"^\s*native\b[^=;(]*?\b{n}\s*\(")
+    if lang in ("", "go"):
+        patterns += [
+            rf"^\s*func\s+(?:\([^)]*\)\s*)?{n}\s*[\[(]",
+            rf"^\s*type\s+{n}\b",
+            # spec inside a grouped `type (` block
+            rf"^\s*{n}\s+(?:struct\b|interface\b|func\b)",
+            rf"^\s*{n}\s*=(?!=)\s*[\w.*\[\]]+\s*(?://.*)?$",
+            rf"^\s*{n}\s+(?:\*?[\w.]+(?:\[[^\]()]*\])?|\[[^()]*|map\[.*|chan\b.*)\s*(?://.*)?$",
+        ]
+    if lang in ("", "rust"):
+        vis = r"(?:pub(?:\s*\([^)]*\))?\s+)?"
+        patterns += [
+            rf"^\s*{vis}(?:(?:default|const|async|unsafe|extern(?:\s+\"[^\"]*\")?)\s+)*fn\s+{n}\s*[<(]",
+            rf"^\s*{vis}(?:(?:unsafe|auto)\s+)?(?:struct|enum|union|trait|type|mod)\s+{n}(?=[\s<{{;(=]|$)",
+        ]
+    if lang in ("", "dart"):
+        patterns += [
+            rf"^\s*(?:(?:abstract|sealed|base|final|interface|mixin)\s+)*"
+            rf"(?:class|mixin|enum|typedef|extension(?:\s+type)?)\s+(?:const\s+)?{n}\b",
+            rf"^\s*(?:(?:const|factory|external)\s+)+[A-Za-z_$][\w$]*\.{n}\s*[(<]",
+            rf"^\s*{_GET_SET_MODS}get\s+{n}\b",
+        ]
+        if owner:
+            patterns.append(rf"^\s*{re.escape(owner)}\.{n}\s*[(<]")
+        if name.startswith("operator "):
+            op = re.escape(name[len("operator "):].strip())
+            patterns.append(rf"^\s*(?!//).*?\boperator\s*{op}")
+        elif name.endswith("=") and len(name) > 1:
+            patterns.append(rf"^\s*{_GET_SET_MODS}set\s+{re.escape(name[:-1])}\s*\(")
     return [re.compile(p) for p in patterns]
 
 

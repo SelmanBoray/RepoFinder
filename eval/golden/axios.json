@@ -1,0 +1,356 @@
+{
+  "repo": {"name": "axios", "source": "https://github.com/axios/axios", "commit": "a81d62a"},
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Where is `CancelToken.source()` implemented, the helper that gives me a token together with its `cancel` function?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "lib/cancel/CancelToken.js", "symbol": "CancelToken.source", "start_line": 123, "end_line": 132}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/cancel/CancelToken.js", "symbol": "CancelToken.constructor", "start_line": 13, "end_line": 63},
+        {"path": "lib/cancel/CancelToken.js", "symbol": "CancelToken.subscribe", "start_line": 78, "end_line": 89},
+        {"path": "lib/cancel/CancelToken.js", "symbol": "CancelToken.toAbortSignal", "start_line": 105, "end_line": 117}
+      ],
+      "notes": "Exact identifier; 'source' and 'cancel' are common words in docs and tests. source() constructs a CancelToken with an executor that captures the cancel function and returns { token, cancel } (CancelToken.js:123-132). The cancel function itself is created inside the constructor: it ignores repeat calls, stores a CanceledError(message, config, request) as token.reason and resolves the token's promise, which calls the subscribed listeners (54-62, 27-36). Wrong but plausible: the CancelToken constructor alone (defines cancel, not source), CancelToken.toAbortSignal, CanceledError, the CancelToken declarations in index.d.ts."
+    },
+    {
+      "id": "q02",
+      "question": "Which function decides whether a finished request resolves or rejects, and creates the \"Request failed with status code 404\" error when `validateStatus` returns false?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "lib/core/settle.js", "symbol": "settle", "start_line": 14, "end_line": 27}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/defaults/index.js", "start_line": 162, "end_line": 164},
+        {"path": "lib/core/AxiosError.js", "symbol": "AxiosError.constructor", "start_line": 203, "end_line": 228},
+        {"path": "lib/adapters/xhr.js", "start_line": 153, "end_line": 163}
+      ],
+      "notes": "settle reads response.config.validateStatus and resolves when the status is 0/missing, when validateStatus is null/undefined, or when it returns true; otherwise it rejects with AxiosError('Request failed with status code ' + status), code ERR_BAD_REQUEST for 4xx and ERR_BAD_RESPONSE otherwise (settle.js:14-27). The xhr, fetch and http adapters all call it (e.g. xhr.js:153-163). Wrong but plausible: the default validateStatus in defaults/index.js:162-164 (only the 2xx predicate), the AxiosError constructor (generic), dispatchRequest's onAdapterRejection (transforms the body of an already rejected response)."
+    },
+    {
+      "id": "q03",
+      "question": "The adapters call `headers.setContentType(...)` and `headers.getContentLength()`, but I can't find those methods in the AxiosHeaders class body. Where are they defined?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "lib/core/AxiosHeaders.js", "symbol": "buildAccessors", "start_line": 195, "end_line": 209},
+        {"path": "lib/core/AxiosHeaders.js", "symbol": "AxiosHeaders.accessor", "start_line": 439, "end_line": 462},
+        {"path": "lib/core/AxiosHeaders.js", "start_line": 465, "end_line": 472}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/core/AxiosHeaders.js", "symbol": "AxiosHeaders.set", "start_line": 216, "end_line": 270},
+        {"path": "lib/core/AxiosHeaders.js", "symbol": "AxiosHeaders.get", "start_line": 272, "end_line": 300},
+        {"path": "lib/utils.js", "symbol": "toCamelCase", "start_line": 893, "end_line": 897}
+      ],
+      "notes": "The methods are generated at load time. buildAccessors defines get<Name>, set<Name> and has<Name> on AxiosHeaders.prototype for one header, taking the suffix from utils.toCamelCase(' ' + header), and each one forwards to this.get/set/has with the header name (AxiosHeaders.js:195-209). AxiosHeaders.accessor calls it once per normalized header name (439-462), and the module registers Content-Type, Content-Length, Accept, Accept-Encoding, User-Agent and Authorization at 465-472. Any of the three answers. Wrong but plausible: AxiosHeaders.set / get (the generic methods the accessors forward to), the TypeScript declarations in index.d.ts (line 68 declares setContentType but defines nothing), the 'reserved names hotfix' reduceDescriptors call (474-483)."
+    },
+    {
+      "id": "q04",
+      "question": "Where is `getAdapter` implemented, the code that walks a list like `['xhr', 'http', 'fetch']` and returns the first adapter the current environment supports?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "lib/adapters/adapters.js", "symbol": "getAdapter", "start_line": 65, "end_line": 115}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/adapters/adapters.js", "start_line": 16, "end_line": 22},
+        {"path": "lib/defaults/index.js", "start_line": 42, "end_line": 42},
+        {"path": "lib/core/dispatchRequest.js", "symbol": "dispatchRequest", "start_line": 66, "end_line": 132},
+        {"path": "lib/adapters/fetch.js", "symbol": "getFetch", "start_line": 718, "end_line": 745}
+      ],
+      "notes": "getAdapter wraps a single value in an array and walks it: names are looked up case-insensitively in knownAdapters (an unknown name throws 'Unknown adapter'), functions/null/false are taken as they are, and the fetch entry is resolved lazily through its get(config), i.e. getFetch; the first function wins, otherwise it throws ERR_NOT_SUPPORT 'There is no suitable adapter to dispatch the request' and lists each entry as 'not supported by the environment' (false) or 'not available in the build' (adapters.js:65-115). xhr.js and http.js export false when XMLHttpRequest / process are missing (xhr.js:15-17, http.js:543-544, 672-673). Wrong but plausible: dispatchRequest (calls it at dispatchRequest.js:83), getFetch (only decides whether fetch is usable), the adapter: ['xhr', 'http', 'fetch'] default (defaults/index.js:42), the knownAdapters map (16-22)."
+    },
+    {
+      "id": "q05",
+      "question": "Where is `axios.create()` defined? I want to see how a new instance gets its own defaults and why the instance can be called like a function.",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "lib/axios.js", "symbol": "createInstance", "start_line": 28, "end_line": 44}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/helpers/bind.js", "symbol": "bind", "start_line": 10, "end_line": 14},
+        {"path": "lib/core/Axios.js", "symbol": "Axios.constructor", "start_line": 56, "end_line": 62},
+        {"path": "lib/core/mergeConfig.js", "symbol": "mergeConfig", "start_line": 199, "end_line": 237},
+        {"path": "lib/utils.js", "symbol": "extend", "start_line": 663, "end_line": 690}
+      ],
+      "notes": "create is not a method of the Axios class: createInstance builds an Axios context, binds Axios.prototype.request to it with bind() so the instance itself is a function, copies the prototype methods (bound to the context) and the context's own fields (defaults, interceptors) onto it with utils.extend, and sets instance.create = (instanceConfig) => createInstance(mergeConfig(defaultConfig, instanceConfig)) (axios.js:28-44, create at 39-41); the default export is createInstance(defaults) (47). Wrong but plausible: the Axios constructor (only stores defaults and interceptors, Axios.js:56-62), mergeConfig (how the configs combine, not the factory), the create() declaration in index.d.ts."
+    },
+    {
+      "id": "q06",
+      "question": "Tarayıcıda `getAllResponseHeaders()` ile gelen ham başlık metnini nesneye çeviren, tekrar eden başlıkları birleştirip `set-cookie` satırlarını diziye toplayan fonksiyon nerede?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "lib/helpers/parseHeaders.js", "start_line": 41, "end_line": 72}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/core/AxiosHeaders.js", "symbol": "AxiosHeaders.set", "start_line": 216, "end_line": 270},
+        {"path": "lib/adapters/xhr.js", "start_line": 137, "end_line": 139},
+        {"path": "lib/core/AxiosHeaders.js", "symbol": "AxiosHeaders.getSetCookie", "start_line": 414, "end_line": 417}
+      ],
+      "notes": "The answer is the anonymous arrow default-exported by helpers/parseHeaders.js (no symbol name, hence lines only): it splits on newlines, trims and lowercases names, ignores repeats of the single-value headers in ignoreDuplicateOf (age, authorization, content-type, location, user-agent, ...; 7-25), collects set-cookie into an array and joins other repeats with ', ' (41-72). The xhr adapter passes getAllResponseHeaders() to AxiosHeaders.from (xhr.js:137-139), and AxiosHeaders.set hands a raw string that is not a valid single header name to parseHeaders (AxiosHeaders.js:243-244). Wrong but plausible: AxiosHeaders.getSetCookie (reads the already parsed array), AxiosHeaders.set / from (callers), parseTokens / parseParameters in AxiosHeaders.js (parse one header value, not a header block)."
+    },
+    {
+      "id": "q07",
+      "question": "HTTP/2 kullanirken ayni sunucuya giden istekler icin oturum nerede tekrar kullaniliyor, bosta kalan oturum ne zaman kapatiliyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "lib/helpers/Http2Sessions.js", "symbol": "Http2Sessions.getSession", "start_line": 16, "end_line": 119}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/adapters/http.js", "start_line": 623, "end_line": 669},
+        {"path": "lib/adapters/http.js", "start_line": 290, "end_line": 290}
+      ],
+      "notes": "Turkish without Turkish letters ('HTTP/2 kullanırken aynı sunucuya giden istekler için oturum nerede tekrar kullanılıyor, boşta kalan oturum ne zaman kapatılıyor'). Http2Sessions.getSession keeps a list of sessions per authority and returns one that is neither destroyed nor closed and whose options are deep-equal; otherwise it calls http2.connect. With sessionTimeout (default 1000 ms) it wraps session.request to count open streams and, when the last stream closes, starts a timer that calls removeSession; close, error and goaway also remove the session (Http2Sessions.js:16-119). The http2Transport object in http.js builds the authority and calls getSession on the module-level http2Sessions (http.js:623-669, 290). Wrong but plausible: http2Transport.request (the caller that maps pseudo-headers), the httpVersion checks in httpAdapter (http.js:706-731), Node's http2 module."
+    },
+    {
+      "id": "q08",
+      "question": "Node'da `maxRate` ile yükleme ve indirme hızını sınırlayan, veriyi zaman pencerelerine bölüp bekleten sınıf hangisi?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "lib/helpers/AxiosTransformStream.js", "symbol": "AxiosTransformStream", "start_line": 8, "end_line": 163},
+        {"path": "lib/helpers/AxiosTransformStream.js", "symbol": "AxiosTransformStream._transform", "start_line": 62, "end_line": 162}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/adapters/http.js", "start_line": 990, "end_line": 1023},
+        {"path": "lib/adapters/http.js", "start_line": 1267, "end_line": 1289},
+        {"path": "lib/helpers/throttle.js", "symbol": "throttle", "start_line": 7, "end_line": 43}
+      ],
+      "notes": "AxiosTransformStream extends stream.Transform; _transform turns maxRate into a per-window byte budget (bytesThreshold = maxRate / (1000 / timeWindow), timeWindow 500 ms by default), delays the chunk with setTimeout until the next window when the budget is used up, and splits a chunk larger than the remaining budget, emitting 'progress' with bytesSeen as it pushes (AxiosTransformStream.js:62-162; options in the constructor, 9-50). httpAdapter splits maxRate into [upload, download] and pipes the request body through one instance (http.js:990-1023) and the response through another (1267-1289). Either the class or _transform answers. Wrong but plausible: throttle (limits how often progress callbacks fire, not bytes), speedometer (measures the rate), progressEventReducer."
+    },
+    {
+      "id": "q09",
+      "question": "When does axios read the XSRF-TOKEN cookie and send it back as an X-XSRF-TOKEN header, and why isn't it sent to other origins?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "lib/helpers/resolveConfig.js", "symbol": "resolveConfig", "start_line": 27, "end_line": 118}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/helpers/isURLSameOrigin.js", "start_line": 3, "end_line": 11},
+        {"path": "lib/helpers/cookies.js", "start_line": 39, "end_line": 57},
+        {"path": "lib/adapters/xhr.js", "start_line": 20, "end_line": 37},
+        {"path": "lib/adapters/xhr.js", "start_line": 358, "end_line": 379},
+        {"path": "lib/defaults/index.js", "start_line": 151, "end_line": 152}
+      ],
+      "notes": "The logic is the last block of resolveConfig (resolveConfig.js:97-115), run only when platform.hasStandardBrowserEnv: a function withXSRFToken is called with the config; the token is sent when withXSRFToken === true, or when it is unset and isURLSameOrigin(newConfig.url); the value comes from readXsrfCookie(xsrfCookieName) (cookies.read by default) and is set under xsrfHeaderName. isURLSameOrigin compares protocol, host and port of the URL with platform.origin (isURLSameOrigin.js:3-11). When window.cookieStore exists, the xhr adapter passes a reader that only records the cookie name and reads the cookie asynchronously before send (xhr.js:20-37, 358-379). The XSRF-TOKEN / X-XSRF-TOKEN defaults are in defaults/index.js:151-152. Wrong but plausible: cookies.write/read alone, withCredentials handling in xhr.js:250-252 (sends cookies, not the header), the defaults."
+    },
+    {
+      "id": "q10",
+      "question": "How does the Node.js adapter decompress a gzip, deflate or brotli response body, and when does it leave the body compressed?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "lib/adapters/http.js", "start_line": 1298, "end_line": 1341}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/adapters/http.js", "start_line": 57, "end_line": 58},
+        {"path": "lib/adapters/http.js", "start_line": 1059, "end_line": 1066},
+        {"path": "lib/helpers/ZlibHeaderTransformStream.js", "symbol": "ZlibHeaderTransformStream", "start_line": 5, "end_line": 27},
+        {"path": "lib/adapters/http.js", "start_line": 40, "end_line": 53}
+      ],
+      "notes": "Inside handleResponse in httpAdapter: when decompress !== false and the response has content-encoding, the header is dropped for HEAD/204, then the switch pushes zlib.createUnzip for gzip/x-gzip/compress/x-compress, ZlibHeaderTransformStream + createUnzip for deflate (adds a missing zlib header), createBrotliDecompress for br and createZstdDecompress for zstd (the last two only if this Node has them) and deletes content-encoding; the streams are joined with stream.pipeline (http.js:1298-1341). decompress: false, an unknown encoding, or br/zstd on a Node without support leaves the body as received. Wrong but plausible: ACCEPT_ENCODING and the Accept-Encoding header (http.js:57-58, 1059-1066; they only advertise), ZlibHeaderTransformStream alone, the xhr/fetch adapters (the platform decodes there)."
+    },
+    {
+      "id": "q11",
+      "question": "If I put `redact: ['authorization', 'password']` in the request config, where are those values replaced with \"[REDACTED ****]\" when an AxiosError is serialized?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "lib/core/AxiosError.js", "symbol": "redactConfig", "start_line": 29, "end_line": 73},
+        {"path": "lib/core/AxiosError.js", "symbol": "AxiosError.toJSON", "start_line": 230, "end_line": 259}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/core/buildFullPath.js", "symbol": "redactSensitiveURLParts", "start_line": 28, "end_line": 43},
+        {"path": "lib/core/AxiosError.js", "start_line": 6, "end_line": 6},
+        {"path": "lib/utils.js", "symbol": "toJSONObject", "start_line": 1005, "end_line": 1050}
+      ],
+      "notes": "AxiosError.toJSON reads the config's own redact key; for a non-empty array it serializes the config through redactConfig instead of utils.toJSONObject (AxiosError.js:230-259). redactConfig walks objects, arrays and AxiosHeaders (via toJSON), compares keys case-insensitively with the list, puts REDACTED ('[REDACTED ****]', line 6) in place of matching values and skips circular references (29-73). Either answers. Wrong but plausible: redactSensitiveURLParts in core/buildFullPath.js:28-43 (redacts credentials and query values in the 'Invalid URL' message, independent of config.redact), utils.toJSONObject (the unredacted path)."
+    },
+    {
+      "id": "q12",
+      "question": "Where is the \"timeout of 5000ms exceeded\" error created, and where do `timeoutErrorMessage` and `transitional.clarifyTimeoutError` change its message and code?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "lib/adapters/xhr.js", "start_line": 223, "end_line": 244},
+        {"path": "lib/adapters/http.js", "start_line": 757, "end_line": 772}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/helpers/composeSignals.js", "start_line": 29, "end_line": 34},
+        {"path": "lib/adapters/http.js", "start_line": 1504, "end_line": 1542},
+        {"path": "lib/defaults/transitional.js", "start_line": 6, "end_line": 6}
+      ],
+      "notes": "Two adapters build it the same way. xhr: request.ontimeout (handleTimeout) uses 'timeout of ' + timeout + 'ms exceeded' (or 'timeout exceeded'), replaces it with timeoutErrorMessage when set and uses ETIMEDOUT if transitional.clarifyTimeoutError, else ECONNABORTED (xhr.js:223-244). Node: createTimeoutError, a nested function inside httpAdapter, does the same (http.js:757-772) and is raised by handleTimeout through req.setTimeout and, for native transports, a connect-phase timer (1504-1542). Either answers. Wrong but plausible: composeSignals (the fetch adapter's timer, composeSignals.js:29-34; always ETIMEDOUT and ignores timeoutErrorMessage and clarifyTimeoutError), the clarifyTimeoutError default in defaults/transitional.js:6, defaults.timeout."
+    },
+    {
+      "id": "q13",
+      "question": "Config'e `auth: { username, password }` verdiğimde `Authorization: Basic ...` başlığı nerede oluşturuluyor? URL'deki `kullanici:sifre@host` bilgisi de kullanılıyor mu?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "lib/helpers/resolveConfig.js", "start_line": 53, "end_line": 76},
+        {"path": "lib/adapters/fetch.js", "start_line": 274, "end_line": 312},
+        {"path": "lib/adapters/http.js", "start_line": 1026, "end_line": 1040}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/adapters/http.js", "start_line": 1183, "end_line": 1199},
+        {"path": "lib/adapters/fetch.js", "symbol": "decodeURIComponentSafe", "start_line": 52, "end_line": 62},
+        {"path": "lib/helpers/resolveConfig.js", "symbol": "encodeUTF8", "start_line": 20, "end_line": 23}
+      ],
+      "notes": "Each adapter does it. resolveConfig (used by xhr, and as fetch's first step) sets 'Basic ' + btoa(username + ':' + password), always UTF-8 encoding the password and the username only with transitional.encodeBasicAuthUsername; it ignores URL credentials (resolveConfig.js:53-76). The fetch adapter takes config.auth or, if missing, the URL's percent-decoded username/password, strips them from the URL, deletes any authorization header and sets Basic again (fetch.js:274-312). The Node adapter builds 'user:pass' from config.auth or the URL, deletes the user's authorization header and passes it as options.auth so Node's http.request writes the header (http.js:1026-1040, used at 1079); beforeRedirectAuth restores it on same-origin redirects only (1183-1199). Any one answers. Wrong but plausible: setProxy's Proxy-Authorization (proxy credentials, http.js:418-497), the encodeUTF8 helpers alone."
+    },
+    {
+      "id": "q14",
+      "question": "onUploadProgress ve onDownloadProgress callback'lerine giden progress, rate ve estimated degerleri nerede hesaplaniyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "lib/helpers/progressEventReducer.js", "symbol": "progressEventReducer", "start_line": 5, "end_line": 35},
+        {"path": "lib/helpers/speedometer.js", "symbol": "speedometer", "start_line": 9, "end_line": 53}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "lib/helpers/throttle.js", "symbol": "throttle", "start_line": 7, "end_line": 43},
+        {"path": "lib/helpers/progressEventReducer.js", "symbol": "progressEventDecorator", "start_line": 37, "end_line": 49},
+        {"path": "lib/adapters/xhr.js", "start_line": 260, "end_line": 275},
+        {"path": "lib/adapters/http.js", "start_line": 1012, "end_line": 1022}
+      ],
+      "notes": "Turkish without Turkish letters ('... callback'lerine giden progress, rate ve estimated değerleri nerede hesaplanıyor'). progressEventReducer wraps the listener in throttle (freq 3 per second), clamps loaded to total and builds { loaded, total, progress, bytes, rate, estimated, event, lengthComputable, upload|download: true }, with rate from speedometer(50, 250) and estimated = (total - loaded) / rate (progressEventReducer.js:5-35). speedometer keeps a ring buffer of byte counts and timestamps and returns bytes per second once 250 ms have passed (speedometer.js:9-53). The adapters only wire it: xhr.js:260-275, http.js:1012-1022 and 1272-1286, fetch through progressEventDecorator and trackStream. Either answers. Wrong but plausible: throttle (only rate-limits the calls), AxiosTransformStream (emits raw byte counts), trackStream."
+    },
+    {
+      "id": "q15",
+      "question": "What happens between calling `axios.get(url)` and the adapter actually sending the request? I'd like the chain of calls, including where request interceptors run.",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "lib/core/Axios.js", "symbol": "Axios._request", "start_line": 125, "end_line": 311},
+        {"path": "lib/core/dispatchRequest.js", "symbol": "dispatchRequest", "start_line": 66, "end_line": 132},
+        {"path": "lib/adapters/adapters.js", "symbol": "getAdapter", "start_line": 65, "end_line": 115}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "lib/core/Axios.js", "start_line": 321, "end_line": 332},
+        {"path": "lib/core/Axios.js", "symbol": "Axios.request", "start_line": 72, "end_line": 123},
+        {"path": "lib/core/mergeConfig.js", "symbol": "mergeConfig", "start_line": 199, "end_line": 237},
+        {"path": "lib/core/InterceptorManager.js", "symbol": "InterceptorManager.forEach", "start_line": 159, "end_line": 179},
+        {"path": "lib/core/transformData.js", "symbol": "transformData", "start_line": 15, "end_line": 28}
+      ],
+      "notes": "Axios.prototype.get is generated in a forEach over ['delete', 'get', 'head', 'options'] and calls this.request(mergeConfig(config, { method, url })) (Axios.js:321-332); Axios.request only wraps _request to splice the caller's stack into errors (72-123). _request merges this.defaults with mergeConfig, validates transitional and paramsSerializer, flattens headers.common and headers[method] into AxiosHeaders, collects request interceptors (honouring runWhen; with legacyInterceptorReqResOrdering, the default, later ones run first) and response interceptors, and either chains everything as promises or runs synchronous request interceptors inline before dispatchRequest (125-311). dispatchRequest throws if already canceled, runs transformRequest through transformData, picks the adapter with adapters.getAdapter and calls adapter(config), then transforms the response (dispatchRequest.js:66-132); getAdapter resolves the adapter list (adapters.js:65-115). Wrong but plausible: InterceptorManager.use (registration only), createInstance (binds request), the internals of one adapter."
+    },
+    {
+      "id": "q16",
+      "question": "When I call `controller.abort()` on the AbortSignal I passed as `signal`, how does that stop an in-flight XHR request, and why does my `catch` get an error for which `axios.isCancel(err)` is true?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "lib/adapters/xhr.js", "start_line": 277, "end_line": 298},
+        {"path": "lib/cancel/CanceledError.js", "symbol": "CanceledError", "start_line": 5, "end_line": 20},
+        {"path": "lib/cancel/isCancel.js", "symbol": "isCancel", "start_line": 3, "end_line": 5}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "lib/core/dispatchRequest.js", "symbol": "throwIfCancellationRequested", "start_line": 18, "end_line": 26},
+        {"path": "lib/adapters/xhr.js", "start_line": 196, "end_line": 206},
+        {"path": "lib/helpers/composeSignals.js", "symbol": "composeSignals", "start_line": 5, "end_line": 69},
+        {"path": "lib/cancel/CancelToken.js", "symbol": "CancelToken.subscribe", "start_line": 78, "end_line": 89}
+      ],
+      "notes": "With config.signal (or cancelToken) set, the xhr adapter defines onCanceled: it rejects with new CanceledError(null, config, request) when called with no argument or an Event (cancel.type), runs done() to detach listeners, clears request and calls xhr.abort(); it is added as the signal's 'abort' listener, or called at once if the signal is already aborted (xhr.js:277-298). Because request is set to null first, request.onabort (196-206) does not reject a second time with ECONNABORTED. CanceledError extends AxiosError with code ERR_CANCELED, name 'CanceledError' and __CANCEL__ = true (CanceledError.js:5-20), and isCancel only checks __CANCEL__ (isCancel.js:3-5); dispatchRequest's rejection handler skips transformResponse for canceled requests (dispatchRequest.js:108-130). Wrong but plausible: CancelToken (the legacy API), composeSignals (the fetch adapter's path), request.onabort (browser-initiated aborts become 'Request aborted' ECONNABORTED, not a cancel)."
+    },
+    {
+      "id": "q17",
+      "question": "params nesnesi URL'deki query string'e nasil donusuyor? Ornegin `{ ids: [1, 2] }` neden `ids[]` anahtariyla iki kez yaziliyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "lib/helpers/buildURL.js", "symbol": "buildURL", "start_line": 31, "end_line": 69},
+        {"path": "lib/helpers/AxiosURLSearchParams.js", "symbol": "AxiosURLSearchParams", "start_line": 35, "end_line": 39},
+        {"path": "lib/helpers/toFormData.js", "symbol": "toFormData", "start_line": 94, "end_line": 277}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "lib/helpers/AxiosURLSearchParams.js", "start_line": 47, "end_line": 57},
+        {"path": "lib/helpers/resolveConfig.js", "start_line": 46, "end_line": 50},
+        {"path": "lib/adapters/http.js", "start_line": 1044, "end_line": 1057},
+        {"path": "lib/helpers/buildURL.js", "symbol": "encode", "start_line": 14, "end_line": 20}
+      ],
+      "notes": "Turkish without Turkish letters ('params nesnesi URL'deki query string'e nasıl dönüşüyor? Örneğin ... neden ids[] anahtarıyla iki kez yazılıyor'). resolveConfig (xhr/fetch) and httpAdapter call buildURL(fullPath, params, paramsSerializer) (resolveConfig.js:46-50, http.js:1044-1057). buildURL uses a custom serialize function if given, params.toString() for URLSearchParams, otherwise new AxiosURLSearchParams(params, options).toString(encode), drops a '#' fragment and appends with '?' or '&' (buildURL.js:31-69); its encode leaves the brackets percent-encoded (ids%5B%5D=1). AxiosURLSearchParams is a FormData look-alike whose constructor runs toFormData(params, this, options) and whose append/toString collect and join [key, value] pairs (AxiosURLSearchParams.js:35-39, 43-57). toFormData's defaultVisitor writes a flat top-level array as key + '[]' per element (key[0] with indexes: true, the bare key with indexes: null) and nested objects as a[b][c] via renderKey (toFormData.js:194-238). All three are needed. Wrong but plausible: formDataToJSON (the inverse), toURLEncodedForm (request bodies, not URLs), mergeParams in core/mergeConfig.js (merges default and request params)."
+    },
+    {
+      "id": "q18",
+      "question": "In Node, where is the redirect loop that reads the `Location` header, sends the next request and stops after `maxRedirects` hops?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "lib/adapters/http.js", "start_line": 1155, "end_line": 1241},
+        {"path": "lib/adapters/http.js", "symbol": "dispatchBeforeRedirect", "start_line": 300, "end_line": 320}
+      ],
+      "related": [
+        {"path": "lib/adapters/http.js", "symbol": "isSameOriginRedirect", "start_line": 334, "end_line": 345},
+        {"path": "lib/adapters/http.js", "start_line": 62, "end_line": 62},
+        {"path": "lib/core/AxiosError.js", "start_line": 269, "end_line": 269},
+        {"path": "lib/adapters/fetch.js", "start_line": 521, "end_line": 527},
+        {"path": "lib/adapters/http.js", "start_line": 1458, "end_line": 1460}
+      ],
+      "notes": "The loop is in the follow-redirects package. httpAdapter uses its http/https wrappers (imported at http.js:12, destructured at 62) unless the request is HTTP/2, a custom transport is given, or maxRedirects === 0 (native http/https, no redirects), and hands them maxRedirects, sensitiveHeaders and the beforeRedirects hooks (http.js:1155-1241; options.beforeRedirect = dispatchBeforeRedirect at 1082). axios only adjusts each hop: dispatchBeforeRedirect strips Authorization and Cookie on cross-origin hops and runs the proxy, auth, sensitiveHeaders, direct-agent and user beforeRedirect hooks (300-320). The too-many-redirects error is raised by follow-redirects and wrapped by handleRequestError (1458-1460); only its code constant lives in AxiosError.js:269. Browsers follow redirects inside XHR/fetch (fetch uses redirect: 'manual' only for maxRedirects: 0, fetch.js:521-527). Correct behaviour: say the loop is not in the repo and cite the pointer. Wrong but plausible: dispatchBeforeRedirect or isSameOriginRedirect presented as the loop."
+    },
+    {
+      "id": "q19",
+      "question": "Node'da `HTTP_PROXY` ve `HTTPS_PROXY` ortam değişkenlerini okuyup bir istek URL'si için hangi proxy adresinin kullanılacağını döndüren kod nerede?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "lib/adapters/http.js", "symbol": "setProxy", "start_line": 357, "end_line": 541}
+      ],
+      "related": [
+        {"path": "lib/helpers/shouldBypassProxy.js", "symbol": "shouldBypassProxy", "start_line": 453, "end_line": 520},
+        {"path": "lib/adapters/http.js", "symbol": "isNodeEnvProxyEnabled", "start_line": 131, "end_line": 141},
+        {"path": "lib/adapters/http.js", "start_line": 5, "end_line": 5},
+        {"path": "lib/adapters/http.js", "start_line": 1128, "end_line": 1139}
+      ],
+      "notes": "The lookup is getProxyForUrl from the proxy-from-env package (imported at http.js:5). setProxy calls it only when no proxy is configured, proxy is not false, env proxies are allowed (not for HTTP/2) and Node's own env-proxy support is not active on the selected agent (isNodeEnvProxyEnabled: agent.options.proxyEnv on Node 22.21+, 24.5+ or 25+, where Node itself reads the variables), and then still asks axios's shouldBypassProxy before using the URL (http.js:366-375); httpAdapter calls setProxy at 1128-1139. Correct behaviour: say the HTTP_PROXY/HTTPS_PROXY lookup is not in the repo and cite setProxy. Wrong but plausible: shouldBypassProxy (in the repo, but it reads only NO_PROXY/no_proxy, shouldBypassProxy.js:453-520), isNodeEnvProxyEnabled / isNodeNativeEnvProxySupported (only detect Node's built-in support), getTunnelingAgent."
+    },
+    {
+      "id": "q20",
+      "question": "axios DNS cozumlemesini nerede yapiyor, hostname'i IP adresine ceviren kod hangisi?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "lib/adapters/http.js", "symbol": "normalizeLookup", "start_line": 588, "end_line": 621},
+        {"path": "lib/adapters/http.js", "start_line": 1068, "end_line": 1089}
+      ],
+      "related": [
+        {"path": "lib/adapters/http.js", "symbol": "resolveFamily", "start_line": 573, "end_line": 581},
+        {"path": "lib/adapters/http.js", "start_line": 733, "end_line": 735},
+        {"path": "lib/helpers/callbackify.js", "symbol": "callbackify", "start_line": 3, "end_line": 16}
+      ],
+      "notes": "Turkish without Turkish letters ('axios DNS çözümlemesini nerede yapıyor, hostname'i IP adresine çeviren kod hangisi'). Name resolution is done by Node (dns.lookup, called by net/tls when http.request, https.request or http2.connect opens a socket, or by a user-supplied agent); browsers resolve inside XHR/fetch. axios only forwards config.family and an optional config.lookup: normalizeLookup adapts a sync, async or callback lookup (via callbackify) to Node's (hostname, options, cb) signature, honouring options.all and inferring the family from the address (http.js:588-621; resolveFamily 573-581); httpAdapter applies it at 733-735, and the request options carry family and lookup (http2Options.lookup for HTTP/2) at 1068-1089. Correct behaviour: say DNS resolution is not in the repo and cite the pointer. Wrong but plausible: normalizeLookup / resolveFamily presented as the resolver, the IP parsing helpers in shouldBypassProxy.js (parse literals for NO_PROXY, no lookup)."
+    }
+  ]
+}

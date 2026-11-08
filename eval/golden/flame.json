@@ -1,0 +1,353 @@
+{
+  "repo": {"name": "flame", "source": "https://github.com/flame-engine/flame", "commit": "88c0438"},
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Where is the `dt` that my component's `update(double dt)` receives actually computed from the frame timestamps?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "packages/flame/lib/src/game/game_loop.dart", "symbol": "GameLoop._tick", "start_line": 42, "end_line": 47}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/game/game_render_box.dart", "symbol": "GameRenderBox.gameLoopCallback", "start_line": 195, "end_line": 202},
+        {"path": "packages/flame/lib/src/game/game_loop.dart", "symbol": "GameLoop.GameLoop", "start_line": 25, "end_line": 27},
+        {"path": "packages/flame/lib/src/game/flame_game.dart", "symbol": "FlameGame.update", "start_line": 183, "end_line": 192}
+      ],
+      "notes": "GameLoop creates a Flutter Ticker(_tick) in the body of its primary constructor (game_loop.dart:25-27); _tick subtracts the previous Ticker timestamp from the current one, converts the microseconds to seconds and calls callback(dt) (42-47). The callback is GameRenderBox.gameLoopCallback, which calls game.update(dt) and markNeedsPaint (game_render_box.dart:195-202); stop() resets _previous to zero (game_loop.dart:61-64). Wrong but plausible: FlameGame.update / Component.update (only receive dt), FlameGame.currentTime (wall-clock seconds 'compatible with dt', flame_game.dart:320-323), Game.stepEngine (a fixed 1/60 step while paused), FpsComponent.update (averages dt)."
+    },
+    {
+      "id": "q02",
+      "question": "Where is a saved string like \"center\" or \"Anchor(0.3, 0.7)\" turned back into an `Anchor` object?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "packages/flame/lib/src/anchor.dart", "symbol": "Anchor.valueOf", "start_line": 107, "end_line": 119}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/anchor.dart", "symbol": "Anchor.name", "start_line": 66, "end_line": 68},
+        {"path": "packages/flame/lib/src/anchor.dart", "symbol": "Anchor.toString", "start_line": 85, "end_line": 86}
+      ],
+      "notes": "Anchor.valueOf is a named factory constructor: a predefined name is looked up in the _valueNames map (anchor.dart:88-98), anything else is matched with a regular expression for 'Anchor(x, y)' and parsed into two doubles (107-119). The class itself is declared with a primary constructor (`class const Anchor(...)`, 18-29). Anchor.name / toString produce these strings (related, the opposite direction). Wrong but plausible: Anchor.name / toString (serialize, do not parse), the static constants topLeft..bottomRight (30-38), Anchor.toOtherAnchorPosition."
+    },
+    {
+      "id": "q03",
+      "question": "How does `JoystickComponent` decide whether the knob is pushed up, upRight, left and so on?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "packages/flame/lib/src/components/input/joystick_component.dart", "symbol": "JoystickComponent.direction", "start_line": 139, "end_line": 170}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/components/input/joystick_component.dart", "symbol": "JoystickComponent.update", "start_line": 90, "end_line": 105},
+        {"path": "packages/flame/lib/src/components/input/joystick_component.dart", "symbol": "JoystickDirection", "start_line": 7, "end_line": 17},
+        {"path": "packages/flame/lib/src/components/input/joystick_component.dart", "symbol": "JoystickComponent.onDragUpdate", "start_line": 113, "end_line": 117}
+      ],
+      "notes": "The direction getter returns idle for a zero delta, otherwise takes delta.screenAngle(), maps negative angles into [0, 2*pi) and picks one of eight sectors bounded by odd multiples of pi/8 (joystick_component.dart:139-170). The delta it reads is clamped to knobRadius in update(), which also computes intensity (90-105); onDragUpdate accumulates the raw drag (113-117). Wrong but plausible: the JoystickDirection enum (only the values, 7-17), JoystickComponent.update (knob position and intensity, not the direction), relativeDelta (45)."
+    },
+    {
+      "id": "q04",
+      "question": "In flame_forge2d, after each physics step, which code hands the begin/end contact events to `beginContact`/`endContact` of the body or shape whose userData is a `ContactCallbacks`?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart", "symbol": "ContactEventsDispatcher.dispatch", "start_line": 34, "end_line": 56},
+        {"path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart", "symbol": "ContactEventsDispatcher._dispatch", "start_line": 79, "end_line": 91}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame_forge2d/lib/forge2d_world.dart", "symbol": "Forge2DWorld.update", "start_line": 105, "end_line": 112},
+        {"path": "packages/flame_forge2d/lib/contact_callbacks.dart", "symbol": "ContactCallbacks.beginContact", "start_line": 20, "end_line": 22},
+        {"path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart", "symbol": "ContactEventsDispatcher.beginContact", "start_line": 60, "end_line": 68},
+        {"path": "packages/flame_forge2d/lib/body_component.dart", "symbol": "BodyComponent.createBody", "start_line": 92, "end_line": 108}
+      ],
+      "notes": "Bridge package question. Forge2DWorld.update steps the physics world and passes physicsWorld.contactEvents and sensorEvents to contactEventsDispatcher.dispatch (forge2d_world.dart:105-112). dispatch turns each begin/end contact and sensor event into a Contact and calls beginContact/endContact (contact_events_dispatcher.dart:34-56); _dispatch takes Contact.userDatas (the userData of both shapes and their bodies) and calls the callback on every ContactCallbacks with each other userData (79-91). BodyComponent.createBody enables contact and sensor events on the shapes when a ContactCallbacks is in the userData (body_component.dart:98-104, related). Wrong but plausible: ContactCallbacks (the receiving mixin), Flame's own CollisionCallbacks / StandardCollisionDetection in packages/flame (the non-physics hitbox system), Forge2DWorld.preSolveCallback=."
+    },
+    {
+      "id": "q05",
+      "question": "Döngüsüz (loop: false) bir sprite animasyonunda sıradaki kareye geçiş ve son karede onComplete çağrısı nerede yapılıyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "packages/flame/lib/src/sprite_animation_ticker.dart", "symbol": "SpriteAnimationTicker.update", "start_line": 122, "end_line": 155}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/components/sprite_animation_component.dart", "symbol": "SpriteAnimationComponent.update", "start_line": 144, "end_line": 154},
+        {"path": "packages/flame/lib/src/sprite_animation_ticker.dart", "symbol": "SpriteAnimationTicker.completed", "start_line": 59, "end_line": 67},
+        {"path": "packages/flame/lib/src/sprite_animation_ticker.dart", "symbol": "SpriteAnimationTicker.reset", "start_line": 70, "end_line": 82}
+      ],
+      "notes": "Describes one method in Turkish. SpriteAnimationTicker.update adds dt to clock, fires onStart/onFrame once, then while clock >= currentFrame.stepTime either advances currentIndex or, on the last frame, wraps to 0 when spriteAnimation.loop is true, or sets _done, calls onComplete and completes the completed future (sprite_animation_ticker.dart:122-155). SpriteAnimationComponent.update only forwards dt to the ticker and removes the component when removeOnFinish and done() (sprite_animation_component.dart:144-154, related). Wrong but plausible: SpriteAnimation (frames and stepTime, no clock), SpriteAnimationComponent.update, SpriteAnimationTicker.completed (only the future)."
+    },
+    {
+      "id": "q06",
+      "question": "EffectController(duration: 1, alternate: true, infinite: true) yazinca bu parametreler hangi controller zincirine donusturuluyor, bu nerede kuruluyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "packages/flame/lib/src/effects/controllers/effect_controller.dart", "symbol": "EffectController.EffectController", "start_line": 81, "end_line": 231}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/effects/controllers/infinite_effect_controller.dart", "symbol": "InfiniteEffectController", "start_line": 5, "end_line": 50},
+        {"path": "packages/flame/lib/src/effects/controllers/sequence_effect_controller.dart", "symbol": "SequenceEffectController", "start_line": 6, "end_line": 84},
+        {"path": "packages/flame/lib/src/effects/controllers/repeated_effect_controller.dart", "symbol": "RepeatedEffectController", "start_line": 8, "end_line": 86}
+      ],
+      "notes": "Turkish without Turkish letters ('... yazınca bu parametreler hangi controller zincirine dönüştürülüyor, bu nerede kuruluyor'). The unnamed factory constructor of EffectController builds a list: a forward Linear/Curved controller (wrapped in SpeedEffectController when speed is given), an optional onMax CallbackController and atMax PauseEffectController, a reverse controller when alternate / reverseDuration / reverseSpeed is set, then onMin and atMin; more than one item becomes a SequenceEffectController, which is then wrapped in InfiniteEffectController, RepeatedEffectController and DelayedEffectController as requested (effect_controller.dart:142-230). The class header is itself a primary constructor, `EffectController.empty()` (46). Wrong but plausible: InfiniteEffectController / SequenceEffectController (one link of the chain each), Effect.update (drives the finished controller), the private _SequenceEffectEffectController in sequence_effect.dart (for SequenceEffect, not for these options)."
+    },
+    {
+      "id": "q07",
+      "question": "Kamera bir oyuncuyu takip ederken maxSpeed sınırına göre her karede ne kadar yaklaşacağı nerede hesaplanıyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart", "symbol": "FollowBehavior.update", "start_line": 54, "end_line": 69}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/camera/camera_component.dart", "symbol": "CameraComponent.follow", "start_line": 371, "end_line": 391},
+        {"path": "packages/flame/lib/src/camera/behaviors/follow_behavior.dart", "symbol": "FollowBehavior.FollowBehavior", "start_line": 29, "end_line": 34},
+        {"path": "packages/flame/lib/src/camera/behaviors/bounded_position_behavior.dart", "symbol": "BoundedPositionBehavior.update", "start_line": 68, "end_line": 78}
+      ],
+      "notes": "FollowBehavior.update computes the target - owner difference (zeroing x for verticalOnly and y for horizontalOnly), shortens it to maxSpeed * dt when the distance is larger, and moves the owner by it (follow_behavior.dart:54-69). CameraComponent.follow only removes earlier FollowBehavior / MoveEffect children with stop() and adds a FollowBehavior with the viewfinder as owner; snap sets the position once (camera_component.dart:371-391, related). Wrong but plausible: CameraComponent.follow, Viewfinder.position= (a setter), BoundedPositionBehavior.update (clamps to bounds, not speed), CameraComponent.moveTo (a MoveToEffect)."
+    },
+    {
+      "id": "q08",
+      "question": "Bir bilesene timeScale = 0.5 verip agir cekim yapinca dt nerede bu oranla carpiliyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "packages/flame/lib/src/components/mixins/has_time_scale.dart", "symbol": "HasTimeScale.updateSubtree", "start_line": 31, "end_line": 37}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/components/mixins/has_time_scale.dart", "symbol": "HasTimeScale.timeScale=", "start_line": 24, "end_line": 29},
+        {"path": "packages/flame/lib/src/components/core/custom_traversal.dart", "symbol": "CustomTraversal.updateSubtree", "start_line": 30, "end_line": 30},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.updateTree", "start_line": 626, "end_line": 633}
+      ],
+      "notes": "Turkish without Turkish letters ('Bir bileşene timeScale = 0.5 verip ağır çekim yapınca dt nerede bu oranla çarpılıyor'). HasTimeScale is a mixin on CustomTraversal; its updateSubtree returns early for a time scale of 0 and otherwise calls super.updateSubtree(dt * _timeScale), so the component and its whole subtree get the scaled dt (has_time_scale.dart:31-37). The engine calls updateSubtree for such traversal barriers from Component.updateTree and _updateFlatList (component.dart:626-650). Wrong but plausible: the timeScale setter (only rejects negative values, 24-29), HasTimeScale.pause / resume, Game.pauseEngine, Timer.update."
+    },
+    {
+      "id": "q09",
+      "question": "After an effect such as a MoveToEffect finishes, where does it remove itself from the component it was added to?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "packages/flame/lib/src/effects/effect.dart", "symbol": "Effect.update", "start_line": 116, "end_line": 138}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/effects/effect.dart", "symbol": "Effect.onFinish", "start_line": 198, "end_line": 203},
+        {"path": "packages/flame/lib/src/effects/effect.dart", "symbol": "Effect.advance", "start_line": 143, "end_line": 160},
+        {"path": "packages/flame/lib/src/effects/effect.dart", "symbol": "Effect.Effect", "start_line": 37, "end_line": 43}
+      ],
+      "notes": "Effect.update advances the controller, calls apply(progress), and the first time controller.completed is true sets _finished, calls onFinish() and, when removeOnFinish is set (true by default, initialized in the primary constructor body, effect.dart:37-43), calls removeFromParent() (131-137). Effect.advance does the same for SequenceEffect children but never removes (143-160). Wrong but plausible: RemoveEffect (removes its target after a delay, remove_effect.dart), Effect.onFinish (only fires onComplete and the completed future), SpriteAnimationComponent.update (its own removeOnFinish for animations)."
+    },
+    {
+      "id": "q10",
+      "question": "When the image cache goes over its memory budget, how does Flame choose which images to dispose of?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images._enforceBudget", "start_line": 383, "end_line": 401},
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images._evictionCandidates", "start_line": 374, "end_line": 381}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images.evictUnused", "start_line": 153, "end_line": 160},
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images.retain", "start_line": 109, "end_line": 116},
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images.release", "start_line": 122, "end_line": 136},
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images._evict", "start_line": 403, "end_line": 407}
+      ],
+      "notes": "_enforceBudget does nothing without maxSizeBytes; when sizeBytes (4 bytes per pixel) is over it, it sorts the eviction candidates by lastUsed and evicts the oldest until the estimate fits (images.dart:383-401). It runs after a load completes (_onImageLoaded), after add / addFromBase64Data and when the budget changes. _evictionCandidates keeps only loaded images with refCount 0 that were not used within gracePeriod (374-381); retain / release maintain refCount (the ImageRetainer mixin calls them). Wrong but plausible: Images.clear / clearCache (explicit removal), evictUnused (evicts every candidate regardless of the budget), MemoryCache in cache/memory_cache.dart (evicts by entry count, oldest insert first)."
+    },
+    {
+      "id": "q11",
+      "question": "With `CameraComponent.withFixedResolution(width: 320, height: 180)` on a wider screen, where is the scale factor computed and where is it decided that the game area is centered with empty bars on the sides?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "packages/flame/lib/src/camera/viewports/fixed_resolution_viewport.dart", "symbol": "FixedResolutionViewport.onViewportResize", "start_line": 38, "end_line": 46},
+        {"path": "packages/flame/lib/src/camera/viewports/fixed_aspect_ratio_viewport.dart", "symbol": "FixedAspectRatioViewport._handleResize", "start_line": 38, "end_line": 47}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/camera/camera_component.dart", "symbol": "CameraComponent.withFixedResolution", "start_line": 84, "end_line": 101},
+        {"path": "packages/flame/lib/src/camera/viewports/fixed_aspect_ratio_viewport.dart", "symbol": "FixedAspectRatioViewport.onViewportResize", "start_line": 59, "end_line": 71},
+        {"path": "packages/flame/lib/src/camera/viewports/fixed_aspect_ratio_viewport.dart", "symbol": "FixedAspectRatioViewport.clip", "start_line": 49, "end_line": 50},
+        {"path": "packages/flame/lib/src/camera/camera_component.dart", "symbol": "CameraComponent.renderTree", "start_line": 180, "end_line": 222}
+      ],
+      "notes": "withFixedResolution only wires a FixedResolutionViewport(resolution: Vector2(width, height)) (camera_component.dart:84-101). FixedAspectRatioViewport._handleResize, called from onLoad and onGameResize, fits the largest rectangle of the aspect ratio into the canvas, centers it through position and sets the clip rect; what is left over are the bars (fixed_aspect_ratio_viewport.dart:38-47). Setting the viewport size triggers onViewportResize, and FixedResolutionViewport's override sets transform.scale to min(size.x / resolution.x, size.y / resolution.y) (fixed_resolution_viewport.dart:38-46). CameraComponent.renderTree applies viewport.clip and transformCanvas (180-222). Wrong but plausible: Viewfinder.zoom / visibleGameSize (zoom inside the world), MaxViewport, GameWidget layout."
+    },
+    {
+      "id": "q12",
+      "question": "With `debugMode = true`, where are the component's outline rectangle, the small cross at its anchor and the x:/y: coordinate labels drawn?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "packages/flame/lib/src/components/position_component.dart", "symbol": "PositionComponent.renderDebugMode", "start_line": 486, "end_line": 516}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.renderTree", "start_line": 730, "end_line": 755},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.debugPaint", "start_line": 1504, "end_line": 1514},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.debugTextPaint", "start_line": 1518, "end_line": 1538}
+      ],
+      "notes": "PositionComponent.renderDebugMode draws size.toRect() with debugPaint, two short lines crossing at -transform.offset (the anchor point), and, unless debugCoordinatesPrecision is null, the absolute top-left and bottom-right coordinates with debugTextPaint, offset by the camera zoom (position_component.dart:486-516). Component.renderTree calls renderDebugMode after the children when debugMode is set (component.dart:749-752); debugPaint / debugTextPaint build the magenta hairline paint and the text style (1504-1538). Wrong but plausible: Component.renderDebugMode (the empty default, 1540), the shape-specific overrides in CircleComponent / PolygonComponent / PathComponent, Component._mount (only copies debugMode from the parent)."
+    },
+    {
+      "id": "q13",
+      "question": "Uygulama arka plana alındığında oyun nerede otomatik olarak duraklatılıyor, tekrar öne gelince nerede devam ettiriliyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "packages/flame/lib/src/game/flame_game.dart", "symbol": "FlameGame.lifecycleStateChange", "start_line": 367, "end_line": 385}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/game/game_render_box.dart", "symbol": "GameRenderBox.didChangeAppLifecycleState", "start_line": 399, "end_line": 402},
+        {"path": "packages/flame/lib/src/game/game.dart", "symbol": "Game.pauseEngine", "start_line": 414, "end_line": 417},
+        {"path": "packages/flame/lib/src/game/flame_game.dart", "symbol": "FlameGame.mount", "start_line": 141, "end_line": 149}
+      ],
+      "notes": "GameRenderBox registers itself as a WidgetsBinding observer when it attaches the game and forwards didChangeAppLifecycleState to game.lifecycleStateChange (game_render_box.dart:179, 391-393, 399-402). FlameGame.lifecycleStateChange pauses the engine on paused / detached / hidden when pauseWhenBackgrounded is true and the game is not already paused, remembering _pausedBecauseBackgrounded, and resumes on resumed / inactive only if it was paused for that reason (flame_game.dart:367-385); FlameGame.mount also resumes such a game (141-149). pauseEngine stops the GameLoop (game.dart:414-417). Wrong but plausible: Game.lifecycleStateChange (the empty default hook, game.dart:247), Bgm.didChangeAppLifecycleState in flame_audio (pauses only the background music), Game.pauseEngine (the mechanism, not the decision)."
+    },
+    {
+      "id": "q14",
+      "question": "Oyun calisirken bir bilesenin priority degerini degistirince kardesleri arasinda yeniden siralama nerede yapiliyor, ayni priority'deki bilesenlerin sirasi nasil korunuyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "packages/flame/lib/src/components/core/component_list.dart", "symbol": "ComponentList._rebalance", "start_line": 271, "end_line": 305}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.priority=", "start_line": 1083, "end_line": 1092},
+        {"path": "packages/flame/lib/src/components/core/component_tree_root.dart", "symbol": "ComponentTreeRoot._enqueuePriorityChange", "start_line": 145, "end_line": 154},
+        {"path": "packages/flame/lib/src/components/core/component_tree_root.dart", "symbol": "ComponentTreeRoot._processLifecycleEvents", "start_line": 252, "end_line": 300},
+        {"path": "packages/flame/lib/src/components/core/component_list.dart", "symbol": "ComponentList._insertSorted", "start_line": 189, "end_line": 203},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.rebalanceChildren", "start_line": 361, "end_line": 361}
+      ],
+      "notes": "Turkish without Turkish letters ('Oyun çalışırken bir bileşenin priority değerini değiştirince kardeşleri arasında yeniden sıralama nerede yapılıyor, aynı priority'deki bileşenlerin sırası nasıl korunuyor'). The priority setter enqueues a rebalance lifecycle event for the parent (component.dart:1083-1092; component_tree_root.dart:145-154); _processLifecycleEvents collects those parents and calls rebalanceChildren() once per parent (component_tree_root.dart:293-295), which calls ComponentList._rebalance. _rebalance compacts the tombstones, returns early when the list is still sorted, otherwise sorts by _compareOrder and breaks ties by the previous _containerIndex, so equal priorities keep their order (component_list.dart:271-305). Wrong but plausible: ComponentList._insertSorted (placement of a newly added child), ComponentList._compareOrder (only the comparison, 36-42), the Component.priority getter."
+    },
+    {
+      "id": "q15",
+      "question": "When the player taps the screen, how does the touch get from Flutter's gesture recognizer to my component's `onTapDown`, and how is the component under the finger chosen?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart", "symbol": "MultiTapDispatcher.onMount", "start_line": 159, "end_line": 176},
+        {"path": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart", "symbol": "MultiTapDispatcher.onTapDown", "start_line": 32, "end_line": 41},
+        {"path": "packages/flame/lib/src/events/messages/location_context_event.dart", "symbol": "LocationContextEvent.deliverAtPoint", "start_line": 42, "end_line": 62},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.componentsAtLocation", "start_line": 1025, "end_line": 1061}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/events/callbacks/tap_callbacks.dart", "symbol": "TapCallbacks.onMount", "start_line": 21, "end_line": 26},
+        {"path": "packages/flame/lib/src/events/dispatchers/dispatcher.dart", "symbol": "Dispatcher.addDispatcher", "start_line": 7, "end_line": 19},
+        {"path": "packages/flame/lib/src/events/dispatchers/multi_tap_dispatcher.dart", "symbol": "MultiTapDispatcher.handleTapDown", "start_line": 131, "end_line": 134},
+        {"path": "packages/flame/lib/src/events/messages/position_event.dart", "symbol": "PositionEvent.collectApplicableChildren", "start_line": 37, "end_line": 42},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.componentsAtPoint", "start_line": 998, "end_line": 1008},
+        {"path": "packages/flame/lib/src/game/game_widget/gesture_detector_builder.dart", "symbol": "GestureDetectorBuilder.build", "start_line": 31, "end_line": 40}
+      ],
+      "notes": "Mounting a TapCallbacks component adds one MultiTapDispatcher to the root game (TapCallbacks.onMount -> Dispatcher.addDispatcher; tap_callbacks.dart:21-26, dispatcher.dart:7-19). The dispatcher's onMount registers a MultiTapGestureRecognizer with the game's gestureDetectors and wires its onTapDown to handleTapDown, which wraps the details in a TapDownEvent (multi_tap_dispatcher.dart:159-176, 131-134); GestureDetectorBuilder.build puts the recognizers into a RawGestureDetector (related). onTapDown calls event.deliverAtPoint with rootComponent: gameRef and records the pointer (32-41); deliverAtPoint gets the candidates from collectApplicableChildren -> componentsAtPoint(canvasPosition) and calls the handler on each TapCallbacks hit, stopping after the first unless continuePropagation is set (location_context_event.dart:42-62). componentsAtLocation walks the children in reverse order, transforms the point through every CoordinateTransform, skips IgnoreEvents, and yields components whose containsLocalPoint is true, children before their parent (component.dart:1025-1061). Wrong but plausible: TapCallbacks itself (empty hooks), GameRenderBox.hitTestSelf (Flutter-level hit test of the whole game widget), the Game.mouseDetector / applyMouseDetectors path (mouse, not taps)."
+    },
+    {
+      "id": "q16",
+      "question": "Her karede carpismalar nasil tespit ediliyor ve sonunda benim bilesenimin onCollision metodu nasil cagriliyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "packages/flame/lib/src/collisions/has_collision_detection.dart", "symbol": "HasCollisionDetection.update", "start_line": 25, "end_line": 29},
+        {"path": "packages/flame/lib/src/collisions/collision_detection.dart", "symbol": "CollisionDetection.run", "start_line": 33, "end_line": 70},
+        {"path": "packages/flame/lib/src/collisions/broadphase/sweep/sweep.dart", "symbol": "Sweep.query", "start_line": 30, "end_line": 63},
+        {"path": "packages/flame/lib/src/collisions/standard_collision_detection.dart", "symbol": "StandardCollisionDetection.handleCollision", "start_line": 48, "end_line": 56},
+        {"path": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart", "symbol": "ShapeHitbox.onCollision", "start_line": 229, "end_line": 241}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart", "symbol": "ShapeHitbox.onMount", "start_line": 78, "end_line": 120},
+        {"path": "packages/flame/lib/src/collisions/broadphase/sweep/sweep.dart", "symbol": "Sweep.update", "start_line": 17, "end_line": 25},
+        {"path": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart", "symbol": "ShapeHitbox.possiblyIntersects", "start_line": 182, "end_line": 187},
+        {"path": "packages/flame/lib/src/collisions/hitboxes/shape_hitbox.dart", "symbol": "ShapeHitbox.intersections", "start_line": 161, "end_line": 175},
+        {"path": "packages/flame/lib/src/collisions/standard_collision_detection.dart", "symbol": "StandardCollisionDetection.handleCollisionStart", "start_line": 34, "end_line": 42}
+      ],
+      "notes": "Turkish without Turkish letters ('Her karede çarpışmalar nasıl tespit ediliyor ve sonunda benim bileşenimin onCollision metodu nasıl çağrılıyor'). A ShapeHitbox registers itself with the nearest HasCollisionDetection ancestor in onMount (shape_hitbox.dart:113-119). HasCollisionDetection.update calls collisionDetection.run() after super.update every tick (has_collision_detection.dart:25-29). run() updates and queries the broadphase, then for each prospect checks possiblyIntersects (AABB overlap) and intersections, and calls handleCollisionStart / handleCollision / handleCollisionEnd (collision_detection.dart:33-70). The default broadphase Sweep insertion-sorts the hitboxes by aabb.min.x and pairs overlapping x intervals where at least one hitbox is active (sweep.dart:17-63). StandardCollisionDetection.handleCollision calls onCollision on both hitboxes (standard_collision_detection.dart:48-56), and ShapeHitbox.onCollision forwards to its hitboxParent when that is CollisionCallbacks (shape_hitbox.dart:229-241). Wrong but plausible: CollisionCallbacks.onCollision (the empty user hook), QuadTreeBroadphase (the optional alternative), flame_forge2d contact callbacks (physics, a different system)."
+    },
+    {
+      "id": "q17",
+      "question": "When I call `add(enemy)` while the game is running, at which points do `enemy.onLoad()` and `enemy.onMount()` actually run?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component._addChild", "start_line": 849, "end_line": 885},
+        {"path": "packages/flame/lib/src/components/core/component_tree_root.dart", "symbol": "ComponentTreeRoot._processLifecycleEvents", "start_line": 252, "end_line": 300},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component._handleLifecycleEventAdd", "start_line": 1098, "end_line": 1124},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component._startLoading", "start_line": 1185, "end_line": 1208},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component._mount", "start_line": 1323, "end_line": 1359}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "packages/flame/lib/src/components/core/component_tree_root.dart", "symbol": "ComponentTreeRoot._enqueueAdd", "start_line": 57, "end_line": 63},
+        {"path": "packages/flame/lib/src/game/flame_game.dart", "symbol": "FlameGame.update", "start_line": 183, "end_line": 192},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component.add", "start_line": 816, "end_line": 816},
+        {"path": "packages/flame/lib/src/components/core/component.dart", "symbol": "Component._finishLoading", "start_line": 1213, "end_line": 1219},
+        {"path": "packages/flame/lib/src/components/core/component_tree_root.dart", "symbol": "ComponentTreeRoot.processLifecycleEvents", "start_line": 230, "end_line": 250}
+      ],
+      "notes": "add() calls _addChild (component.dart:816). With a mounted parent and an unmounted child, _addChild sets child._parent and enqueues an add event on the root (game._enqueueAdd, component_tree_root.dart:57-63), and, since the game has a layout, starts loading at once (component.dart:874-884): _startLoading sets the loading bit and calls onLoad() synchronously, finishing through _finishLoading or _failLoading when its future settles (1185-1208). Mounting waits for the next tick: FlameGame.update calls processLifecycleEvents before updateTree (flame_game.dart:183-192), _processLifecycleEvents loops over the queue (component_tree_root.dart:252-300), and _handleLifecycleEventAdd blocks the event until the child is loaded, then calls _mount (component.dart:1098-1124), which runs onGameResize, onParentResize, onMount, sets the mounted bit, inserts the child into parent.children and calls onChildrenChanged (1323-1359). Wrong but plausible: Component.onLoad / onMount (the empty hooks), FlameGame.ready (drains the whole queue at startup), the Component.loaded / mounted futures."
+    },
+    {
+      "id": "q18",
+      "question": "Where is the physics solver that resolves contacts and integrates body velocities on each step when I use Forge2DGame?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "packages/flame_forge2d/lib/forge2d_world.dart", "symbol": "Forge2DWorld.update", "start_line": 105, "end_line": 112},
+        {"path": "packages/flame_forge2d/lib/forge2d_world.dart", "symbol": "Forge2DWorld.physicsWorld", "start_line": 46, "end_line": 67}
+      ],
+      "related": [
+        {"path": "packages/flame_forge2d/lib/contact_events_dispatcher.dart", "symbol": "ContactEventsDispatcher.dispatch", "start_line": 34, "end_line": 56},
+        {"path": "packages/flame_forge2d/lib/forge2d_world.dart", "symbol": "Forge2DWorld.createBody", "start_line": 114, "end_line": 118},
+        {"path": "packages/flame_forge2d/lib/body_component.dart", "symbol": "BodyComponent.createBody", "start_line": 92, "end_line": 108}
+      ],
+      "notes": "The solver lives in the forge2d package (a pubspec dependency of flame_forge2d, ^0.15.1), whose world the comments here describe as native Box2D. flame_forge2d only creates the forge2d.World lazily in the physicsWorld getter (forge2d_world.dart:46-67) and calls physicsWorld.step(dt, subStepCount: subStepCount) in update before dispatching the contact events (105-112). Correct behaviour: say the solver is not in the repo and cite the pointer. Wrong but plausible: Flame's own CollisionDetection.run / StandardCollisionDetection in packages/flame (hitbox overlap detection, no physical response), ContactEventsDispatcher (only routes events after the step), BodyComponent (creates and renders bodies)."
+    },
+    {
+      "id": "q19",
+      "question": "Aynı ses efektinin üst üste çalabilmesi için birden fazla AudioPlayer'ı hazır tutan AudioPool sınıfı nerede yazılmış?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "packages/flame_audio/lib/flame_audio.dart", "symbol": "FlameAudio.createPool", "start_line": 147, "end_line": 163}
+      ],
+      "related": [
+        {"path": "packages/flame_audio/lib/flame_audio.dart", "symbol": "FlameAudio._preparePlayer", "start_line": 45, "end_line": 64},
+        {"path": "packages/flame_audio/lib/flame_audio.dart", "symbol": "FlameAudio.play", "start_line": 70, "end_line": 84}
+      ],
+      "notes": "AudioPool comes from the audioplayers package, which flame_audio depends on and re-exports (flame_audio.dart:1-4); no AudioPool class is declared in the repository. FlameAudio.createPool only resolves the asset path and calls AudioPool.create with the global audioCache, minPlayers and maxPlayers (147-163). Correct behaviour: say AudioPool is not in the repo and cite the pointer. Wrong but plausible: ComponentPool (packages/flame/lib/src/components/component_pool.dart, pools components, not players), ProspectPool (collision prospects), FlameAudio.play (one new AudioPlayer per call, 70-84), Bgm."
+    },
+    {
+      "id": "q20",
+      "question": "Where is the code that decodes a PNG file's bytes into the pixels of a `ui.Image`?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images._fetchToMemory", "start_line": 341, "end_line": 346},
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images._fetchFromBase64", "start_line": 335, "end_line": 339}
+      ],
+      "related": [
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images.load", "start_line": 251, "end_line": 254},
+        {"path": "packages/flame/lib/src/cache/images.dart", "symbol": "Images._fetch", "start_line": 324, "end_line": 333}
+      ],
+      "notes": "Decoding is done by Flutter (decodeImageFromList from package:flutter/painting, on top of the dart:ui image codecs), not by Flame. Images._fetchToMemory loads the asset bytes from the bundle and calls decodeImageFromList (images.dart:341-346); _fetchFromBase64 does the same for base64 data (335-339); Images.load goes through _fetch, which caches the future (251-254, 324-333). Correct behaviour: say the decoder is not in the repo and cite the pointer. Wrong but plausible: ImageExtension.fromPixels (raw RGBA bytes through decodeImageFromPixels, extensions/image.dart:20-31), Sprite.load (a caller), the decodeImageFromList call in flame_texturepacker's parser."
+    }
+  ]
+}

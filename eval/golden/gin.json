@@ -1,0 +1,354 @@
+{
+  "repo": {"name": "gin", "source": "https://github.com/gin-gonic/gin", "commit": "0f09c3a"},
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Where is `c.Next()` implemented, the call a middleware uses to run the rest of the handler chain before doing its own after-work?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "context.go", "symbol": "Context.Next", "start_line": 197, "end_line": 205}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "context.go", "symbol": "Context.Abort", "start_line": 216, "end_line": 218},
+        {"path": "context.go", "symbol": "Context.IsAborted", "start_line": 208, "end_line": 210},
+        {"path": "gin.go", "symbol": "Engine.handleHTTPRequest", "start_line": 719, "end_line": 789}
+      ],
+      "notes": "Exact method name; 'Next' is a common word and gin also calls c.Next() in many places. Context.Next increments c.index and loops over c.handlers, calling each non-nil handler and incrementing again, so the code after c.Next() in a middleware runs once the downstream handlers have returned (context.go:197-205). Abort only sets c.index = abortIndex (math.MaxInt8 >> 1, line 57) so the loop stops. handleHTTPRequest starts the chain with c.Next() (gin.go:751, related). Wrong but plausible: Context.Abort / IsAborted (stop the chain), HandlersChain.Last (gin.go:67-72, returns the main handler), serveError (gin.go:793-808, also calls c.Next for the 404/405 chains), the Logger or Recovery closures that call c.Next()."
+    },
+    {
+      "id": "q02",
+      "question": "I want to keep using the request's context inside a goroutine I start from a handler. Which method gives me a copy of `*gin.Context` that is safe to use there?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "context.go", "symbol": "Context.Copy", "start_line": 122, "end_line": 154}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "context.go", "symbol": "Context.reset", "start_line": 103, "end_line": 118},
+        {"path": "gin.go", "symbol": "Engine.ServeHTTP", "start_line": 691, "end_line": 704}
+      ],
+      "notes": "Copy builds a new Context that shares Request and engine, detaches the writer (writermem.ResponseWriter = nil), sets index to abortIndex and handlers to nil, and clones Keys under the read lock plus Params, Errors and Accepted (context.go:122-154). It is needed because ServeHTTP takes the Context from engine.pool and puts it back after the request (gin.go:696-703), and reset() clears it for the next request (context.go:103-118). Wrong but plausible: Context.reset (the reuse Copy protects against), Engine.allocateContext (creates pooled contexts), Context.Value / Context.Done (context.Context methods, no copy), Engine.HandleContext."
+    },
+    {
+      "id": "q03",
+      "question": "My debug log shows `[WARNING] Headers were already written. Wanted to override status code 200 with 500`. Which code prints that warning, and why is the status not changed?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "response_writer.go", "symbol": "responseWriter.WriteHeader", "start_line": 67, "end_line": 75}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "response_writer.go", "symbol": "responseWriter.WriteHeaderNow", "start_line": 77, "end_line": 82},
+        {"path": "response_writer.go", "symbol": "responseWriter.Written", "start_line": 106, "end_line": 108},
+        {"path": "context.go", "symbol": "Context.Status", "start_line": 1122, "end_line": 1124},
+        {"path": "debug.go", "symbol": "debugPrint", "start_line": 56, "end_line": 70}
+      ],
+      "notes": "responseWriter.WriteHeader only records the status; when the code differs from the stored one and Written() is already true (size != noWritten, i.e. WriteHeaderNow or a body write has happened), it calls debugPrint with this warning and returns without changing anything (response_writer.go:67-75). debugPrint prints only in debug mode (debug.go:56-70). Context.Status and the render helpers reach it through c.Writer.WriteHeader (context.go:1122-1124). Wrong but plausible: Context.Status (the caller), debugPrint (only prints), responseWriter.WriteHeaderNow (where the header is actually sent), Context.Render."
+    },
+    {
+      "id": "q04",
+      "question": "Where is bracket syntax in the query string, like `ids[a]=1&ids[b]=2`, turned into a map when I call `c.QueryMap(\"ids\")`?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "context.go", "symbol": "getMapFromFormData", "start_line": 683, "end_line": 704}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "context.go", "symbol": "Context.GetQueryMap", "start_line": 603, "end_line": 606},
+        {"path": "context.go", "symbol": "Context.GetPostFormMap", "start_line": 676, "end_line": 679},
+        {"path": "context.go", "symbol": "Context.initQueryCache", "start_line": 577, "end_line": 585}
+      ],
+      "notes": "getMapFromFormData scans every key of the parsed values, keeps those that start with key + '[' and contain a closing ']', and stores the text between the brackets as the map key with the first value (context.go:683-704). GetQueryMap feeds it the cached URL query and GetPostFormMap the form cache (related). Wrong but plausible: setFormMap in binding/form_mapping.go:528-550 (binds the whole form into a map[string]string or map[string][]string, no brackets), Context.QueryArray / GetQueryArray (repeated keys, not brackets), initQueryCache (only caches URL.Query())."
+    },
+    {
+      "id": "q05",
+      "question": "Registering both `/users/:id` and `/users/:name` panics with \"conflicts with existing wildcard\". Which function raises that panic?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "tree.go", "symbol": "node.addRoute", "start_line": 135, "end_line": 249}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "tree.go", "symbol": "node.insertChild", "start_line": 288, "end_line": 397},
+        {"path": "tree.go", "symbol": "findWildcard", "start_line": 253, "end_line": 286},
+        {"path": "gin.go", "symbol": "Engine.addRoute", "start_line": 387, "end_line": 409}
+      ],
+      "notes": "node.addRoute walks the radix tree; when the new path needs a wildcard where the node already has a wildcard child, it checks that the existing wildcard is a prefix of the new segment and not a catch-all, otherwise it builds \"'<segment>' in new path '<full>' conflicts with existing wildcard '<existing>' in existing prefix '<prefix>'\" and panics (tree.go:210-234). It also panics with 'handlers are already registered for path' (242-244). Wrong but plausible: node.insertChild (the other registration panics: one wildcard per segment, unnamed wildcard, catch-all position and conflicts, 297-364), findWildcard (only finds and validates the wildcard), Engine.addRoute (asserts, then calls node.addRoute)."
+    },
+    {
+      "id": "q06",
+      "question": "Recovery middleware'i panic'i loga yazarken isteğin Authorization başlığını nerede gizliyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "recovery.go", "symbol": "secureRequestDump", "start_line": 98, "end_line": 107}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "recovery.go", "symbol": "CustomRecoveryWithWriter", "start_line": 53, "end_line": 92},
+        {"path": "recovery.go", "symbol": "stack", "start_line": 119, "end_line": 145}
+      ],
+      "notes": "Describes one function in Turkish. secureRequestDump dumps the request with httputil.DumpRequest(r, false), splits it into lines and replaces every line that starts with 'Authorization:' with 'Authorization: *' (recovery.go:98-107). CustomRecoveryWithWriter calls it for the broken-pipe log line and the debug-mode log line (72, 74-75); outside debug mode the request is not dumped at all (77-78). Wrong but plausible: CustomRecoveryWithWriter (the caller), stack (the stack trace), defaultHandleRecovery (writes the 500), BasicAuthForRealm (reads Authorization, does not mask it)."
+    },
+    {
+      "id": "q07",
+      "question": "BasicAuth middleware'inde gelen Authorization başlığı kayıtlı kullanıcı/şifre çiftleriyle nerede karşılaştırılıyor, karşılaştırma sabit zamanlı mı?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "auth.go", "symbol": "authPairs.searchCredential", "start_line": 32, "end_line": 42}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "auth.go", "symbol": "BasicAuthForRealm", "start_line": 48, "end_line": 68},
+        {"path": "auth.go", "symbol": "processAccounts", "start_line": 76, "end_line": 89},
+        {"path": "auth.go", "symbol": "authorizationHeader", "start_line": 91, "end_line": 94}
+      ],
+      "notes": "The header is never decoded: processAccounts precomputes 'Basic ' + base64(user:password) for each account (auth.go:76-94), and searchCredential compares the raw Authorization value with each precomputed value using subtle.ConstantTimeCompare and returns the user on a match (32-42), so each comparison is constant-time. BasicAuthForRealm calls it and answers 401 with WWW-Authenticate on failure (48-68, related). Wrong but plausible: BasicAuthForRealm (the middleware wrapper), BasicAuthForProxy (Proxy-Authorization, 98-116), authorizationHeader (builds the expected value, compares nothing)."
+    },
+    {
+      "id": "q08",
+      "question": "GIN_MODE ortam degiskeni nerede okunuyor, release moduna gecis nasil yapiliyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "mode.go", "symbol": "init", "start_line": 52, "end_line": 55},
+        {"path": "mode.go", "symbol": "SetMode", "start_line": 58, "end_line": 78}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "debug.go", "symbol": "IsDebugging", "start_line": 22, "end_line": 24},
+        {"path": "mode.go", "symbol": "Mode", "start_line": 98, "end_line": 100},
+        {"path": "debug.go", "symbol": "debugPrintWARNINGNew", "start_line": 92, "end_line": 98}
+      ],
+      "notes": "Turkish without Turkish letters ('GIN_MODE ortam değişkeni nerede okunuyor, release moduna geçiş nasıl yapılıyor'). The package init reads os.Getenv(EnvGinMode) and passes it to SetMode (mode.go:52-55; EnvGinMode = \"GIN_MODE\" at 17). SetMode falls back to test mode under go test (flag test.v) or to debug mode for an empty value, stores debugCode/releaseCode/testCode atomically in ginMode, panics on an unknown value and records the name (58-78). IsDebugging reads ginMode (debug.go:22-24, related). Note that several files define an init function (codec/json/*.go, context_appengine.go); only mode.go's is the answer. Wrong but plausible: debugPrintWARNINGNew (only prints the 'export GIN_MODE=release' hint), IsDebugging / Mode (read the stored mode), DisableBindValidation further down mode.go."
+    },
+    {
+      "id": "q09",
+      "question": "I registered `/users`, and a GET to `/users/` gets a 301 redirect to `/users`. Where is that redirect decided and performed?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "gin.go", "symbol": "redirectTrailingSlash", "start_line": 810, "end_line": 824},
+        {"path": "gin.go", "start_line": 755, "end_line": 759}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gin.go", "symbol": "redirectRequest", "start_line": 849, "end_line": 861},
+        {"path": "tree.go", "symbol": "node.getValue", "start_line": 418, "end_line": 672},
+        {"path": "gin.go", "symbol": "redirectFixedPath", "start_line": 837, "end_line": 847},
+        {"path": "gin.go", "symbol": "New", "start_line": 215, "end_line": 247}
+      ],
+      "notes": "node.getValue returns tsr=true when the path only differs from a registered route by a trailing slash (for this case tree.go:485). handleHTTPRequest calls redirectTrailingSlash when value.tsr and engine.RedirectTrailingSlash are set, the method is not CONNECT and the path is not '/' (gin.go:755-759, given as lines inside Engine.handleHTTPRequest); RedirectTrailingSlash is true by default in New (224). redirectTrailingSlash adds or strips the trailing slash, prefixing a sanitized X-Forwarded-Prefix (810-824), and redirectRequest answers 301 for GET and 307 for other methods (849-861). Wrong but plausible: redirectFixedPath / node.findCaseInsensitivePath (RedirectFixedPath, off by default), cleanPath (RemoveExtraSlash), Context.Redirect (redirects a handler asks for)."
+    },
+    {
+      "id": "q10",
+      "question": "When I redirect the server's stdout to a file, the request log lines lose their colors. Where does the logger decide whether to color its output?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "logger.go", "symbol": "LoggerWithConfig", "start_line": 245, "end_line": 314},
+        {"path": "logger.go", "symbol": "LogFormatterParams.IsOutputColor", "start_line": 162, "end_line": 164}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "logger.go", "start_line": 167, "end_line": 194},
+        {"path": "logger.go", "symbol": "ForceConsoleColor", "start_line": 202, "end_line": 204},
+        {"path": "logger.go", "symbol": "DisableConsoleColor", "start_line": 197, "end_line": 199},
+        {"path": "logger.go", "symbol": "LogFormatterParams.StatusCodeColor", "start_line": 94, "end_line": 109}
+      ],
+      "notes": "LoggerWithConfig sets isTerm=false once, when the middleware is built, if the output is not an *os.File, TERM=dumb, or the descriptor is neither a terminal nor a Cygwin terminal (go-isatty; logger.go:258-263), and copies isTerm into every LogFormatterParams (289-293). IsOutputColor is true for forceColor, or for autoColor when isTerm (162-164); defaultLogFormatter (a var holding a func literal, 167-194, given as lines) fills the color codes only when it is true (169-174). ForceConsoleColor / DisableConsoleColor switch the global mode (197-204). Wrong but plausible: StatusCodeColor / MethodColor / LatencyColor (choose which color, not whether), debugPrint and the [GIN-debug] output."
+    },
+    {
+      "id": "q11",
+      "question": "How does gin decide whether to parse the request body as JSON, XML or form data when I call `c.ShouldBind(&obj)`?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "binding/binding.go", "symbol": "Default", "start_line": 95, "end_line": 120},
+        {"path": "binding/binding_nomsgpack.go", "symbol": "Default", "start_line": 91, "end_line": 114}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "context.go", "symbol": "Context.ShouldBind", "start_line": 860, "end_line": 863},
+        {"path": "context.go", "symbol": "Context.ContentType", "start_line": 1058, "end_line": 1060},
+        {"path": "utils.go", "symbol": "filterFlags", "start_line": 92, "end_line": 99},
+        {"path": "context.go", "symbol": "Context.Bind", "start_line": 779, "end_line": 782}
+      ],
+      "notes": "ShouldBind and Bind call binding.Default(c.Request.Method, c.ContentType()) (context.go:779-782, 860-863). Default returns Form for every GET, otherwise switches on the MIME type: JSON, XML (two types), ProtoBuf, MsgPack (two types), YAML (two types), TOML, multipart -> FormMultipart, BSON, and Form for anything else (binding.go:95-120). binding_nomsgpack.go is the nomsgpack build-tag twin without MsgPack (91-114); either answers. ContentType cuts parameters such as '; charset=utf-8' with filterFlags (utils.go:92-99). Wrong but plausible: Context.ShouldBind (only delegates), Context.NegotiateFormat (Accept negotiation for the response), the MIME constants at the top of binding.go."
+    },
+    {
+      "id": "q12",
+      "question": "json icin encoding/json yerine jsoniter ya da sonic kullanmak istiyorum; gin hangi json kutuphanesini kullanacagini nerede seciyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "codec/json/json.go", "start_line": 5, "end_line": 19},
+        {"path": "codec/json/jsoniter.go", "start_line": 5, "end_line": 20},
+        {"path": "codec/json/sonic.go", "start_line": 5, "end_line": 20},
+        {"path": "codec/json/go_json.go", "start_line": 5, "end_line": 20}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "codec/json/api.go", "symbol": "Core", "start_line": 13, "end_line": 19},
+        {"path": "render/json.go", "symbol": "WriteJSON", "start_line": 67, "end_line": 75},
+        {"path": "binding/json.go", "symbol": "decodeJSON", "start_line": 44, "end_line": 56}
+      ],
+      "notes": "Turkish without Turkish letters ('JSON için encoding/json yerine jsoniter ya da sonic kullanmak istiyorum; gin hangi JSON kütüphanesini kullanacağını nerede seçiyor'). The choice is made at compile time by build tags: json.go is built unless jsoniter, go_json, or sonic on linux/windows/darwin is set (its //go:build line 5), and each variant's init assigns its adapter to the package-level json.API (json.go:17-19, jsoniter.go:18-20, sonic.go:18-20, go_json.go:18-20). All JSON rendering and binding go through json.API (render/json.go:69, binding/json.go:45). Given as lines (build line through init) because the decision is the //go:build constraint plus init, not one symbol; any of the four files answers. Wrong but plausible: api.go Core (only the interface; the API variable is at api.go:10), EnableJsonDecoderUseNumber in mode.go, render.WriteJSON (a user of json.API)."
+    },
+    {
+      "id": "q13",
+      "question": "router.Static ile bir klasoru sunarken dizin listeleme nasil kapatiliyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "fs.go", "symbol": "Dir", "start_line": 42, "end_line": 50},
+        {"path": "fs.go", "symbol": "OnlyFilesFS.Open", "start_line": 18, "end_line": 25},
+        {"path": "fs.go", "symbol": "neutralizedReaddirFile.Readdir", "start_line": 33, "end_line": 36}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "routergroup.go", "symbol": "RouterGroup.Static", "start_line": 232, "end_line": 234},
+        {"path": "routergroup.go", "symbol": "RouterGroup.createStaticHandler", "start_line": 252, "end_line": 275},
+        {"path": "routergroup.go", "symbol": "RouterGroup.StaticFS", "start_line": 239, "end_line": 250}
+      ],
+      "notes": "Turkish without Turkish letters ('router.Static ile bir klasörü sunarken dizin listeleme nasıl kapatılıyor'). Static calls StaticFS(relativePath, Dir(root, false)) (routergroup.go:232-234); Dir wraps http.Dir in OnlyFilesFS unless listDirectory is true (fs.go:42-50); OnlyFilesFS.Open returns every file as a neutralizedReaddirFile (18-25) whose Readdir always returns nil, so http.FileServer gets nothing to list (33-36). createStaticHandler also pre-sets a 404 status when the file system is an *OnlyFilesFS (routergroup.go:257-259; gin's responseWriter only records it until something is written), related. Wrong but plausible: createStaticHandler alone (existence check, then http.FileServer), internal/fs FileSystem (adapts http.FileSystem to fs.FS for LoadHTMLFS), StaticFile (a single file)."
+    },
+    {
+      "id": "q14",
+      "question": "Struct tag'inde `form:\"page,default=1\"` yazdığımda, sorguda `page` yoksa varsayılan değer nerede okunup alana yazılıyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "binding/form_mapping.go", "symbol": "tryToSetValue", "start_line": 145, "end_line": 180},
+        {"path": "binding/form_mapping.go", "symbol": "setByForm", "start_line": 245, "end_line": 321}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "binding/form_mapping.go", "symbol": "setWithProperType", "start_line": 323, "end_line": 388},
+        {"path": "binding/form_mapping.go", "symbol": "mapping", "start_line": 84, "end_line": 136},
+        {"path": "context.go", "symbol": "Context.DefaultQuery", "start_line": 547, "end_line": 552}
+      ],
+      "notes": "tryToSetValue splits the tag at commas, records default=... in setOptions (isDefaultExists, defaultValue) and, for slice/array fields with an empty, multi or csv collection_format, turns ';' into ',' (form_mapping.go:159-177), then calls setter.TrySet. setByForm uses opt.defaultValue when the key is missing or its first value is empty (308-309; for slices and arrays the default is split on ',' at 253-264 and 278-289) and passes it to setWithProperType. Wrong but plausible: Context.DefaultQuery (a handler-side helper, unrelated to struct tags), validator rules in the binding tag, mapping (only walks the struct fields)."
+    },
+    {
+      "id": "q15",
+      "question": "Walk me through what happens between `Engine.ServeHTTP` receiving a request and my handler running: where is the route looked up for the request path, and where are the matched handlers started?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "gin.go", "symbol": "Engine.ServeHTTP", "start_line": 691, "end_line": 704},
+        {"path": "gin.go", "symbol": "Engine.handleHTTPRequest", "start_line": 719, "end_line": 789},
+        {"path": "tree.go", "symbol": "node.getValue", "start_line": 418, "end_line": 672}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "context.go", "symbol": "Context.Next", "start_line": 197, "end_line": 205},
+        {"path": "context.go", "symbol": "Context.reset", "start_line": 103, "end_line": 118},
+        {"path": "response_writer.go", "symbol": "responseWriter.reset", "start_line": 61, "end_line": 65},
+        {"path": "gin.go", "symbol": "serveError", "start_line": 793, "end_line": 808}
+      ],
+      "notes": "ServeHTTP updates the route trees once (routeTreesUpdated), takes a Context from engine.pool, resets the writer and the Context, calls handleHTTPRequest and puts the Context back (gin.go:691-704). handleHTTPRequest picks the path (URL.Path, or EscapedPath / RawPath depending on options, cleanPath when RemoveExtraSlash), finds the tree for the method and calls root.getValue (719-744); when handlers are found it stores c.Params, c.handlers and fullPath, runs c.Next() and then WriteHeaderNow (745-753); otherwise trailing-slash / fixed-path redirects, 405 and 404 (755-788). node.getValue walks the radix tree, fills params for :name and *catch-all segments, backtracks through skippedNodes and sets the tsr hint (tree.go:418-672). Wrong but plausible: Engine.Run (only starts the http.Server), RouterGroup.handle / node.addRoute (registration time, not request time), Engine.HandleContext (re-entry)."
+    },
+    {
+      "id": "q16",
+      "question": "When I call `c.ShouldBindJSON(&req)` on a struct with `binding:\"required\"` tags, how does the body get decoded and then validated?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "binding/json.go", "symbol": "jsonBinding.Bind", "start_line": 33, "end_line": 38},
+        {"path": "binding/json.go", "symbol": "decodeJSON", "start_line": 44, "end_line": 56},
+        {"path": "binding/default_validator.go", "symbol": "defaultValidator.ValidateStruct", "start_line": 47, "end_line": 76}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "context.go", "symbol": "Context.ShouldBindJSON", "start_line": 889, "end_line": 891},
+        {"path": "context.go", "symbol": "Context.ShouldBindWith", "start_line": 941, "end_line": 943},
+        {"path": "binding/binding.go", "symbol": "validate", "start_line": 122, "end_line": 127},
+        {"path": "binding/default_validator.go", "symbol": "defaultValidator.validateStruct", "start_line": 79, "end_line": 82},
+        {"path": "binding/default_validator.go", "symbol": "defaultValidator.lazyinit", "start_line": 93, "end_line": 98}
+      ],
+      "notes": "ShouldBindJSON -> ShouldBindWith(obj, binding.JSON) -> b.Bind(c.Request, obj) (context.go:889-891, 941-943). jsonBinding.Bind rejects a nil request or body and calls decodeJSON (json.go:33-38), which decodes with json.API.NewDecoder, honouring EnableDecoderUseNumber and EnableDecoderDisallowUnknownFields, then calls validate(obj) (44-56). validate skips when binding.Validator is nil (binding.go:122-127); defaultValidator.ValidateStruct validates structs and pointers to structs and every element of slices and arrays, collecting a SliceValidationError (default_validator.go:47-76); validateStruct / lazyinit hand the struct to go-playground/validator configured with tag name 'binding' (79-98). Wrong but plausible: Context.BindJSON / MustBindWith (the aborting 400 variant), ShouldBindBodyWith (caches the body, BindBody path), binding.Default (not used here, the binding is fixed)."
+    },
+    {
+      "id": "q17",
+      "question": "`v1 := r.Group(\"/v1\", authMiddleware)` ile grup oluşturup `v1.GET(\"/users\", handler)` dediğimde, grubun öneki ve middleware'i bu route'a nasıl ekleniyor ve route ağaca nasıl kaydediliyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "routergroup.go", "symbol": "RouterGroup.Group", "start_line": 96, "end_line": 102},
+        {"path": "routergroup.go", "symbol": "RouterGroup.handle", "start_line": 110, "end_line": 115},
+        {"path": "routergroup.go", "symbol": "RouterGroup.combineHandlers", "start_line": 277, "end_line": 284},
+        {"path": "gin.go", "symbol": "Engine.addRoute", "start_line": 387, "end_line": 409}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "routergroup.go", "symbol": "RouterGroup.GET", "start_line": 142, "end_line": 144},
+        {"path": "routergroup.go", "symbol": "RouterGroup.calculateAbsolutePath", "start_line": 286, "end_line": 288},
+        {"path": "utils.go", "symbol": "joinPaths", "start_line": 136, "end_line": 146},
+        {"path": "tree.go", "symbol": "node.addRoute", "start_line": 135, "end_line": 249}
+      ],
+      "notes": "Group returns a new RouterGroup whose Handlers are the parent's handlers followed by the given middleware (combineHandlers) and whose basePath is the joined path (routergroup.go:96-102). GET calls handle, which computes the absolute path with calculateAbsolutePath / joinPaths, prepends the group's handlers with combineHandlers (a fresh copy, asserted to stay below abortIndex) and calls engine.addRoute (110-115, 277-284). Engine.addRoute asserts the path and handlers, prints the route in debug mode, gets or creates the method tree, inserts the path with node.addRoute and updates maxParams / maxSections (gin.go:387-409). Wrong but plausible: RouterGroup.Use (appends to an existing group, affects only routes registered afterwards), Engine.Use (also rebuilds the 404/405 chains), node.addRoute alone (the tree insert, knows nothing about groups)."
+    },
+    {
+      "id": "q18",
+      "question": "Where are validation rules like `binding:\"required,email\"` or `min=3` actually checked against the field values?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "binding/default_validator.go", "symbol": "defaultValidator.validateStruct", "start_line": 79, "end_line": 82},
+        {"path": "binding/default_validator.go", "symbol": "defaultValidator.lazyinit", "start_line": 93, "end_line": 98}
+      ],
+      "related": [
+        {"path": "binding/default_validator.go", "symbol": "defaultValidator.ValidateStruct", "start_line": 47, "end_line": 76},
+        {"path": "binding/binding.go", "symbol": "validate", "start_line": 122, "end_line": 127},
+        {"path": "binding/binding.go", "symbol": "StructValidator", "start_line": 55, "end_line": 67},
+        {"path": "binding/default_validator.go", "symbol": "defaultValidator.Engine", "start_line": 88, "end_line": 91}
+      ],
+      "notes": "The rules (required, email, min, ...) are implemented in go-playground/validator/v10. gin only creates the engine with validator.New() and SetTagName(\"binding\") (default_validator.go:93-98) and calls v.validate.Struct(obj) (79-82); ValidateStruct only dispatches by kind. Custom rules are registered on the engine returned by binding.Validator.Engine() (88-91). Correct behaviour: say the rule checks are not in the repo and cite the pointer. Wrong but plausible: defaultValidator.ValidateStruct (no rule logic), mapping / setByForm in form_mapping.go (parse values, do not validate), SliceValidationError."
+    },
+    {
+      "id": "q19",
+      "question": "When I serve files with `c.File` or `router.Static`, where are `Range` requests (206 Partial Content) and `If-Modified-Since` / 304 Not Modified handled?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "context.go", "symbol": "Context.File", "start_line": 1340, "end_line": 1342},
+        {"path": "context.go", "symbol": "Context.FileFromFS", "start_line": 1345, "end_line": 1353},
+        {"path": "routergroup.go", "symbol": "RouterGroup.createStaticHandler", "start_line": 252, "end_line": 275}
+      ],
+      "related": [
+        {"path": "context.go", "symbol": "Context.FileAttachment", "start_line": 1363, "end_line": 1370},
+        {"path": "routergroup.go", "symbol": "RouterGroup.StaticFile", "start_line": 201, "end_line": 205},
+        {"path": "context.go", "symbol": "bodyAllowedForStatus", "start_line": 1109, "end_line": 1119}
+      ],
+      "notes": "gin has no range or conditional-request code: Context.File calls http.ServeFile (context.go:1341), FileFromFS and the Static handler hand the request to http.FileServer (1352; routergroup.go:254, 273), and net/http's file serving handles Range, If-Modified-Since, ETag preconditions and 304. Correct behaviour: say it is not in the repo and cite the pointer. Wrong but plausible: bodyAllowedForStatus (only knows that 304 has no body), createStaticHandler (only checks that the file opens), render.Reader / Context.DataFromReader (sets Content-Length, no ranges)."
+    },
+    {
+      "id": "q20",
+      "question": "HTTP/3 icin QUIC baglantisi, UDP paketleri ve stream yonetimi gin'de nerede yapiliyor?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "gin.go", "symbol": "Engine.RunQUIC", "start_line": 658, "end_line": 669}
+      ],
+      "related": [
+        {"path": "gin.go", "symbol": "Engine.Handler", "start_line": 257, "end_line": 264},
+        {"path": "gin.go", "symbol": "Engine.RunTLS", "start_line": 588, "end_line": 604}
+      ],
+      "notes": "Turkish without Turkish letters ('HTTP/3 için QUIC bağlantısı, UDP paketleri ve stream yönetimi gin'de nerede yapılıyor'). QUIC and HTTP/3 are implemented by github.com/quic-go/quic-go; gin's only use is RunQUIC, which calls http3.ListenAndServeQUIC(addr, certFile, keyFile, engine.Handler()) (gin.go:658-669; import at 21). Correct behaviour: say it is not in the repo and cite the pointer. Wrong but plausible: Engine.Handler (wraps the engine in h2c for cleartext HTTP/2 when UseH2C is set, 257-264), Engine.RunTLS (HTTP/1.1 and HTTP/2 over TLS through net/http)."
+    }
+  ]
+}

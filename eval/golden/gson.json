@@ -1,0 +1,365 @@
+{
+  "repo": {"name": "gson", "source": "https://github.com/google/gson", "commit": "65df6e5"},
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Where is `Gson.getAdapter(TypeToken)` implemented, the lookup that asks every TypeAdapterFactory in order and caches the adapter it gets back?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.getAdapter", "start_line": 340, "end_line": 399}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.getAdapter", "start_line": 407, "end_line": 409},
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.getDelegateAdapter", "start_line": 472, "end_line": 503},
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.FutureTypeAdapter", "start_line": 1239, "end_line": 1276},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.createFactories", "start_line": 926, "end_line": 1004}
+      ],
+      "notes": "Exact identifier with two overloads: the TypeToken overload (Gson.java:340-399) is the implementation, the Class overload (407-409) only wraps TypeToken.get. It returns a hit from typeTokenCache, otherwise puts a FutureTypeAdapter into the thread-local threadCalls map so a recursive type gets the proxy, asks each factory in this.factories until one returns non-null, wires the proxy with setDelegate, and publishes the resolved adapters to the shared cache only for the initial request (342-398). Wrong but plausible: Gson.getDelegateAdapter (the same loop, but skips factories up to skipPast), Gson.FutureTypeAdapter (only the proxy for cyclic types), GsonBuilder.createFactories (builds the factory order, looks nothing up)."
+    },
+    {
+      "id": "q02",
+      "question": "When I serialize an object that has a `Double.NaN` field, which method throws the error telling me to use `serializeSpecialFloatingPointValues()`?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java", "symbol": "TypeAdapters.checkValidFloatingPoint", "start_line": 520, "end_line": 527}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java", "symbol": "TypeAdapters.DoubleAdapter.write", "start_line": 506, "end_line": 517},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java", "symbol": "TypeAdapters.FloatAdapter.write", "start_line": 473, "end_line": 487},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.doubleAdapter", "start_line": 1021, "end_line": 1023},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.serializeSpecialFloatingPointValues", "start_line": 862, "end_line": 866},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java", "symbol": "JsonWriter.value", "start_line": 597, "end_line": 606}
+      ],
+      "notes": "checkValidFloatingPoint throws IllegalArgumentException \"<value> is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.\" (TypeAdapters.java:520-527). DoubleAdapter.write and FloatAdapter.write call it only in the strict variants DOUBLE_STRICT / FLOAT_STRICT (473-517), which GsonBuilder.doubleAdapter / floatAdapter pick unless serializeSpecialFloatingPointValues() was called (GsonBuilder.java:1021-1027). Wrong but plausible: GsonBuilder.serializeSpecialFloatingPointValues (only sets the flag), JsonWriter.value(double) (throws a different message, 'Numeric values must be finite', and only for a non-lenient writer; Gson.toJson switches a default writer to LENIENT), JsonReader.nextDouble (the reading side)."
+    },
+    {
+      "id": "q03",
+      "question": "How does `new TypeToken<List<String>>() {}` get `List<String>` back at runtime despite type erasure? Which method reads the type argument?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java", "symbol": "TypeToken.getTypeTokenTypeArgument", "start_line": 95, "end_line": 119}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java", "symbol": "TypeToken.TypeToken", "start_line": 72, "end_line": 77},
+        {"path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java", "symbol": "TypeToken.verifyNoTypeVariable", "start_line": 121, "end_line": 158},
+        {"path": "gson/src/main/java/com/google/gson/internal/GsonTypes.java", "symbol": "GsonTypes.canonicalize", "start_line": 104, "end_line": 126},
+        {"path": "gson/src/main/java/com/google/gson/reflect/TypeToken.java", "symbol": "TypeToken.getParameterized", "start_line": 385, "end_line": 444}
+      ],
+      "notes": "The protected no-arg constructor (TypeToken.java:72-77, one of two constructors) calls getTypeTokenTypeArgument, which takes getClass().getGenericSuperclass() of the anonymous subclass, returns its first actual type argument in canonical form when the raw superclass is TypeToken, rejects captured type variables through verifyNoTypeVariable, and throws for a raw TypeToken or a subclass of a subclass (95-119). Wrong but plausible: TypeToken.get(Type) / the private TypeToken(Type) constructor (wrap a Type you already have), TypeToken.getParameterized (builds the type by hand), GsonTypes.canonicalize (normalizes, captures nothing)."
+    },
+    {
+      "id": "q04",
+      "question": "Where does Gson refuse to turn a huge number such as `1e1000000000` or a 50,000-digit literal into a BigDecimal, to avoid very slow parsing?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java", "symbol": "NumberLimits.parseBigDecimal", "start_line": 21, "end_line": 30},
+        {"path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java", "symbol": "NumberLimits.checkNumberStringLength", "start_line": 15, "end_line": 19}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java", "start_line": 590, "end_line": 603},
+        {"path": "gson/src/main/java/com/google/gson/internal/NumberLimits.java", "symbol": "NumberLimits.parseBigInteger", "start_line": 32, "end_line": 35},
+        {"path": "gson/src/main/java/com/google/gson/JsonPrimitive.java", "symbol": "JsonPrimitive.getAsBigDecimal", "start_line": 181, "end_line": 186},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.peekNumber", "start_line": 815, "end_line": 925}
+      ],
+      "notes": "parseBigDecimal first calls checkNumberStringLength, which rejects strings longer than MAX_NUMBER_STRING_LENGTH = 10,000 characters, then builds the BigDecimal and rejects any scale whose absolute value is 10,000 or more, which is what an exponent like 1e1000000000 produces (NumberLimits.java:13-30). Callers: the BIG_DECIMAL adapter's read in TypeAdapters (anonymous class, 590-603), LazilyParsedNumber.asBigDecimal, JsonPrimitive.getAsBigDecimal, ToNumberPolicy.BIG_DECIMAL. Wrong but plausible: the BIG_DECIMAL adapter (only delegates and wraps the NumberFormatException), JsonReader.peekNumber (stops treating a literal longer than the buffer as a number, a different mechanism), JsonReader.setNestingLimit (a depth limit, not a number limit)."
+    },
+    {
+      "id": "q05",
+      "question": "Which method turns an escape sequence like `\\u00e9` or `\\n` inside a JSON string back into the real character while reading?",
+      "lang": "en",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.readEscapeCharacter", "start_line": 1872, "end_line": 1937}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.nextQuotedValue", "start_line": 1209, "end_line": 1263},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.skipQuotedValue", "start_line": 1345, "end_line": 1370},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java", "symbol": "JsonWriter.string", "start_line": 743, "end_line": 773}
+      ],
+      "notes": "readEscapeCharacter runs after the backslash has been consumed: it decodes the four hex digits of \\uXXXX by hand and maps t, b, n, r, f to control characters; an escaped ' or newline is rejected in STRICT mode (JsonReader.java:1873-1937; the range starts at its @SuppressWarnings on 1872). nextQuotedValue calls it while building the string (1243) and skipQuotedValue while skipping (1359). Wrong but plausible: JsonReader.nextQuotedValue (finds the backslash and delegates), JsonWriter.string (the opposite direction: escapes characters on output with REPLACEMENT_CHARS), JsonTreeReader.nextString (a tree has no escapes)."
+    },
+    {
+      "id": "q06",
+      "question": "Java'daki camelCase alan adini JSON'da snake_case'e (someFieldName -> some_field_name) ceviren kod nerede?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java", "symbol": "FieldNamingPolicy.separateCamelCase", "start_line": 179, "end_line": 189},
+        {"path": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java", "start_line": 114, "end_line": 119}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.getFieldNames", "start_line": 85, "end_line": 107},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.setFieldNamingPolicy", "start_line": 412, "end_line": 415},
+        {"path": "gson/src/main/java/com/google/gson/FieldNamingPolicy.java", "symbol": "FieldNamingPolicy.upperCaseFirstLetter", "start_line": 192, "end_line": 212}
+      ],
+      "notes": "Turkish without Turkish letters ('Java'daki camelCase alan adını JSON'da snake_case'e (someFieldName -> some_field_name) çeviren kod nerede'). The LOWER_CASE_WITH_UNDERSCORES enum constant overrides translateName as separateCamelCase(name, '_').toLowerCase(Locale.ENGLISH) (FieldNamingPolicy.java:114-119, an enum-constant body, so lines only); separateCamelCase inserts the separator before every upper-case character except at the start (179-189). Either answers. ReflectiveTypeAdapterFactory.getFieldNames calls translateName when the field has no @SerializedName (related). Wrong but plausible: LOWER_CASE_WITH_DASHES / LOWER_CASE_WITH_DOTS (same helper, other separator), UPPER_CAMEL_CASE and upperCaseFirstLetter (the other direction), GsonBuilder.setFieldNamingPolicy (only stores the policy)."
+    },
+    {
+      "id": "q07",
+      "question": "transient ya da static alanlar JSON'a neden yazılmıyor; bu alanları eleyen kontrol hangi metotta?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/internal/Excluder.java", "symbol": "Excluder.excludeField", "start_line": 158, "end_line": 165},
+        {"path": "gson/src/main/java/com/google/gson/internal/Excluder.java", "symbol": "Excluder.isExcludedByModifier", "start_line": 167, "end_line": 169}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/Excluder.java", "start_line": 54, "end_line": 54},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.includeField", "start_line": 80, "end_line": 82},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.getBoundFields", "start_line": 341, "end_line": 450},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.excludeFieldsWithModifiers", "start_line": 227, "end_line": 232}
+      ],
+      "notes": "Excluder.excludeField is asked for every declared field (through ReflectiveTypeAdapterFactory.includeField, from getBoundFields 372-376) and returns true when isExcludedByModifier matches (Excluder.java:158-169); the default mask is Modifier.TRANSIENT | Modifier.STATIC (54). The same method also covers @Since/@Until, synthetic fields, @Expose and ExclusionStrategy. Wrong but plausible: ReflectiveTypeAdapterFactory.includeField (a one-line wrapper), GsonBuilder.excludeFieldsWithModifiers / Excluder.withModifiers (replace the mask), Excluder.excludeClass (class-level exclusion), Excluder.isExcludedByExposeAnnotation."
+    },
+    {
+      "id": "q08",
+      "question": "Alanin tipi Animal ama icinde bir Dog nesnesi var; serialize ederken Dog'un alanlarini da yazmaya nerede karar veriliyor?",
+      "lang": "tr",
+      "category": "locate-symbol",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java", "symbol": "TypeAdapterRuntimeTypeWrapper.write", "start_line": 44, "end_line": 78},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java", "symbol": "TypeAdapterRuntimeTypeWrapper.getRuntimeTypeIfMoreSpecific", "start_line": 103, "end_line": 121}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.createBoundField", "start_line": 181, "end_line": 310},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java", "symbol": "TypeAdapterRuntimeTypeWrapper.isReflective", "start_line": 85, "end_line": 100},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/CollectionTypeAdapterFactory.java", "symbol": "CollectionTypeAdapterFactory.create", "start_line": 41, "end_line": 62},
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.toJson", "start_line": 565, "end_line": 570}
+      ],
+      "notes": "Turkish without Turkish letters ('Alanın tipi Animal ama içinde bir Dog nesnesi var; serialize ederken Dog'un alanlarını da yazmaya nerede karar veriliyor'). Reflective, collection and map adapters wrap the declared-type adapter in TypeAdapterRuntimeTypeWrapper (ReflectiveTypeAdapterFactory.java:211-215, CollectionTypeAdapterFactory.java:52-53). Its write() calls getRuntimeTypeIfMoreSpecific, which returns value.getClass() when the declared type is a Class, a type variable or a wildcard bounded by one (TypeAdapterRuntimeTypeWrapper.java:103-121), then prefers a user adapter for the runtime type, then a user adapter for the declared type, then the reflective adapter for the runtime type (44-78). Wrong but plausible: Gson.toJson(Object) (uses src.getClass() for the top-level object only), RuntimeTypeAdapterFactory in extras/ (adds a type discriminator field; opt-in, not used by default), ReflectiveTypeAdapterFactory.createBoundField (only installs the wrapper)."
+    },
+    {
+      "id": "q09",
+      "question": "How does Gson guard JSON against being loaded as a script by another site with the `)]}'` prefix: where is the prefix written, and where is it skipped when reading?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.newJsonWriter", "start_line": 797, "end_line": 807},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.consumeNonExecutePrefix", "start_line": 1963, "end_line": 1984}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.generateNonExecutableJson", "start_line": 242, "end_line": 246},
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "start_line": 158, "end_line": 158},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.doPeek", "start_line": 590, "end_line": 756}
+      ],
+      "notes": "Gson.newJsonWriter writes JSON_NON_EXECUTABLE_PREFIX (\")]}'\\n\", Gson.java:158) before anything else when generateNonExecutableJson is set (798-800). On the reading side JsonReader.doPeek calls consumeNonExecutePrefix for the first token only when the reader is LENIENT (679-682); it skips leading whitespace and drops exactly the five characters )]}'\\n (1963-1984). Gson.fromJson switches a default LEGACY_STRICT reader to LENIENT (1094-1097), so fromJson accepts the prefix. Wrong but plausible: GsonBuilder.generateNonExecutableJson (sets the flag only), JsonWriter (never writes the prefix itself), JsonReader.nextNonWhitespace (generic whitespace and comment skipping)."
+    },
+    {
+      "id": "q10",
+      "question": "If a Map's keys are objects (say a Point with x and y), when does Gson write the map as a JSON array of [key, value] pairs instead of a JSON object, and where is that decided?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java", "symbol": "MapTypeAdapterFactory.Adapter.write", "start_line": 216, "end_line": 262}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.enableComplexMapKeySerialization", "start_line": 359, "end_line": 363},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java", "symbol": "MapTypeAdapterFactory.Adapter.read", "start_line": 175, "end_line": 214},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java", "symbol": "MapTypeAdapterFactory.Adapter.keyToString", "start_line": 264, "end_line": 281},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java", "symbol": "MapTypeAdapterFactory.create", "start_line": 125, "end_line": 152}
+      ],
+      "notes": "Adapter.write writes a plain JSON object with String.valueOf(key) when complexMapKeySerialization is off (MapTypeAdapterFactory.java:223-231). With it on, every key is first turned into a JsonElement; only if at least one key becomes a JSON array or object is the whole map written as an array of [key, value] arrays (233-252), otherwise the keys go through keyToString into a JSON object (253-261). Wrong but plausible: GsonBuilder.enableComplexMapKeySerialization (sets the flag only), Adapter.read (accepts both shapes when reading), MapTypeAdapterFactory.create (picks the key and value adapters, decides nothing about the shape), ReflectiveTypeAdapterFactory (writes Point itself, not the map)."
+    },
+    {
+      "id": "q11",
+      "question": "Java records have final fields and no no-args constructor. How does Gson deserialize a record then?",
+      "lang": "en",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.RecordAdapter", "start_line": 592, "end_line": 693},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.RecordAdapter.finalize", "start_line": 666, "end_line": 692}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.create", "start_line": 109, "end_line": 166},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.RecordAdapter.readField", "start_line": 647, "end_line": 664},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "start_line": 275, "end_line": 287},
+        {"path": "gson/src/main/java/com/google/gson/internal/reflect/ReflectionHelper.java", "symbol": "ReflectionHelper.RecordSupportedHelper.getCanonicalRecordConstructor", "start_line": 270, "end_line": 284},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.Adapter.read", "start_line": 523, "end_line": 551}
+      ],
+      "notes": "ReflectiveTypeAdapterFactory.create detects records with ReflectionHelper.isRecord and returns a RecordAdapter instead of FieldReflectionAdapter (154-161). RecordAdapter finds the canonical constructor and the component indices and uses an Object[] accumulator pre-filled with primitive defaults (602-645); readField stores each value at its component index through the bound field's readIntoArray (647-664, 275-287); finalize calls constructor.newInstance(args) (666-692). Record fields are never set by reflection; on write they are read through the accessor methods (getBoundFields 380-407). Wrong but plausible: FieldReflectionAdapter (the class path, instance from ConstructorConstructor plus Field.set), ConstructorConstructor.get (no-args constructor or Unsafe, not used for records), ReflectionHelper.RecordSupportedHelper (reflective lookups only)."
+    },
+    {
+      "id": "q12",
+      "question": "Bir alana anotasyonla farkli bir JSON adi ve yedek (alternatif) adlar verdigimde, okurken bu adlar alana nerede eslestiriliyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.getFieldNames", "start_line": 85, "end_line": 107},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.getBoundFields", "start_line": 341, "end_line": 450}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.Adapter.read", "start_line": 523, "end_line": 551},
+        {"path": "gson/src/main/java/com/google/gson/annotations/SerializedName.java", "symbol": "SerializedName", "start_line": 83, "end_line": 101},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/EnumTypeAdapter.java", "symbol": "EnumTypeAdapter.EnumTypeAdapter", "start_line": 64, "end_line": 111}
+      ],
+      "notes": "Turkish without Turkish letters ('Bir alana anotasyonla farklı bir JSON adı ve yedek (alternatif) adlar verdiğimde, okurken bu adlar alana nerede eşleştiriliyor'). getFieldNames returns @SerializedName value() followed by alternate(), or the FieldNamingStrategy's translateName / alternateNames when the annotation is missing (ReflectiveTypeAdapterFactory.java:85-107). getBoundFields puts the BoundField into deserializedFields under every one of those names and fails on a duplicate (429-437); only the first name is used for writing (439-444). Adapter.read then looks each incoming name up in that map (related). Wrong but plausible: SerializedName (the annotation declaration only), FieldNamingPolicy (used only when the annotation is missing), EnumTypeAdapter's constructor (the same idea for enum constants, not fields)."
+    },
+    {
+      "id": "q13",
+      "question": "JSON'u Map<String, Object>'e okuduğumda 1 gibi tam sayılar neden 1.0 (Double) oluyor; bu dönüşüm nerede yapılıyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ObjectTypeAdapter.java", "symbol": "ObjectTypeAdapter.readTerminal", "start_line": 91, "end_line": 106},
+        {"path": "gson/src/main/java/com/google/gson/ToNumberPolicy.java", "start_line": 42, "end_line": 47}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "start_line": 106, "end_line": 106},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.setObjectToNumberStrategy", "start_line": 443, "end_line": 447},
+        {"path": "gson/src/main/java/com/google/gson/ToNumberPolicy.java", "start_line": 69, "end_line": 97},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ObjectTypeAdapter.java", "symbol": "ObjectTypeAdapter.read", "start_line": 108, "end_line": 167}
+      ],
+      "notes": "For Map<String, Object> the map adapter delegates values to ObjectTypeAdapter, whose readTerminal turns a NUMBER token into toNumberStrategy.readNumber(in) (ObjectTypeAdapter.java:91-106). The default object-to-number strategy is ToNumberPolicy.DOUBLE (GsonBuilder.java:106), whose readNumber returns in.nextDouble() (ToNumberPolicy.java:42-47, an enum-constant body, so lines only); so 1 becomes 1.0. GsonBuilder.setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE) changes it (related, LONG_OR_DOUBLE at 69-97). Wrong but plausible: TypeAdapters.DoubleAdapter (fields declared double/Double), NumberTypeAdapter (fields declared Number, default LAZILY_PARSED_NUMBER), MapTypeAdapterFactory.Adapter.read (reads the keys and delegates the values)."
+    },
+    {
+      "id": "q14",
+      "question": "Lenient modda JSON içindeki // ve # ile başlayan yorum satırları ve /* */ blokları nerede atlanıyor?",
+      "lang": "tr",
+      "category": "locate-feature",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.nextNonWhitespace", "start_line": 1639, "end_line": 1726}
+      ],
+      "accept_any": true,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.skipToEndOfLine", "start_line": 1739, "end_line": 1750},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.skipTo", "start_line": 1755, "end_line": 1772},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.checkLenient", "start_line": 1728, "end_line": 1733}
+      ],
+      "notes": "nextNonWhitespace skips whitespace and, after checkLenient(), '/* ... */' blocks with skipTo(\"*/\") and '//' and '#' line comments with skipToEndOfLine (JsonReader.java:1670-1715). In any strictness other than LENIENT, checkLenient throws 'Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON' (1728-1733). Wrong but plausible: JsonReader.skipValue (skips a JSON value, not a comment), checkLenient alone (only the guard), consumeNonExecutePrefix (the )]}' prefix), JsonParser.parseReader (only sets the reader to LENIENT)."
+    },
+    {
+      "id": "q15",
+      "question": "What happens between `gson.fromJson(json, User.class)` and getting back a filled-in `User`: how does the JSON text become an object with its fields set?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.fromJson", "start_line": 1087, "end_line": 1136},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.create", "start_line": 109, "end_line": 166},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.Adapter.read", "start_line": 523, "end_line": 551}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.fromJson", "start_line": 1001, "end_line": 1007},
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.getAdapter", "start_line": 340, "end_line": 399},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "symbol": "ReflectiveTypeAdapterFactory.getBoundFields", "start_line": 341, "end_line": 450},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/ReflectiveTypeAdapterFactory.java", "start_line": 289, "end_line": 308},
+        {"path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java", "symbol": "ConstructorConstructor.get", "start_line": 103, "end_line": 171}
+      ],
+      "notes": "fromJson(String, Class) -> fromJson(String, TypeToken) -> fromJson(Reader, TypeToken), which creates the JsonReader and checks full consumption (Gson.java:1001-1007) -> fromJson(JsonReader, TypeToken) (1087-1136): sets LENIENT for a legacy reader, calls getAdapter(typeOfT) and typeAdapter.read(reader), and checks the result type. For a plain class the factory that answers is ReflectiveTypeAdapterFactory.create: it gets an ObjectConstructor from ConstructorConstructor.get and builds the BoundFields with getBoundFields (109-166). Adapter.read creates the instance with createAccumulator, loops beginObject / nextName, skips unknown names and calls readField -> BoundField.readIntoField, which reads with the field's adapter and calls field.set (523-551, 289-308). Wrong but plausible: JsonParser.parseString (builds a JsonElement tree, not an object), Gson.getAdapter alone (selection only, no reading)."
+    },
+    {
+      "id": "q16",
+      "question": "GsonBuilder.registerTypeAdapter ile kaydettiğim bir JsonDeserializer, fromJson çağrısı sırasında nasıl bulunuyor ve deserialize metodum nereden çağrılıyor?",
+      "lang": "tr",
+      "category": "flow",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.registerTypeAdapter", "start_line": 739, "end_line": 771},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java", "symbol": "TreeTypeAdapter.SingleTypeFactory.create", "start_line": 177, "end_line": 188},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java", "symbol": "TreeTypeAdapter.read", "start_line": 86, "end_line": 96}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java", "symbol": "TreeTypeAdapter.newFactoryWithMatchRawType", "start_line": 137, "end_line": 142},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.addUserDefinedAdapters", "start_line": 1029, "end_line": 1042},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.createFactories", "start_line": 926, "end_line": 1004},
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.getAdapter", "start_line": 340, "end_line": 399},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java", "symbol": "TreeTypeAdapter.GsonContextImpl.deserialize", "start_line": 203, "end_line": 207},
+        {"path": "gson/src/main/java/com/google/gson/internal/Streams.java", "symbol": "Streams.parse", "start_line": 43, "end_line": 66}
+      ],
+      "notes": "registerTypeAdapter wraps a JsonSerializer/JsonDeserializer with TreeTypeAdapter.newFactoryWithMatchRawType and adds it to the builder's factories (GsonBuilder.java:760-763). createFactories puts the user factories, reversed so the last registration wins, right after the Excluder (936-939 via addUserDefinedAdapters 1029-1042), so Gson.getAdapter asks them before the built-in adapters. SingleTypeFactory.create matches the exact type, or the raw type for a raw registration, and returns a TreeTypeAdapter (TreeTypeAdapter.java:177-188). TreeTypeAdapter.read parses the value into a JsonElement with Streams.parse, returns null for JSON null (nullSafe) and calls deserializer.deserialize(value, type, context) (86-96); context.deserialize goes back to gson.fromJson (203-207). Wrong but plausible: registerTypeHierarchyAdapter / newTypeHierarchyFactory (the subtype route), JsonAdapterAnnotationTypeAdapterFactory (the annotation route), TypeAdapters.newFactory (used for TypeAdapter instances, not for a JsonDeserializer)."
+    },
+    {
+      "id": "q17",
+      "question": "With `new GsonBuilder().setPrettyPrinting().create()`, how does that setting travel to the writer, and where are the newlines and two-space indents actually written?",
+      "lang": "en",
+      "category": "flow",
+      "expected": [
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.newJsonWriter", "start_line": 797, "end_line": 807},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java", "symbol": "JsonWriter.setFormattingStyle", "start_line": 266, "end_line": 283},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java", "symbol": "JsonWriter.newline", "start_line": 775, "end_line": 784}
+      ],
+      "accept_any": false,
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.setPrettyPrinting", "start_line": 548, "end_line": 551},
+        {"path": "gson/src/main/java/com/google/gson/FormattingStyle.java", "start_line": 64, "end_line": 64},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java", "symbol": "JsonWriter.beforeValue", "start_line": 805, "end_line": 835},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonWriter.java", "symbol": "JsonWriter.beforeName", "start_line": 790, "end_line": 799},
+        {"path": "gson/src/main/java/com/google/gson/Gson.java", "symbol": "Gson.toJson", "start_line": 640, "end_line": 647}
+      ],
+      "notes": "setPrettyPrinting is setFormattingStyle(FormattingStyle.PRETTY), i.e. \"\\n\", two spaces and a space after separators (GsonBuilder.java:548-551; FormattingStyle.java:64). The Gson constructor copies the style (Gson.java:255), and every toJson that writes to an Appendable gets its JsonWriter from newJsonWriter, which calls setFormattingStyle (797-807; toJson 640-647). JsonWriter.setFormattingStyle precomputes ': ' versus ':' and ', ' versus ',' and whether newline and indent are both empty (266-283). JsonWriter.newline writes the newline string plus one indent per open scope (775-784); beforeName, beforeValue and closeScope call it (790-835, 454-470). Wrong but plausible: JsonWriter.setIndent (older convenience that ends in setFormattingStyle), FormattingStyle itself (holds the strings only), Gson.toJson(Object) (only passes the writer along)."
+    },
+    {
+      "id": "q18",
+      "question": "I see Gson calling `allocateInstance` to create objects of classes without a no-args constructor, without running any constructor. Where is `allocateInstance` itself implemented?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java", "symbol": "UnsafeAllocator.create", "start_line": 48, "end_line": 128},
+        {"path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java", "symbol": "ConstructorConstructor.newUnsafeAllocator", "start_line": 361, "end_line": 395}
+      ],
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/internal/UnsafeAllocator.java", "symbol": "UnsafeAllocator.assertInstantiable", "start_line": 38, "end_line": 44},
+        {"path": "gson/src/main/java/com/google/gson/internal/ConstructorConstructor.java", "symbol": "ConstructorConstructor.get", "start_line": 103, "end_line": 171},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.disableJdkUnsafe", "start_line": 883, "end_line": 887}
+      ],
+      "notes": "allocateInstance is a method of sun.misc.Unsafe in the JDK (module jdk.unsupported), implemented natively in the JVM. UnsafeAllocator.create only looks it up by reflection (class 'sun.misc.Unsafe', field theUnsafe, method allocateInstance) and invokes it after assertInstantiable (UnsafeAllocator.java:54-66), with Android fallbacks through the private ObjectStreamClass.newInstance and ObjectInputStream.newInstance methods (76-115). ConstructorConstructor.newUnsafeAllocator uses UnsafeAllocator.INSTANCE as the last resort when there is no usable no-args constructor and JDK Unsafe is enabled (361-395). Correct behaviour: say the implementation is not in the repo and cite the pointer. Wrong but plausible: UnsafeAllocator.create presented as the implementation, ConstructorConstructor.newDefaultConstructor (calls a real constructor)."
+    },
+    {
+      "id": "q19",
+      "question": "Where is the algorithm that converts the decimal digits of a JSON number such as `3.14159e-2` into the correctly rounded `double`?",
+      "lang": "en",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.nextDouble", "start_line": 1084, "end_line": 1131},
+        {"path": "gson/src/main/java/com/google/gson/internal/LazilyParsedNumber.java", "symbol": "LazilyParsedNumber.doubleValue", "start_line": 70, "end_line": 73},
+        {"path": "gson/src/main/java/com/google/gson/ToNumberPolicy.java", "start_line": 84, "end_line": 96}
+      ],
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.peekNumber", "start_line": 815, "end_line": 925},
+        {"path": "gson/src/main/java/com/google/gson/stream/JsonReader.java", "symbol": "JsonReader.nextLong", "start_line": 1142, "end_line": 1200},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java", "symbol": "TypeAdapters.DoubleAdapter.read", "start_line": 497, "end_line": 504}
+      ],
+      "notes": "Decimal-to-binary conversion is Double.parseDouble / Double.valueOf in java.lang (the JDK's FloatingDecimal). JsonReader.nextDouble hands the token text to Double.parseDouble (JsonReader.java:1115) and only checks NaN / Infinity afterwards; LazilyParsedNumber.doubleValue (72) and the parseAsDouble helper of ToNumberPolicy.LONG_OR_DOUBLE (ToNumberPolicy.java:84-96, inside an enum-constant body, so lines only) do the same. Correct behaviour: say the conversion is not in the repo and cite the pointer. Wrong but plausible: JsonReader.peekNumber (scans the characters and accumulates only integers that fit in a long; for fractions and exponents it just records the length), JsonReader.nextLong (also falls back to parseDouble), JsonWriter.value(double) (the opposite direction, Double.toString)."
+    },
+    {
+      "id": "q20",
+      "question": "setDateFormat(\"yyyy-MM-dd HH:mm\") verdigimde desendeki yyyy, MM, HH harfleri tarih okunurken nerede yorumlaniyor?",
+      "lang": "tr",
+      "category": "not-in-repo",
+      "expected": [],
+      "accept_any": true,
+      "pointer": [
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/DefaultDateTypeAdapter.java", "symbol": "DefaultDateTypeAdapter.deserializeToDate", "start_line": 165, "end_line": 187},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/DefaultDateTypeAdapter.java", "symbol": "DefaultDateTypeAdapter.DefaultDateTypeAdapter", "start_line": 120, "end_line": 126},
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.setDateFormat", "start_line": 638, "end_line": 650}
+      ],
+      "related": [
+        {"path": "gson/src/main/java/com/google/gson/GsonBuilder.java", "symbol": "GsonBuilder.addDateTypeAdapters", "start_line": 1044, "end_line": 1077},
+        {"path": "gson/src/main/java/com/google/gson/internal/bind/util/ISO8601Utils.java", "symbol": "ISO8601Utils.parse", "start_line": 147, "end_line": 309},
+        {"path": "gson/src/main/java/com/google/gson/internal/PreJava9DateFormatProvider.java", "symbol": "PreJava9DateFormatProvider.getUsDateTimeFormat", "start_line": 30, "end_line": 34}
+      ],
+      "notes": "Turkish without Turkish letters ('setDateFormat(\"yyyy-MM-dd HH:mm\") verdiğimde desendeki yyyy, MM, HH harfleri tarih okunurken nerede yorumlanıyor'). Pattern letters are interpreted by java.text.SimpleDateFormat in the JDK. Gson only checks the pattern by constructing a SimpleDateFormat in setDateFormat(String) (GsonBuilder.java:640-647), creates SimpleDateFormat(pattern, Locale.US) plus one for the default locale (DefaultDateTypeAdapter.java:120-126), calls dateFormat.parse(s) on each until one succeeds and then falls back to ISO8601Utils.parse (165-187). Correct behaviour: say the pattern parsing is not in the repo and cite the pointer. Wrong but plausible: ISO8601Utils.parse (Gson's own hand-written parser for the fixed ISO 8601 format; it ignores the pattern), PreJava9DateFormatProvider (only builds pattern strings for date styles), GsonBuilder.addDateTypeAdapters (only wires the factories)."
+    }
+  ]
+}
