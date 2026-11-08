@@ -14,6 +14,7 @@ from repofinder.search import (
     Hit,
     SearchIndex,
     _abbreviations,
+    _dot_rust_paths,
     _explicit_identifiers,
     _file_stem,
     _path_text,
@@ -948,3 +949,159 @@ def test_function_words_alone_never_join_into_an_identifier() -> None:
     q = SearchIndex(index)._analyze("which answers may be cached")
     assert "may be" not in [u.text for u in q.units]
     assert "maybe" not in q.tokens
+
+
+# --------------------------------------------------------------------------- #
+# Rust: `::` paths in queries and mod.rs file stems
+# --------------------------------------------------------------------------- #
+
+
+def _rust_index() -> RepoIndex:
+    return make_index(
+        [
+            sym("crates/searcher/src/searcher/mod.rs", "Searcher", "class", start=1, end=100,
+                signature="pub struct Searcher"),
+            sym("crates/searcher/src/searcher/mod.rs", "Searcher.new", "method", start=10, end=20,
+                signature="pub fn new() -> Searcher", doc="Create a new searcher."),
+            sym("crates/searcher/src/searcher/mod.rs", "Searcher.search_path", "method", start=30, end=50,
+                signature="pub fn search_path(&mut self)", doc="Search a file path."),
+            sym("crates/printer/src/standard.rs", "Standard", "class", start=1, end=80,
+                signature="pub struct Standard"),
+            sym("crates/printer/src/standard.rs", "Standard.new", "method", start=10, end=20,
+                signature="pub fn new() -> Standard", doc="Create a standard printer."),
+            sym("crates/printer/src/util.rs", "trim_ascii", start=5, end=9, doc="Trim whitespace."),
+            sym("crates/regex/src/matcher.rs", "RegexMatcher", "class", start=1, end=40),
+            sym("crates/regex/src/matcher.rs", "RegexMatcher.is_match", "method", start=12, end=18),
+        ]
+    )
+
+
+def _same_hits(search: SearchIndex, rust_query: str, dotted_query: str) -> list[Hit]:
+    rust, dotted = search.search(rust_query, k=10), search.search(dotted_query, k=10)
+    assert ids(rust) == ids(dotted)
+    assert [h.score for h in rust] == pytest.approx([h.score for h in dotted])
+    return rust
+
+
+def test_rust_path_in_backticks_equals_the_dotted_form() -> None:
+    search = SearchIndex(_rust_index())
+    hits = _same_hits(search, "where is `Searcher::new` defined", "where is `Searcher.new` defined")
+    assert hits
+    assert hits[0].symbol_id == "crates/searcher/src/searcher/mod.rs::Searcher.new"
+
+
+def test_bare_rust_path_equals_the_dotted_form() -> None:
+    search = SearchIndex(_rust_index())
+    hits = _same_hits(search, "where is Searcher::new defined", "where is Searcher.new defined")
+    assert hits[0].symbol_id == "crates/searcher/src/searcher/mod.rs::Searcher.new"
+    hits = _same_hits(search, "Searcher::search_path", "Searcher.search_path")
+    assert hits[0].symbol_id == "crates/searcher/src/searcher/mod.rs::Searcher.search_path"
+
+
+def test_rust_path_with_three_segments_equals_the_dotted_form() -> None:
+    search = SearchIndex(_rust_index())
+    hits = _same_hits(search, "`grep_searcher::Searcher`", "`grep_searcher.Searcher`")
+    assert hits
+    _same_hits(search, "grep_searcher::Searcher::new", "grep_searcher.Searcher.new")
+
+
+@pytest.mark.parametrize("prefix", ["crate::", "self::", "super::"])
+def test_leading_crate_self_super_is_dropped(prefix: str) -> None:
+    search = SearchIndex(_rust_index())
+    hits = _same_hits(search, f"{prefix}printer::Standard", "printer.Standard")
+    assert hits
+    _same_hits(search, f"where is `{prefix}printer::Standard` defined", "where is `printer.Standard` defined")
+
+
+def test_trailing_or_lone_double_colon_does_not_crash() -> None:
+    search = SearchIndex(_rust_index())
+    _same_hits(search, "Searcher::", "Searcher")
+    _same_hits(search, "where is `Searcher::` defined", "where is `Searcher` defined")
+    _same_hits(search, "Searcher:: new", "Searcher new")
+    lone = search.search("::")
+    assert ids(lone) == ids(search.search(""))
+    assert ids(search.search("where is :: defined")) == ids(search.search("where is defined"))
+
+
+def test_queries_without_double_colon_are_unchanged_by_the_rust_handling() -> None:
+    search = SearchIndex(_rust_index())
+    hits = search.search("Searcher.new", k=10)
+    assert hits[0].symbol_id == "crates/searcher/src/searcher/mod.rs::Searcher.new"
+    assert "qualname/path match: searcher.new" in hits[0].why
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        ("src/printer/mod.rs", "printer"),
+        ("crates/searcher/src/searcher/mod.rs", "searcher"),
+        ("src/main.rs", "main"),
+        ("src/lib.rs", "lib"),
+        ("src/util/index.ts", "util"),
+    ],
+)
+def test_file_stem_rust_mod_rs_names_its_directory(path: str, expected: str) -> None:
+    assert _file_stem(path) == expected
+
+
+# --------------------------------------------------------------------------- #
+# dotted words ending in .go/.rs/.java: a file name only if the index has that file
+# --------------------------------------------------------------------------- #
+
+
+def _explicit_texts(search: SearchIndex, query: str) -> list[str]:
+    return [e.text for e in search._analyze(query).explicit]
+
+
+def test_dart_method_named_go_is_an_explicit_identifier_without_such_a_file() -> None:
+    index = make_index(
+        [
+            sym("lib/camera.dart", "CameraTarget", "class", start=1, end=60, signature="class CameraTarget"),
+            sym("lib/camera.dart", "CameraTarget.go", "method", start=10, end=20, signature="void go()"),
+            sym("lib/camera.dart", "CameraTarget.stop", "method", start=30, end=40, signature="void stop()"),
+            sym("lib/other.dart", "Mover", "class", start=1, end=20),
+        ]
+    )
+    search = SearchIndex(index)
+    assert "cameratarget.go" in _explicit_texts(search, "where is CameraTarget.go implemented")
+    bare = search.search("where is CameraTarget.go implemented", k=10)
+    ticked = search.search("where is `CameraTarget.go` implemented", k=10)
+    assert bare[0].symbol_id == "lib/camera.dart::CameraTarget.go"
+    assert ids(bare) == ids(ticked)
+    assert [h.score for h in bare] == pytest.approx([h.score for h in ticked])
+
+
+def test_go_file_name_is_a_file_when_the_index_has_that_file() -> None:
+    index = make_index(
+        [
+            sym("cmd/tool/main.go", "main", start=3, end=20, signature="func main()"),
+            sym("cmd/tool/util.go", "helper", start=3, end=9, signature="func helper()"),
+        ]
+    )
+    search = SearchIndex(index)
+    for query in ["what does main.go do", "main.go", "where is run in main.go"]:
+        assert _explicit_texts(search, query) == [], query
+    hits = search.search("what does main.go do", k=5)
+    assert all("explicit" not in h.why for h in hits)
+
+
+@pytest.mark.parametrize("path, query", [("pkg/app.py", "app.py"), ("pkg/app.py", "what does app.py do")])
+def test_older_extension_file_name_is_still_a_file_name(path: str, query: str) -> None:
+    index = make_index([sym(path, "create_app", signature="def create_app()")])
+    search = SearchIndex(index)
+    assert _explicit_texts(search, query) == []
+    assert _explicit_identifiers("what does app.py do") == []
+
+
+def test_pytest_node_id_is_not_a_rust_path() -> None:
+    assert "tests/test_basic.py.test_x" not in _dot_rust_paths("tests/test_basic.py::test_x")
+    assert "test_basic.py.test_x" not in _dot_rust_paths("tests/test_basic.py::test_x")
+    index = make_index(
+        [
+            sym("tests/test_basic.py", "test_session_expiration", start=10, end=20),
+            sym("tests/test_basic.py", "test_url_generation", start=30, end=40),
+            sym("src/flask/sessions.py", "SessionInterface", "class", start=1, end=50),
+        ]
+    )
+    hits = SearchIndex(index).search("tests/test_basic.py::test_session_expiration fails", k=5)
+    assert hits[0].symbol_id == "tests/test_basic.py::test_session_expiration"

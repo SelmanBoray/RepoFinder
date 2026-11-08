@@ -50,7 +50,8 @@ abbreviation) never weighs more than the word itself: in the requests repo
   ``Session.request``/``requests.get``, snake_case or camelCase) gets the full
   name boost when it is the only identifier named, however common its words
   are; the qualifier of a dotted name ("Session" in ``Session.request``) is not
-  a name match by itself;
+  a name match by itself. A Rust path is its dotted form: ``Searcher::new`` is
+  ``Searcher.new``, ``crate::printer::Standard`` is ``printer.Standard``;
 * owner: the enclosing class is named in the query too (``make_response`` "on
   the Flask application object" -> ``Flask.make_response``), scaled by how
   strongly the name itself matched;
@@ -83,7 +84,7 @@ from itertools import product
 from pathlib import Path
 from typing import Callable, Optional
 
-from .graph import PATH_MODULE_EXTENSIONS, is_test_path, module_names, split_source_extension
+from .graph import PATH_MODULE_EXTENSIONS, is_test_path, module_names, path_module_name, split_source_extension
 from .models import RepoIndex, Symbol
 
 K1 = 1.5
@@ -113,9 +114,25 @@ _BACKTICK_RE = re.compile(r"`([^`]+)`")
 _IDENTIFIER_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")
 _DOTTED_RE = re.compile(r"(?<![\w./])[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+(?![\w/])")
 _CAMEL_HUMP_RE = re.compile(r"[a-z0-9][A-Z]|[A-Z]{2}[a-z]")
+# A Rust path in a query ("Searcher::new", "grep_searcher::Searcher",
+# "crate::printer::Standard"): read as the dotted name it stands for, the way
+# index qualnames are written (see :func:`_dot_rust_paths`). A path does not
+# start inside a token, after a word character, ".", "/" or ":": in the pytest
+# node id "tests/test_app.py::TestApp::test_run" no "::" is a Rust path.
+_RUST_PATH_RE = re.compile(r"(?<![\w./:])[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)+")
+# A "::" at the edge of a word: trailing ("Searcher::"), lone (" :: "),
+# leading ("::std") or before a turbofish ("collect::<").
+_EDGE_PATH_SEPARATOR_RE = re.compile(r"(?<!\w)::|::(?!\w)")
+# Leading path segments that only say where a Rust path starts.
+_RUST_PATH_ROOTS = frozenset({"crate", "self", "super"})
 # A dotted query term ending in one of these is a file name ("app.py",
 # "index.ts"), not an identifier.
-_FILE_EXTENSION_WORDS = frozenset({"py", "pyi", *(ext[1:] for ext in PATH_MODULE_EXTENSIONS)})
+_FILE_EXTENSION_WORDS = frozenset({"py", "pyi", "ts", "tsx", "mts", "cts", "js", "jsx", "mjs", "cjs", "dart"})
+# The other source extensions (Go, Rust, Java) are also common member names
+# (``CameraTarget.go``, ``router.go``, ``wg.Go``): a term ending in one is a
+# file name only when the index has a file of that name (``main.go``,
+# ``lib.rs``, ``Gson.java``; see :func:`_explicit_identifiers`).
+_INDEXED_FILE_EXTENSION_WORDS = frozenset(ext[1:] for ext in PATH_MODULE_EXTENSIONS) - _FILE_EXTENSION_WORDS
 _CLASS_BASED_RE = re.compile(r"(?i)\bclass-based\b")
 
 # Dropped wherever they stand alone. Parts of a compound identifier are kept
@@ -471,10 +488,16 @@ def _path_text(path: str) -> str:
 def _file_stem(path: str) -> str:
     """``pkg/mod.py`` -> ``mod``; ``pkg/sub/__init__.py`` -> ``sub``;
     ``src/util.ts`` -> ``util``; ``src/util/index.ts`` -> ``util`` (an
-    ``index`` file names its directory, as ``__init__.py`` does)."""
+    ``index`` file names its directory, as ``__init__.py`` does);
+    ``src/printer/mod.rs`` -> ``printer`` (so does a Rust ``mod.rs``), while
+    ``src/main.rs`` and ``src/lib.rs`` keep their stem. Files named by path
+    follow :func:`graph.path_module_name` (``pkg/index.go`` stays ``index``)."""
+    module = path_module_name(path)
+    if module is not None:
+        return module.rsplit("/", 1)[-1].lower()
     parts = _strip_extension(path).split("/")
     base = parts[-1]
-    if len(parts) > 1 and (base == "__init__" or (base == "index" and path.endswith(PATH_MODULE_EXTENSIONS))):
+    if len(parts) > 1 and base == "__init__":
         base = parts[-2]
     return base.lower()
 
@@ -606,6 +629,13 @@ class SearchIndex:
         path_tokens: dict[str, list[str]] = {}
         for record in index.files:
             path_tokens[record.path] = tokenize(_path_text(record.path))
+        # Lowercase names of the indexed files whose extension is also a common
+        # member name ("main.go"): such a query term is a file name only then.
+        self._file_names = frozenset(
+            name
+            for name in (record.path.rsplit("/", 1)[-1].lower() for record in index.files)
+            if name.rpartition(".")[2] in _INDEXED_FILE_EXTENSION_WORDS
+        )
 
         for sym in index.symbols:
             names_by_file.setdefault(sym.path, []).append(sym.name)
@@ -972,6 +1002,7 @@ class SearchIndex:
         return q
 
     def _analyze_with(self, query: str, drop: frozenset[str]) -> _Query:
+        query = _dot_rust_paths(query)
         written = [w.strip("_") for w in _WORD_RE.findall(query)]
         raw = [_lower(w) for w in written]
         turkish = _looks_turkish(query, raw)
@@ -1052,7 +1083,7 @@ class SearchIndex:
         # does not make a name match by itself.
         explicit: list[_Explicit] = []
         qualifier_words: Counter[str] = Counter()
-        for parts in _explicit_identifiers(query):
+        for parts in _explicit_identifiers(query, self._file_names):
             lowered = [_lower(p) for p in parts]
             qualifier_words.update(lowered[:-1])
             quals = frozenset(seen[w][0] for w in lowered[:-1] if w in seen and seen[w][0] is not None)
@@ -1166,7 +1197,32 @@ class SearchIndex:
         return [word]
 
 
-def _explicit_identifiers(query: str) -> list[tuple[str, ...]]:
+def _dot_rust_paths(query: str) -> str:
+    """``query`` with its Rust paths written with dots, as index qualnames are.
+
+    ``Searcher::new`` -> ``Searcher.new``, ``grep_searcher::Searcher`` ->
+    ``grep_searcher.Searcher``; leading ``crate``, ``self`` and ``super``
+    segments only say where the path starts and are dropped
+    (``crate::printer::Standard`` -> ``printer.Standard``). A ``::`` at the
+    edge of a word (trailing ``Searcher::``, lone, leading ``::std``, before a
+    turbofish ``<``) becomes a space first. A ``::`` inside a token that is
+    not a path stays as written: a pytest node id
+    (``tests/test_app.py::test_run``) reads as it always did. A query without
+    ``::`` is returned unchanged. Applying this twice changes nothing more.
+    """
+    if "::" not in query:
+        return query
+
+    def dotted(match: re.Match[str]) -> str:
+        segments = match.group().split("::")
+        while len(segments) > 1 and segments[0] in _RUST_PATH_ROOTS:
+            del segments[0]
+        return ".".join(segments)
+
+    return _RUST_PATH_RE.sub(dotted, _EDGE_PATH_SEPARATOR_RE.sub(" ", query))
+
+
+def _explicit_identifiers(query: str, file_names: frozenset[str] = frozenset()) -> list[tuple[str, ...]]:
     """Identifiers the query names outright, as dot-separated parts (outer
     underscores stripped, case kept).
 
@@ -1174,8 +1230,14 @@ def _explicit_identifiers(query: str) -> list[tuple[str, ...]]:
     outside a path (``requests.get(url)``; not a file name such as ``app.py``
     or ``index.ts``, not "e.g.") and a
     snake_case or camelCase word (``url_for``, ``CaseInsensitiveDict``). Plain
-    words, even backticked ones in a phrase (```flask run```), are not.
+    words, even backticked ones in a phrase (```flask run```), are not. A Rust
+    path counts as its dotted form (``Searcher::new`` is ``Searcher.new``, see
+    :func:`_dot_rust_paths`). A dotted name ending in ``go``, ``rs`` or
+    ``java`` (:data:`_INDEXED_FILE_EXTENSION_WORDS`) is a file name only when
+    it ends in one of ``file_names``, the lowercase names of such indexed files
+    (``main.go`` in a Go repository; ``CameraTarget.go`` elsewhere is a method).
     """
+    query = _dot_rust_paths(query)
     found: list[str] = []
     for span in _BACKTICK_RE.findall(query):
         span = span.strip()
@@ -1186,7 +1248,7 @@ def _explicit_identifiers(query: str) -> list[tuple[str, ...]]:
     for term in _DOTTED_RE.findall(query):
         parts = term.split(".")
         # Not a file name ("app.py", "index.ts") nor an abbreviation ("e.g").
-        if parts[-1].lower() not in _FILE_EXTENSION_WORDS and all(len(p) >= 2 for p in parts):
+        if all(len(p) >= 2 for p in parts) and not _is_file_name(parts, file_names):
             found.append(term)
     for word in _WORD_RE.findall(query):
         if word.isascii() and ("_" in word.strip("_") or _CAMEL_HUMP_RE.search(word)):
@@ -1197,6 +1259,18 @@ def _explicit_identifiers(query: str) -> list[tuple[str, ...]]:
         if all(parts) and parts not in out:
             out.append(parts)
     return out
+
+
+def _is_file_name(parts: list[str], file_names: frozenset[str]) -> bool:
+    """The dotted term ``parts`` is a file name: it ends in a source
+    extension of :data:`_FILE_EXTENSION_WORDS`, or ends in one of
+    ``file_names`` (see :func:`_explicit_identifiers`)."""
+    ext = parts[-1].lower()
+    if ext in _FILE_EXTENSION_WORDS:
+        return True
+    if ext not in _INDEXED_FILE_EXTENSION_WORDS or not file_names:
+        return False
+    return any(".".join(parts[i:]).lower() in file_names for i in range(len(parts) - 1))
 
 
 def _explicit_match(doc: _Doc, explicit: list[_Explicit]) -> Optional[_Explicit]:
