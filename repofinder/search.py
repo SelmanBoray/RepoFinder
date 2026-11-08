@@ -105,11 +105,6 @@ from .graph import PATH_MODULE_EXTENSIONS, is_test_path, module_names, path_modu
 from .graph import inline_test_scopes, is_test_symbol, rust_test_module_files
 from .models import RepoIndex, Symbol
 
-try:  # Python 3.11+; on 3.10 TOML manifests (Cargo, pyproject) declare no shipped files
-    import tomllib
-except ImportError:  # pragma: no cover
-    tomllib = None  # type: ignore[assignment]
-
 K1 = 1.5
 B = 0.75
 NAME_BOOST = 3.0       # symbol name is the whole query; scaled down by coverage (see module doc)
@@ -229,7 +224,10 @@ _MANIFEST_NAMES = (
     "pubspec.yaml", "package.json", "Cargo.toml", "go.mod", "pom.xml", "build.gradle",
     "build.gradle.kts", "pyproject.toml", "setup.py",
 )
-_MANIFEST_MAX_BYTES = 1024 * 1024
+# A larger manifest is not read (REA's package.json, with a long "files" list, is 25 KB).
+_MANIFEST_MAX_BYTES = 256 * 1024
+# At most this many strings are taken from one JSON field (``exports`` maps).
+_MANIFEST_MAX_STRINGS = 10_000
 # The manifests that can declare a shipped file (see :func:`_shipped_paths`).
 _SHIPPING_MANIFESTS = frozenset({"package.json", "pyproject.toml", "setup.py", "Cargo.toml"})
 # A query word from this set (ASCII-folded) or starting with one of the Turkish
@@ -747,7 +745,7 @@ class _AuxDirs:
                         continue
                     try:
                         manifest = (directory / name).resolve()
-                    except OSError:
+                    except (OSError, RuntimeError, ValueError):  # a link loop, a bad name
                         continue
                     if manifest.is_relative_to(self.root):  # not through a link out of the checkout
                         found.update(_shipped_paths(manifest))
@@ -772,54 +770,55 @@ def _shipped_paths(manifest: Path) -> set[str]:
     * ``Cargo.toml``: the ``path`` of ``[lib]`` and ``[[bin]]`` (``[[example]]``
       and ``[[bench]]`` do not ship).
 
-    Other manifests declare nothing here. An unreadable manifest declares nothing.
+    TOML manifests are read by line (:func:`_toml_strings`), so the result is
+    the same on every Python version. Repositories are untrusted: a manifest
+    larger than :data:`_MANIFEST_MAX_BYTES`, unreadable, undecodable, too
+    deeply nested or of an unexpected shape declares nothing, and reading it
+    never raises.
     """
     if manifest.name not in _SHIPPING_MANIFESTS:
         return set()
     try:
         with open(manifest, "rb") as handle:
             raw = handle.read(_MANIFEST_MAX_BYTES + 1)
-    except OSError:
+        if len(raw) > _MANIFEST_MAX_BYTES:
+            return set()
+        return _declared_paths(manifest.name, raw.decode("utf-8", errors="replace").lstrip("\ufeff"))
+    except Exception:  # noqa: BLE001 - OSError, RecursionError, odd shapes: no exemption
         return set()
-    if len(raw) > _MANIFEST_MAX_BYTES:
-        return set()
-    text = raw.decode("utf-8", errors="replace").lstrip("\ufeff")
+
+
+def _declared_paths(name: str, text: str) -> set[str]:
+    """The shipped paths of manifest ``name`` with contents ``text`` (see :func:`_shipped_paths`)."""
     files: list[str] = []
     modules: list[str] = []
-    try:
-        if manifest.name == "package.json":
-            data = json.loads(text)
-            if isinstance(data, dict):
-                for field in ("bin", "main", "module", "browser", "types", "exports"):
-                    files.extend(_json_strings(data.get(field)))
-                entries = data.get("files")
-                if isinstance(entries, list):
-                    files.extend(e for e in entries if isinstance(e, str))
-        elif manifest.name == "pyproject.toml" and tomllib is not None:
-            data = tomllib.loads(text)
-            project = data.get("project") or {}
-            tool = data.get("tool") or {}
-            for table in (project.get("scripts"), project.get("gui-scripts"), (tool.get("poetry") or {}).get("scripts")):
-                if isinstance(table, dict):
-                    modules.extend(v.split(":", 1)[0] for v in table.values() if isinstance(v, str))
-            script_files = (tool.get("setuptools") or {}).get("script-files")
-            if isinstance(script_files, list):
-                files.extend(f for f in script_files if isinstance(f, str))
-        elif manifest.name == "setup.py":
-            listed = re.search(r"\bscripts\s*=\s*\[([^\]]*)\]", text)
-            if listed:
-                files.extend(re.findall(r"['\"]([^'\"]+)['\"]", listed.group(1)))
-            modules.extend(re.findall(r"['\"][\w.-]+\s*=\s*([\w.]+)\s*:", text))
-        elif manifest.name == "Cargo.toml" and tomllib is not None:
-            data = tomllib.loads(text)
-            lib = data.get("lib")
-            targets = [lib] if isinstance(lib, dict) else []
-            bins = data.get("bin")
-            if isinstance(bins, list):
-                targets.extend(b for b in bins if isinstance(b, dict))
-            files.extend(t["path"] for t in targets if isinstance(t.get("path"), str))
-    except (ValueError, AttributeError, TypeError):  # tomllib.TOMLDecodeError is a ValueError
-        return set()
+    if name == "package.json":
+        data = json.loads(text)
+        if isinstance(data, dict):
+            for field in ("bin", "main", "module", "browser", "types", "exports"):
+                files.extend(_json_strings(data.get(field)))
+            entries = data.get("files")
+            if isinstance(entries, list):
+                files.extend(e for e in entries if isinstance(e, str))
+    elif name == "pyproject.toml":
+        for key, values in _toml_strings(text).items():
+            if (len(key) == 3 and key[:2] in (("project", "scripts"), ("project", "gui-scripts"))) or (
+                len(key) == 4 and key[:3] == ("tool", "poetry", "scripts")
+            ):
+                modules.extend(v.split(":", 1)[0] for v in values)
+            elif key == ("tool", "setuptools", "script-files"):
+                files.extend(values)
+    elif name == "setup.py":
+        listed = re.search(r"\bscripts\s*=\s*\[", text)
+        if listed:
+            end = text.find("]", listed.end())
+            if end >= 0:
+                files.extend(re.findall(r"['\"]([^'\"\n]+)['\"]", text[listed.end() : end]))
+        modules.extend(re.findall(r"['\"][\w.-]+\s*=\s*([\w.]+)\s*:", text))
+    elif name == "Cargo.toml":
+        toml = _toml_strings(text)
+        files.extend(toml.get(("lib", "path"), ()))
+        files.extend(toml.get(("bin", "path"), ()))
     out: set[str] = set()
     for f in files:
         if any(ch in f for ch in "*?[!"):
@@ -828,8 +827,9 @@ def _shipped_paths(manifest: Path) -> set[str]:
         if norm and not norm.startswith(("..", "/")) and norm != ".":
             out.add(norm)
     for module in modules:
-        base = module.strip().replace(".", "/")
-        if base:
+        module = module.strip()
+        if re.fullmatch(r"\w+(?:\.\w+)*", module):
+            base = module.replace(".", "/")
             for root in ("", "src/"):
                 out.add(f"{root}{base}.py")
                 out.add(f"{root}{base}/__init__.py")
@@ -837,14 +837,115 @@ def _shipped_paths(manifest: Path) -> set[str]:
 
 
 def _json_strings(value: object) -> list[str]:
-    """Every string inside a JSON value (``bin`` maps, nested ``exports``)."""
-    if isinstance(value, str):
-        return [value]
-    if isinstance(value, dict):
-        return [s for v in value.values() for s in _json_strings(v)]
-    if isinstance(value, list):
-        return [s for v in value for s in _json_strings(v)]
-    return []
+    """Every string inside a JSON value (``bin`` maps, nested ``exports``),
+    at most :data:`_MANIFEST_MAX_STRINGS`; iterative, so depth does not matter."""
+    out: list[str] = []
+    stack = [value]
+    while stack and len(out) < _MANIFEST_MAX_STRINGS:
+        item = stack.pop()
+        if isinstance(item, str):
+            out.append(item)
+        elif isinstance(item, dict):
+            stack.extend(reversed(list(item.values())))
+        elif isinstance(item, list):
+            stack.extend(reversed(item))
+    return out
+
+
+# A line-based reader for the few TOML keys of :func:`_shipped_paths`; not a
+# TOML parser (compare ``parser_rust._parse_manifest``).
+_TOML_KEY_PART = r"""[A-Za-z0-9_-]+|"(?:[^"\\\n]|\\.)*"|'[^'\n]*'"""
+_TOML_KEY = rf"(?:{_TOML_KEY_PART})(?:\s*\.\s*(?:{_TOML_KEY_PART}))*"
+_TOML_HEADER_RE = re.compile(rf"^\s*\[\[?\s*({_TOML_KEY})\s*\]\]?\s*(?:#.*)?$")
+_TOML_ASSIGN_RE = re.compile(rf"^\s*({_TOML_KEY})\s*=\s*")
+_TOML_PART_RE = re.compile(r"""[A-Za-z0-9_-]+|"((?:[^"\\\n]|\\.)*)"|'([^'\n]*)'""")
+_TOML_STRING_RE = re.compile(r""""((?:[^"\\\n]|\\.)*)"|'([^'\n]*)'""")
+_TOML_PAIR_RE = re.compile(rf"""({_TOML_KEY})\s*=\s*(?:"((?:[^"\\\n]|\\.)*)"|'([^'\n]*)')""")
+
+
+def _toml_key(text: str) -> tuple[str, ...]:
+    """``tool."poetry".scripts`` -> ``("tool", "poetry", "scripts")``."""
+    return tuple(
+        _toml_unescape(m.group(1)) if m.group(1) is not None else m.group(2) if m.group(2) is not None else m.group()
+        for m in _TOML_PART_RE.finditer(text)
+    )
+
+
+def _toml_unescape(text: str) -> str:
+    return re.sub(r"\\(.)", r"\1", text)
+
+
+def _toml_scan(text: str, strings: list[str]) -> int:
+    """Append the strings of one value line to ``strings``; return its bracket
+    balance (``[``/``{`` minus ``]``/``}`` outside strings). A comment ends it."""
+    balance = 0
+    i, n = 0, len(text)
+    while i < n:
+        ch = text[i]
+        if ch in "\"'":
+            m = _TOML_STRING_RE.match(text, i)
+            if m is None:
+                break  # unterminated or multi-line: the rest of the line is not read
+            strings.append(_toml_unescape(m.group(1)) if m.group(1) is not None else m.group(2))
+            i = m.end()
+            continue
+        if ch == "#":
+            break
+        if ch in "[{":
+            balance += 1
+        elif ch in "]}":
+            balance -= 1
+        i += 1
+    return balance
+
+
+def _toml_strings(text: str) -> dict[tuple[str, ...], list[str]]:
+    """Full dotted key -> the strings assigned to it, by line.
+
+    ``[table]`` and ``[[array]]`` headers set the key prefix (every
+    ``[[bin]]`` adds to ``("bin", "path")``); dotted and quoted keys are
+    split; a value array may span lines; a one-line inline table
+    (``gui-scripts = { gui = "pkg.gui:main" }``) gives one key per string
+    pair. Multi-line strings are skipped, so a header inside one is no header.
+    Nested inline tables and arrays of inline tables are not read.
+    """
+    out: dict[tuple[str, ...], list[str]] = {}
+    table: tuple[str, ...] = ()
+    open_array: Optional[tuple[tuple[str, ...], int]] = None  # key and bracket balance of a value spanning lines
+    open_string: Optional[str] = None  # delimiter of a multi-line string being skipped
+    for line in text.splitlines():
+        if open_array is not None:
+            key, balance = open_array
+            balance += _toml_scan(line, out[key])
+            open_array = (key, balance) if balance > 0 else None
+            continue
+        if open_string is not None:
+            if line.count(open_string) % 2:
+                open_string = None
+            continue
+        opened = next((d for d in ('"""', "'''") if line.count(d) % 2), None)
+        if opened is not None:
+            open_string = opened
+            continue
+        header = _TOML_HEADER_RE.match(line)
+        if header is not None:
+            table = _toml_key(header.group(1))
+            continue
+        assign = _TOML_ASSIGN_RE.match(line)
+        if assign is None:
+            continue
+        key = table + _toml_key(assign.group(1))
+        rest = line[assign.end() :]
+        if rest.startswith("{"):
+            for pair in _TOML_PAIR_RE.finditer(rest):
+                value = _toml_unescape(pair.group(2)) if pair.group(2) is not None else pair.group(3)
+                out.setdefault(key + _toml_key(pair.group(1)), []).append(value)
+            continue
+        values = out.setdefault(key, [])
+        balance = _toml_scan(rest, values)
+        if balance > 0:
+            open_array = (key, balance)
+    return out
 
 
 @dataclass
