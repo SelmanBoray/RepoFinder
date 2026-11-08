@@ -110,26 +110,26 @@ def test_inline_rust_tests_rank_below_product_code(rust_index: RepoIndex) -> Non
     by_id = {h.symbol_id: h for h in hits}
     product = by_id["src/lib.rs::count_matches"]
     assert hits[0] is product
-    assert "test file" not in product.why
-    assert "test file" not in by_id["src/lib.rs::simd.count_matches_fast"].why
+    assert "test code" not in product.why
+    assert "test code" not in by_id["src/lib.rs::simd.count_matches_fast"].why
     for test_id in (
         "src/lib.rs::count_matches_empty",
         "src/lib.rs::tests.count_matches_helper",
         "src/lib.rs::tests.nested.count_matches_nested",
         "src/lib.rs::tests.count_matches_lines",
     ):
-        assert "test file" in by_id[test_id].why
+        assert "test code" in by_id[test_id].why
         assert by_id[test_id].score < product.score
     # The file holds product code: its file-level record is not a test.
     files = [h for h in search.search("lib", k=20) if h.kind == "file"]
-    assert files and all("test file" not in h.why for h in files)
+    assert files and all("test code" not in h.why for h in files)
 
 
 def test_the_penalty_lifts_when_the_query_mentions_tests(rust_index: RepoIndex) -> None:
     search = SearchIndex(rust_index)
     plain = {h.symbol_id: h for h in search.search("count matches haystack lines", k=20)}
     tests = {h.symbol_id: h for h in search.search("tests for count matches haystack lines", k=20)}
-    assert all("test file" not in h.why for h in tests.values())
+    assert all("test code" not in h.why for h in tests.values())
     helper = "src/lib.rs::tests.count_matches_helper"
     assert tests[helper].score > plain[helper].score
 
@@ -228,19 +228,19 @@ def test_symbols_and_file_of_a_test_module_file_rank_as_tests(crate_index: RepoI
     hits = search.search("matcher matching lines haystack", k=30)
     by_id = {h.symbol_id or h.path: h for h in hits}
     product = by_id["src/util.rs::Matcher"]
-    assert "test file" not in product.why
+    assert "test code" not in product.why
     test_hit = by_id["src/testutil.rs::RegexMatcher"]
-    assert "test file" in test_hit.why
+    assert "test code" in test_hit.why
     assert hits.index(product) < hits.index(test_hit)
     for name in ("src/testutil/deeper.rs::deeper_matcher", "src/support/shared.rs::shared_matcher",
                  "src/printer/helpers.rs::helper_matcher", "src/checks/fixtures.rs::fixture_matcher"):
-        assert "test file" in by_id[name].why
+        assert "test code" in by_id[name].why
     for name in ("src/simd.rs::fast_matcher", "src/printer/standard.rs::standard_matcher"):
-        assert "test file" not in by_id[name].why
+        assert "test code" not in by_id[name].why
     files = {h.path: h for h in search.search("testutil", k=30) if h.kind == "file"}
-    assert "test file" in files["src/testutil.rs"].why
+    assert "test code" in files["src/testutil.rs"].why
     lifted = search.search("tests for the regex matcher", k=30)
-    assert all("test file" not in h.why for h in lifted)
+    assert all("test code" not in h.why for h in lifted)
 
 
 def test_a_hand_built_index_without_test_markers_stays_product() -> None:
