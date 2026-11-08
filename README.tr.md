@@ -4,7 +4,7 @@
 RepoFinder, büyük bir açık kaynak projeye katkıda bulunmadan önce o projede
 yolunuzu bulmanıza yardım eder. Ona bir GitHub deposu verdiğinizde bir mimari
 haritası çizer ve "X özelliği nerede uygulanmış?" sorusunu koda işaret eden
-`path:start-end` alıntılarıyla yanıtlar. Python ve TypeScript projelerini okur (Dart isteğe bağlı).
+`path:start-end` alıntılarıyla yanıtlar. Python, TypeScript, JavaScript, Go, Rust ve Java projelerini okur (Dart isteğe bağlı).
 
 ## Kurulum
 
@@ -130,7 +130,7 @@ yaklaşık 80), bu yüzden önce `--limit 10` ile deneyin.
 
 | Komut | Ne yapar |
 | --- | --- |
-| `repofinder index <source> [--refresh]` | Klonlar (URL ise) ve Python ile TypeScript dosyalarını (`dart` ekstrasıyla Dart da) indeksler. `--refresh` mevcut bir indeksi yeniden oluşturur ve hâlâ var olan dosyaların özetlerini korur. |
+| `repofinder index <source> [--refresh]` | Klonlar (URL ise) ve Python, TypeScript, JavaScript, Go, Rust ve Java dosyalarını (`dart` ekstrasıyla Dart da) indeksler. `--refresh` mevcut bir indeksi yeniden oluşturur ve hâlâ var olan dosyaların özetlerini korur. |
 | `repofinder map <source> [--out FILE] [--max-modules N]` | Markdown biçiminde mimari haritası: giriş noktaları, fan-in'e göre çekirdek modüller, paket düzeni, sıcak noktalar ve nereden başlanacağı. |
 | `repofinder ask <source> "question" [-k N] [--show-context] [--decisions jev\|rules] [--candidates N] [--json]` | Alıntılarla yanıt verir. `-k` kaç arama sonucunun bağlama gireceğini belirler (varsayılan 8); `--show-context` Claude'a gönderilen kesitleri listeler; `--decisions` bu çalıştırma için karar katmanını seçer (varsayılan: kuruluysa Jev, değilse kurallar); Jev ile, en üstteki `-k` sonuç bağlama girmeden önce tek bir çağrı ilk `--candidates` sonucu yeniden sıralar (varsayılan 16, en fazla 16); `--json` şunları yazdırır: `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage`, `elapsed_s`, `decisions` (`name`, `calls`, `cost_usd`, `reranked`, `off_target`, `error`), `candidates` ve `probabilities` (`path:start-end`'den p'ye). |
 | `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | Kod hakkında bir sohbet; stdin'den her satırda bir mesaj okunur (bkz. [Sohbet modu](#sohbet-modu)). `-k` arama başına sonuç sayısını belirler (varsayılan 8); `--decisions` bu çalıştırma için karar katmanını seçer. `/context` son aramanın kesitlerini listeler, `/route` son mesajın nasıl yönlendirildiğini gösterir, `/help` komutları listeler, `/quit` ya da girdinin sonu sohbetten çıkarır. `--json` her tur için satır başına bir JSON nesnesi yazdırır (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). `you>` istemi yalnızca terminalde yazarken gösterilir; böylece pipe ile aktarılan çıktı temiz kalır. |
@@ -186,7 +186,7 @@ requests'te 0.59'dan 0.88'e çıkarır
 
 ## Nasıl çalışır
 
-Tree-sitter her Python ve TypeScript dosyasını (kuruluysa Dart da) sınıflara, fonksiyonlara,
+Tree-sitter her Python, TypeScript, JavaScript, Go, Rust ve Java dosyasını (kuruluysa Dart da) sınıflara, fonksiyonlara,
 metotlara ve import'lara ayrıştırır; bunlar bir import grafiğiyle (fan-in, fan-out, giriş
 noktaları) birlikte bir SQLite veritabanında saklanır. Bir soru, en iyi
 sembolleri ve dosyaları döndüren sözcüksel bir aramayla (sembol adları,
@@ -199,25 +199,98 @@ hafif bir İngilizce kök bulma (stem) ve yaygın tanımlayıcı kısaltmaları
 Türkçe sorular ise Türkçe dolgu sözcükleri atılıp geri kalanı küçük bir
 sözlükle çevrilerek desteklenir. Seçilen sembollerin tam kaynak satırları
 kesitlere dönüşür (fonksiyon ve sınıfların tamamı, uzun olanlar yaklaşık 100
-satırlık pencerelerle, metotlar için sınıf başlığı), toplamda yaklaşık 36,000
+satırlık pencerelerle, metotlar için sınıf başlığı; Java, Go ve Rust metotlarında sahibinin başlığı, bkz. [Diller](#diller)), toplamda yaklaşık 36,000
 karakter. Claude yalnızca bu kesitlerden yanıt verir ve `path:start-end`
 biçiminde alıntı yapar; Sources listesi yalnızca kesitlerin içine düşen
 alıntıları tutar.
 
 ### Diller
 
-Python (`.py`) ve TypeScript (`.ts`, `.mts`, `.cts`, `.tsx`) indekslenir.
+Python (`.py`), TypeScript (`.ts`, `.mts`, `.cts`, `.tsx`), JavaScript, Go,
+Rust ve Java indekslenir; Dart isteğe bağlıdır (aşağıda).
 TypeScript sembolleri fonksiyonlar, sınıflar, metotlar, interface'ler,
 type'lar, enum'lar, namespace'ler ve arrow-function const'larıdır; JSDoc
 yorumu docstring olarak alınır. Göreli import'lar çözülür (`./a.js`,
 `a.ts` veya `index.ts` dosyasını bulur), `index.ts` adlı dosya dizinin adını
 taşır ve `*.test.ts`, `*.spec.ts` ile `__tests__/` test sayılır.
 `node_modules`, `dist`, `build`, `third_party`, `licenses`, minify edilmiş
-dosyalar ve 2 MB'tan büyük dosyalar atlanır. JavaScript (`.js`, `.mjs`)
-henüz ayrıştırılmıyor. morluto/rea üzerinde (3.119 dosya, 747 bin satır)
-indeksleme 5,4 sn sürdü ve 12,5 MB'lık indekste 15.267 sembol üretti; 59
-dosya ayrıştırılamadı (tree-sitter 0.23 `importOriginal<typeof import("x")>()`
-ifadesini okuyamıyor); arama anında yanıt verir.
+dosyalar ve 2 MB'tan büyük dosyalar atlanır. morluto/rea üzerinde (3.119
+dosya, 747 bin satır) indeksleme 5,4 sn sürdü ve 12,5 MB'lık indekste 15.267
+sembol üretti; 59 dosya ayrıştırılamadı (tree-sitter 0.23
+`importOriginal<typeof import("x")>()` ifadesini okuyamıyor); arama anında
+yanıt verir. (Bu rakamlar JavaScript indekslenmeden önce alındı; REA'nın 420
+JavaScript dosyası artık indeksleniyor.)
+
+JavaScript (`.js`, `.jsx`, `.mjs`, `.cjs`; gramer `tree-sitter-javascript`,
+JSX dahil) TypeScript çıkarıcısını paylaşır; yani aynı sembolleri verir, ek
+olarak fonksiyon tutan sınıf alanlarını ve yalnızca JavaScript kodunda görülen
+atamaları da alır: `X.prototype.m = function` `X.m` metodudur, `exports.f = ...`
+ve `module.exports.f = ...` `f` fonksiyonlarıdır, `obj.f = function` `obj.f`
+qualname'li bir fonksiyondur, `module.exports = function name() {}` ise `name`
+olur (adsız olana sembol verilmez). Göreli import belirteçleri TypeScript
+kurallarıyla çözülür: her dosya adayı herhangi bir dizin indeksinden önce
+gelir, TypeScript JavaScript'ten önce denenir ve indeksliyse yazıldığı haliyle
+belirtilen dosya kazanır. `require()` ve `import()` çağrıları da import
+kenarı üretir. Aynı gövde adlı bir TypeScript kaynağının yanındaki `.js`,
+`.jsx`, `.mjs` veya `.cjs` dosyası (`a.ts` yanında `a.js`) derlenmiş çıktı
+sayılır ve atlanır; bildirim dosyası (`.d.ts`) bu kaynak yerine geçmez.
+
+Go (`.go`): fonksiyonlar, metotlar (`Recv.Name`), struct'lar (`class` olarak),
+interface'ler (`interface` olarak, metotlarıyla) ve diğer tipler (`type`
+olarak) semboldür; doc yorumu docstring olur. Bir import, depo içindeki en yakın
+`go.mod` üzerinden, adını verdiği paketin test olmayan bir dosyasına çözülür;
+standart kütüphane ve başka modüller çözümsüz kalır. Üretilmiş dosyalar atlanır
+(`*.pb.go`, `*.pb.gw.go`, `zz_generated*` ve başlığında
+`// Code generated ... DO NOT EDIT.` olan her dosya). `*_test.go`, `testdata/`
+ve test dizinleri test sayılır; `main.go` ile `cmd/<name>/main.go` giriş
+noktalarıdır. Derleme kısıtları (`//go:build`) yok sayılır; bir paketin her
+varyantı sembollerini verir.
+
+Rust (`.rs`): `fn`, `impl` bloklarındaki metotlar (`Type.method`), trait'ler
+(`interface` olarak), struct ve union'lar (`class` olarak), enum'lar, tip
+takma adları ve satır içi `mod` blokları (`namespace` olarak) semboldür;
+aralık öğenin ilk attribute'unda başlar, `///` yorumları docstring'dir. Her
+`use` yaprağı bir import kenarıdır, `mod` bildirimleri de öyle. `crate::`,
+`self::` ve `super::` dosya yollarıyla çözülür; aynı workspace'teki diğer
+crate'ler de `Cargo.toml` içindeki `[package]` adıyla bulunur. İzlenmeyenler:
+`#[cfg]`, `#[path]`, makrolar ve yeniden dışa aktarma zincirleri
+(`use crate::Foo`, `Foo`'yu yeniden dışa aktaran dosyaya çözülür). `Cargo.toml`
+yanındaki `target/` dizini atlanır. Giriş noktaları `Cargo.toml`'daki
+`[[bin]]` girdilerinden ve varsayılan `src/main.rs`'ten gelir; `lib.rs` her
+çalıştırılabilir dosyanın altında sıralanır. Aramada sorudaki `a::b::C`
+ifadesi `a.b.C` gibi okunur ve `mod.rs` dizininin adını taşır.
+
+Java (`.java`): sınıflar ve record'lar (`class` olarak), interface'ler ve
+`@interface` (`interface` olarak), enum'lar, iç içe tipler (`Outer.Inner`),
+metotlar ve kurucular (`Type.Type`) semboldür; aşırı yüklemeler tek id
+paylaşır, Javadoc docstring olur. Tekil, joker ve static import'lar yol
+sonekiyle çözülür (`a.b.C`, `a/b/C.java` ile biten bir dosyadır); test olmayan
+dosya, sonra en kısa yol tercih edilir. Modül import'ları (`import module ...`)
+kenar üretmez. `pom.xml` yanındaki `target/` dizini atlanır. `*Test.java`,
+`*Tests.java`, `*IT.java` ve `src/test` test sayılır.
+
+Java, Go ve Rust metotlarında kesit sahibinin başlığını taşır: Java'da sınıf,
+record, interface veya enum başlığı, Go'da aynı dosyada bildirilmişse alıcı
+(receiver) tipi, Rust'ta `impl` satırı.
+
+Gramer sürümleri `pyproject.toml`'da sabitlenmiştir (`tree-sitter>=0.25`;
+JavaScript ve Go 0.25.x, Rust 0.24.x, Java 0.23.x), çünkü çıkarıcılar
+gramerlerin düğüm adlarına bağlıdır.
+
+Ölçülen kalite (katı, k=8, hit@1 / hit@8): bu diller için yazılan ilk kör
+altın setler, her biri 20 soru (12 İngilizce, 8 Türkçe). Arama bu setlere göre
+ayarlanmadı:
+
+| set (dil, commit) | arama | arama + Jev (16 aday) |
+| --- | --- | --- |
+| axios (JavaScript, `a81d62a`) | 0.59 / 0.77 | 0.71 / 0.77 |
+| gin (Go, `0f09c3a`) | 0.35 / 0.82 | 0.82 / 0.94 |
+| gson (Java, `65df6e5`) | 0.41 / 0.71 | 0.65 / 0.77 |
+| ripgrep (Rust, `91f5d22`) | 0.12 / 0.53 | 0.59 / 0.59 |
+| flame (Dart, `88c0438`) | 0.23 / 0.47 | 0.59 / 0.59 |
+
+Bunlar ilk taban çizgileridir; tam sayılar ve ıskaların teşhisi için
+[eval/README.md](eval/README.md) dosyasına bakın.
 
 Dart (`.dart`) isteğe bağlıdır: `pip install -e ".[dart]"` ile kurulur. İlk
 `.dart` dosyası işlendiğinde gramer indirilir (yaklaşık 22 MB, tek sefer,
@@ -228,7 +301,8 @@ sözdizimi okunur (primary constructor dahil). Üretilmiş dosyalar
 atlanır; liste yalnızca bunlardır, diğer üretilmiş Dart dosyaları indekslenir.
 Mixin, extension ve extension type sınıf olarak; getter, setter,
 operator ve kurucular metot olarak indekslenir. Üst düzey değişkenler sembol
-olarak çıkarılmaz. Dart'ta arama kalitesi henüz ölçülmedi.
+olarak çıkarılmaz. Dart'ta arama kalitesi Flame üzerinde bir kez ölçüldü
+(yalnız aramayla hit@1 0.23, hit@8 0.47; yukarıdaki tabloya bakın).
 
 `dart` ekstrasının güven ve çevrimdışı kullanım açısından anlamı: gramer,
 `tree-sitter-language-pack`'in bir GitHub release'inden indirdiği ve yerel kod
@@ -254,8 +328,18 @@ kaydedilir; neden giderilince (ağ gelince ya da bozuk dosya silinince)
 
 ## Sınırlamalar
 
-- Şimdilik yalnızca Python ve TypeScript (isteğe bağlı Dart); JavaScript henüz ayrıştırılmıyor
-  (diğer diller için bir ayrıştırıcı kaydı gerekir).
+- Şimdilik yalnızca Python, TypeScript, JavaScript, Go, Rust ve Java (isteğe
+  bağlı Dart); diğer diller için bir ayrıştırıcı kaydı gerekir.
+- Arama kalitesi dil başına ölçülür (bkz.
+  [eval/README.md](eval/README.md#javascript-go-rust-and-java-first-baselines-2026-11-08))
+  ve eşit değildir. Rust (ripgrep) ve Dart (flame) için yazılan ilk kör
+  setlerde sorunun yaklaşık %40'ında yanıt ilk 16 adayın dışında kalıyor ve
+  Jev aramanın getirmediği şeyi kurtaramıyor. Bilinen, henüz giderilmemiş
+  nedenler: Rust satır içi testleri (`#[cfg(test)] mod tests`, `#[test]`) test
+  sayılmıyor; örnek, dokümantasyon, benchmark ve betik dizinlerinin arama
+  puanı düşürülmüyor; Türkçe sözcük dağarcığında boşluklar var. REA'nın
+  TypeScript sonuçları, JavaScript dosyaları (betikler, deneyler, fixture'lar)
+  indekslenmeye başlayınca biraz geriledi.
 - Getirme işlemi anlamsal değil sözcükseldir: sorunun kodla ortak sözcükleri
   olmalıdır (tanımlayıcılar, docstring'ler, dosya adları). Yanıt yanlış
   görünüyorsa `repofinder search` neyin getirildiğini gösterir; beklediğiniz
@@ -290,8 +374,9 @@ grafiği, harita), `llm`, `prompts` ve `backends` (Claude), `chunker`
 Katkıda bulunanlar için notlar:
 
 - `Symbol.id` (`path::qualname`) benzersiz değildir: bir property'nin getter ve
-  setter'ı, `@overload` stub'ları ve koşullu yeniden tanımlar aynı id'yi
-  paylaşır. Anahtar olarak `(id, start_line)` kullanın.
+  setter'ı, `@overload` stub'ları, koşullu yeniden tanımlar, Java aşırı
+  yüklemeleri, Go `init` fonksiyonları ve Rust'ta aynı metot adlı trait
+  impl'leri aynı id'yi paylaşır. Anahtar olarak `(id, start_line)` kullanın.
 - `FileRecord.parse_ok=False`, tree-sitter'ın bir sözdizimi hatası bildirdiği
   anlamına gelir; dosyanın sembolleri eksik olabilir.
 - Tree-sitter noktalarını `.row` ya da `.column` ile değil, indeksle okuyun

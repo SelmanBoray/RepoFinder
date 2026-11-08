@@ -1,0 +1,4232 @@
+{
+  "meta": {
+    "decisions": "jev",
+    "candidates": 16,
+    "repo": {
+      "name": "axios",
+      "source": "https://github.com/axios/axios",
+      "commit": "a81d62a"
+    },
+    "source": "C:/Users/Selman/AppData/Local/Temp/claude/29abb69cf93759cc/a3feb6c6-0644-4b09-b6bb-2c4e21761226/scratchpad/repos/axios",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\29abb69cf93759cc\\a3feb6c6-0644-4b09-b6bb-2c4e21761226\\scratchpad\\repos\\axios",
+      "commit": "a81d62a22e4b291a05d5b087a89fcc9d16075e83",
+      "golden_commit": "a81d62a",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20"
+    ],
+    "started": "2026-11-08T21:06:18",
+    "open_workspace_s": 0.016,
+    "total_s": 6.504,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "golden": "eval/golden/axios.json",
+    "validation_warnings": []
+  },
+  "summary": {
+    "overall": {
+      "n": 20,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 17,
+          "yes": 12,
+          "rate": 0.706
+        },
+        "hit@3": {
+          "n": 17,
+          "yes": 12,
+          "rate": 0.706
+        },
+        "hit@k": {
+          "n": 17,
+          "yes": 13,
+          "rate": 0.765
+        },
+        "loose_hit@1": {
+          "n": 17,
+          "yes": 13,
+          "rate": 0.765
+        },
+        "loose_hit@3": {
+          "n": 17,
+          "yes": 13,
+          "rate": 0.765
+        },
+        "loose_hit@k": {
+          "n": 17,
+          "yes": 14,
+          "rate": 0.824
+        },
+        "mrr": 0.718,
+        "chunk_recall": {
+          "n": 17,
+          "yes": 11,
+          "rate": 0.647
+        },
+        "all@k": {
+          "n": 3,
+          "yes": 1,
+          "rate": 0.333
+        },
+        "pointer@k": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 3,
+          "rate": 1.0
+        }
+      },
+      "decision_calls": 20,
+      "decision_cost_usd": 0.00339,
+      "admit_judge_calls": 0,
+      "admit_judge_cost_usd": 0,
+      "reranked": 15,
+      "off_target": 5,
+      "decision_errors": 0,
+      "elapsed_s": {
+        "total": 6.482,
+        "mean": 0.324,
+        "median": 0.286,
+        "max": 0.976
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "hit@3": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "hit@k": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "loose_hit@1": {
+            "n": 8,
+            "yes": 7,
+            "rate": 0.875
+          },
+          "loose_hit@3": {
+            "n": 8,
+            "yes": 7,
+            "rate": 0.875
+          },
+          "loose_hit@k": {
+            "n": 8,
+            "yes": 7,
+            "rate": 0.875
+          },
+          "mrr": 0.75,
+          "chunk_recall": {
+            "n": 8,
+            "yes": 6,
+            "rate": 0.75
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001274,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 6,
+        "off_target": 2,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 3.037,
+          "mean": 0.38,
+          "median": 0.3,
+          "max": 0.976
+        }
+      },
+      "locate-feature": {
+        "n": 6,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "mrr": 0.667,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 6,
+        "decision_cost_usd": 0.001043,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 5,
+        "off_target": 1,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 1.722,
+          "mean": 0.287,
+          "median": 0.281,
+          "max": 0.307
+        }
+      },
+      "flow": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "hit@3": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "hit@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@3": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "mrr": 0.733,
+          "chunk_recall": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "all@k": {
+            "n": 3,
+            "yes": 1,
+            "rate": 0.333
+          },
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.000481,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 2,
+        "off_target": 1,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 0.86,
+          "mean": 0.287,
+          "median": 0.285,
+          "max": 0.303
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.000592,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 2,
+        "off_target": 1,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 0.864,
+          "mean": 0.288,
+          "median": 0.276,
+          "max": 0.323
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 12,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "hit@3": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "hit@k": {
+            "n": 11,
+            "yes": 8,
+            "rate": 0.727
+          },
+          "loose_hit@1": {
+            "n": 11,
+            "yes": 8,
+            "rate": 0.727
+          },
+          "loose_hit@3": {
+            "n": 11,
+            "yes": 8,
+            "rate": 0.727
+          },
+          "loose_hit@k": {
+            "n": 11,
+            "yes": 9,
+            "rate": 0.818
+          },
+          "mrr": 0.655,
+          "chunk_recall": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "all@k": {
+            "n": 2,
+            "yes": 1,
+            "rate": 0.5
+          },
+          "pointer@k": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 12,
+        "decision_cost_usd": 0.002088,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 9,
+        "off_target": 3,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 4.164,
+          "mean": 0.347,
+          "median": 0.292,
+          "max": 0.976
+        }
+      },
+      "tr": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "mrr": 0.833,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "all@k": {
+            "n": 1,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001303,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 6,
+        "off_target": 2,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 2.318,
+          "mean": 0.29,
+          "median": 0.285,
+          "max": 0.323
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is `CancelToken.source()` implemented, the helper that gives me a token together with its `cancel` function?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/cancel/CancelToken.js",
+          "symbol": "CancelToken.source",
+          "start_line": 123,
+          "end_line": 132
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000136836,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.9762,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "symbol_id": "lib/cancel/CancelToken.js::CancelToken.source",
+            "start_line": 123,
+            "end_line": 132,
+            "kind": "symbol",
+            "score": 110.6353,
+            "match": "symbol",
+            "why": "name match: source x1.47 (explicit canceltoken.source); qualname/path match: canceltoken.source; bm25: source, canceltoken, token, cancel"
+          },
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "symbol_id": "lib/cancel/CancelToken.js::CancelToken",
+            "start_line": 12,
+            "end_line": 133,
+            "kind": "symbol",
+            "score": 32.7089,
+            "match": "broad",
+            "why": "name match: CancelToken x1.23 (explicit canceltoken); class boost; bm25: canceltoken, token, cancel"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::CancelTokenSource",
+            "start_line": 626,
+            "end_line": 629,
+            "kind": "symbol",
+            "score": 29.0907,
+            "match": null,
+            "why": "name match: CancelTokenSource x1.19 (canceltoken source, source); type declaration x0.7; bm25: source, canceltokensource, token, cancel"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::axios.CancelTokenSource",
+            "start_line": 692,
+            "end_line": 695,
+            "kind": "symbol",
+            "score": 28.5467,
+            "match": null,
+            "why": "name match: CancelTokenSource x1.19 (canceltoken source, source); type declaration x0.7; bm25: source, canceltokensource, token, cancel"
+          },
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 135,
+            "kind": "file",
+            "score": 22.9531,
+            "match": "file",
+            "why": "bm25: source, canceltoken, token, cancel"
+          },
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "symbol_id": "lib/cancel/CancelToken.js::CancelToken.constructor",
+            "start_line": 13,
+            "end_line": 63,
+            "kind": "symbol",
+            "score": 21.7483,
+            "match": null,
+            "why": "bm25: token, canceltoken, cancel"
+          },
+          {
+            "path": "lib/core/dispatchRequest.js",
+            "symbol_id": "lib/core/dispatchRequest.js::throwIfCancellationRequested",
+            "start_line": 18,
+            "end_line": 26,
+            "kind": "symbol",
+            "score": 19.1257,
+            "match": null,
+            "why": "bm25: cancel; body: canceltoken, token"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::CancelToken",
+            "start_line": 617,
+            "end_line": 624,
+            "kind": "symbol",
+            "score": 18.5203,
+            "match": null,
+            "why": "name match: CancelToken x1.23 (explicit canceltoken); type declaration x0.7; bm25: canceltoken, token, cancel"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "start_line": 1,
+            "end_line": 104,
+            "label": "CancelToken (class header) + CancelToken (first 93 of 122 lines) + module head"
+          },
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "start_line": 123,
+            "end_line": 132,
+            "label": "CancelToken.source"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 626,
+            "end_line": 629,
+            "label": "CancelTokenSource"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 692,
+            "end_line": 695,
+            "label": "axios.CancelTokenSource"
+          },
+          {
+            "path": "lib/core/dispatchRequest.js",
+            "start_line": 18,
+            "end_line": 26,
+            "label": "throwIfCancellationRequested"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 617,
+            "end_line": 624,
+            "label": "CancelToken"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Which function decides whether a finished request resolves or rejects, and creates the \"Request failed with status code 404\" error when `validateStatus` returns false?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/core/settle.js",
+          "symbol": "settle",
+          "start_line": 14,
+          "end_line": 27
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000185346,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.278,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "lib/core/settle.js",
+            "symbol_id": "lib/core/settle.js::settle",
+            "start_line": 14,
+            "end_line": 27,
+            "kind": "symbol",
+            "score": 52.667,
+            "match": "symbol",
+            "why": "bm25: rejects~, resolves~, status; body: validatestatus, validate, failed, error, request"
+          },
+          {
+            "path": "lib/core/mergeConfig.js",
+            "symbol_id": "lib/core/mergeConfig.js::mergeConfig",
+            "start_line": 199,
+            "end_line": 237,
+            "kind": "symbol",
+            "score": 27.9169,
+            "match": null,
+            "why": "bm25: creates; body: validatestatus, validate, status, resolves"
+          },
+          {
+            "path": "examples/server.js",
+            "symbol_id": "examples/server.js::pipeFileToResponse",
+            "start_line": 72,
+            "end_line": 118,
+            "kind": "symbol",
+            "score": 17.1992,
+            "match": null,
+            "why": "bm25: body: error, resolves~, 404, validate, creates~"
+          },
+          {
+            "path": "lib/helpers/isAxiosError.js",
+            "symbol_id": "lib/helpers/isAxiosError.js::isAxiosError",
+            "start_line": 12,
+            "end_line": 14,
+            "kind": "symbol",
+            "score": 14.7506,
+            "match": null,
+            "why": "name match: isAxiosError x1.03 (error); bm25: whether, error"
+          },
+          {
+            "path": "tests/unit/core/settle.test.js",
+            "symbol_id": "tests/unit/core/settle.test.js::makeResponse",
+            "start_line": 10,
+            "end_line": 18,
+            "kind": "symbol",
+            "score": 13.9803,
+            "match": null,
+            "why": "test file x0.5; bm25: validatestatus, validate, status; body: request"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::resolveFamily",
+            "start_line": 573,
+            "end_line": 581,
+            "kind": "symbol",
+            "score": 13.4867,
+            "match": null,
+            "why": "name match: resolveFamily x1.09 (resolves); bm25: resolves~; body: error"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "symbol_id": "lib/core/Axios.js::Axios._request",
+            "start_line": 125,
+            "end_line": 311,
+            "kind": "symbol",
+            "score": 13.2912,
+            "match": null,
+            "why": "name match: _request x1.03 (request); bm25: request; body: rejects~, resolves, error, validate, status"
+          },
+          {
+            "path": "examples/server.js",
+            "symbol_id": "examples/server.js::send404",
+            "start_line": 68,
+            "end_line": 70,
+            "kind": "symbol",
+            "score": 13.1511,
+            "match": null,
+            "why": "name match: send404 x1.09 (404); bm25: 404"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/core/settle.js",
+            "start_line": 14,
+            "end_line": 27,
+            "label": "settle"
+          },
+          {
+            "path": "lib/core/mergeConfig.js",
+            "start_line": 199,
+            "end_line": 237,
+            "label": "mergeConfig"
+          },
+          {
+            "path": "examples/server.js",
+            "start_line": 72,
+            "end_line": 118,
+            "label": "pipeFileToResponse"
+          },
+          {
+            "path": "lib/helpers/isAxiosError.js",
+            "start_line": 12,
+            "end_line": 14,
+            "label": "isAxiosError"
+          },
+          {
+            "path": "tests/unit/core/settle.test.js",
+            "start_line": 10,
+            "end_line": 18,
+            "label": "makeResponse"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 573,
+            "end_line": 581,
+            "label": "resolveFamily"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 55,
+            "end_line": 55,
+            "label": "Axios (class header)"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 125,
+            "end_line": 218,
+            "label": "Axios._request (part 1/2)"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 219,
+            "end_line": 311,
+            "label": "Axios._request (part 2/2)"
+          },
+          {
+            "path": "examples/server.js",
+            "start_line": 68,
+            "end_line": 70,
+            "label": "send404"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "The adapters call `headers.setContentType(...)` and `headers.getContentLength()`, but I can't find those methods in the AxiosHeaders class body. Where are they defined?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/core/AxiosHeaders.js",
+          "symbol": "buildAccessors",
+          "start_line": 195,
+          "end_line": 209
+        },
+        {
+          "path": "lib/core/AxiosHeaders.js",
+          "symbol": "AxiosHeaders.accessor",
+          "start_line": 439,
+          "end_line": 462
+        },
+        {
+          "path": "lib/core/AxiosHeaders.js",
+          "start_line": 465,
+          "end_line": 472
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00017115,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.2698,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "lib/core/AxiosHeaders.js",
+            "symbol_id": "lib/core/AxiosHeaders.js::AxiosHeaders",
+            "start_line": 211,
+            "end_line": 463,
+            "kind": "symbol",
+            "score": 52.6959,
+            "match": "broad",
+            "why": "name match: AxiosHeaders x1.10 (explicit axiosheaders); class boost; class asked x3; bm25: axiosheaders, headers"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::AxiosHeaders",
+            "start_line": 42,
+            "end_line": 132,
+            "kind": "symbol",
+            "score": 52.1421,
+            "match": null,
+            "why": "name match: AxiosHeaders x1.10 (explicit axiosheaders); class boost; class asked x3; bm25: axiosheaders, headers"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::AxiosHeaders",
+            "start_line": 25,
+            "end_line": 103,
+            "kind": "symbol",
+            "score": 52.1421,
+            "match": null,
+            "why": "name match: AxiosHeaders x1.10 (explicit axiosheaders); class boost; class asked x3; bm25: axiosheaders, headers"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::AxiosHeaders.setContentType",
+            "start_line": 88,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 45.8898,
+            "match": null,
+            "why": "name match: setContentType x1.23 (explicit setcontenttype); owner match: AxiosHeaders x1.08; bm25: setcontenttype, axiosheaders, content, headers, type, set"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::AxiosHeaders.setContentType",
+            "start_line": 68,
+            "end_line": 68,
+            "kind": "symbol",
+            "score": 45.8898,
+            "match": null,
+            "why": "name match: setContentType x1.23 (explicit setcontenttype); owner match: AxiosHeaders x1.08; bm25: setcontenttype, axiosheaders, content, headers, type, set"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::AxiosHeaders.getContentLength",
+            "start_line": 97,
+            "end_line": 97,
+            "kind": "symbol",
+            "score": 41.2676,
+            "match": null,
+            "why": "name match: getContentLength x1.23 (explicit getcontentlength); owner match: AxiosHeaders x1.08; bm25: getcontentlength, content, length, axiosheaders, get, headers"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::AxiosHeaders.getContentLength",
+            "start_line": 74,
+            "end_line": 74,
+            "kind": "symbol",
+            "score": 41.2676,
+            "match": null,
+            "why": "name match: getContentLength x1.23 (explicit getcontentlength); owner match: AxiosHeaders x1.08; bm25: getcontentlength, content, length, axiosheaders, get, headers"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "symbol_id": "lib/adapters/fetch.js::factory",
+            "start_line": 81,
+            "end_line": 714,
+            "kind": "symbol",
+            "score": 26.8776,
+            "match": null,
+            "why": "bm25: adapters; body: body, length, content, headers, type, get, axiosheaders, getcontentlength, set, setcontenttype, call, find"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/core/AxiosHeaders.js",
+            "start_line": 211,
+            "end_line": 317,
+            "label": "AxiosHeaders (first 107 of 253 lines)"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 42,
+            "end_line": 132,
+            "label": "AxiosHeaders"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 25,
+            "end_line": 103,
+            "label": "AxiosHeaders"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 81,
+            "end_line": 185,
+            "label": "factory (part 1/6)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 186,
+            "end_line": 271,
+            "label": "factory (part 2/6)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 272,
+            "end_line": 375,
+            "label": "factory (part 3/6)"
+          }
+        ],
+        "rank": null,
+        "loose_rank": 1,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is `getAdapter` implemented, the code that walks a list like `['xhr', 'http', 'fetch']` and returns the first adapter the current environment supports?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/adapters/adapters.js",
+          "symbol": "getAdapter",
+          "start_line": 65,
+          "end_line": 115
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000200172,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2995,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "lib/adapters/adapters.js",
+            "symbol_id": "lib/adapters/adapters.js::getAdapter",
+            "start_line": 65,
+            "end_line": 115,
+            "kind": "symbol",
+            "score": 116.3203,
+            "match": "symbol",
+            "why": "name match: getAdapter (explicit getadapter); bm25: adapter, getadapter, supports~, first, get, list; body: environment"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::getAdapter",
+            "start_line": 761,
+            "end_line": 764,
+            "kind": "symbol",
+            "score": 85.543,
+            "match": null,
+            "why": "name match: getAdapter (explicit getadapter); bm25: adapter, getadapter, get, list"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "symbol_id": "lib/adapters/fetch.js::factory",
+            "start_line": 81,
+            "end_line": 714,
+            "kind": "symbol",
+            "score": 22.4017,
+            "match": null,
+            "why": "bm25: environment, fetch, adapter; body: supports, get, like, http, current"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeNativeEnvProxySupported",
+            "start_line": 111,
+            "end_line": 129,
+            "kind": "symbol",
+            "score": 21.3909,
+            "match": null,
+            "why": "name match: isNodeNativeEnvProxySupported x1.19 (environment, supports); bm25: supports~, environment~, adapter~, http"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "symbol_id": "lib/adapters/fetch.js::getFetch",
+            "start_line": 718,
+            "end_line": 745,
+            "kind": "symbol",
+            "score": 20.351,
+            "match": null,
+            "why": "name match: getFetch x1.04 (fetch); bm25: fetch, get, adapter~; body: environment~"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::getProxyEnvAgent",
+            "start_line": 143,
+            "end_line": 147,
+            "kind": "symbol",
+            "score": 16.6345,
+            "match": null,
+            "why": "name match: getProxyEnvAgent x1.05 (environment); bm25: environment~, http, get, adapter~"
+          },
+          {
+            "path": "lib/adapters/adapters.js",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 132,
+            "kind": "file",
+            "score": 16.6125,
+            "match": "file",
+            "why": "path match: adapters x1.05 (adapter); bm25: adapter, getadapter, get"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::getDirectAgent",
+            "start_line": 149,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 16.1813,
+            "match": null,
+            "why": "bm25: get, adapter~, http; body: environment"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/adapters/adapters.js",
+            "start_line": 65,
+            "end_line": 115,
+            "label": "getAdapter"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 761,
+            "end_line": 764,
+            "label": "getAdapter"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 81,
+            "end_line": 185,
+            "label": "factory (part 1/6)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 186,
+            "end_line": 271,
+            "label": "factory (part 2/6)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 272,
+            "end_line": 375,
+            "label": "factory (part 3/6)"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 111,
+            "end_line": 129,
+            "label": "isNodeNativeEnvProxySupported"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 718,
+            "end_line": 745,
+            "label": "getFetch"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 143,
+            "end_line": 147,
+            "label": "getProxyEnvAgent"
+          },
+          {
+            "path": "lib/adapters/adapters.js",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 149,
+            "end_line": 215,
+            "label": "getDirectAgent"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is `axios.create()` defined? I want to see how a new instance gets its own defaults and why the instance can be called like a function.",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/axios.js",
+          "symbol": "createInstance",
+          "start_line": 28,
+          "end_line": 44
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000164934,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3091,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "lib/axios.js",
+            "symbol_id": "lib/axios.js::createInstance",
+            "start_line": 28,
+            "end_line": 44,
+            "kind": "symbol",
+            "score": 44.7865,
+            "match": "symbol",
+            "why": "name match: createInstance x1.24 (create, instance); bm25: instance, create, axios, defaults~; body: new"
+          },
+          {
+            "path": "lib/axios.js",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 89,
+            "kind": "file",
+            "score": 17.7291,
+            "match": "file",
+            "why": "bm25: instance, create, axios"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::create",
+            "start_line": 789,
+            "end_line": 789,
+            "kind": "symbol",
+            "score": 40.4319,
+            "match": null,
+            "why": "name match: create x1.09 (create); bm25: instance, defaults, create, axios"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "symbol_id": "lib/core/Axios.js::Axios.constructor",
+            "start_line": 56,
+            "end_line": 62,
+            "kind": "symbol",
+            "score": 29.5301,
+            "match": null,
+            "why": "bm25: instance, axios; body: defaults, new"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "symbol_id": "lib/core/Axios.js::Axios",
+            "start_line": 55,
+            "end_line": 318,
+            "kind": "symbol",
+            "score": 25.7264,
+            "match": null,
+            "why": "class boost; bm25: instance, create, axios, new"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::axios.CreateAxiosDefaults",
+            "start_line": 642,
+            "end_line": 647,
+            "kind": "symbol",
+            "score": 19.1577,
+            "match": null,
+            "why": "name match: CreateAxiosDefaults x1.24 (create, defaults); owner match: axios x1.08; type declaration x0.7; bm25: defaults, create, axios"
+          },
+          {
+            "path": "lib/core/createMultipartBody.js",
+            "symbol_id": "lib/core/createMultipartBody.js::createMultipartBody",
+            "start_line": 6,
+            "end_line": 37,
+            "kind": "symbol",
+            "score": 18.8392,
+            "match": null,
+            "why": "name match: createMultipartBody x1.05 (create); bm25: create; body: axios, new, gets~, defaults~"
+          },
+          {
+            "path": "tests/unit/adapters/fetch.test.js",
+            "symbol_id": "tests/unit/adapters/fetch.test.js::createBrokenDOMExceptionLikeError",
+            "start_line": 33,
+            "end_line": 52,
+            "kind": "symbol",
+            "score": 18.0006,
+            "match": null,
+            "why": "test file x0.5; bm25: like, create; body: instance~, new, gets~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/axios.js",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "createInstance + module head"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 789,
+            "end_line": 789,
+            "label": "create"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 55,
+            "end_line": 154,
+            "label": "Axios (class header) + Axios.constructor + Axios (first 100 of 264 lines)"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 642,
+            "end_line": 647,
+            "label": "axios.CreateAxiosDefaults"
+          },
+          {
+            "path": "lib/core/createMultipartBody.js",
+            "start_line": 6,
+            "end_line": 37,
+            "label": "createMultipartBody"
+          },
+          {
+            "path": "tests/unit/adapters/fetch.test.js",
+            "start_line": 33,
+            "end_line": 52,
+            "label": "createBrokenDOMExceptionLikeError"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Tarayıcıda `getAllResponseHeaders()` ile gelen ham başlık metnini nesneye çeviren, tekrar eden başlıkları birleştirip `set-cookie` satırlarını diziye toplayan fonksiyon nerede?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/helpers/parseHeaders.js",
+          "start_line": 41,
+          "end_line": 72
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 8.3958e-05,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.3158,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 16,
+        "top_hits": [
+          {
+            "path": "tests/browser/xsrfCookieStore.browser.test.js",
+            "symbol_id": "tests/browser/xsrfCookieStore.browser.test.js::MockXMLHttpRequest.getAllResponseHeaders",
+            "start_line": 30,
+            "end_line": 32,
+            "kind": "symbol",
+            "score": 46.6136,
+            "match": null,
+            "why": "name match: getAllResponseHeaders (explicit getallresponseheaders); test file x0.5; bm25: getallresponseheaders, all, cookie, get, response, headers, header"
+          },
+          {
+            "path": "tests/browser/interceptors.browser.test.js",
+            "symbol_id": "tests/browser/interceptors.browser.test.js::MockXMLHttpRequest.getAllResponseHeaders",
+            "start_line": 39,
+            "end_line": 47,
+            "kind": "symbol",
+            "score": 44.6681,
+            "match": null,
+            "why": "name match: getAllResponseHeaders (explicit getallresponseheaders); test file x0.5; bm25: getallresponseheaders, all, response, get, headers, header; body: object, string"
+          },
+          {
+            "path": "tests/browser/progress.browser.test.js",
+            "symbol_id": "tests/browser/progress.browser.test.js::MockXMLHttpRequest.getAllResponseHeaders",
+            "start_line": 60,
+            "end_line": 64,
+            "kind": "symbol",
+            "score": 41.9657,
+            "match": null,
+            "why": "name match: getAllResponseHeaders (explicit getallresponseheaders); test file x0.5; bm25: getallresponseheaders, all, get, response, headers, header; body: object"
+          },
+          {
+            "path": "tests/browser/requests.browser.test.js",
+            "symbol_id": "tests/browser/requests.browser.test.js::MockXMLHttpRequest.getAllResponseHeaders",
+            "start_line": 40,
+            "end_line": 44,
+            "kind": "symbol",
+            "score": 41.8682,
+            "match": null,
+            "why": "name match: getAllResponseHeaders (explicit getallresponseheaders); test file x0.5; bm25: getallresponseheaders, all, get, response, headers, header; body: object"
+          },
+          {
+            "path": "tests/browser/cancel.browser.test.js",
+            "symbol_id": "tests/browser/cancel.browser.test.js::MockXMLHttpRequest.getAllResponseHeaders",
+            "start_line": 34,
+            "end_line": 36,
+            "kind": "symbol",
+            "score": 38.3152,
+            "match": null,
+            "why": "name match: getAllResponseHeaders (explicit getallresponseheaders); test file x0.5; bm25: getallresponseheaders, all, get, response, headers, header"
+          },
+          {
+            "path": "tests/browser/formdata.browser.test.js",
+            "symbol_id": "tests/browser/formdata.browser.test.js::MockXMLHttpRequest.getAllResponseHeaders",
+            "start_line": 33,
+            "end_line": 35,
+            "kind": "symbol",
+            "score": 38.3152,
+            "match": null,
+            "why": "name match: getAllResponseHeaders (explicit getallresponseheaders); test file x0.5; bm25: getallresponseheaders, all, get, response, headers, header"
+          },
+          {
+            "path": "tests/browser/transform.browser.test.js",
+            "symbol_id": "tests/browser/transform.browser.test.js::MockXMLHttpRequest.getAllResponseHeaders",
+            "start_line": 38,
+            "end_line": 40,
+            "kind": "symbol",
+            "score": 38.3152,
+            "match": null,
+            "why": "name match: getAllResponseHeaders (explicit getallresponseheaders); test file x0.5; bm25: getallresponseheaders, all, get, response, headers, header"
+          },
+          {
+            "path": "tests/browser/headers.browser.test.js",
+            "symbol_id": "tests/browser/headers.browser.test.js::MockXMLHttpRequest.getAllResponseHeaders",
+            "start_line": 32,
+            "end_line": 34,
+            "kind": "symbol",
+            "score": 38.2467,
+            "match": null,
+            "why": "name match: getAllResponseHeaders (explicit getallresponseheaders); test file x0.5; bm25: getallresponseheaders, all, get, response, headers, header"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "tests/browser/xsrfCookieStore.browser.test.js",
+            "start_line": 12,
+            "end_line": 12,
+            "label": "MockXMLHttpRequest (class header)"
+          },
+          {
+            "path": "tests/browser/xsrfCookieStore.browser.test.js",
+            "start_line": 30,
+            "end_line": 32,
+            "label": "MockXMLHttpRequest.getAllResponseHeaders"
+          },
+          {
+            "path": "tests/browser/interceptors.browser.test.js",
+            "start_line": 5,
+            "end_line": 5,
+            "label": "MockXMLHttpRequest (class header)"
+          },
+          {
+            "path": "tests/browser/interceptors.browser.test.js",
+            "start_line": 39,
+            "end_line": 47,
+            "label": "MockXMLHttpRequest.getAllResponseHeaders"
+          },
+          {
+            "path": "tests/browser/progress.browser.test.js",
+            "start_line": 26,
+            "end_line": 26,
+            "label": "MockXMLHttpRequest (class header)"
+          },
+          {
+            "path": "tests/browser/progress.browser.test.js",
+            "start_line": 60,
+            "end_line": 64,
+            "label": "MockXMLHttpRequest.getAllResponseHeaders"
+          },
+          {
+            "path": "tests/browser/requests.browser.test.js",
+            "start_line": 6,
+            "end_line": 6,
+            "label": "MockXMLHttpRequest (class header)"
+          },
+          {
+            "path": "tests/browser/requests.browser.test.js",
+            "start_line": 40,
+            "end_line": 44,
+            "label": "MockXMLHttpRequest.getAllResponseHeaders"
+          },
+          {
+            "path": "tests/browser/cancel.browser.test.js",
+            "start_line": 5,
+            "end_line": 5,
+            "label": "MockXMLHttpRequest (class header)"
+          },
+          {
+            "path": "tests/browser/cancel.browser.test.js",
+            "start_line": 34,
+            "end_line": 36,
+            "label": "MockXMLHttpRequest.getAllResponseHeaders"
+          },
+          {
+            "path": "tests/browser/formdata.browser.test.js",
+            "start_line": 5,
+            "end_line": 5,
+            "label": "MockXMLHttpRequest (class header)"
+          },
+          {
+            "path": "tests/browser/formdata.browser.test.js",
+            "start_line": 33,
+            "end_line": 35,
+            "label": "MockXMLHttpRequest.getAllResponseHeaders"
+          },
+          {
+            "path": "tests/browser/transform.browser.test.js",
+            "start_line": 6,
+            "end_line": 6,
+            "label": "MockXMLHttpRequest (class header)"
+          },
+          {
+            "path": "tests/browser/transform.browser.test.js",
+            "start_line": 38,
+            "end_line": 40,
+            "label": "MockXMLHttpRequest.getAllResponseHeaders"
+          },
+          {
+            "path": "tests/browser/headers.browser.test.js",
+            "start_line": 5,
+            "end_line": 5,
+            "label": "MockXMLHttpRequest (class header)"
+          },
+          {
+            "path": "tests/browser/headers.browser.test.js",
+            "start_line": 32,
+            "end_line": 34,
+            "label": "MockXMLHttpRequest.getAllResponseHeaders"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "HTTP/2 kullanirken ayni sunucuya giden istekler icin oturum nerede tekrar kullaniliyor, bosta kalan oturum ne zaman kapatiliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/helpers/Http2Sessions.js",
+          "symbol": "Http2Sessions.getSession",
+          "start_line": 16,
+          "end_line": 119
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000169344,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2878,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 4,
+        "top_hits": [
+          {
+            "path": "lib/helpers/Http2Sessions.js",
+            "symbol_id": "lib/helpers/Http2Sessions.js::Http2Sessions.getSession",
+            "start_line": 16,
+            "end_line": 119,
+            "kind": "symbol",
+            "score": 26.408,
+            "match": "symbol",
+            "why": "name match: getSession x1.17 (oturum); owner match: Http2Sessions x1.06; bm25: session, http; body: close~, http2, request"
+          },
+          {
+            "path": "lib/helpers/Http2Sessions.js",
+            "symbol_id": "lib/helpers/Http2Sessions.js::Http2Sessions.getSession.<locals>.removeSession",
+            "start_line": 47,
+            "end_line": 76,
+            "kind": "symbol",
+            "score": 10.6569,
+            "match": "overlap",
+            "why": "name match: removeSession x1.17 (oturum); nested x0.5; bm25: session, http; body: close~"
+          },
+          {
+            "path": "lib/helpers/Http2Sessions.js",
+            "symbol_id": "lib/helpers/Http2Sessions.js::Http2Sessions",
+            "start_line": 11,
+            "end_line": 120,
+            "kind": "symbol",
+            "score": 20.0822,
+            "match": "overlap",
+            "why": "name match: Http2Sessions x1.35 (http, oturum); class boost; bm25: session, http"
+          },
+          {
+            "path": "lib/helpers/Http2Sessions.js",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 122,
+            "kind": "file",
+            "score": 13.8332,
+            "match": "file",
+            "why": "path match: http2sessions x1.21 (http, oturum); bm25: session, http"
+          },
+          {
+            "path": "tests/setup/server.js",
+            "symbol_id": "tests/setup/server.js::startHTTPServer",
+            "start_line": 20,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 12.5356,
+            "match": null,
+            "why": "test file x0.5; bm25: server, http; body: session, close~, http2, time~, request~"
+          },
+          {
+            "path": "lib/helpers/Http2Sessions.js",
+            "symbol_id": "lib/helpers/Http2Sessions.js::Http2Sessions.constructor",
+            "start_line": 12,
+            "end_line": 14,
+            "kind": "symbol",
+            "score": 12.3312,
+            "match": null,
+            "why": "bm25: session, http"
+          },
+          {
+            "path": "tests/setup/server.js",
+            "symbol_id": "tests/setup/server.js::stopHTTPServer",
+            "start_line": 111,
+            "end_line": 138,
+            "kind": "symbol",
+            "score": 10.7111,
+            "match": null,
+            "why": "test file x0.5; bm25: server, http; body: close~, session, request"
+          },
+          {
+            "path": "sandbox/server.js",
+            "symbol_id": "sandbox/server.js::requestHandler",
+            "start_line": 75,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 10.5054,
+            "match": null,
+            "why": "name match: requestHandler x1.04 (istekler); bm25: request, server, http"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/helpers/Http2Sessions.js",
+            "start_line": 1,
+            "end_line": 120,
+            "label": "Http2Sessions (class header) + Http2Sessions.getSession + Http2Sessions + 1 more"
+          },
+          {
+            "path": "tests/setup/server.js",
+            "start_line": 20,
+            "end_line": 109,
+            "label": "startHTTPServer"
+          },
+          {
+            "path": "tests/setup/server.js",
+            "start_line": 111,
+            "end_line": 138,
+            "label": "stopHTTPServer"
+          },
+          {
+            "path": "sandbox/server.js",
+            "start_line": 75,
+            "end_line": 109,
+            "label": "requestHandler"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Node'da `maxRate` ile yükleme ve indirme hızını sınırlayan, veriyi zaman pencerelerine bölüp bekleten sınıf hangisi?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/helpers/AxiosTransformStream.js",
+          "symbol": "AxiosTransformStream",
+          "start_line": 8,
+          "end_line": 163
+        },
+        {
+          "path": "lib/helpers/AxiosTransformStream.js",
+          "symbol": "AxiosTransformStream._transform",
+          "start_line": 62,
+          "end_line": 162
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000162414,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3004,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "symbol_id": "lib/helpers/AxiosTransformStream.js::AxiosTransformStream.constructor",
+            "start_line": 9,
+            "end_line": 50,
+            "kind": "symbol",
+            "score": 25.3498,
+            "match": "overlap",
+            "why": "bm25: body: maxrate, time~, rate, max, load"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "symbol_id": "lib/helpers/AxiosTransformStream.js::AxiosTransformStream._transform",
+            "start_line": 62,
+            "end_line": 162,
+            "kind": "symbol",
+            "score": 21.9258,
+            "match": "symbol",
+            "why": "bm25: body: max, maxrate, time~, rate"
+          },
+          {
+            "path": "lib/helpers/progressEventReducer.js",
+            "symbol_id": "lib/helpers/progressEventReducer.js::progressEventReducer",
+            "start_line": 5,
+            "end_line": 35,
+            "kind": "symbol",
+            "score": 20.2112,
+            "match": null,
+            "why": "bm25: body: load, rate, max"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeNativeEnvProxySupported",
+            "start_line": 111,
+            "end_line": 129,
+            "kind": "symbol",
+            "score": 18.2422,
+            "match": null,
+            "why": "name match: isNodeNativeEnvProxySupported x1.09 (node); bm25: node"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeEnvProxyEnabled",
+            "start_line": 131,
+            "end_line": 141,
+            "kind": "symbol",
+            "score": 17.9151,
+            "match": null,
+            "why": "name match: isNodeEnvProxyEnabled x1.10 (node); bm25: node"
+          },
+          {
+            "path": "rollup.config.js",
+            "symbol_id": "rollup.config.js::nodeCjsExternal",
+            "start_line": 67,
+            "end_line": 77,
+            "kind": "symbol",
+            "score": 17.4187,
+            "match": null,
+            "why": "name match: nodeCjsExternal x1.14 (node); bm25: node"
+          },
+          {
+            "path": "lib/helpers/speedometer.js",
+            "symbol_id": "lib/helpers/speedometer.js::speedometer",
+            "start_line": 9,
+            "end_line": 53,
+            "kind": "symbol",
+            "score": 14.4628,
+            "match": null,
+            "why": "bm25: maxrate, rate, max"
+          },
+          {
+            "path": "lib/platform/node/index.js",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 37,
+            "kind": "file",
+            "score": 12.0131,
+            "match": null,
+            "why": "path match: node x1.15 (node); bm25: node"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "start_line": 8,
+            "end_line": 8,
+            "label": "AxiosTransformStream (class header)"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "start_line": 9,
+            "end_line": 50,
+            "label": "AxiosTransformStream.constructor"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "start_line": 62,
+            "end_line": 162,
+            "label": "AxiosTransformStream._transform"
+          },
+          {
+            "path": "lib/helpers/progressEventReducer.js",
+            "start_line": 5,
+            "end_line": 35,
+            "label": "progressEventReducer"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 111,
+            "end_line": 129,
+            "label": "isNodeNativeEnvProxySupported"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 131,
+            "end_line": 141,
+            "label": "isNodeEnvProxyEnabled"
+          },
+          {
+            "path": "rollup.config.js",
+            "start_line": 67,
+            "end_line": 77,
+            "label": "nodeCjsExternal"
+          },
+          {
+            "path": "lib/helpers/speedometer.js",
+            "start_line": 9,
+            "end_line": 53,
+            "label": "speedometer"
+          },
+          {
+            "path": "lib/platform/node/index.js",
+            "start_line": 1,
+            "end_line": 37,
+            "label": "module head"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.923,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "When does axios read the XSRF-TOKEN cookie and send it back as an X-XSRF-TOKEN header, and why isn't it sent to other origins?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/helpers/resolveConfig.js",
+          "symbol": "resolveConfig",
+          "start_line": 27,
+          "end_line": 118
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00015141,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3037,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "lib/helpers/resolveConfig.js",
+            "symbol_id": "lib/helpers/resolveConfig.js::resolveConfig",
+            "start_line": 27,
+            "end_line": 118,
+            "kind": "symbol",
+            "score": 36.8938,
+            "match": "symbol",
+            "why": "bm25: cookie, xsrf, read; body: token, origins~, header, send, axios"
+          },
+          {
+            "path": "lib/helpers/resolveConfig.js",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 120,
+            "kind": "file",
+            "score": 11.8242,
+            "match": "file",
+            "why": "bm25: cookie, read"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isSameOriginRedirect",
+            "start_line": 334,
+            "end_line": 345,
+            "kind": "symbol",
+            "score": 9.9323,
+            "match": null,
+            "why": "name match: isSameOriginRedirect x1.07 (origins); bm25: origins~"
+          },
+          {
+            "path": "lib/helpers/resolveConfig.js",
+            "symbol_id": "lib/helpers/resolveConfig.js::readCookie",
+            "start_line": 25,
+            "end_line": 25,
+            "kind": "symbol",
+            "score": 27.8237,
+            "match": null,
+            "why": "name match: readCookie x1.25 (cookie, read); bm25: cookie, read"
+          },
+          {
+            "path": "lib/core/AxiosHeaders.js",
+            "symbol_id": "lib/core/AxiosHeaders.js::AxiosHeaders.getSetCookie",
+            "start_line": 414,
+            "end_line": 417,
+            "kind": "symbol",
+            "score": 21.8297,
+            "match": null,
+            "why": "name match: getSetCookie x1.07 (cookie); owner match: AxiosHeaders x1.02; bm25: cookie, axios, header"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::AxiosHeaders.getSetCookie",
+            "start_line": 127,
+            "end_line": 127,
+            "kind": "symbol",
+            "score": 20.5908,
+            "match": null,
+            "why": "name match: getSetCookie x1.07 (cookie); owner match: AxiosHeaders x1.02; bm25: cookie, axios, header"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::AxiosHeaders.getSetCookie",
+            "start_line": 98,
+            "end_line": 98,
+            "kind": "symbol",
+            "score": 20.5908,
+            "match": null,
+            "why": "name match: getSetCookie x1.07 (cookie); owner match: AxiosHeaders x1.02; bm25: cookie, axios, header"
+          },
+          {
+            "path": "lib/helpers/cookies.js",
+            "symbol_id": "lib/helpers/cookies.js::decodeCookieValue",
+            "start_line": 4,
+            "end_line": 10,
+            "kind": "symbol",
+            "score": 15.0346,
+            "match": null,
+            "why": "name match: decodeCookieValue x1.07 (cookie); bm25: cookie"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/helpers/resolveConfig.js",
+            "start_line": 1,
+            "end_line": 118,
+            "label": "resolveConfig + module head"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 334,
+            "end_line": 345,
+            "label": "isSameOriginRedirect"
+          },
+          {
+            "path": "lib/core/AxiosHeaders.js",
+            "start_line": 211,
+            "end_line": 211,
+            "label": "AxiosHeaders (class header)"
+          },
+          {
+            "path": "lib/core/AxiosHeaders.js",
+            "start_line": 414,
+            "end_line": 417,
+            "label": "AxiosHeaders.getSetCookie"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 42,
+            "end_line": 42,
+            "label": "AxiosHeaders (class header)"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 127,
+            "end_line": 127,
+            "label": "AxiosHeaders.getSetCookie"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 25,
+            "end_line": 25,
+            "label": "AxiosHeaders (class header)"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 98,
+            "end_line": 98,
+            "label": "AxiosHeaders.getSetCookie"
+          },
+          {
+            "path": "lib/helpers/cookies.js",
+            "start_line": 4,
+            "end_line": 10,
+            "label": "decodeCookieValue"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How does the Node.js adapter decompress a gzip, deflate or brotli response body, and when does it leave the body compressed?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/adapters/http.js",
+          "start_line": 1298,
+          "end_line": 1341
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000165774,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.307,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "webpack.config.js",
+            "symbol_id": "webpack.config.js::generateConfig",
+            "start_line": 3,
+            "end_line": 20,
+            "kind": "symbol",
+            "score": 24.4899,
+            "match": null,
+            "why": "bm25: body: compressed~, node, js"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeNativeEnvProxySupported",
+            "start_line": 111,
+            "end_line": 129,
+            "kind": "symbol",
+            "score": 19.575,
+            "match": null,
+            "why": "name match: isNodeNativeEnvProxySupported x1.06 (node); bm25: node, adapter~"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeEnvProxyEnabled",
+            "start_line": 131,
+            "end_line": 141,
+            "kind": "symbol",
+            "score": 19.3365,
+            "match": null,
+            "why": "name match: isNodeEnvProxyEnabled x1.06 (node); bm25: node, adapter~"
+          },
+          {
+            "path": "rollup.config.js",
+            "symbol_id": "rollup.config.js::nodeCjsExternal",
+            "start_line": 67,
+            "end_line": 77,
+            "kind": "symbol",
+            "score": 16.6165,
+            "match": null,
+            "why": "name match: nodeCjsExternal x1.08 (node); bm25: node"
+          },
+          {
+            "path": "rollup.config.js",
+            "symbol_id": "rollup.config.js::default",
+            "start_line": 79,
+            "end_line": 142,
+            "kind": "symbol",
+            "score": 16.5482,
+            "match": null,
+            "why": "bm25: body: node, js"
+          },
+          {
+            "path": "lib/core/dispatchRequest.js",
+            "symbol_id": "lib/core/dispatchRequest.js::dispatchRequest",
+            "start_line": 66,
+            "end_line": 132,
+            "kind": "symbol",
+            "score": 16.3394,
+            "match": null,
+            "why": "bm25: adapter; body: response"
+          },
+          {
+            "path": "lib/adapters/adapters.js",
+            "symbol_id": "lib/adapters/adapters.js::getAdapter",
+            "start_line": 65,
+            "end_line": 115,
+            "kind": "symbol",
+            "score": 14.6692,
+            "match": null,
+            "why": "name match: getAdapter x1.09 (adapter); bm25: adapter"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::getAdapter",
+            "start_line": 761,
+            "end_line": 764,
+            "kind": "symbol",
+            "score": 14.4833,
+            "match": null,
+            "why": "name match: getAdapter x1.09 (adapter); bm25: adapter"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "webpack.config.js",
+            "start_line": 3,
+            "end_line": 20,
+            "label": "generateConfig"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 111,
+            "end_line": 129,
+            "label": "isNodeNativeEnvProxySupported"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 131,
+            "end_line": 141,
+            "label": "isNodeEnvProxyEnabled"
+          },
+          {
+            "path": "rollup.config.js",
+            "start_line": 67,
+            "end_line": 77,
+            "label": "nodeCjsExternal"
+          },
+          {
+            "path": "rollup.config.js",
+            "start_line": 79,
+            "end_line": 142,
+            "label": "default"
+          },
+          {
+            "path": "lib/core/dispatchRequest.js",
+            "start_line": 66,
+            "end_line": 132,
+            "label": "dispatchRequest"
+          },
+          {
+            "path": "lib/adapters/adapters.js",
+            "start_line": 65,
+            "end_line": 115,
+            "label": "getAdapter"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 761,
+            "end_line": 764,
+            "label": "getAdapter"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "If I put `redact: ['authorization', 'password']` in the request config, where are those values replaced with \"[REDACTED ****]\" when an AxiosError is serialized?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/core/AxiosError.js",
+          "symbol": "redactConfig",
+          "start_line": 29,
+          "end_line": 73
+        },
+        {
+          "path": "lib/core/AxiosError.js",
+          "symbol": "AxiosError.toJSON",
+          "start_line": 230,
+          "end_line": 259
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000219492,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.281,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "lib/core/AxiosError.js",
+            "symbol_id": "lib/core/AxiosError.js::redactConfig",
+            "start_line": 29,
+            "end_line": 73,
+            "kind": "symbol",
+            "score": 30.8971,
+            "match": "symbol",
+            "why": "name match: redactConfig x1.32 (config, redact, redacted); bm25: redact, config, axioserror; body: values~, redacted"
+          },
+          {
+            "path": "lib/core/AxiosError.js",
+            "symbol_id": "lib/core/AxiosError.js::AxiosError.toJSON",
+            "start_line": 230,
+            "end_line": 259,
+            "kind": "symbol",
+            "score": 41.9828,
+            "match": "symbol",
+            "why": "bm25: axioserror; body: serialized, redact, replaced, config, redacted, values~, request"
+          },
+          {
+            "path": "lib/core/buildFullPath.js",
+            "symbol_id": "lib/core/buildFullPath.js::redactSensitiveURLParts",
+            "start_line": 28,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 30.4566,
+            "match": null,
+            "why": "name match: redactSensitiveURLParts x1.12 (redact, redacted); bm25: redact; body: redacted, replaced~"
+          },
+          {
+            "path": "lib/core/buildFullPath.js",
+            "symbol_id": "lib/core/buildFullPath.js::redactFragment",
+            "start_line": 18,
+            "end_line": 26,
+            "kind": "symbol",
+            "score": 27.2016,
+            "match": null,
+            "why": "name match: redactFragment x1.18 (redact, redacted); bm25: redact; body: redacted, replaced~"
+          },
+          {
+            "path": "lib/core/AxiosError.js",
+            "symbol_id": "lib/core/AxiosError.js::AxiosError",
+            "start_line": 153,
+            "end_line": 260,
+            "kind": "symbol",
+            "score": 21.6933,
+            "match": "overlap",
+            "why": "name match: AxiosError (explicit axioserror); class boost; bm25: axioserror"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::AxiosError",
+            "start_line": 134,
+            "end_line": 174,
+            "kind": "symbol",
+            "score": 21.0848,
+            "match": null,
+            "why": "name match: AxiosError (explicit axioserror); class boost; bm25: axioserror"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::AxiosError",
+            "start_line": 540,
+            "end_line": 580,
+            "kind": "symbol",
+            "score": 21.0848,
+            "match": null,
+            "why": "name match: AxiosError (explicit axioserror); class boost; bm25: axioserror"
+          },
+          {
+            "path": "lib/helpers/buildURL.js",
+            "symbol_id": "lib/helpers/buildURL.js::buildURL",
+            "start_line": 31,
+            "end_line": 69,
+            "kind": "symbol",
+            "score": 19.1323,
+            "match": null,
+            "why": "bm25: body: serialized, values"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/core/AxiosError.js",
+            "start_line": 29,
+            "end_line": 73,
+            "label": "redactConfig"
+          },
+          {
+            "path": "lib/core/AxiosError.js",
+            "start_line": 153,
+            "end_line": 260,
+            "label": "AxiosError (class header) + AxiosError.toJSON + AxiosError"
+          },
+          {
+            "path": "lib/core/buildFullPath.js",
+            "start_line": 28,
+            "end_line": 43,
+            "label": "redactSensitiveURLParts"
+          },
+          {
+            "path": "lib/core/buildFullPath.js",
+            "start_line": 18,
+            "end_line": 26,
+            "label": "redactFragment"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 134,
+            "end_line": 174,
+            "label": "AxiosError"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 540,
+            "end_line": 580,
+            "label": "AxiosError"
+          },
+          {
+            "path": "lib/helpers/buildURL.js",
+            "start_line": 31,
+            "end_line": 69,
+            "label": "buildURL"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Where is the \"timeout of 5000ms exceeded\" error created, and where do `timeoutErrorMessage` and `transitional.clarifyTimeoutError` change its message and code?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/adapters/xhr.js",
+          "start_line": 223,
+          "end_line": 244
+        },
+        {
+          "path": "lib/adapters/http.js",
+          "start_line": 757,
+          "end_line": 772
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000155946,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2757,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "lib/helpers/composeSignals.js",
+            "symbol_id": "lib/helpers/composeSignals.js::composeSignals",
+            "start_line": 5,
+            "end_line": 69,
+            "kind": "symbol",
+            "score": 22.339,
+            "match": null,
+            "why": "bm25: timeout; body: error, exceeded, message, ms"
+          },
+          {
+            "path": "lib/helpers/validator.js",
+            "symbol_id": "lib/helpers/validator.js::validators.transitional",
+            "start_line": 26,
+            "end_line": 61,
+            "kind": "symbol",
+            "score": 25.2378,
+            "match": null,
+            "why": "bm25: message, transitional; body: error"
+          },
+          {
+            "path": "examples/network_enhanced.js",
+            "symbol_id": "examples/network_enhanced.js::enhanceNetworkError",
+            "start_line": 3,
+            "end_line": 57,
+            "kind": "symbol",
+            "score": 21.793,
+            "match": null,
+            "why": "name match: enhanceNetworkError x1.03 (error); bm25: error; body: message, timeout"
+          },
+          {
+            "path": "lib/helpers/formDataToJSON.js",
+            "symbol_id": "lib/helpers/formDataToJSON.js::throwIfDepthExceeded",
+            "start_line": 9,
+            "end_line": 16,
+            "kind": "symbol",
+            "score": 25.5499,
+            "match": null,
+            "why": "name match: throwIfDepthExceeded x1.06 (exceeded); bm25: exceeded; body: error"
+          },
+          {
+            "path": "lib/core/AxiosError.js",
+            "symbol_id": "lib/core/AxiosError.js::aggregateErrorMessage",
+            "start_line": 83,
+            "end_line": 96,
+            "kind": "symbol",
+            "score": 22.8868,
+            "match": null,
+            "why": "name match: aggregateErrorMessage x1.11 (error, message); bm25: message, error"
+          },
+          {
+            "path": "docs/scripts/utils.js",
+            "symbol_id": "docs/scripts/utils.js::printErrorMessage",
+            "start_line": 11,
+            "end_line": 13,
+            "kind": "symbol",
+            "score": 19.8778,
+            "match": null,
+            "why": "name match: printErrorMessage x1.11 (error, message); bm25: message, error"
+          },
+          {
+            "path": "lib/cancel/CanceledError.js",
+            "symbol_id": "lib/cancel/CanceledError.js::CanceledError.constructor",
+            "start_line": 15,
+            "end_line": 19,
+            "kind": "symbol",
+            "score": 19.5743,
+            "match": null,
+            "why": "bm25: message, error"
+          },
+          {
+            "path": "lib/core/AxiosError.js",
+            "symbol_id": "lib/core/AxiosError.js::AxiosError.constructor",
+            "start_line": 203,
+            "end_line": 228,
+            "kind": "symbol",
+            "score": 18.284,
+            "match": null,
+            "why": "bm25: message, error, created~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/helpers/composeSignals.js",
+            "start_line": 5,
+            "end_line": 69,
+            "label": "composeSignals"
+          },
+          {
+            "path": "lib/helpers/validator.js",
+            "start_line": 26,
+            "end_line": 61,
+            "label": "validators.transitional"
+          },
+          {
+            "path": "examples/network_enhanced.js",
+            "start_line": 3,
+            "end_line": 57,
+            "label": "enhanceNetworkError"
+          },
+          {
+            "path": "lib/helpers/formDataToJSON.js",
+            "start_line": 9,
+            "end_line": 16,
+            "label": "throwIfDepthExceeded"
+          },
+          {
+            "path": "lib/core/AxiosError.js",
+            "start_line": 83,
+            "end_line": 96,
+            "label": "aggregateErrorMessage"
+          },
+          {
+            "path": "docs/scripts/utils.js",
+            "start_line": 11,
+            "end_line": 13,
+            "label": "printErrorMessage"
+          },
+          {
+            "path": "lib/cancel/CanceledError.js",
+            "start_line": 5,
+            "end_line": 5,
+            "label": "CanceledError (class header)"
+          },
+          {
+            "path": "lib/cancel/CanceledError.js",
+            "start_line": 15,
+            "end_line": 19,
+            "label": "CanceledError.constructor"
+          },
+          {
+            "path": "lib/core/AxiosError.js",
+            "start_line": 153,
+            "end_line": 153,
+            "label": "AxiosError (class header)"
+          },
+          {
+            "path": "lib/core/AxiosError.js",
+            "start_line": 203,
+            "end_line": 228,
+            "label": "AxiosError.constructor"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Config'e `auth: { username, password }` verdiğimde `Authorization: Basic ...` başlığı nerede oluşturuluyor? URL'deki `kullanici:sifre@host` bilgisi de kullanılıyor mu?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/helpers/resolveConfig.js",
+          "start_line": 53,
+          "end_line": 76
+        },
+        {
+          "path": "lib/adapters/fetch.js",
+          "start_line": 274,
+          "end_line": 312
+        },
+        {
+          "path": "lib/adapters/http.js",
+          "start_line": 1026,
+          "end_line": 1040
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000169554,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2819,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 15,
+        "top_hits": [
+          {
+            "path": "lib/helpers/resolveConfig.js",
+            "symbol_id": "lib/helpers/resolveConfig.js::resolveConfig",
+            "start_line": 27,
+            "end_line": 118,
+            "kind": "symbol",
+            "score": 35.1046,
+            "match": "overlap",
+            "why": "name match: resolveConfig x1.04 (config); bm25: config; body: username, password, auth, url, basic, header, authorization"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "symbol_id": "lib/adapters/fetch.js::maybeWithAuthCredentials",
+            "start_line": 72,
+            "end_line": 79,
+            "kind": "symbol",
+            "score": 13.141,
+            "match": null,
+            "why": "name match: maybeWithAuthCredentials x1.10 (auth, authorization); bm25: auth, url"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::setProxy",
+            "start_line": 357,
+            "end_line": 541,
+            "kind": "symbol",
+            "score": 38.1024,
+            "match": null,
+            "why": "bm25: config; body: username, host, auth, password, url, authorization, user, header, basic"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "symbol_id": "lib/adapters/fetch.js::factory",
+            "start_line": 81,
+            "end_line": 714,
+            "kind": "symbol",
+            "score": 14.6235,
+            "match": "broad",
+            "why": "bm25: body: username, password, url, auth, config, header, user, create~, authorization, basic"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "symbol_id": "lib/core/Axios.js::Axios._request",
+            "start_line": 125,
+            "end_line": 311,
+            "kind": "symbol",
+            "score": 12.9474,
+            "match": null,
+            "why": "bm25: config, url; body: header, username, basic, auth"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::dispatchBeforeRedirect",
+            "start_line": 300,
+            "end_line": 320,
+            "kind": "symbol",
+            "score": 12.2465,
+            "match": null,
+            "why": "bm25: auth, config, header; body: authorization"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::AxiosHeaders.hasAuthorization",
+            "start_line": 125,
+            "end_line": 125,
+            "kind": "symbol",
+            "score": 12.0361,
+            "match": null,
+            "why": "name match: hasAuthorization x1.08 (authorization); owner match: AxiosHeaders x1.01; bm25: authorization, header"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::AxiosHeaders.hasAuthorization",
+            "start_line": 96,
+            "end_line": 96,
+            "kind": "symbol",
+            "score": 12.0361,
+            "match": null,
+            "why": "name match: hasAuthorization x1.08 (authorization); owner match: AxiosHeaders x1.01; bm25: authorization, header"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/helpers/resolveConfig.js",
+            "start_line": 27,
+            "end_line": 118,
+            "label": "resolveConfig"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 72,
+            "end_line": 79,
+            "label": "maybeWithAuthCredentials"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 357,
+            "end_line": 441,
+            "label": "setProxy (part 1/2)"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 442,
+            "end_line": 541,
+            "label": "setProxy (part 2/2)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 81,
+            "end_line": 185,
+            "label": "factory (part 1/6)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 186,
+            "end_line": 271,
+            "label": "factory (part 2/6)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 272,
+            "end_line": 375,
+            "label": "factory (part 3/6)"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 55,
+            "end_line": 55,
+            "label": "Axios (class header)"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 125,
+            "end_line": 218,
+            "label": "Axios._request (part 1/2)"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 219,
+            "end_line": 311,
+            "label": "Axios._request (part 2/2)"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 300,
+            "end_line": 320,
+            "label": "dispatchBeforeRedirect"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 42,
+            "end_line": 42,
+            "label": "AxiosHeaders (class header)"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 125,
+            "end_line": 125,
+            "label": "AxiosHeaders.hasAuthorization"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 25,
+            "end_line": 25,
+            "label": "AxiosHeaders (class header)"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 96,
+            "end_line": 96,
+            "label": "AxiosHeaders.hasAuthorization"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "onUploadProgress ve onDownloadProgress callback'lerine giden progress, rate ve estimated degerleri nerede hesaplaniyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "lib/helpers/progressEventReducer.js",
+          "symbol": "progressEventReducer",
+          "start_line": 5,
+          "end_line": 35
+        },
+        {
+          "path": "lib/helpers/speedometer.js",
+          "symbol": "speedometer",
+          "start_line": 9,
+          "end_line": 53
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00018081,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2726,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "lib/helpers/progressEventReducer.js",
+            "symbol_id": "lib/helpers/progressEventReducer.js::progressEventReducer",
+            "start_line": 5,
+            "end_line": 35,
+            "kind": "symbol",
+            "score": 38.6867,
+            "match": "symbol",
+            "why": "name match: progressEventReducer x1.07 (progress); bm25: download, progress; body: rate, estimated, upload"
+          },
+          {
+            "path": "lib/helpers/speedometer.js",
+            "symbol_id": "lib/helpers/speedometer.js::speedometer",
+            "start_line": 9,
+            "end_line": 53,
+            "kind": "symbol",
+            "score": 9.0897,
+            "match": "symbol",
+            "why": "bm25: rate"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::MaxDownloadRate",
+            "start_line": 361,
+            "end_line": 361,
+            "kind": "symbol",
+            "score": 18.6454,
+            "match": null,
+            "why": "name match: MaxDownloadRate x1.09 (rate); type declaration x0.7; bm25: rate, download"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::axios.MaxDownloadRate",
+            "start_line": 491,
+            "end_line": 491,
+            "kind": "symbol",
+            "score": 18.3,
+            "match": null,
+            "why": "name match: MaxDownloadRate x1.09 (rate); type declaration x0.7; bm25: rate, download"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "symbol_id": "lib/helpers/AxiosTransformStream.js::AxiosTransformStream._transform",
+            "start_line": 62,
+            "end_line": 162,
+            "kind": "symbol",
+            "score": 18.2844,
+            "match": null,
+            "why": "bm25: callback; body: rate, on, progress"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "symbol_id": "lib/helpers/AxiosTransformStream.js::AxiosTransformStream.constructor",
+            "start_line": 9,
+            "end_line": 50,
+            "kind": "symbol",
+            "score": 17.3874,
+            "match": null,
+            "why": "bm25: body: rate, callback, progress, on"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::MaxUploadRate",
+            "start_line": 359,
+            "end_line": 359,
+            "kind": "symbol",
+            "score": 16.6644,
+            "match": null,
+            "why": "name match: MaxUploadRate x1.09 (rate); type declaration x0.7; bm25: rate, upload"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::axios.MaxUploadRate",
+            "start_line": 489,
+            "end_line": 489,
+            "kind": "symbol",
+            "score": 16.3556,
+            "match": null,
+            "why": "name match: MaxUploadRate x1.09 (rate); type declaration x0.7; bm25: rate, upload"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/helpers/progressEventReducer.js",
+            "start_line": 5,
+            "end_line": 35,
+            "label": "progressEventReducer"
+          },
+          {
+            "path": "lib/helpers/speedometer.js",
+            "start_line": 9,
+            "end_line": 53,
+            "label": "speedometer"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 361,
+            "end_line": 361,
+            "label": "MaxDownloadRate"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 491,
+            "end_line": 491,
+            "label": "axios.MaxDownloadRate"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "start_line": 8,
+            "end_line": 8,
+            "label": "AxiosTransformStream (class header)"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "start_line": 62,
+            "end_line": 162,
+            "label": "AxiosTransformStream._transform"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "start_line": 9,
+            "end_line": 50,
+            "label": "AxiosTransformStream.constructor"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 359,
+            "end_line": 359,
+            "label": "MaxUploadRate"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 489,
+            "end_line": 489,
+            "label": "axios.MaxUploadRate"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "flow",
+      "lang": "en",
+      "question": "What happens between calling `axios.get(url)` and the adapter actually sending the request? I'd like the chain of calls, including where request interceptors run.",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "lib/core/Axios.js",
+          "symbol": "Axios._request",
+          "start_line": 125,
+          "end_line": 311
+        },
+        {
+          "path": "lib/core/dispatchRequest.js",
+          "symbol": "dispatchRequest",
+          "start_line": 66,
+          "end_line": 132
+        },
+        {
+          "path": "lib/adapters/adapters.js",
+          "symbol": "getAdapter",
+          "start_line": 65,
+          "end_line": 115
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000168378,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2852,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "lib/core/Axios.js",
+            "symbol_id": "lib/core/Axios.js::Axios._request",
+            "start_line": 125,
+            "end_line": 311,
+            "kind": "symbol",
+            "score": 31.7262,
+            "match": "symbol",
+            "why": "name match: _request x1.03 (request); owner match: Axios x1.01; bm25: axios, url, request; body: interceptors, chain, calling~, get, run"
+          },
+          {
+            "path": "lib/core/dispatchRequest.js",
+            "symbol_id": "lib/core/dispatchRequest.js::dispatchRequest",
+            "start_line": 66,
+            "end_line": 132,
+            "kind": "symbol",
+            "score": 21.4897,
+            "match": "symbol",
+            "why": "name match: dispatchRequest x1.02 (request); bm25: adapter, request; body: calling~, axios, interceptors, get"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::Axios.get",
+            "start_line": 201,
+            "end_line": 204,
+            "kind": "symbol",
+            "score": 88.6038,
+            "match": null,
+            "why": "name match: get (explicit axios.get); qualname/path match: axios.get; bm25: axios, url, get, request"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::Axios.get",
+            "start_line": 675,
+            "end_line": 678,
+            "kind": "symbol",
+            "score": 88.5668,
+            "match": null,
+            "why": "name match: get (explicit axios.get); qualname/path match: axios.get; bm25: axios, url, get, request"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::getAdapter",
+            "start_line": 761,
+            "end_line": 764,
+            "kind": "symbol",
+            "score": 26.3808,
+            "match": null,
+            "why": "name match: getAdapter x1.12 (adapter, get); bm25: adapter, axios, get, request"
+          },
+          {
+            "path": "lib/adapters/adapters.js",
+            "symbol_id": "lib/adapters/adapters.js::getAdapter",
+            "start_line": 65,
+            "end_line": 115,
+            "kind": "symbol",
+            "score": 22.9695,
+            "match": "symbol",
+            "why": "name match: getAdapter x1.12 (adapter, get); bm25: adapter, axios, get; body: request"
+          },
+          {
+            "path": "lib/utils.js",
+            "symbol_id": "lib/utils.js::toArray",
+            "start_line": 792,
+            "end_line": 832,
+            "kind": "symbol",
+            "score": 20.3658,
+            "match": null,
+            "why": "bm25: like; body: including, get"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "symbol_id": "lib/core/Axios.js::Axios.constructor",
+            "start_line": 56,
+            "end_line": 62,
+            "kind": "symbol",
+            "score": 16.9359,
+            "match": null,
+            "why": "bm25: axios; body: interceptors, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 55,
+            "end_line": 55,
+            "label": "Axios (class header)"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 125,
+            "end_line": 218,
+            "label": "Axios._request (part 1/2)"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 219,
+            "end_line": 311,
+            "label": "Axios._request (part 2/2)"
+          },
+          {
+            "path": "lib/core/dispatchRequest.js",
+            "start_line": 66,
+            "end_line": 132,
+            "label": "dispatchRequest"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 190,
+            "end_line": 190,
+            "label": "Axios (class header)"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 201,
+            "end_line": 204,
+            "label": "Axios.get"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 664,
+            "end_line": 664,
+            "label": "Axios (class header)"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 675,
+            "end_line": 678,
+            "label": "Axios.get"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 761,
+            "end_line": 764,
+            "label": "getAdapter"
+          },
+          {
+            "path": "lib/adapters/adapters.js",
+            "start_line": 65,
+            "end_line": 115,
+            "label": "getAdapter"
+          },
+          {
+            "path": "lib/utils.js",
+            "start_line": 792,
+            "end_line": 832,
+            "label": "toArray"
+          },
+          {
+            "path": "lib/core/Axios.js",
+            "start_line": 56,
+            "end_line": 62,
+            "label": "Axios.constructor"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": true,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "flow",
+      "lang": "en",
+      "question": "When I call `controller.abort()` on the AbortSignal I passed as `signal`, how does that stop an in-flight XHR request, and why does my `catch` get an error for which `axios.isCancel(err)` is true?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "lib/adapters/xhr.js",
+          "start_line": 277,
+          "end_line": 298
+        },
+        {
+          "path": "lib/cancel/CanceledError.js",
+          "symbol": "CanceledError",
+          "start_line": 5,
+          "end_line": 20
+        },
+        {
+          "path": "lib/cancel/isCancel.js",
+          "symbol": "isCancel",
+          "start_line": 3,
+          "end_line": 5
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000161364,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3028,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "lib/helpers/composeSignals.js",
+            "symbol_id": "lib/helpers/composeSignals.js::composeSignals",
+            "start_line": 5,
+            "end_line": 69,
+            "kind": "symbol",
+            "score": 47.6855,
+            "match": null,
+            "why": "name match: composeSignals x1.06 (signal); bm25: signal; body: controller, error, abort, call, axios, cancel, is, get"
+          },
+          {
+            "path": "lib/helpers/composeSignals.js",
+            "symbol_id": "lib/helpers/composeSignals.js::composeSignals.<locals>.onabort",
+            "start_line": 16,
+            "end_line": 27,
+            "kind": "symbol",
+            "score": 21.2109,
+            "match": null,
+            "why": "nested x0.5; bm25: signal; body: error, controller, abort, cancel, axios"
+          },
+          {
+            "path": "lib/core/dispatchRequest.js",
+            "symbol_id": "lib/core/dispatchRequest.js::throwIfCancellationRequested",
+            "start_line": 18,
+            "end_line": 26,
+            "kind": "symbol",
+            "score": 22.7116,
+            "match": null,
+            "why": "name match: throwIfCancellationRequested x1.01 (request); bm25: cancel, error, request; body: signal, abort"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "symbol_id": "lib/adapters/fetch.js::factory",
+            "start_line": 81,
+            "end_line": 714,
+            "kind": "symbol",
+            "score": 17.7808,
+            "match": null,
+            "why": "bm25: body: error, signal, is, axios, request, cancel, get, abort, passed, catch, call"
+          },
+          {
+            "path": "lib/cancel/CanceledError.js",
+            "symbol_id": "lib/cancel/CanceledError.js::CanceledError.constructor",
+            "start_line": 15,
+            "end_line": 19,
+            "kind": "symbol",
+            "score": 21.2552,
+            "match": "overlap",
+            "why": "bm25: error, cancel, request; body: axios"
+          },
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "symbol_id": "lib/cancel/CancelToken.js::CancelToken.toAbortSignal",
+            "start_line": 105,
+            "end_line": 117,
+            "kind": "symbol",
+            "score": 53.162,
+            "match": null,
+            "why": "name match: toAbortSignal x1.13 (abort, signal); bm25: signal, abort, cancel; body: controller, error~"
+          },
+          {
+            "path": "lib/cancel/isCancel.js",
+            "symbol_id": "lib/cancel/isCancel.js::isCancel",
+            "start_line": 3,
+            "end_line": 5,
+            "kind": "symbol",
+            "score": 24.4149,
+            "match": "symbol",
+            "why": "name match: isCancel x1.11 (explicit iscancel); bm25: iscancel, cancel, is"
+          },
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "symbol_id": "lib/cancel/CancelToken.js::CancelToken.toAbortSignal.<locals>.abort",
+            "start_line": 108,
+            "end_line": 110,
+            "kind": "symbol",
+            "score": 22.1773,
+            "match": null,
+            "why": "name match: abort x1.07 (abort); owner match: toAbortSignal x1.02; nested x0.5; bm25: abort, error~, cancel, signal; body: controller"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/helpers/composeSignals.js",
+            "start_line": 5,
+            "end_line": 69,
+            "label": "composeSignals"
+          },
+          {
+            "path": "lib/core/dispatchRequest.js",
+            "start_line": 18,
+            "end_line": 26,
+            "label": "throwIfCancellationRequested"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 81,
+            "end_line": 185,
+            "label": "factory (part 1/6)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 186,
+            "end_line": 271,
+            "label": "factory (part 2/6)"
+          },
+          {
+            "path": "lib/adapters/fetch.js",
+            "start_line": 272,
+            "end_line": 375,
+            "label": "factory (part 3/6)"
+          },
+          {
+            "path": "lib/cancel/CanceledError.js",
+            "start_line": 5,
+            "end_line": 5,
+            "label": "CanceledError (class header)"
+          },
+          {
+            "path": "lib/cancel/CanceledError.js",
+            "start_line": 15,
+            "end_line": 19,
+            "label": "CanceledError.constructor"
+          },
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "start_line": 12,
+            "end_line": 12,
+            "label": "CancelToken (class header)"
+          },
+          {
+            "path": "lib/cancel/CancelToken.js",
+            "start_line": 105,
+            "end_line": 117,
+            "label": "CancelToken.toAbortSignal"
+          },
+          {
+            "path": "lib/cancel/isCancel.js",
+            "start_line": 3,
+            "end_line": 5,
+            "label": "isCancel"
+          }
+        ],
+        "rank": 5,
+        "loose_rank": 5,
+        "rr": 0.2,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.375,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "flow",
+      "lang": "tr",
+      "question": "params nesnesi URL'deki query string'e nasil donusuyor? Ornegin `{ ids: [1, 2] }` neden `ids[]` anahtariyla iki kez yaziliyor?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "lib/helpers/buildURL.js",
+          "symbol": "buildURL",
+          "start_line": 31,
+          "end_line": 69
+        },
+        {
+          "path": "lib/helpers/AxiosURLSearchParams.js",
+          "symbol": "AxiosURLSearchParams",
+          "start_line": 35,
+          "end_line": 39
+        },
+        {
+          "path": "lib/helpers/toFormData.js",
+          "symbol": "toFormData",
+          "start_line": 94,
+          "end_line": 277
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00015099,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.272,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "lib/helpers/AxiosURLSearchParams.js",
+            "symbol_id": "lib/helpers/AxiosURLSearchParams.js::AxiosURLSearchParams",
+            "start_line": 35,
+            "end_line": 39,
+            "kind": "symbol",
+            "score": 23.0771,
+            "match": "symbol",
+            "why": "name match: AxiosURLSearchParams x1.14 (params, url); bm25: params, url, object"
+          },
+          {
+            "path": "lib/core/assertParamsAcyclic.js",
+            "symbol_id": "lib/core/assertParamsAcyclic.js::assertParamsAcyclic",
+            "start_line": 6,
+            "end_line": 49,
+            "kind": "symbol",
+            "score": 22.0158,
+            "match": null,
+            "why": "name match: assertParamsAcyclic x1.06 (params); bm25: params; body: key, object"
+          },
+          {
+            "path": "lib/helpers/buildURL.js",
+            "symbol_id": "lib/helpers/buildURL.js::buildURL",
+            "start_line": 31,
+            "end_line": 69,
+            "kind": "symbol",
+            "score": 21.5733,
+            "match": "symbol",
+            "why": "name match: buildURL x1.06 (url); bm25: params, url; body: string, object"
+          },
+          {
+            "path": "docs/scripts/process-sponsors.js",
+            "symbol_id": "docs/scripts/process-sponsors.js::buildLinks",
+            "start_line": 175,
+            "end_line": 193,
+            "kind": "symbol",
+            "score": 20.7531,
+            "match": null,
+            "why": "bm25: url; body: params, object, string"
+          },
+          {
+            "path": "examples/abort-controller/server.js",
+            "symbol_id": "examples/abort-controller/server.js::default",
+            "start_line": 1,
+            "end_line": 23,
+            "kind": "symbol",
+            "score": 20.3336,
+            "match": null,
+            "why": "bm25: example~; body: params, write~, url"
+          },
+          {
+            "path": "lib/core/mergeConfig.js",
+            "symbol_id": "lib/core/mergeConfig.js::mergeParams",
+            "start_line": 23,
+            "end_line": 66,
+            "kind": "symbol",
+            "score": 19.3796,
+            "match": null,
+            "why": "name match: mergeParams x1.08 (params); bm25: params; body: key, object"
+          },
+          {
+            "path": "index.d.ts",
+            "symbol_id": "index.d.ts::Axios.query",
+            "start_line": 721,
+            "end_line": 725,
+            "kind": "symbol",
+            "score": 18.6391,
+            "match": null,
+            "why": "name match: query x1.18 (query); bm25: query, url, string"
+          },
+          {
+            "path": "index.d.cts",
+            "symbol_id": "index.d.cts::Axios.query",
+            "start_line": 247,
+            "end_line": 251,
+            "kind": "symbol",
+            "score": 18.3894,
+            "match": null,
+            "why": "name match: query x1.18 (query); bm25: query, url, string"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/helpers/AxiosURLSearchParams.js",
+            "start_line": 35,
+            "end_line": 39,
+            "label": "AxiosURLSearchParams"
+          },
+          {
+            "path": "lib/core/assertParamsAcyclic.js",
+            "start_line": 6,
+            "end_line": 49,
+            "label": "assertParamsAcyclic"
+          },
+          {
+            "path": "lib/helpers/buildURL.js",
+            "start_line": 31,
+            "end_line": 69,
+            "label": "buildURL"
+          },
+          {
+            "path": "docs/scripts/process-sponsors.js",
+            "start_line": 175,
+            "end_line": 193,
+            "label": "buildLinks"
+          },
+          {
+            "path": "examples/abort-controller/server.js",
+            "start_line": 1,
+            "end_line": 23,
+            "label": "default"
+          },
+          {
+            "path": "lib/core/mergeConfig.js",
+            "start_line": 23,
+            "end_line": 66,
+            "label": "mergeParams"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 664,
+            "end_line": 664,
+            "label": "Axios (class header)"
+          },
+          {
+            "path": "index.d.ts",
+            "start_line": 721,
+            "end_line": 725,
+            "label": "Axios.query"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 190,
+            "end_line": 190,
+            "label": "Axios (class header)"
+          },
+          {
+            "path": "index.d.cts",
+            "start_line": 247,
+            "end_line": 251,
+            "label": "Axios.query"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          1.0,
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "In Node, where is the redirect loop that reads the `Location` header, sends the next request and stops after `maxRedirects` hops?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "lib/adapters/http.js",
+          "start_line": 1155,
+          "end_line": 1241
+        },
+        {
+          "path": "lib/adapters/http.js",
+          "symbol": "dispatchBeforeRedirect",
+          "start_line": 300,
+          "end_line": 320
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000206724,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.2762,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::dispatchBeforeRedirect",
+            "start_line": 300,
+            "end_line": 320,
+            "kind": "symbol",
+            "score": 27.7798,
+            "match": "symbol",
+            "why": "name match: dispatchBeforeRedirect x1.07 (redirect); bm25: redirects, redirect, header, request"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::setProxy",
+            "start_line": 357,
+            "end_line": 541,
+            "kind": "symbol",
+            "score": 27.641,
+            "match": null,
+            "why": "bm25: redirect, redirects, after; body: reads, node, header, sends, request, hops~, maxredirects, max"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeNativeEnvProxySupported",
+            "start_line": 111,
+            "end_line": 129,
+            "kind": "symbol",
+            "score": 17.4876,
+            "match": null,
+            "why": "name match: isNodeNativeEnvProxySupported x1.05 (node); bm25: node"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeEnvProxyEnabled",
+            "start_line": 131,
+            "end_line": 141,
+            "kind": "symbol",
+            "score": 17.1049,
+            "match": null,
+            "why": "name match: isNodeEnvProxyEnabled x1.05 (node); bm25: node"
+          },
+          {
+            "path": "rollup.config.js",
+            "symbol_id": "rollup.config.js::nodeCjsExternal",
+            "start_line": 67,
+            "end_line": 77,
+            "kind": "symbol",
+            "score": 16.0896,
+            "match": null,
+            "why": "name match: nodeCjsExternal x1.05 (node); bm25: node"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isSameOriginRedirect",
+            "start_line": 334,
+            "end_line": 345,
+            "kind": "symbol",
+            "score": 14.5861,
+            "match": null,
+            "why": "name match: isSameOriginRedirect x1.08 (redirect); bm25: redirect, request"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "symbol_id": "lib/helpers/AxiosTransformStream.js::AxiosTransformStream._transform",
+            "start_line": 62,
+            "end_line": 162,
+            "kind": "symbol",
+            "score": 12.4131,
+            "match": null,
+            "why": "bm25: body: max, next, reads~"
+          },
+          {
+            "path": "lib/platform/node/classes/Buffer.js",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 11,
+            "kind": "file",
+            "score": 11.3345,
+            "match": null,
+            "why": "bm25: node"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 300,
+            "end_line": 320,
+            "label": "dispatchBeforeRedirect"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 357,
+            "end_line": 441,
+            "label": "setProxy (part 1/2)"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 442,
+            "end_line": 541,
+            "label": "setProxy (part 2/2)"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 111,
+            "end_line": 129,
+            "label": "isNodeNativeEnvProxySupported"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 131,
+            "end_line": 141,
+            "label": "isNodeEnvProxyEnabled"
+          },
+          {
+            "path": "rollup.config.js",
+            "start_line": 67,
+            "end_line": 77,
+            "label": "nodeCjsExternal"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 334,
+            "end_line": 345,
+            "label": "isSameOriginRedirect"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "start_line": 8,
+            "end_line": 8,
+            "label": "AxiosTransformStream (class header)"
+          },
+          {
+            "path": "lib/helpers/AxiosTransformStream.js",
+            "start_line": 62,
+            "end_line": 162,
+            "label": "AxiosTransformStream._transform"
+          },
+          {
+            "path": "lib/platform/node/classes/Buffer.js",
+            "start_line": 1,
+            "end_line": 11,
+            "label": "module head"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q19",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "Node'da `HTTP_PROXY` ve `HTTPS_PROXY` ortam değişkenlerini okuyup bir istek URL'si için hangi proxy adresinin kullanılacağını döndüren kod nerede?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "lib/adapters/http.js",
+          "symbol": "setProxy",
+          "start_line": 357,
+          "end_line": 541
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000215838,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3229,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::setProxy",
+            "start_line": 357,
+            "end_line": 541,
+            "kind": "symbol",
+            "score": 33.4974,
+            "match": "symbol",
+            "why": "name match: setProxy x1.08 (proxy); bm25: proxy, https, environment~, http; body: read, url, node, request"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 1609,
+            "kind": "file",
+            "score": 16.86,
+            "match": "file",
+            "why": "bm25: node, proxy, environment~, address, read, http"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeEnvProxyEnabled",
+            "start_line": 131,
+            "end_line": 141,
+            "kind": "symbol",
+            "score": 42.5521,
+            "match": null,
+            "why": "name match: isNodeEnvProxyEnabled x1.36 (node, ortam, proxy); bm25: node, proxy, environment~, http"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::isNodeNativeEnvProxySupported",
+            "start_line": 111,
+            "end_line": 129,
+            "kind": "symbol",
+            "score": 41.0755,
+            "match": null,
+            "why": "name match: isNodeNativeEnvProxySupported x1.32 (node, ortam, proxy); bm25: node, proxy, environment~, http"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::getProxyEnvAgent",
+            "start_line": 143,
+            "end_line": 147,
+            "kind": "symbol",
+            "score": 31.7437,
+            "match": null,
+            "why": "name match: getProxyEnvAgent x1.21 (ortam, proxy); bm25: https, proxy, environment~, http"
+          },
+          {
+            "path": "rollup.config.js",
+            "symbol_id": "rollup.config.js::nodeCjsExternal",
+            "start_line": 67,
+            "end_line": 77,
+            "kind": "symbol",
+            "score": 26.6097,
+            "match": null,
+            "why": "name match: nodeCjsExternal x1.07 (node); bm25: node; body: proxy, environment~"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::getDirectAgent",
+            "start_line": 149,
+            "end_line": 215,
+            "kind": "symbol",
+            "score": 21.7759,
+            "match": null,
+            "why": "bm25: http; body: environment, node, proxy, request"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::getTunnelingAgent",
+            "start_line": 226,
+            "end_line": 262,
+            "kind": "symbol",
+            "score": 19.7159,
+            "match": null,
+            "why": "bm25: https, http; body: proxy, request, read"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 357,
+            "end_line": 441,
+            "label": "setProxy (part 1/2)"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 442,
+            "end_line": 541,
+            "label": "setProxy (part 2/2)"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 131,
+            "end_line": 141,
+            "label": "isNodeEnvProxyEnabled"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 111,
+            "end_line": 129,
+            "label": "isNodeNativeEnvProxySupported"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 143,
+            "end_line": 147,
+            "label": "getProxyEnvAgent"
+          },
+          {
+            "path": "rollup.config.js",
+            "start_line": 67,
+            "end_line": 77,
+            "label": "nodeCjsExternal"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 149,
+            "end_line": 215,
+            "label": "getDirectAgent"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 226,
+            "end_line": 262,
+            "label": "getTunnelingAgent"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q20",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "axios DNS cozumlemesini nerede yapiyor, hostname'i IP adresine ceviren kod hangisi?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "lib/adapters/http.js",
+          "symbol": "normalizeLookup",
+          "start_line": 588,
+          "end_line": 621
+        },
+        {
+          "path": "lib/adapters/http.js",
+          "start_line": 1068,
+          "end_line": 1089
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00016968,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2649,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::normalizeLookup",
+            "start_line": 588,
+            "end_line": 621,
+            "kind": "symbol",
+            "score": 18.4033,
+            "match": "symbol",
+            "why": "bm25: body: hostname, address"
+          },
+          {
+            "path": "lib/helpers/shouldBypassProxy.js",
+            "symbol_id": "lib/helpers/shouldBypassProxy.js::normalizeNoProxyHost",
+            "start_line": 315,
+            "end_line": 347,
+            "kind": "symbol",
+            "score": 27.1243,
+            "match": null,
+            "why": "bm25: hostname; body: ip, address, url"
+          },
+          {
+            "path": "lib/helpers/shouldBypassProxy.js",
+            "symbol_id": "lib/helpers/shouldBypassProxy.js::normalizeIPAddress",
+            "start_line": 63,
+            "end_line": 126,
+            "kind": "symbol",
+            "score": 23.2417,
+            "match": null,
+            "why": "name match: normalizeIPAddress x1.35 (adresine, ip); bm25: ip, address; body: url"
+          },
+          {
+            "path": "lib/helpers/shouldBypassProxy.js",
+            "symbol_id": "lib/helpers/shouldBypassProxy.js::shouldBypassProxy",
+            "start_line": 453,
+            "end_line": 520,
+            "kind": "symbol",
+            "score": 20.9157,
+            "match": null,
+            "why": "bm25: body: hostname, ip, url"
+          },
+          {
+            "path": "lib/helpers/AxiosURLSearchParams.js",
+            "symbol_id": "lib/helpers/AxiosURLSearchParams.js::AxiosURLSearchParams",
+            "start_line": 35,
+            "end_line": 39,
+            "kind": "symbol",
+            "score": 14.3024,
+            "match": null,
+            "why": "name match: AxiosURLSearchParams x1.16 (adresine, axios); bm25: axios, url, convert"
+          },
+          {
+            "path": "lib/helpers/shouldBypassProxy.js",
+            "symbol_id": "lib/helpers/shouldBypassProxy.js::normalizeCidrBase",
+            "start_line": 349,
+            "end_line": 390,
+            "kind": "symbol",
+            "score": 13.0368,
+            "match": null,
+            "why": "bm25: body: hostname, ip, address, url"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "symbol_id": "lib/adapters/http.js::resolveFamily",
+            "start_line": 573,
+            "end_line": 581,
+            "kind": "symbol",
+            "score": 12.5572,
+            "match": null,
+            "why": "bm25: address; body: axios"
+          },
+          {
+            "path": "tests/unit/adapters/routingConsistency.test.js",
+            "symbol_id": "tests/unit/adapters/routingConsistency.test.js::lookup",
+            "start_line": 26,
+            "end_line": 29,
+            "kind": "symbol",
+            "score": 11.7333,
+            "match": null,
+            "why": "test file x0.5; bm25: hostname; body: address"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 588,
+            "end_line": 621,
+            "label": "normalizeLookup"
+          },
+          {
+            "path": "lib/helpers/shouldBypassProxy.js",
+            "start_line": 315,
+            "end_line": 347,
+            "label": "normalizeNoProxyHost"
+          },
+          {
+            "path": "lib/helpers/shouldBypassProxy.js",
+            "start_line": 63,
+            "end_line": 126,
+            "label": "normalizeIPAddress"
+          },
+          {
+            "path": "lib/helpers/shouldBypassProxy.js",
+            "start_line": 453,
+            "end_line": 520,
+            "label": "shouldBypassProxy"
+          },
+          {
+            "path": "lib/helpers/AxiosURLSearchParams.js",
+            "start_line": 35,
+            "end_line": 39,
+            "label": "AxiosURLSearchParams"
+          },
+          {
+            "path": "lib/helpers/shouldBypassProxy.js",
+            "start_line": 349,
+            "end_line": 390,
+            "label": "normalizeCidrBase"
+          },
+          {
+            "path": "lib/adapters/http.js",
+            "start_line": 573,
+            "end_line": 581,
+            "label": "resolveFamily"
+          },
+          {
+            "path": "tests/unit/adapters/routingConsistency.test.js",
+            "start_line": 26,
+            "end_line": 29,
+            "label": "lookup"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    }
+  ]
+}

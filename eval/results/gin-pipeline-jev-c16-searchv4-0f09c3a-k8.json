@@ -1,0 +1,4319 @@
+{
+  "meta": {
+    "decisions": "jev",
+    "candidates": 16,
+    "repo": {
+      "name": "gin",
+      "source": "https://github.com/gin-gonic/gin",
+      "commit": "0f09c3a"
+    },
+    "source": "C:/Users/Selman/AppData/Local/Temp/claude/29abb69cf93759cc/a3feb6c6-0644-4b09-b6bb-2c4e21761226/scratchpad/repos/gin",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\29abb69cf93759cc\\a3feb6c6-0644-4b09-b6bb-2c4e21761226\\scratchpad\\repos\\gin",
+      "commit": "0f09c3a9b4626d9fe9979cf4d0521d6ae32ab646",
+      "golden_commit": "0f09c3a",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20"
+    ],
+    "started": "2026-11-08T21:06:28",
+    "open_workspace_s": 0.012,
+    "total_s": 5.958,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "golden": "eval/golden/gin.json",
+    "validation_warnings": []
+  },
+  "summary": {
+    "overall": {
+      "n": 20,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 17,
+          "yes": 14,
+          "rate": 0.824
+        },
+        "hit@3": {
+          "n": 17,
+          "yes": 16,
+          "rate": 0.941
+        },
+        "hit@k": {
+          "n": 17,
+          "yes": 16,
+          "rate": 0.941
+        },
+        "loose_hit@1": {
+          "n": 17,
+          "yes": 15,
+          "rate": 0.882
+        },
+        "loose_hit@3": {
+          "n": 17,
+          "yes": 16,
+          "rate": 0.941
+        },
+        "loose_hit@k": {
+          "n": 17,
+          "yes": 16,
+          "rate": 0.941
+        },
+        "mrr": 0.882,
+        "chunk_recall": {
+          "n": 17,
+          "yes": 13,
+          "rate": 0.765
+        },
+        "all@k": {
+          "n": 3,
+          "yes": 0,
+          "rate": 0.0
+        },
+        "pointer@k": {
+          "n": 3,
+          "yes": 2,
+          "rate": 0.667
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 2,
+          "rate": 0.667
+        }
+      },
+      "decision_calls": 20,
+      "decision_cost_usd": 0.002679,
+      "admit_judge_calls": 0,
+      "admit_judge_cost_usd": 0,
+      "reranked": 20,
+      "off_target": 0,
+      "decision_errors": 0,
+      "elapsed_s": {
+        "total": 5.943,
+        "mean": 0.297,
+        "median": 0.269,
+        "max": 0.614
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "hit@3": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "loose_hit@3": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "mrr": 1.0,
+          "chunk_recall": {
+            "n": 8,
+            "yes": 8,
+            "rate": 1.0
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001116,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 8,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 2.518,
+          "mean": 0.315,
+          "median": 0.266,
+          "max": 0.614
+        }
+      },
+      "locate-feature": {
+        "n": 6,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "mrr": 0.667,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 5,
+            "rate": 0.833
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 6,
+        "decision_cost_usd": 0.000767,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 6,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 1.661,
+          "mean": 0.277,
+          "median": 0.271,
+          "max": 0.323
+        }
+      },
+      "flow": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "hit@3": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "loose_hit@3": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 3,
+            "yes": 3,
+            "rate": 1.0
+          },
+          "mrr": 1.0,
+          "chunk_recall": {
+            "n": 3,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "all@k": {
+            "n": 3,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.00039,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 3,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 0.959,
+          "mean": 0.32,
+          "median": 0.287,
+          "max": 0.392
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          }
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.000406,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 3,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 0.804,
+          "mean": 0.268,
+          "median": 0.266,
+          "max": 0.288
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 12,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "hit@3": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "hit@k": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "loose_hit@1": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "loose_hit@3": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "loose_hit@k": {
+            "n": 10,
+            "yes": 9,
+            "rate": 0.9
+          },
+          "mrr": 0.9,
+          "chunk_recall": {
+            "n": 10,
+            "yes": 7,
+            "rate": 0.7
+          },
+          "all@k": {
+            "n": 2,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": {
+            "n": 2,
+            "yes": 1,
+            "rate": 0.5
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 1,
+            "rate": 0.5
+          }
+        },
+        "decision_calls": 12,
+        "decision_cost_usd": 0.001636,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 12,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 3.788,
+          "mean": 0.316,
+          "median": 0.281,
+          "max": 0.614
+        }
+      },
+      "tr": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 7,
+            "yes": 5,
+            "rate": 0.714
+          },
+          "hit@3": {
+            "n": 7,
+            "yes": 7,
+            "rate": 1.0
+          },
+          "hit@k": {
+            "n": 7,
+            "yes": 7,
+            "rate": 1.0
+          },
+          "loose_hit@1": {
+            "n": 7,
+            "yes": 6,
+            "rate": 0.857
+          },
+          "loose_hit@3": {
+            "n": 7,
+            "yes": 7,
+            "rate": 1.0
+          },
+          "loose_hit@k": {
+            "n": 7,
+            "yes": 7,
+            "rate": 1.0
+          },
+          "mrr": 0.857,
+          "chunk_recall": {
+            "n": 7,
+            "yes": 6,
+            "rate": 0.857
+          },
+          "all@k": {
+            "n": 1,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer@k": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 1,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001044,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 8,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 2.154,
+          "mean": 0.269,
+          "median": 0.269,
+          "max": 0.28
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is `c.Next()` implemented, the call a middleware uses to run the rest of the handler chain before doing its own after-work?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "context.go",
+          "symbol": "Context.Next",
+          "start_line": 197,
+          "end_line": 205
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000120834,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.6139,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.Next",
+            "start_line": 197,
+            "end_line": 205,
+            "kind": "symbol",
+            "score": 33.0091,
+            "match": "symbol",
+            "why": "name match: Next x1.10 (next); bm25: next, handler, middleware, chain, call, uses~"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.Use",
+            "start_line": 363,
+            "end_line": 368,
+            "kind": "symbol",
+            "score": 32.3453,
+            "match": null,
+            "why": "name match: Use x1.16 (uses); bm25: middleware, handler, uses~, chain"
+          },
+          {
+            "path": "ginS/gins.go",
+            "symbol_id": "ginS/gins.go::Use",
+            "start_line": 129,
+            "end_line": 131,
+            "kind": "symbol",
+            "score": 29.7764,
+            "match": null,
+            "why": "name match: Use x1.16 (uses); bm25: middleware, handler, uses~, chain"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.Use",
+            "start_line": 89,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 29.5358,
+            "match": null,
+            "why": "name match: Use x1.16 (uses); bm25: middleware, handler, uses~"
+          },
+          {
+            "path": "middleware_test.go",
+            "symbol_id": "middleware_test.go::TestMiddlewareAbortHandlersChainAndNext",
+            "start_line": 185,
+            "end_line": 204,
+            "kind": "symbol",
+            "score": 17.8465,
+            "match": null,
+            "why": "test file x0.5; bm25: middleware, next, chain, handler~; body: run, uses~"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.StaticFS",
+            "start_line": 239,
+            "end_line": 250,
+            "kind": "symbol",
+            "score": 17.5211,
+            "match": null,
+            "why": "bm25: uses, work; body: handler"
+          },
+          {
+            "path": "recovery.go",
+            "symbol_id": "recovery.go::CustomRecovery",
+            "start_line": 40,
+            "end_line": 42,
+            "kind": "symbol",
+            "score": 17.3764,
+            "match": null,
+            "why": "bm25: handler, middleware, call"
+          },
+          {
+            "path": "middleware_test.go",
+            "symbol_id": "middleware_test.go::TestMiddlewareFailHandlersChain",
+            "start_line": 208,
+            "end_line": 227,
+            "kind": "symbol",
+            "score": 16.7318,
+            "match": null,
+            "why": "test file x0.5; bm25: middleware, chain, uses~, handler~; body: next, run"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 197,
+            "end_line": 205,
+            "label": "Context.Next"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "Engine (class header)"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 363,
+            "end_line": 368,
+            "label": "Engine.Use"
+          },
+          {
+            "path": "ginS/gins.go",
+            "start_line": 129,
+            "end_line": 131,
+            "label": "Use"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 76,
+            "end_line": 76,
+            "label": "RouterGroup (class header)"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 89,
+            "end_line": 92,
+            "label": "RouterGroup.Use"
+          },
+          {
+            "path": "middleware_test.go",
+            "start_line": 185,
+            "end_line": 204,
+            "label": "TestMiddlewareAbortHandlersChainAndNext"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 239,
+            "end_line": 250,
+            "label": "RouterGroup.StaticFS"
+          },
+          {
+            "path": "recovery.go",
+            "start_line": 40,
+            "end_line": 42,
+            "label": "CustomRecovery"
+          },
+          {
+            "path": "middleware_test.go",
+            "start_line": 208,
+            "end_line": 227,
+            "label": "TestMiddlewareFailHandlersChain"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "I want to keep using the request's context inside a goroutine I start from a handler. Which method gives me a copy of `*gin.Context` that is safe to use there?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "context.go",
+          "symbol": "Context.Copy",
+          "start_line": 122,
+          "end_line": 154
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00011823,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2626,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.Copy",
+            "start_line": 122,
+            "end_line": 154,
+            "kind": "symbol",
+            "score": 31.5827,
+            "match": "symbol",
+            "why": "name match: Copy x1.09 (copy); owner match: Context x1.03; bm25: goroutine, copy, use, context, request; body: handler~"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.Next",
+            "start_line": 197,
+            "end_line": 205,
+            "kind": "symbol",
+            "score": 42.2611,
+            "match": null,
+            "why": "bm25: inside, handler, use, context; body: safe"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.RunUnix",
+            "start_line": 609,
+            "end_line": 630,
+            "kind": "symbol",
+            "score": 27.739,
+            "match": null,
+            "why": "bm25: goroutine, requests, start, gin, request; body: safe, handler"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.Run",
+            "start_line": 566,
+            "end_line": 583,
+            "kind": "symbol",
+            "score": 24.869,
+            "match": null,
+            "why": "bm25: goroutine, requests, gin, start, request; body: safe, handler"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.RunQUIC",
+            "start_line": 658,
+            "end_line": 669,
+            "kind": "symbol",
+            "score": 23.759,
+            "match": null,
+            "why": "bm25: goroutine, gin, requests, start, request; body: safe, handler"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.RunTLS",
+            "start_line": 588,
+            "end_line": 604,
+            "kind": "symbol",
+            "score": 23.6681,
+            "match": null,
+            "why": "bm25: goroutine, gin, requests, start, request; body: safe, handler"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.RunFd",
+            "start_line": 635,
+            "end_line": 653,
+            "kind": "symbol",
+            "score": 22.8882,
+            "match": null,
+            "why": "bm25: goroutine, requests, start, gin, request; body: safe"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.RunListener",
+            "start_line": 673,
+            "end_line": 688,
+            "kind": "symbol",
+            "score": 21.8176,
+            "match": null,
+            "why": "bm25: requests, start, gin, request; body: safe, handler"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 122,
+            "end_line": 154,
+            "label": "Context.Copy"
+          },
+          {
+            "path": "context.go",
+            "start_line": 197,
+            "end_line": 205,
+            "label": "Context.Next"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "Engine (class header)"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 609,
+            "end_line": 630,
+            "label": "Engine.RunUnix"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 566,
+            "end_line": 583,
+            "label": "Engine.Run"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 658,
+            "end_line": 669,
+            "label": "Engine.RunQUIC"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 588,
+            "end_line": 604,
+            "label": "Engine.RunTLS"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 635,
+            "end_line": 653,
+            "label": "Engine.RunFd"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 673,
+            "end_line": 688,
+            "label": "Engine.RunListener"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "My debug log shows `[WARNING] Headers were already written. Wanted to override status code 200 with 500`. Which code prints that warning, and why is the status not changed?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "response_writer.go",
+          "symbol": "responseWriter.WriteHeader",
+          "start_line": 67,
+          "end_line": 75
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.0001428,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2628,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "response_writer.go",
+            "symbol_id": "response_writer.go::responseWriter.WriteHeader",
+            "start_line": 67,
+            "end_line": 75,
+            "kind": "symbol",
+            "score": 75.9556,
+            "match": "symbol",
+            "why": "name match: WriteHeader x1.04 (headers); bm25: headers; body: override, wanted, warning, written, already, prints~, status, debug"
+          },
+          {
+            "path": "debug.go",
+            "symbol_id": "debug.go::debugPrintWARNINGDefault",
+            "start_line": 81,
+            "end_line": 90,
+            "kind": "symbol",
+            "score": 45.3074,
+            "match": null,
+            "why": "name match: debugPrintWARNINGDefault x1.20 (debug, prints, warning); bm25: warning, prints~, debug; body: already"
+          },
+          {
+            "path": "debug.go",
+            "symbol_id": "debug.go::debugPrintWARNINGNew",
+            "start_line": 92,
+            "end_line": 98,
+            "kind": "symbol",
+            "score": 38.3712,
+            "match": null,
+            "why": "name match: debugPrintWARNINGNew x1.20 (debug, prints, warning); bm25: warning, prints~, debug"
+          },
+          {
+            "path": "debug.go",
+            "symbol_id": "debug.go::debugPrintWARNINGSetHTMLTemplate",
+            "start_line": 100,
+            "end_line": 108,
+            "kind": "symbol",
+            "score": 35.2759,
+            "match": null,
+            "why": "name match: debugPrintWARNINGSetHTMLTemplate x1.16 (debug, prints, warning); bm25: warning, prints~, debug"
+          },
+          {
+            "path": "debug.go",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 114,
+            "kind": "file",
+            "score": 31.9457,
+            "match": null,
+            "why": "path match: debug x1.03 (debug); bm25: warning, prints~, debug"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Default",
+            "start_line": 250,
+            "end_line": 255,
+            "kind": "symbol",
+            "score": 26.7613,
+            "match": null,
+            "why": "bm25: already; body: warning, prints~, debug"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.Run",
+            "start_line": 566,
+            "end_line": 583,
+            "kind": "symbol",
+            "score": 18.7078,
+            "match": null,
+            "why": "bm25: headers~; body: warning, prints~, debug"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.RunListener",
+            "start_line": 673,
+            "end_line": 688,
+            "kind": "symbol",
+            "score": 18.6186,
+            "match": null,
+            "why": "bm25: body: warning, prints~, debug, headers~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "response_writer.go",
+            "start_line": 49,
+            "end_line": 49,
+            "label": "responseWriter (class header)"
+          },
+          {
+            "path": "response_writer.go",
+            "start_line": 67,
+            "end_line": 75,
+            "label": "responseWriter.WriteHeader"
+          },
+          {
+            "path": "debug.go",
+            "start_line": 81,
+            "end_line": 90,
+            "label": "debugPrintWARNINGDefault"
+          },
+          {
+            "path": "debug.go",
+            "start_line": 92,
+            "end_line": 98,
+            "label": "debugPrintWARNINGNew"
+          },
+          {
+            "path": "debug.go",
+            "start_line": 100,
+            "end_line": 108,
+            "label": "debugPrintWARNINGSetHTMLTemplate"
+          },
+          {
+            "path": "debug.go",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 250,
+            "end_line": 255,
+            "label": "Default"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "Engine (class header)"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 566,
+            "end_line": 583,
+            "label": "Engine.Run"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 673,
+            "end_line": 688,
+            "label": "Engine.RunListener"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where is bracket syntax in the query string, like `ids[a]=1&ids[b]=2`, turned into a map when I call `c.QueryMap(\"ids\")`?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "context.go",
+          "symbol": "getMapFromFormData",
+          "start_line": 683,
+          "end_line": 704
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000150318,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.251,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::getMapFromFormData",
+            "start_line": 683,
+            "end_line": 704,
+            "kind": "symbol",
+            "score": 18.1037,
+            "match": "symbol",
+            "why": "name match: getMapFromFormData x1.02 (map); bm25: like, bracket, map, string"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.GetQueryMap",
+            "start_line": 603,
+            "end_line": 606,
+            "kind": "symbol",
+            "score": 13.9771,
+            "match": null,
+            "why": "name match: GetQueryMap x1.12 (map, query); bm25: query, map, string"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.QueryMap",
+            "start_line": 596,
+            "end_line": 599,
+            "kind": "symbol",
+            "score": 76.1206,
+            "match": null,
+            "why": "name match: QueryMap (explicit querymap); bm25: querymap, query, map, string"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.GetQuery",
+            "start_line": 563,
+            "end_line": 568,
+            "kind": "symbol",
+            "score": 16.9013,
+            "match": null,
+            "why": "name match: GetQuery x1.06 (query); bm25: like, query, string"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.ShouldBindQuery",
+            "start_line": 901,
+            "end_line": 903,
+            "kind": "symbol",
+            "score": 15.1407,
+            "match": null,
+            "why": "name match: ShouldBindQuery x1.05 (query); bm25: like, query"
+          },
+          {
+            "path": "path.go",
+            "symbol_id": "path.go::cleanPath",
+            "start_line": 23,
+            "end_line": 124,
+            "kind": "symbol",
+            "score": 13.6903,
+            "match": null,
+            "why": "bm25: string; body: like, turned~, call"
+          },
+          {
+            "path": "context_test.go",
+            "symbol_id": "context_test.go::TestGetMapFromFormData",
+            "start_line": 3843,
+            "end_line": 3972,
+            "kind": "symbol",
+            "score": 12.8393,
+            "match": null,
+            "why": "test file x0.5; bm25: map; body: ids, bracket, string"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.ShouldBindUri",
+            "start_line": 931,
+            "end_line": 937,
+            "kind": "symbol",
+            "score": 11.5388,
+            "match": null,
+            "why": "bm25: like; body: map, string"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "context.go",
+            "start_line": 683,
+            "end_line": 704,
+            "label": "getMapFromFormData"
+          },
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 603,
+            "end_line": 606,
+            "label": "Context.GetQueryMap"
+          },
+          {
+            "path": "context.go",
+            "start_line": 596,
+            "end_line": 599,
+            "label": "Context.QueryMap"
+          },
+          {
+            "path": "context.go",
+            "start_line": 563,
+            "end_line": 568,
+            "label": "Context.GetQuery"
+          },
+          {
+            "path": "context.go",
+            "start_line": 901,
+            "end_line": 903,
+            "label": "Context.ShouldBindQuery"
+          },
+          {
+            "path": "path.go",
+            "start_line": 23,
+            "end_line": 124,
+            "label": "cleanPath"
+          },
+          {
+            "path": "context_test.go",
+            "start_line": 3843,
+            "end_line": 3962,
+            "label": "TestGetMapFromFormData (part 1/2)"
+          },
+          {
+            "path": "context_test.go",
+            "start_line": 3963,
+            "end_line": 3972,
+            "label": "TestGetMapFromFormData (part 2/2)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 931,
+            "end_line": 937,
+            "label": "Context.ShouldBindUri"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Registering both `/users/:id` and `/users/:name` panics with \"conflicts with existing wildcard\". Which function raises that panic?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "tree.go",
+          "symbol": "node.addRoute",
+          "start_line": 135,
+          "end_line": 249
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000191184,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3292,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "tree.go",
+            "symbol_id": "tree.go::node.addRoute",
+            "start_line": 135,
+            "end_line": 249,
+            "kind": "symbol",
+            "score": 25.3424,
+            "match": "symbol",
+            "why": "bm25: body: existing, conflicts, wildcard, name, panics~, registering~"
+          },
+          {
+            "path": "tree.go",
+            "symbol_id": "tree.go::node.insertChild",
+            "start_line": 288,
+            "end_line": 397,
+            "kind": "symbol",
+            "score": 26.2047,
+            "match": null,
+            "why": "bm25: body: wildcard, existing, conflicts, name, panics~"
+          },
+          {
+            "path": "tree_test.go",
+            "symbol_id": "tree_test.go::TestTreeWildcardConflictEx",
+            "start_line": 942,
+            "end_line": 978,
+            "kind": "symbol",
+            "score": 20.4149,
+            "match": null,
+            "why": "test file x0.5; bm25: conflicts, wildcard; body: existing, panics~"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.HandlerName",
+            "start_line": 158,
+            "end_line": 160,
+            "kind": "symbol",
+            "score": 21.2281,
+            "match": null,
+            "why": "name match: HandlerName x1.04 (name); bm25: users, name"
+          },
+          {
+            "path": "tree_test.go",
+            "symbol_id": "tree_test.go::TestTreeWildcardConflict",
+            "start_line": 394,
+            "end_line": 429,
+            "kind": "symbol",
+            "score": 18.1248,
+            "match": null,
+            "why": "test file x0.5; bm25: conflicts~, wildcard; body: name, id, users~"
+          },
+          {
+            "path": "tree.go",
+            "symbol_id": "tree.go::findWildcard",
+            "start_line": 253,
+            "end_line": 286,
+            "kind": "symbol",
+            "score": 17.5948,
+            "match": null,
+            "why": "name match: findWildcard x1.08 (wildcard); bm25: wildcard, name; body: panics~"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.MustGet",
+            "start_line": 305,
+            "end_line": 310,
+            "kind": "symbol",
+            "score": 16.774,
+            "match": null,
+            "why": "bm25: panics, existing~"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::BasicAuthForRealm",
+            "start_line": 48,
+            "end_line": 68,
+            "kind": "symbol",
+            "score": 16.3495,
+            "match": null,
+            "why": "bm25: users~, name; body: id"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "tree.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "node (class header)"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 135,
+            "end_line": 249,
+            "label": "node.addRoute"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 288,
+            "end_line": 397,
+            "label": "node.insertChild"
+          },
+          {
+            "path": "tree_test.go",
+            "start_line": 942,
+            "end_line": 978,
+            "label": "TestTreeWildcardConflictEx"
+          },
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 158,
+            "end_line": 160,
+            "label": "Context.HandlerName"
+          },
+          {
+            "path": "tree_test.go",
+            "start_line": 394,
+            "end_line": 429,
+            "label": "TestTreeWildcardConflict"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 253,
+            "end_line": 286,
+            "label": "findWildcard"
+          },
+          {
+            "path": "context.go",
+            "start_line": 305,
+            "end_line": 310,
+            "label": "Context.MustGet"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 48,
+            "end_line": 68,
+            "label": "BasicAuthForRealm"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "Recovery middleware'i panic'i loga yazarken isteğin Authorization başlığını nerede gizliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "recovery.go",
+          "symbol": "secureRequestDump",
+          "start_line": 98,
+          "end_line": 107
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000140574,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.269,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 7,
+        "top_hits": [
+          {
+            "path": "recovery.go",
+            "symbol_id": "recovery.go::secureRequestDump",
+            "start_line": 98,
+            "end_line": 107,
+            "kind": "symbol",
+            "score": 15.9574,
+            "match": "symbol",
+            "why": "name match: secureRequestDump x1.03 (isteğin); bm25: authorization, recovery, request, header"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::authorizationHeader",
+            "start_line": 91,
+            "end_line": 94,
+            "kind": "symbol",
+            "score": 37.0118,
+            "match": null,
+            "why": "name match: authorizationHeader x1.29 (authorization, authorization başlığını, başlığını); bm25: authorization, authorizationheader, header"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 116,
+            "kind": "file",
+            "score": 28.3976,
+            "match": null,
+            "why": "path match: auth x1.12 (authorization); bm25: authorization, authorizationheader, header"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::BasicAuthForProxy",
+            "start_line": 98,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 26.7283,
+            "match": null,
+            "why": "name match: BasicAuthForProxy x1.10 (authorization); bm25: authorization, middleware; body: header, request"
+          },
+          {
+            "path": "recovery.go",
+            "symbol_id": "recovery.go::Recovery",
+            "start_line": 35,
+            "end_line": 37,
+            "kind": "symbol",
+            "score": 26.6437,
+            "match": null,
+            "why": "name match: Recovery x1.18 (recovery); bm25: recovery, middleware, panic, write~"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::BasicAuthForRealm",
+            "start_line": 48,
+            "end_line": 68,
+            "kind": "symbol",
+            "score": 24.3942,
+            "match": null,
+            "why": "name match: BasicAuthForRealm x1.10 (authorization); bm25: authorization, middleware; body: header, request"
+          },
+          {
+            "path": "recovery.go",
+            "symbol_id": "recovery.go::CustomRecoveryWithWriter",
+            "start_line": 53,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 21.6076,
+            "match": null,
+            "why": "name match: CustomRecoveryWithWriter x1.09 (recovery); bm25: recovery, middleware, panic; body: request, write~"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::BasicAuth",
+            "start_line": 72,
+            "end_line": 74,
+            "kind": "symbol",
+            "score": 21.411,
+            "match": null,
+            "why": "name match: BasicAuth x1.14 (authorization); bm25: authorization, middleware"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "recovery.go",
+            "start_line": 98,
+            "end_line": 107,
+            "label": "secureRequestDump"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 91,
+            "end_line": 94,
+            "label": "authorizationHeader"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 1,
+            "end_line": 68,
+            "label": "module head + BasicAuthForRealm"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 98,
+            "end_line": 116,
+            "label": "BasicAuthForProxy"
+          },
+          {
+            "path": "recovery.go",
+            "start_line": 35,
+            "end_line": 37,
+            "label": "Recovery"
+          },
+          {
+            "path": "recovery.go",
+            "start_line": 53,
+            "end_line": 92,
+            "label": "CustomRecoveryWithWriter"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 72,
+            "end_line": 74,
+            "label": "BasicAuth"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "BasicAuth middleware'inde gelen Authorization başlığı kayıtlı kullanıcı/şifre çiftleriyle nerede karşılaştırılıyor, karşılaştırma sabit zamanlı mı?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "auth.go",
+          "symbol": "authPairs.searchCredential",
+          "start_line": 32,
+          "end_line": 42
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00013419,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2602,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 6,
+        "top_hits": [
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::authPairs.searchCredential",
+            "start_line": 32,
+            "end_line": 42,
+            "kind": "symbol",
+            "score": 16.977,
+            "match": "symbol",
+            "why": "bm25: authorization~; body: user, time~"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::BasicAuthForRealm",
+            "start_line": 48,
+            "end_line": 68,
+            "kind": "symbol",
+            "score": 34.5362,
+            "match": null,
+            "why": "name match: BasicAuthForRealm x1.08 (authorization); bm25: authorization, user, middleware, password; body: header"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 116,
+            "kind": "file",
+            "score": 36.7345,
+            "match": "file",
+            "why": "path match: auth x1.10 (authorization); bm25: authorization, basicauth, authorizationheader, header"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::BasicAuth",
+            "start_line": 72,
+            "end_line": 74,
+            "kind": "symbol",
+            "score": 113.5444,
+            "match": null,
+            "why": "name match: BasicAuth (explicit basicauth); bm25: authorization, basicauth, middleware, password, user"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::authorizationHeader",
+            "start_line": 91,
+            "end_line": 94,
+            "kind": "symbol",
+            "score": 55.6095,
+            "match": null,
+            "why": "name match: authorizationHeader x1.24 (authorization, authorization başlığı, başlığı); bm25: authorization, authorizationheader, password, user, header"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::processAccounts",
+            "start_line": 76,
+            "end_line": 89,
+            "kind": "symbol",
+            "score": 34.2835,
+            "match": null,
+            "why": "bm25: authorization; body: user, password, authorizationheader, header"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::BasicAuthForProxy",
+            "start_line": 98,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 33.3588,
+            "match": null,
+            "why": "name match: BasicAuthForProxy x1.08 (authorization); bm25: authorization, middleware; body: user, header"
+          },
+          {
+            "path": "auth_test.go",
+            "symbol_id": "auth_test.go::TestBasicAuthSearchCredential",
+            "start_line": 48,
+            "end_line": 78,
+            "kind": "symbol",
+            "score": 21.6873,
+            "match": null,
+            "why": "test file x0.5; bm25: authorization; body: authorizationheader, user, password, header"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "auth.go",
+            "start_line": 1,
+            "end_line": 68,
+            "label": "authPairs (type header) + authPairs.searchCredential + BasicAuthForRealm + 1 more"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 72,
+            "end_line": 74,
+            "label": "BasicAuth"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 91,
+            "end_line": 94,
+            "label": "authorizationHeader"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 76,
+            "end_line": 89,
+            "label": "processAccounts"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 98,
+            "end_line": 116,
+            "label": "BasicAuthForProxy"
+          },
+          {
+            "path": "auth_test.go",
+            "start_line": 48,
+            "end_line": 78,
+            "label": "TestBasicAuthSearchCredential"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "GIN_MODE ortam degiskeni nerede okunuyor, release moduna gecis nasil yapiliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "mode.go",
+          "symbol": "init",
+          "start_line": 52,
+          "end_line": 55
+        },
+        {
+          "path": "mode.go",
+          "symbol": "SetMode",
+          "start_line": 58,
+          "end_line": 78
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000117978,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2693,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 8,
+        "top_hits": [
+          {
+            "path": "mode.go",
+            "symbol_id": "mode.go::init",
+            "start_line": 52,
+            "end_line": 55,
+            "kind": "symbol",
+            "score": 17.6723,
+            "match": "symbol",
+            "why": "bm25: mode; body: environment~, gin"
+          },
+          {
+            "path": "mode.go",
+            "symbol_id": "mode.go::SetMode",
+            "start_line": 58,
+            "end_line": 78,
+            "kind": "symbol",
+            "score": 23.7949,
+            "match": "symbol",
+            "why": "bm25: mode, gin; body: release"
+          },
+          {
+            "path": "debug.go",
+            "symbol_id": "debug.go::debugPrintWARNINGNew",
+            "start_line": 92,
+            "end_line": 98,
+            "kind": "symbol",
+            "score": 41.5979,
+            "match": null,
+            "why": "bm25: body: release, gin_mode, environment~, mode, gin"
+          },
+          {
+            "path": "utils.go",
+            "symbol_id": "utils.go::resolveAddress",
+            "start_line": 148,
+            "end_line": 162,
+            "kind": "symbol",
+            "score": 20.2912,
+            "match": null,
+            "why": "bm25: body: environment, variable~"
+          },
+          {
+            "path": "debug_test.go",
+            "symbol_id": "debug_test.go::TestDebugPrintWARNINGNew",
+            "start_line": 127,
+            "end_line": 134,
+            "kind": "symbol",
+            "score": 18.1572,
+            "match": null,
+            "why": "test file x0.5; bm25: body: release, mode, gin_mode, environment~, gin"
+          },
+          {
+            "path": "debug.go",
+            "symbol_id": "debug.go::IsDebugging",
+            "start_line": 22,
+            "end_line": 24,
+            "kind": "symbol",
+            "score": 17.0825,
+            "match": null,
+            "why": "bm25: release, mode, gin"
+          },
+          {
+            "path": "gin_test.go",
+            "symbol_id": "gin_test.go::TestLoadHTMLGlobReleaseMode",
+            "start_line": 143,
+            "end_line": 161,
+            "kind": "symbol",
+            "score": 14.8965,
+            "match": null,
+            "why": "test file x0.5; bm25: release, mode, gin; body: read"
+          },
+          {
+            "path": "gin_test.go",
+            "symbol_id": "gin_test.go::TestLoadHTMLFSReleaseMode",
+            "start_line": 370,
+            "end_line": 388,
+            "kind": "symbol",
+            "score": 14.7512,
+            "match": null,
+            "why": "test file x0.5; bm25: release, mode, gin; body: read"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "mode.go",
+            "start_line": 52,
+            "end_line": 55,
+            "label": "init"
+          },
+          {
+            "path": "mode.go",
+            "start_line": 58,
+            "end_line": 78,
+            "label": "SetMode"
+          },
+          {
+            "path": "debug.go",
+            "start_line": 92,
+            "end_line": 98,
+            "label": "debugPrintWARNINGNew"
+          },
+          {
+            "path": "utils.go",
+            "start_line": 148,
+            "end_line": 162,
+            "label": "resolveAddress"
+          },
+          {
+            "path": "debug_test.go",
+            "start_line": 127,
+            "end_line": 134,
+            "label": "TestDebugPrintWARNINGNew"
+          },
+          {
+            "path": "debug.go",
+            "start_line": 22,
+            "end_line": 24,
+            "label": "IsDebugging"
+          },
+          {
+            "path": "gin_test.go",
+            "start_line": 143,
+            "end_line": 161,
+            "label": "TestLoadHTMLGlobReleaseMode"
+          },
+          {
+            "path": "gin_test.go",
+            "start_line": 370,
+            "end_line": 388,
+            "label": "TestLoadHTMLFSReleaseMode"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "I registered `/users`, and a GET to `/users/` gets a 301 redirect to `/users`. Where is that redirect decided and performed?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "gin.go",
+          "symbol": "redirectTrailingSlash",
+          "start_line": 810,
+          "end_line": 824
+        },
+        {
+          "path": "gin.go",
+          "start_line": 755,
+          "end_line": 759
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00013965,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2741,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::redirectTrailingSlash",
+            "start_line": 810,
+            "end_line": 824,
+            "kind": "symbol",
+            "score": 10.2763,
+            "match": "symbol",
+            "why": "name match: redirectTrailingSlash x1.07 (redirect); bm25: redirect; body: get"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::redirectRequest",
+            "start_line": 849,
+            "end_line": 861,
+            "kind": "symbol",
+            "score": 11.5621,
+            "match": null,
+            "why": "name match: redirectRequest x1.09 (redirect); bm25: redirect; body: get"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::redirectFixedPath",
+            "start_line": 837,
+            "end_line": 847,
+            "kind": "symbol",
+            "score": 8.3667,
+            "match": null,
+            "why": "name match: redirectFixedPath x1.07 (redirect); bm25: redirect"
+          },
+          {
+            "path": "tree.go",
+            "symbol_id": "tree.go::node.getValue",
+            "start_line": 418,
+            "end_line": 672,
+            "kind": "symbol",
+            "score": 12.6169,
+            "match": null,
+            "why": "name match: getValue x1.20 (get, gets); bm25: registered, redirect, get"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.HandlerName",
+            "start_line": 158,
+            "end_line": 160,
+            "kind": "symbol",
+            "score": 13.2181,
+            "match": null,
+            "why": "bm25: users, get"
+          },
+          {
+            "path": "render/redirect.go",
+            "symbol_id": "render/redirect.go::Redirect",
+            "start_line": 13,
+            "end_line": 17,
+            "kind": "symbol",
+            "score": 11.2646,
+            "match": null,
+            "why": "name match: Redirect x1.13 (redirect); class boost; bm25: redirect"
+          },
+          {
+            "path": "routes_test.go",
+            "symbol_id": "routes_test.go::TestRouteQueryRegisteredByAny",
+            "start_line": 114,
+            "end_line": 123,
+            "kind": "symbol",
+            "score": 10.3078,
+            "match": null,
+            "why": "test file x0.5; bm25: registered; body: performed~"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.Redirect",
+            "start_line": 1313,
+            "end_line": 1319,
+            "kind": "symbol",
+            "score": 9.9597,
+            "match": null,
+            "why": "name match: Redirect x1.13 (redirect); bm25: redirect"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gin.go",
+            "start_line": 810,
+            "end_line": 824,
+            "label": "redirectTrailingSlash"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 849,
+            "end_line": 861,
+            "label": "redirectRequest"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 837,
+            "end_line": 847,
+            "label": "redirectFixedPath"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "node (class header)"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 418,
+            "end_line": 530,
+            "label": "node.getValue (part 1/3)"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 531,
+            "end_line": 646,
+            "label": "node.getValue (part 2/3)"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 647,
+            "end_line": 672,
+            "label": "node.getValue (part 3/3)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 158,
+            "end_line": 160,
+            "label": "Context.HandlerName"
+          },
+          {
+            "path": "render/redirect.go",
+            "start_line": 13,
+            "end_line": 17,
+            "label": "Redirect"
+          },
+          {
+            "path": "routes_test.go",
+            "start_line": 114,
+            "end_line": 123,
+            "label": "TestRouteQueryRegisteredByAny"
+          },
+          {
+            "path": "context.go",
+            "start_line": 1313,
+            "end_line": 1319,
+            "label": "Context.Redirect"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "When I redirect the server's stdout to a file, the request log lines lose their colors. Where does the logger decide whether to color its output?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "logger.go",
+          "symbol": "LoggerWithConfig",
+          "start_line": 245,
+          "end_line": 314
+        },
+        {
+          "path": "logger.go",
+          "symbol": "LogFormatterParams.IsOutputColor",
+          "start_line": 162,
+          "end_line": 164
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000119994,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2543,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "logger.go",
+            "symbol_id": "logger.go::LogFormatterParams.IsOutputColor",
+            "start_line": 162,
+            "end_line": 164,
+            "kind": "symbol",
+            "score": 58.477,
+            "match": "symbol",
+            "why": "name match: IsOutputColor x1.33 (color, colors, output); owner match: LogFormatterParams x1.04; bm25: colors, whether, output, log, logger"
+          },
+          {
+            "path": "logger.go",
+            "symbol_id": "logger.go::LoggerWithConfig",
+            "start_line": 245,
+            "end_line": 314,
+            "kind": "symbol",
+            "score": 16.2038,
+            "match": "symbol",
+            "why": "name match: LoggerWithConfig x1.05 (logger); bm25: logger; body: log, request, output"
+          },
+          {
+            "path": "recovery.go",
+            "symbol_id": "recovery.go::secureRequestDump",
+            "start_line": 98,
+            "end_line": 107,
+            "kind": "symbol",
+            "score": 28.1513,
+            "match": null,
+            "why": "name match: secureRequestDump x1.02 (request); bm25: request; body: lines"
+          },
+          {
+            "path": "logger.go",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 314,
+            "kind": "file",
+            "score": 28.0822,
+            "match": "file",
+            "why": "path match: logger x1.05 (logger); bm25: colors~, logger, log, output"
+          },
+          {
+            "path": "logger.go",
+            "symbol_id": "logger.go::LogFormatterParams.StatusCodeColor",
+            "start_line": 94,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 26.4405,
+            "match": null,
+            "why": "name match: StatusCodeColor x1.16 (color, colors); owner match: LogFormatterParams x1.02; bm25: colors~, log, logger; body: server, request"
+          },
+          {
+            "path": "logger.go",
+            "symbol_id": "logger.go::LogFormatterParams.ResetColor",
+            "start_line": 157,
+            "end_line": 159,
+            "kind": "symbol",
+            "score": 24.2027,
+            "match": null,
+            "why": "name match: ResetColor x1.20 (color, colors); owner match: LogFormatterParams x1.02; bm25: colors~, log, logger"
+          },
+          {
+            "path": "logger.go",
+            "symbol_id": "logger.go::LogFormatterParams.LatencyColor",
+            "start_line": 112,
+            "end_line": 130,
+            "kind": "symbol",
+            "score": 23.3418,
+            "match": null,
+            "why": "name match: LatencyColor x1.20 (color, colors); owner match: LogFormatterParams x1.02; bm25: colors~, log, logger"
+          },
+          {
+            "path": "logger.go",
+            "symbol_id": "logger.go::LogFormatterParams.MethodColor",
+            "start_line": 133,
+            "end_line": 154,
+            "kind": "symbol",
+            "score": 23.2455,
+            "match": null,
+            "why": "name match: MethodColor x1.20 (color, colors); owner match: LogFormatterParams x1.02; bm25: colors~, log, logger"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "logger.go",
+            "start_line": 68,
+            "end_line": 68,
+            "label": "LogFormatterParams (class header)"
+          },
+          {
+            "path": "logger.go",
+            "start_line": 162,
+            "end_line": 164,
+            "label": "LogFormatterParams.IsOutputColor"
+          },
+          {
+            "path": "logger.go",
+            "start_line": 245,
+            "end_line": 314,
+            "label": "LoggerWithConfig"
+          },
+          {
+            "path": "recovery.go",
+            "start_line": 98,
+            "end_line": 107,
+            "label": "secureRequestDump"
+          },
+          {
+            "path": "logger.go",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "logger.go",
+            "start_line": 94,
+            "end_line": 109,
+            "label": "LogFormatterParams.StatusCodeColor"
+          },
+          {
+            "path": "logger.go",
+            "start_line": 157,
+            "end_line": 159,
+            "label": "LogFormatterParams.ResetColor"
+          },
+          {
+            "path": "logger.go",
+            "start_line": 112,
+            "end_line": 130,
+            "label": "LogFormatterParams.LatencyColor"
+          },
+          {
+            "path": "logger.go",
+            "start_line": 133,
+            "end_line": 154,
+            "label": "LogFormatterParams.MethodColor"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How does gin decide whether to parse the request body as JSON, XML or form data when I call `c.ShouldBind(&obj)`?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "binding/binding.go",
+          "symbol": "Default",
+          "start_line": 95,
+          "end_line": 120
+        },
+        {
+          "path": "binding/binding_nomsgpack.go",
+          "symbol": "Default",
+          "start_line": 91,
+          "end_line": 114
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00011214,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3234,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.ShouldBind",
+            "start_line": 860,
+            "end_line": 863,
+            "kind": "symbol",
+            "score": 40.7937,
+            "match": null,
+            "why": "name match: ShouldBind (explicit shouldbind); bm25: shouldbind; body: request"
+          },
+          {
+            "path": "binding/form.go",
+            "symbol_id": "binding/form.go::formBinding.Bind",
+            "start_line": 24,
+            "end_line": 35,
+            "kind": "symbol",
+            "score": 19.6465,
+            "match": null,
+            "why": "bm25: request, form; body: parse"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.initFormCache",
+            "start_line": 647,
+            "end_line": 658,
+            "kind": "symbol",
+            "score": 18.3445,
+            "match": null,
+            "why": "name match: initFormCache x1.04 (form); bm25: form; body: parse, request"
+          },
+          {
+            "path": "binding/form.go",
+            "symbol_id": "binding/form.go::formPostBinding.Bind",
+            "start_line": 41,
+            "end_line": 49,
+            "kind": "symbol",
+            "score": 18.0351,
+            "match": null,
+            "why": "bm25: request, form; body: parse"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.MultipartForm",
+            "start_line": 722,
+            "end_line": 725,
+            "kind": "symbol",
+            "score": 17.924,
+            "match": null,
+            "why": "name match: MultipartForm x1.05 (form); bm25: parse, form; body: request"
+          },
+          {
+            "path": "binding/form.go",
+            "symbol_id": "binding/form.go::formMultipartBinding.Bind",
+            "start_line": 55,
+            "end_line": 64,
+            "kind": "symbol",
+            "score": 17.6197,
+            "match": null,
+            "why": "bm25: request, form; body: parse"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::parseIP",
+            "start_line": 548,
+            "end_line": 558,
+            "kind": "symbol",
+            "score": 17.4867,
+            "match": null,
+            "why": "name match: parseIP x1.09 (parse); bm25: parse, gin"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.GetPostFormMap",
+            "start_line": 676,
+            "end_line": 679,
+            "kind": "symbol",
+            "score": 15.6504,
+            "match": null,
+            "why": "name match: GetPostFormMap x1.03 (form); bm25: whether, form; body: data"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 860,
+            "end_line": 863,
+            "label": "Context.ShouldBind"
+          },
+          {
+            "path": "binding/form.go",
+            "start_line": 15,
+            "end_line": 15,
+            "label": "formBinding (class header)"
+          },
+          {
+            "path": "binding/form.go",
+            "start_line": 24,
+            "end_line": 35,
+            "label": "formBinding.Bind"
+          },
+          {
+            "path": "context.go",
+            "start_line": 647,
+            "end_line": 658,
+            "label": "Context.initFormCache"
+          },
+          {
+            "path": "binding/form.go",
+            "start_line": 16,
+            "end_line": 16,
+            "label": "formPostBinding (class header)"
+          },
+          {
+            "path": "binding/form.go",
+            "start_line": 41,
+            "end_line": 49,
+            "label": "formPostBinding.Bind"
+          },
+          {
+            "path": "context.go",
+            "start_line": 722,
+            "end_line": 725,
+            "label": "Context.MultipartForm"
+          },
+          {
+            "path": "binding/form.go",
+            "start_line": 17,
+            "end_line": 17,
+            "label": "formMultipartBinding (class header)"
+          },
+          {
+            "path": "binding/form.go",
+            "start_line": 55,
+            "end_line": 64,
+            "label": "formMultipartBinding.Bind"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 548,
+            "end_line": 558,
+            "label": "parseIP"
+          },
+          {
+            "path": "context.go",
+            "start_line": 676,
+            "end_line": 679,
+            "label": "Context.GetPostFormMap"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "json icin encoding/json yerine jsoniter ya da sonic kullanmak istiyorum; gin hangi json kutuphanesini kullanacagini nerede seciyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "codec/json/json.go",
+          "start_line": 5,
+          "end_line": 19
+        },
+        {
+          "path": "codec/json/jsoniter.go",
+          "start_line": 5,
+          "end_line": 20
+        },
+        {
+          "path": "codec/json/sonic.go",
+          "start_line": 5,
+          "end_line": 20
+        },
+        {
+          "path": "codec/json/go_json.go",
+          "start_line": 5,
+          "end_line": 20
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 8.9418e-05,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2683,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 4,
+        "top_hits": [
+          {
+            "path": "codec/json/jsoniter.go",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 44,
+            "kind": "file",
+            "score": 28.3532,
+            "match": "file",
+            "why": "path match: jsoniter x1.15 (jsoniter); bm25: jsoniter, encoding~, json"
+          },
+          {
+            "path": "codec/json/jsoniter.go",
+            "symbol_id": "codec/json/jsoniter.go::init",
+            "start_line": 18,
+            "end_line": 20,
+            "kind": "symbol",
+            "score": 21.1167,
+            "match": "overlap",
+            "why": "bm25: jsoniter, json"
+          },
+          {
+            "path": "codec/json/sonic.go",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 44,
+            "kind": "file",
+            "score": 20.2652,
+            "match": "file",
+            "why": "path match: sonic x1.17 (sonic); bm25: sonic, encoding~, json"
+          },
+          {
+            "path": "codec/json/api.go",
+            "symbol_id": "codec/json/api.go::Encoder.Encode",
+            "start_line": 37,
+            "end_line": 37,
+            "kind": "symbol",
+            "score": 16.5912,
+            "match": null,
+            "why": "name match: Encode x1.20 (encoding); bm25: encoding, json"
+          },
+          {
+            "path": "codec/json/jsoniter.go",
+            "symbol_id": "codec/json/jsoniter.go::jsoniterApi.NewEncoder",
+            "start_line": 38,
+            "end_line": 40,
+            "kind": "symbol",
+            "score": 32.3729,
+            "match": null,
+            "why": "name match: NewEncoder x1.14 (encoding); owner match: jsoniterApi x1.02; bm25: jsoniter, encoding~, json"
+          },
+          {
+            "path": "codec/json/jsoniter.go",
+            "symbol_id": "codec/json/jsoniter.go::jsoniterApi",
+            "start_line": 24,
+            "end_line": 24,
+            "kind": "symbol",
+            "score": 28.7636,
+            "match": null,
+            "why": "name match: jsoniterApi x1.17 (jsoniter); class boost; bm25: jsoniter, json"
+          },
+          {
+            "path": "codec/json/sonic.go",
+            "symbol_id": "codec/json/sonic.go::sonicApi.NewEncoder",
+            "start_line": 38,
+            "end_line": 40,
+            "kind": "symbol",
+            "score": 23.5312,
+            "match": null,
+            "why": "name match: NewEncoder x1.14 (encoding); owner match: sonicApi x1.02; bm25: sonic, encoding~, json"
+          },
+          {
+            "path": "codec/json/jsoniter.go",
+            "symbol_id": "codec/json/jsoniter.go::jsoniterApi.Marshal",
+            "start_line": 26,
+            "end_line": 28,
+            "kind": "symbol",
+            "score": 22.6346,
+            "match": null,
+            "why": "bm25: jsoniter, json"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "codec/json/jsoniter.go",
+            "start_line": 1,
+            "end_line": 44,
+            "label": "module head"
+          },
+          {
+            "path": "codec/json/sonic.go",
+            "start_line": 1,
+            "end_line": 44,
+            "label": "module head"
+          },
+          {
+            "path": "codec/json/api.go",
+            "start_line": 22,
+            "end_line": 22,
+            "label": "Encoder (interface header)"
+          },
+          {
+            "path": "codec/json/api.go",
+            "start_line": 37,
+            "end_line": 37,
+            "label": "Encoder.Encode"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 1,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          1.0,
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "router.Static ile bir klasoru sunarken dizin listeleme nasil kapatiliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "fs.go",
+          "symbol": "Dir",
+          "start_line": 42,
+          "end_line": 50
+        },
+        {
+          "path": "fs.go",
+          "symbol": "OnlyFilesFS.Open",
+          "start_line": 18,
+          "end_line": 25
+        },
+        {
+          "path": "fs.go",
+          "symbol": "neutralizedReaddirFile.Readdir",
+          "start_line": 33,
+          "end_line": 36
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000133644,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2616,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.Static",
+            "start_line": 232,
+            "end_line": 234,
+            "kind": "symbol",
+            "score": 19.4447,
+            "match": null,
+            "why": "name match: Static x1.17 (static); owner match: RouterGroup x1.03; bm25: static, router; body: directory~"
+          },
+          {
+            "path": "fs.go",
+            "symbol_id": "fs.go::Dir",
+            "start_line": 42,
+            "end_line": 50,
+            "kind": "symbol",
+            "score": 38.6005,
+            "match": "symbol",
+            "why": "name match: Dir x1.25 (dizin); bm25: directory, list, static, router"
+          },
+          {
+            "path": "fs.go",
+            "symbol_id": "fs.go::neutralizedReaddirFile.Readdir",
+            "start_line": 33,
+            "end_line": 36,
+            "kind": "symbol",
+            "score": 13.8722,
+            "match": "symbol",
+            "why": "bm25: body: directory, list"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.createStaticHandler",
+            "start_line": 252,
+            "end_line": 275,
+            "kind": "symbol",
+            "score": 17.383,
+            "match": null,
+            "why": "name match: createStaticHandler x1.09 (static); owner match: RouterGroup x1.02; bm25: static, router; body: list, close~"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.StaticFS",
+            "start_line": 239,
+            "end_line": 250,
+            "kind": "symbol",
+            "score": 20.4834,
+            "match": null,
+            "why": "name match: StaticFS x1.11 (static); owner match: RouterGroup x1.02; bm25: static, router, directory~; body: folder"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.SaveUploadedFile",
+            "start_line": 733,
+            "end_line": 768,
+            "kind": "symbol",
+            "score": 17.5132,
+            "match": null,
+            "why": "bm25: directory; body: close~"
+          },
+          {
+            "path": "routes_test.go",
+            "symbol_id": "routes_test.go::TestRouteStaticListingDir",
+            "start_line": 507,
+            "end_line": 516,
+            "kind": "symbol",
+            "score": 15.5805,
+            "match": null,
+            "why": "test file x0.5; bm25: directory, list, static; body: router"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.StaticFileFS",
+            "start_line": 210,
+            "end_line": 214,
+            "kind": "symbol",
+            "score": 15.2423,
+            "match": null,
+            "why": "name match: StaticFileFS x1.09 (static); owner match: RouterGroup x1.02; bm25: static, directory~, router"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "routergroup.go",
+            "start_line": 76,
+            "end_line": 76,
+            "label": "RouterGroup (class header)"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 232,
+            "end_line": 234,
+            "label": "RouterGroup.Static"
+          },
+          {
+            "path": "fs.go",
+            "start_line": 42,
+            "end_line": 50,
+            "label": "Dir"
+          },
+          {
+            "path": "fs.go",
+            "start_line": 28,
+            "end_line": 28,
+            "label": "neutralizedReaddirFile (class header)"
+          },
+          {
+            "path": "fs.go",
+            "start_line": 33,
+            "end_line": 36,
+            "label": "neutralizedReaddirFile.Readdir"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 252,
+            "end_line": 275,
+            "label": "RouterGroup.createStaticHandler"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 239,
+            "end_line": 250,
+            "label": "RouterGroup.StaticFS"
+          },
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 733,
+            "end_line": 768,
+            "label": "Context.SaveUploadedFile"
+          },
+          {
+            "path": "routes_test.go",
+            "start_line": 507,
+            "end_line": 516,
+            "label": "TestRouteStaticListingDir"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 210,
+            "end_line": 214,
+            "label": "RouterGroup.StaticFileFS"
+          }
+        ],
+        "rank": 2,
+        "loose_rank": 2,
+        "rr": 0.5,
+        "hit@1": false,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": false,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Struct tag'inde `form:\"page,default=1\"` yazdığımda, sorguda `page` yoksa varsayılan değer nerede okunup alana yazılıyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "binding/form_mapping.go",
+          "symbol": "tryToSetValue",
+          "start_line": 145,
+          "end_line": 180
+        },
+        {
+          "path": "binding/form_mapping.go",
+          "symbol": "setByForm",
+          "start_line": 245,
+          "end_line": 321
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000171864,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2796,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::setByForm",
+            "start_line": 245,
+            "end_line": 321,
+            "kind": "symbol",
+            "score": 23.2677,
+            "match": "symbol",
+            "why": "name match: setByForm x1.05 (form); bm25: tag, value~, form, struct; body: default"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::tryToSetValue",
+            "start_line": 145,
+            "end_line": 180,
+            "kind": "symbol",
+            "score": 20.5057,
+            "match": "symbol",
+            "why": "name match: tryToSetValue x1.04 (değer); bm25: tag, value~, form, struct; body: default"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::mapFormByTag",
+            "start_line": 46,
+            "end_line": 63,
+            "kind": "symbol",
+            "score": 21.3684,
+            "match": null,
+            "why": "name match: mapFormByTag x1.18 (form, tag); bm25: tag, form; body: value~"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.DefaultQuery",
+            "start_line": 547,
+            "end_line": 552,
+            "kind": "symbol",
+            "score": 19.5045,
+            "match": null,
+            "why": "name match: DefaultQuery x1.24 (default, sorguda); bm25: query, default, value~"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::setTimeField",
+            "start_line": 434,
+            "end_line": 488,
+            "kind": "symbol",
+            "score": 18.5206,
+            "match": null,
+            "why": "bm25: value~, struct, form; body: tag, default"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::formSource.TrySet",
+            "start_line": 75,
+            "end_line": 77,
+            "kind": "symbol",
+            "score": 16.6788,
+            "match": null,
+            "why": "bm25: tag, form, value~, struct"
+          },
+          {
+            "path": "context_test.go",
+            "symbol_id": "context_test.go::TestContextQuery",
+            "start_line": 838,
+            "end_line": 871,
+            "kind": "symbol",
+            "score": 16.42,
+            "match": null,
+            "why": "test file x0.5; bm25: query; body: page, value~, default, form"
+          },
+          {
+            "path": "context_test.go",
+            "symbol_id": "context_test.go::TestContextQueryAndPostForm",
+            "start_line": 930,
+            "end_line": 1026,
+            "kind": "symbol",
+            "score": 15.5987,
+            "match": null,
+            "why": "test file x0.5; bm25: query, form; body: page, value~, default, struct"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 245,
+            "end_line": 321,
+            "label": "setByForm"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 145,
+            "end_line": 180,
+            "label": "tryToSetValue"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 46,
+            "end_line": 63,
+            "label": "mapFormByTag"
+          },
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 547,
+            "end_line": 552,
+            "label": "Context.DefaultQuery"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 434,
+            "end_line": 488,
+            "label": "setTimeField"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 70,
+            "end_line": 70,
+            "label": "formSource (type header)"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 75,
+            "end_line": 77,
+            "label": "formSource.TrySet"
+          },
+          {
+            "path": "context_test.go",
+            "start_line": 838,
+            "end_line": 871,
+            "label": "TestContextQuery"
+          },
+          {
+            "path": "context_test.go",
+            "start_line": 930,
+            "end_line": 1026,
+            "label": "TestContextQueryAndPostForm"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "flow",
+      "lang": "en",
+      "question": "Walk me through what happens between `Engine.ServeHTTP` receiving a request and my handler running: where is the route looked up for the request path, and where are the matched handlers started?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "gin.go",
+          "symbol": "Engine.ServeHTTP",
+          "start_line": 691,
+          "end_line": 704
+        },
+        {
+          "path": "gin.go",
+          "symbol": "Engine.handleHTTPRequest",
+          "start_line": 719,
+          "end_line": 789
+        },
+        {
+          "path": "tree.go",
+          "symbol": "node.getValue",
+          "start_line": 418,
+          "end_line": 672
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000154014,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3918,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.handleHTTPRequest",
+            "start_line": 719,
+            "end_line": 789,
+            "kind": "symbol",
+            "score": 29.0122,
+            "match": "symbol",
+            "why": "name match: handleHTTPRequest x1.09 (handler, handlers, request); owner match: Engine x1.03; bm25: engine, handler~, request; body: path, handlers, route"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.ServeHTTP",
+            "start_line": 691,
+            "end_line": 704,
+            "kind": "symbol",
+            "score": 72.3527,
+            "match": "symbol",
+            "why": "name match: ServeHTTP x1.09 (explicit engine.servehttp); qualname/path match: engine.servehttp; bm25: engine, servehttp, handler, request; body: route"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.Handle",
+            "start_line": 129,
+            "end_line": 134,
+            "kind": "symbol",
+            "score": 39.0754,
+            "match": null,
+            "why": "name match: Handle x1.08 (handler, handlers); bm25: handler, handlers, path, route~, request; body: matched"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.NoRoute",
+            "start_line": 349,
+            "end_line": 352,
+            "kind": "symbol",
+            "score": 33.9359,
+            "match": null,
+            "why": "name match: NoRoute x1.03 (route); owner match: Engine x1.01; bm25: engine, route, handler, handlers"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.addRoute",
+            "start_line": 387,
+            "end_line": 409,
+            "kind": "symbol",
+            "score": 33.6763,
+            "match": null,
+            "why": "name match: addRoute x1.03 (route); owner match: Engine x1.01; bm25: engine, route, handler, handlers, path"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.Match",
+            "start_line": 191,
+            "end_line": 197,
+            "kind": "symbol",
+            "score": 32.2887,
+            "match": null,
+            "why": "name match: Match x1.10 (matched); bm25: matched~, handler, route, handlers, path"
+          },
+          {
+            "path": "ginS/gins.go",
+            "symbol_id": "ginS/gins.go::NoRoute",
+            "start_line": 40,
+            "end_line": 42,
+            "kind": "symbol",
+            "score": 30.6328,
+            "match": null,
+            "why": "name match: NoRoute x1.03 (route); bm25: route, handler, handlers; body: engine"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.Use",
+            "start_line": 363,
+            "end_line": 368,
+            "kind": "symbol",
+            "score": 29.8829,
+            "match": null,
+            "why": "bm25: engine, handler, handlers, through, route~, request"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gin.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "Engine (class header)"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 719,
+            "end_line": 789,
+            "label": "Engine.handleHTTPRequest"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 691,
+            "end_line": 704,
+            "label": "Engine.ServeHTTP"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 76,
+            "end_line": 76,
+            "label": "RouterGroup (class header)"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 129,
+            "end_line": 134,
+            "label": "RouterGroup.Handle"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 349,
+            "end_line": 352,
+            "label": "Engine.NoRoute"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 387,
+            "end_line": 409,
+            "label": "Engine.addRoute"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 191,
+            "end_line": 197,
+            "label": "RouterGroup.Match"
+          },
+          {
+            "path": "ginS/gins.go",
+            "start_line": 40,
+            "end_line": 42,
+            "label": "NoRoute"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 363,
+            "end_line": 368,
+            "label": "Engine.Use"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          1.0,
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "flow",
+      "lang": "en",
+      "question": "When I call `c.ShouldBindJSON(&req)` on a struct with `binding:\"required\"` tags, how does the body get decoded and then validated?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "binding/json.go",
+          "symbol": "jsonBinding.Bind",
+          "start_line": 33,
+          "end_line": 38
+        },
+        {
+          "path": "binding/json.go",
+          "symbol": "decodeJSON",
+          "start_line": 44,
+          "end_line": 56
+        },
+        {
+          "path": "binding/default_validator.go",
+          "symbol": "defaultValidator.ValidateStruct",
+          "start_line": 47,
+          "end_line": 76
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000106176,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2872,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "binding/json.go",
+            "symbol_id": "binding/json.go::jsonBinding.Bind",
+            "start_line": 33,
+            "end_line": 38,
+            "kind": "symbol",
+            "score": 18.6726,
+            "match": "symbol",
+            "why": "name match: Bind x1.04 (binding); bm25: req, binding; body: decoded~, body"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.ShouldBindJSON",
+            "start_line": 889,
+            "end_line": 891,
+            "kind": "symbol",
+            "score": 45.2192,
+            "match": null,
+            "why": "name match: ShouldBindJSON (explicit shouldbindjson); bm25: shouldbindjson, binding"
+          },
+          {
+            "path": "binding/binding.go",
+            "symbol_id": "binding/binding.go::validate",
+            "start_line": 122,
+            "end_line": 127,
+            "kind": "symbol",
+            "score": 17.7482,
+            "match": null,
+            "why": "name match: validate x1.22 (validated); bm25: validated~, binding; body: struct"
+          },
+          {
+            "path": "binding/toml.go",
+            "symbol_id": "binding/toml.go::decodeToml",
+            "start_line": 29,
+            "end_line": 35,
+            "kind": "symbol",
+            "score": 17.5428,
+            "match": null,
+            "why": "name match: decodeToml x1.14 (decoded); bm25: decoded~, binding; body: validated~"
+          },
+          {
+            "path": "binding/binding.go",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 127,
+            "kind": "file",
+            "score": 17.3523,
+            "match": null,
+            "why": "path match: binding x1.02 (binding); bm25: validated~, binding, body, struct"
+          },
+          {
+            "path": "binding/xml.go",
+            "symbol_id": "binding/xml.go::decodeXML",
+            "start_line": 28,
+            "end_line": 34,
+            "kind": "symbol",
+            "score": 17.5428,
+            "match": null,
+            "why": "name match: decodeXML x1.14 (decoded); bm25: decoded~, binding; body: validated~"
+          },
+          {
+            "path": "binding/toml.go",
+            "symbol_id": "binding/toml.go::tomlBinding.Bind",
+            "start_line": 21,
+            "end_line": 23,
+            "kind": "symbol",
+            "score": 18.4222,
+            "match": null,
+            "why": "name match: Bind x1.04 (binding); bm25: binding, req; body: decoded~, body"
+          },
+          {
+            "path": "binding/xml.go",
+            "symbol_id": "binding/xml.go::xmlBinding.Bind",
+            "start_line": 20,
+            "end_line": 22,
+            "kind": "symbol",
+            "score": 18.4222,
+            "match": null,
+            "why": "name match: Bind x1.04 (binding); bm25: binding, req; body: decoded~, body"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "binding/json.go",
+            "start_line": 27,
+            "end_line": 27,
+            "label": "jsonBinding (class header)"
+          },
+          {
+            "path": "binding/json.go",
+            "start_line": 33,
+            "end_line": 38,
+            "label": "jsonBinding.Bind"
+          },
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 889,
+            "end_line": 891,
+            "label": "Context.ShouldBindJSON"
+          },
+          {
+            "path": "binding/binding.go",
+            "start_line": 122,
+            "end_line": 127,
+            "label": "validate"
+          },
+          {
+            "path": "binding/toml.go",
+            "start_line": 29,
+            "end_line": 35,
+            "label": "decodeToml"
+          },
+          {
+            "path": "binding/binding.go",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "binding/xml.go",
+            "start_line": 28,
+            "end_line": 34,
+            "label": "decodeXML"
+          },
+          {
+            "path": "binding/toml.go",
+            "start_line": 15,
+            "end_line": 15,
+            "label": "tomlBinding (class header)"
+          },
+          {
+            "path": "binding/toml.go",
+            "start_line": 21,
+            "end_line": 23,
+            "label": "tomlBinding.Bind"
+          },
+          {
+            "path": "binding/xml.go",
+            "start_line": 14,
+            "end_line": 14,
+            "label": "xmlBinding (class header)"
+          },
+          {
+            "path": "binding/xml.go",
+            "start_line": 20,
+            "end_line": 22,
+            "label": "xmlBinding.Bind"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          1.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "flow",
+      "lang": "tr",
+      "question": "`v1 := r.Group(\"/v1\", authMiddleware)` ile grup oluşturup `v1.GET(\"/users\", handler)` dediğimde, grubun öneki ve middleware'i bu route'a nasıl ekleniyor ve route ağaca nasıl kaydediliyor?",
+      "accept_any": false,
+      "expected": [
+        {
+          "path": "routergroup.go",
+          "symbol": "RouterGroup.Group",
+          "start_line": 96,
+          "end_line": 102
+        },
+        {
+          "path": "routergroup.go",
+          "symbol": "RouterGroup.handle",
+          "start_line": 110,
+          "end_line": 115
+        },
+        {
+          "path": "routergroup.go",
+          "symbol": "RouterGroup.combineHandlers",
+          "start_line": 277,
+          "end_line": 284
+        },
+        {
+          "path": "gin.go",
+          "symbol": "Engine.addRoute",
+          "start_line": 387,
+          "end_line": 409
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00012999,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2802,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.Group",
+            "start_line": 96,
+            "end_line": 102,
+            "kind": "symbol",
+            "score": 33.0998,
+            "match": "symbol",
+            "why": "name match: Group x1.09 (group); bm25: group, handler, middleware, prefix, route~, add, create~"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.Handle",
+            "start_line": 129,
+            "end_line": 134,
+            "kind": "symbol",
+            "score": 28.8276,
+            "match": null,
+            "why": "name match: Handle x1.07 (handler); owner match: RouterGroup x1.01; bm25: handler, middleware, group, route~, register~"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.addRoute",
+            "start_line": 387,
+            "end_line": 409,
+            "kind": "symbol",
+            "score": 22.6344,
+            "match": "symbol",
+            "why": "name match: addRoute x1.15 (ekleniyor, route); bm25: route, handler, add; body: get"
+          },
+          {
+            "path": "tree.go",
+            "symbol_id": "tree.go::node.addRoute",
+            "start_line": 135,
+            "end_line": 249,
+            "kind": "symbol",
+            "score": 25.571,
+            "match": null,
+            "why": "name match: addRoute x1.15 (ekleniyor, route); bm25: route, add, handler~; body: prefix, register~"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.Use",
+            "start_line": 89,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 33.6618,
+            "match": null,
+            "why": "bm25: middleware, handler, group, route~, add"
+          },
+          {
+            "path": "ginS/gins.go",
+            "symbol_id": "ginS/gins.go::Group",
+            "start_line": 51,
+            "end_line": 53,
+            "kind": "symbol",
+            "score": 33.3355,
+            "match": null,
+            "why": "name match: Group x1.09 (group); bm25: handler, group, middleware, prefix, route~, add, create~"
+          },
+          {
+            "path": "auth.go",
+            "symbol_id": "auth.go::BasicAuthForProxy",
+            "start_line": 98,
+            "end_line": 116,
+            "kind": "symbol",
+            "score": 28.3945,
+            "match": null,
+            "why": "bm25: auth, handler, middleware; body: users~, get"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.Use",
+            "start_line": 363,
+            "end_line": 368,
+            "kind": "symbol",
+            "score": 27.1564,
+            "match": null,
+            "why": "bm25: middleware, handler, route~; body: group"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "routergroup.go",
+            "start_line": 76,
+            "end_line": 76,
+            "label": "RouterGroup (class header)"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 96,
+            "end_line": 102,
+            "label": "RouterGroup.Group"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 129,
+            "end_line": 134,
+            "label": "RouterGroup.Handle"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "Engine (class header)"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 387,
+            "end_line": 409,
+            "label": "Engine.addRoute"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "node (class header)"
+          },
+          {
+            "path": "tree.go",
+            "start_line": 135,
+            "end_line": 249,
+            "label": "node.addRoute"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 89,
+            "end_line": 92,
+            "label": "RouterGroup.Use"
+          },
+          {
+            "path": "ginS/gins.go",
+            "start_line": 51,
+            "end_line": 53,
+            "label": "Group"
+          },
+          {
+            "path": "auth.go",
+            "start_line": 98,
+            "end_line": 116,
+            "label": "BasicAuthForProxy"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 363,
+            "end_line": 368,
+            "label": "Engine.Use"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": false,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where are validation rules like `binding:\"required,email\"` or `min=3` actually checked against the field values?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "binding/default_validator.go",
+          "symbol": "defaultValidator.validateStruct",
+          "start_line": 79,
+          "end_line": 82
+        },
+        {
+          "path": "binding/default_validator.go",
+          "symbol": "defaultValidator.lazyinit",
+          "start_line": 93,
+          "end_line": 98
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000141918,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2501,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "binding/query.go",
+            "symbol_id": "binding/query.go::queryBinding.Bind",
+            "start_line": 15,
+            "end_line": 21,
+            "kind": "symbol",
+            "score": 14.9963,
+            "match": null,
+            "why": "name match: Bind x1.03 (binding); bm25: binding; body: values"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::tryToSetValue",
+            "start_line": 145,
+            "end_line": 180,
+            "kind": "symbol",
+            "score": 16.2165,
+            "match": null,
+            "why": "name match: tryToSetValue x1.04 (values); bm25: values, field, binding"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::setWithProperType",
+            "start_line": 323,
+            "end_line": 388,
+            "kind": "symbol",
+            "score": 24.7898,
+            "match": null,
+            "why": "bm25: values~, field, binding; body: like, required, checked~"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.GetPostForm",
+            "start_line": 633,
+            "end_line": 638,
+            "kind": "symbol",
+            "score": 21.192,
+            "match": null,
+            "why": "bm25: values, like, email"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::setBoolField",
+            "start_line": 412,
+            "end_line": 421,
+            "kind": "symbol",
+            "score": 21.0933,
+            "match": null,
+            "why": "name match: setBoolField x1.05 (field); bm25: values~, field, binding"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::setFloatField",
+            "start_line": 423,
+            "end_line": 432,
+            "kind": "symbol",
+            "score": 20.3055,
+            "match": null,
+            "why": "name match: setFloatField x1.05 (field); bm25: values~, field, binding"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::setIntField",
+            "start_line": 390,
+            "end_line": 399,
+            "kind": "symbol",
+            "score": 20.2732,
+            "match": null,
+            "why": "name match: setIntField x1.05 (field); bm25: values~, field, binding"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "symbol_id": "binding/form_mapping.go::setUintField",
+            "start_line": 401,
+            "end_line": 410,
+            "kind": "symbol",
+            "score": 20.2732,
+            "match": null,
+            "why": "name match: setUintField x1.05 (field); bm25: values~, field, binding"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "binding/query.go",
+            "start_line": 9,
+            "end_line": 9,
+            "label": "queryBinding (class header)"
+          },
+          {
+            "path": "binding/query.go",
+            "start_line": 15,
+            "end_line": 21,
+            "label": "queryBinding.Bind"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 145,
+            "end_line": 180,
+            "label": "tryToSetValue"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 323,
+            "end_line": 388,
+            "label": "setWithProperType"
+          },
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 633,
+            "end_line": 638,
+            "label": "Context.GetPostForm"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 412,
+            "end_line": 421,
+            "label": "setBoolField"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 423,
+            "end_line": 432,
+            "label": "setFloatField"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 390,
+            "end_line": 399,
+            "label": "setIntField"
+          },
+          {
+            "path": "binding/form_mapping.go",
+            "start_line": 401,
+            "end_line": 410,
+            "label": "setUintField"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": null,
+        "pointer_at_k": false,
+        "pointer_chunk_recall": false
+      }
+    },
+    {
+      "id": "q19",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "When I serve files with `c.File` or `router.Static`, where are `Range` requests (206 Partial Content) and `If-Modified-Since` / 304 Not Modified handled?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "context.go",
+          "symbol": "Context.File",
+          "start_line": 1340,
+          "end_line": 1342
+        },
+        {
+          "path": "context.go",
+          "symbol": "Context.FileFromFS",
+          "start_line": 1345,
+          "end_line": 1353
+        },
+        {
+          "path": "routergroup.go",
+          "symbol": "RouterGroup.createStaticHandler",
+          "start_line": 252,
+          "end_line": 275
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000138348,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2879,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.createStaticHandler",
+            "start_line": 252,
+            "end_line": 275,
+            "kind": "symbol",
+            "score": 14.9874,
+            "match": "symbol",
+            "why": "name match: createStaticHandler x1.07 (static); owner match: RouterGroup x1.01; bm25: static, router; body: serve, requests~"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::bodyAllowedForStatus",
+            "start_line": 1109,
+            "end_line": 1119,
+            "kind": "symbol",
+            "score": 14.9623,
+            "match": null,
+            "why": "bm25: body: modified, content"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.ServeHTTP",
+            "start_line": 691,
+            "end_line": 704,
+            "kind": "symbol",
+            "score": 19.8283,
+            "match": null,
+            "why": "name match: ServeHTTP x1.07 (serve); bm25: serve, requests~"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.StaticFile",
+            "start_line": 201,
+            "end_line": 205,
+            "kind": "symbol",
+            "score": 16.77,
+            "match": null,
+            "why": "name match: StaticFile x1.12 (static); owner match: RouterGroup x1.02; bm25: static, serve, router"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::serveError",
+            "start_line": 793,
+            "end_line": 808,
+            "kind": "symbol",
+            "score": 15.3768,
+            "match": null,
+            "why": "name match: serveError x1.07 (serve); bm25: serve; body: content"
+          },
+          {
+            "path": "debug.go",
+            "symbol_id": "debug.go::debugPrintWARNINGSetHTMLTemplate",
+            "start_line": 100,
+            "end_line": 108,
+            "kind": "symbol",
+            "score": 15.0721,
+            "match": null,
+            "why": "bm25: body: since, router"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.Static",
+            "start_line": 232,
+            "end_line": 234,
+            "kind": "symbol",
+            "score": 14.4888,
+            "match": null,
+            "why": "name match: Static x1.12 (static); owner match: RouterGroup x1.02; bm25: static, router, serve~"
+          },
+          {
+            "path": "routergroup.go",
+            "symbol_id": "routergroup.go::RouterGroup.staticFileHandler",
+            "start_line": 216,
+            "end_line": 223,
+            "kind": "symbol",
+            "score": 14.1161,
+            "match": null,
+            "why": "name match: staticFileHandler x1.09 (static); owner match: RouterGroup x1.02; bm25: static, router; body: serve~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "routergroup.go",
+            "start_line": 76,
+            "end_line": 76,
+            "label": "RouterGroup (class header)"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 252,
+            "end_line": 275,
+            "label": "RouterGroup.createStaticHandler"
+          },
+          {
+            "path": "context.go",
+            "start_line": 1109,
+            "end_line": 1119,
+            "label": "bodyAllowedForStatus"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "Engine (class header)"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 691,
+            "end_line": 704,
+            "label": "Engine.ServeHTTP"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 201,
+            "end_line": 205,
+            "label": "RouterGroup.StaticFile"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 793,
+            "end_line": 808,
+            "label": "serveError"
+          },
+          {
+            "path": "debug.go",
+            "start_line": 100,
+            "end_line": 108,
+            "label": "debugPrintWARNINGSetHTMLTemplate"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 232,
+            "end_line": 234,
+            "label": "RouterGroup.Static"
+          },
+          {
+            "path": "routergroup.go",
+            "start_line": 216,
+            "end_line": 223,
+            "label": "RouterGroup.staticFileHandler"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q20",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "HTTP/3 icin QUIC baglantisi, UDP paketleri ve stream yonetimi gin'de nerede yapiliyor?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "gin.go",
+          "symbol": "Engine.RunQUIC",
+          "start_line": 658,
+          "end_line": 669
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000125874,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.2661,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "gin.go",
+            "symbol_id": "gin.go::Engine.RunQUIC",
+            "start_line": 658,
+            "end_line": 669,
+            "kind": "symbol",
+            "score": 27.8499,
+            "match": "symbol",
+            "why": "name match: RunQUIC x1.20 (quic); bm25: quic, http3, gin, http"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.Stream",
+            "start_line": 1382,
+            "end_line": 1397,
+            "kind": "symbol",
+            "score": 11.5845,
+            "match": null,
+            "why": "name match: Stream x1.22 (stream); bm25: stream"
+          },
+          {
+            "path": "gin.go",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 861,
+            "kind": "file",
+            "score": 6.0603,
+            "match": "file",
+            "why": "path match: gin x1.05 (gin); bm25: quic, gin, http"
+          },
+          {
+            "path": "gin_integration_test.go",
+            "symbol_id": "gin_integration_test.go::TestRunQUIC",
+            "start_line": 283,
+            "end_line": 297,
+            "kind": "symbol",
+            "score": 7.9515,
+            "match": null,
+            "why": "test file x0.5; bm25: quic, gin; body: http"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.IsWebsocket",
+            "start_line": 1064,
+            "end_line": 1070,
+            "kind": "symbol",
+            "score": 7.2019,
+            "match": null,
+            "why": "bm25: body: connection"
+          },
+          {
+            "path": "context.go",
+            "symbol_id": "context.go::Context.File",
+            "start_line": 1340,
+            "end_line": 1342,
+            "kind": "symbol",
+            "score": 6.7319,
+            "match": null,
+            "why": "bm25: stream; body: http"
+          },
+          {
+            "path": "ginS/gins.go",
+            "symbol_id": "ginS/gins.go::Handle",
+            "start_line": 56,
+            "end_line": 58,
+            "kind": "symbol",
+            "score": 5.8657,
+            "match": null,
+            "why": "bm25: gin, http"
+          },
+          {
+            "path": "recovery.go",
+            "symbol_id": "recovery.go::CustomRecoveryWithWriter",
+            "start_line": 53,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 5.8461,
+            "match": null,
+            "why": "bm25: body: connection, http"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "gin.go",
+            "start_line": 99,
+            "end_line": 99,
+            "label": "Engine (class header)"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 658,
+            "end_line": 669,
+            "label": "Engine.RunQUIC"
+          },
+          {
+            "path": "context.go",
+            "start_line": 61,
+            "end_line": 61,
+            "label": "Context (class header)"
+          },
+          {
+            "path": "context.go",
+            "start_line": 1382,
+            "end_line": 1397,
+            "label": "Context.Stream"
+          },
+          {
+            "path": "gin.go",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "gin_integration_test.go",
+            "start_line": 283,
+            "end_line": 297,
+            "label": "TestRunQUIC"
+          },
+          {
+            "path": "context.go",
+            "start_line": 1064,
+            "end_line": 1070,
+            "label": "Context.IsWebsocket"
+          },
+          {
+            "path": "context.go",
+            "start_line": 1340,
+            "end_line": 1342,
+            "label": "Context.File"
+          },
+          {
+            "path": "ginS/gins.go",
+            "start_line": 56,
+            "end_line": 58,
+            "label": "Handle"
+          },
+          {
+            "path": "recovery.go",
+            "start_line": 53,
+            "end_line": 92,
+            "label": "CustomRecoveryWithWriter"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    }
+  ]
+}

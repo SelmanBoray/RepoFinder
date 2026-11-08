@@ -1,0 +1,4544 @@
+{
+  "meta": {
+    "decisions": "jev",
+    "candidates": 16,
+    "repo": {
+      "name": "ripgrep",
+      "source": "https://github.com/BurntSushi/ripgrep",
+      "commit": "91f5d22"
+    },
+    "source": "C:/Users/Selman/AppData/Local/Temp/claude/29abb69cf93759cc/a3feb6c6-0644-4b09-b6bb-2c4e21761226/scratchpad/repos/ripgrep",
+    "checkout": {
+      "root": "C:\\Users\\Selman\\AppData\\Local\\Temp\\claude\\29abb69cf93759cc\\a3feb6c6-0644-4b09-b6bb-2c4e21761226\\scratchpad\\repos\\ripgrep",
+      "commit": "91f5d22ef48bde459d90a8c7dbeab416e97d0f2b",
+      "golden_commit": "91f5d22",
+      "matches_golden": true
+    },
+    "mode": "retrieval",
+    "k": 8,
+    "ids": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20"
+    ],
+    "started": "2026-11-08T21:06:37",
+    "open_workspace_s": 0.028,
+    "total_s": 8.168,
+    "constants": {
+      "BROAD_FACTOR": 4,
+      "BROAD_MIN_SPAN": 60,
+      "CHUNK_COVER_MIN": 0.5
+    },
+    "golden": "eval/golden/ripgrep.json",
+    "validation_warnings": []
+  },
+  "summary": {
+    "overall": {
+      "n": 20,
+      "errors": 0,
+      "retrieval": {
+        "hit@1": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "hit@3": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "hit@k": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "loose_hit@1": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "loose_hit@3": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "loose_hit@k": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "mrr": 0.588,
+        "chunk_recall": {
+          "n": 17,
+          "yes": 10,
+          "rate": 0.588
+        },
+        "all@k": null,
+        "pointer@k": {
+          "n": 3,
+          "yes": 2,
+          "rate": 0.667
+        },
+        "pointer_chunk_recall": {
+          "n": 3,
+          "yes": 2,
+          "rate": 0.667
+        }
+      },
+      "decision_calls": 20,
+      "decision_cost_usd": 0.003434,
+      "admit_judge_calls": 0,
+      "admit_judge_cost_usd": 0,
+      "reranked": 18,
+      "off_target": 2,
+      "decision_errors": 0,
+      "elapsed_s": {
+        "total": 8.133,
+        "mean": 0.407,
+        "median": 0.352,
+        "max": 1.109
+      }
+    },
+    "by_category": {
+      "locate-symbol": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "hit@3": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "hit@k": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "loose_hit@1": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "loose_hit@3": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "loose_hit@k": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "mrr": 0.5,
+          "chunk_recall": {
+            "n": 8,
+            "yes": 4,
+            "rate": 0.5
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001326,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 7,
+        "off_target": 1,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 3.887,
+          "mean": 0.486,
+          "median": 0.399,
+          "max": 1.109
+        }
+      },
+      "locate-feature": {
+        "n": 6,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "mrr": 0.667,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 4,
+            "rate": 0.667
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 6,
+        "decision_cost_usd": 0.000988,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 6,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 2.072,
+          "mean": 0.345,
+          "median": 0.322,
+          "max": 0.415
+        }
+      },
+      "flow": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "hit@3": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "hit@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@1": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@3": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "loose_hit@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "mrr": 0.667,
+          "chunk_recall": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "all@k": null,
+          "pointer@k": null,
+          "pointer_chunk_recall": null
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.000599,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 3,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 1.092,
+          "mean": 0.364,
+          "median": 0.341,
+          "max": 0.441
+        }
+      },
+      "not-in-repo": {
+        "n": 3,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": null,
+          "hit@3": null,
+          "hit@k": null,
+          "loose_hit@1": null,
+          "loose_hit@3": null,
+          "loose_hit@k": null,
+          "mrr": null,
+          "chunk_recall": null,
+          "all@k": null,
+          "pointer@k": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          },
+          "pointer_chunk_recall": {
+            "n": 3,
+            "yes": 2,
+            "rate": 0.667
+          }
+        },
+        "decision_calls": 3,
+        "decision_cost_usd": 0.00052,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 2,
+        "off_target": 1,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 1.082,
+          "mean": 0.361,
+          "median": 0.363,
+          "max": 0.386
+        }
+      }
+    },
+    "by_lang": {
+      "en": {
+        "n": 12,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "hit@3": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "hit@k": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "loose_hit@1": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "loose_hit@3": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "loose_hit@k": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "mrr": 0.636,
+          "chunk_recall": {
+            "n": 11,
+            "yes": 7,
+            "rate": 0.636
+          },
+          "all@k": null,
+          "pointer@k": {
+            "n": 1,
+            "yes": 0,
+            "rate": 0.0
+          },
+          "pointer_chunk_recall": {
+            "n": 1,
+            "yes": 0,
+            "rate": 0.0
+          }
+        },
+        "decision_calls": 12,
+        "decision_cost_usd": 0.002236,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 10,
+        "off_target": 2,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 5.292,
+          "mean": 0.441,
+          "median": 0.379,
+          "max": 1.109
+        }
+      },
+      "tr": {
+        "n": 8,
+        "errors": 0,
+        "retrieval": {
+          "hit@1": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "hit@3": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "hit@k": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "loose_hit@1": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "loose_hit@3": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "loose_hit@k": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "mrr": 0.5,
+          "chunk_recall": {
+            "n": 6,
+            "yes": 3,
+            "rate": 0.5
+          },
+          "all@k": null,
+          "pointer@k": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          },
+          "pointer_chunk_recall": {
+            "n": 2,
+            "yes": 2,
+            "rate": 1.0
+          }
+        },
+        "decision_calls": 8,
+        "decision_cost_usd": 0.001198,
+        "admit_judge_calls": 0,
+        "admit_judge_cost_usd": 0,
+        "reranked": 8,
+        "off_target": 0,
+        "decision_errors": 0,
+        "elapsed_s": {
+          "total": 2.841,
+          "mean": 0.355,
+          "median": 0.335,
+          "max": 0.441
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Where does globset turn a glob such as `src/**/*.rs` into the regular expression that is actually matched against paths?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/globset/src/glob.rs",
+          "symbol": "Tokens.to_regex_with",
+          "start_line": 694,
+          "end_line": 711
+        },
+        {
+          "path": "crates/globset/src/glob.rs",
+          "symbol": "Tokens.tokens_to_regex",
+          "start_line": 713,
+          "end_line": 783
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000139398,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 1.1093,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "crates/globset/src/glob.rs",
+            "symbol_id": "crates/globset/src/glob.rs::Glob.regex",
+            "start_line": 336,
+            "end_line": 338,
+            "kind": "symbol",
+            "score": 22.1212,
+            "match": null,
+            "why": "bm25: regular, expression, glob, globset, src"
+          },
+          {
+            "path": "crates/ignore/src/types.rs",
+            "symbol_id": "crates/ignore/src/types.rs::Types.matched",
+            "start_line": 263,
+            "end_line": 302,
+            "kind": "symbol",
+            "score": 24.4212,
+            "match": null,
+            "why": "name match: matched x1.07 (matched); bm25: matched, against, glob, paths~, src"
+          },
+          {
+            "path": "crates/globset/src/serde_impl.rs",
+            "symbol_id": "crates/globset/src/serde_impl.rs::tests.glob_set_deserialize",
+            "start_line": 121,
+            "end_line": 127,
+            "kind": "symbol",
+            "score": 20.0998,
+            "match": null,
+            "why": "name match: glob_set_deserialize x1.04 (glob); bm25: glob, globset, src; body: rs, matched~"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "symbol_id": "crates/globset/src/lib.rs::tests.matches_all_extensions",
+            "start_line": 1217,
+            "end_line": 1226,
+            "kind": "symbol",
+            "score": 19.9561,
+            "match": null,
+            "why": "name match: matches_all_extensions x1.04 (matched); bm25: globset, matched~, src; body: rs, glob"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "symbol_id": "crates/globset/src/lib.rs::tests.matches_all_suffix",
+            "start_line": 1250,
+            "end_line": 1258,
+            "kind": "symbol",
+            "score": 19.1047,
+            "match": null,
+            "why": "name match: matches_all_suffix x1.04 (matched); bm25: globset, matched~, src; body: rs, glob"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "symbol_id": "crates/globset/src/lib.rs::tests.matches_all_required_extensions",
+            "start_line": 1228,
+            "end_line": 1236,
+            "kind": "symbol",
+            "score": 18.9219,
+            "match": null,
+            "why": "name match: matches_all_required_extensions x1.04 (matched); bm25: globset, matched~, src; body: rs, glob"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "symbol_id": "crates/globset/src/lib.rs::GlobSet",
+            "start_line": 308,
+            "end_line": 312,
+            "kind": "symbol",
+            "score": 18.5742,
+            "match": null,
+            "why": "name match: GlobSet x1.07 (globset); class boost; bm25: globset, glob, matched, src"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "symbol_id": "crates/globset/src/lib.rs::tests.matches_all_regex",
+            "start_line": 1260,
+            "end_line": 1273,
+            "kind": "symbol",
+            "score": 18.5673,
+            "match": null,
+            "why": "name match: matches_all_regex x1.04 (matched); bm25: globset, matched~, src; body: rs, glob"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/globset/src/glob.rs",
+            "start_line": 288,
+            "end_line": 288,
+            "label": "Glob (impl header)"
+          },
+          {
+            "path": "crates/globset/src/glob.rs",
+            "start_line": 336,
+            "end_line": 338,
+            "label": "Glob.regex"
+          },
+          {
+            "path": "crates/ignore/src/types.rs",
+            "start_line": 224,
+            "end_line": 224,
+            "label": "Types (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/types.rs",
+            "start_line": 263,
+            "end_line": 302,
+            "label": "Types.matched"
+          },
+          {
+            "path": "crates/globset/src/serde_impl.rs",
+            "start_line": 121,
+            "end_line": 127,
+            "label": "tests.glob_set_deserialize"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "start_line": 1217,
+            "end_line": 1226,
+            "label": "tests.matches_all_extensions"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "start_line": 1250,
+            "end_line": 1258,
+            "label": "tests.matches_all_suffix"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "start_line": 1228,
+            "end_line": 1236,
+            "label": "tests.matches_all_required_extensions"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "start_line": 308,
+            "end_line": 312,
+            "label": "GlobSet"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "start_line": 1260,
+            "end_line": 1273,
+            "label": "tests.matches_all_regex"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "When I pass `--max-columns 150`, long lines are not printed but replaced by an 'omitted long line' notice (or a cut-off preview with `--max-columns-preview`). Which function writes that?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/printer/src/standard.rs",
+          "symbol": "StandardImpl.write_exceeded_line",
+          "start_line": 1290,
+          "end_line": 1352
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000180684,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4872,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::StandardImpl.write_exceeded_line",
+            "start_line": 1290,
+            "end_line": 1352,
+            "kind": "symbol",
+            "score": 53.7669,
+            "match": "symbol",
+            "why": "name match: write_exceeded_line x1.14 (line, writes); bm25: writes~, line, lines~, printed~; body: omitted, columns, long, max_columns_preview, max, max_columns, preview"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::tests.max_columns_preview",
+            "start_line": 2494,
+            "end_line": 2517,
+            "kind": "symbol",
+            "score": 81.0531,
+            "match": null,
+            "why": "name match: max_columns_preview x1.33 (columns, max, max columns preview, preview); bm25: columns, max_columns_preview, preview, max, printed; body: omitted, max_columns, line, lines~, long"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::StandardBuilder.max_columns_preview",
+            "start_line": 321,
+            "end_line": 324,
+            "kind": "symbol",
+            "score": 66.3838,
+            "match": null,
+            "why": "name match: max_columns_preview x1.33 (columns, max, max columns preview, preview); bm25: columns, max_columns_preview, preview, max, printed, line, lines~, long"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::tests.max_columns_multi_line_preview",
+            "start_line": 2648,
+            "end_line": 2676,
+            "kind": "symbol",
+            "score": 61.656,
+            "match": null,
+            "why": "name match: max_columns_multi_line_preview x1.34 (columns, line, max, preview); bm25: columns, preview, max, printed, line, lines~; body: max_columns_preview, max_columns"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::MaxColumnsPreview",
+            "start_line": 3818,
+            "end_line": 3819,
+            "kind": "symbol",
+            "score": 61.0523,
+            "match": null,
+            "why": "name match: MaxColumnsPreview x1.33 (columns, max, max columns preview, preview); class boost; bm25: columns, maxcolumnspreview, preview, max"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::tests.only_matching_max_columns_preview_multi_line1",
+            "start_line": 3172,
+            "end_line": 3204,
+            "kind": "symbol",
+            "score": 58.3256,
+            "match": null,
+            "why": "name match: only_matching_max_columns_preview_multi_line1 x1.28 (columns, line, max, preview); bm25: columns, preview, max, lines, printed, line; body: max_columns_preview, max_columns"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::MaxColumns.doc_long",
+            "start_line": 3782,
+            "end_line": 3789,
+            "kind": "symbol",
+            "score": 57.9807,
+            "match": null,
+            "why": "name match: doc_long x1.04 (long); owner match: MaxColumns x1.02; bm25: columns, maxcolumns, long, max; body: omitted, lines, printed, line"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::tests.max_columns",
+            "start_line": 2470,
+            "end_line": 2492,
+            "kind": "symbol",
+            "score": 57.8004,
+            "match": null,
+            "why": "name match: max_columns x1.18 (columns, max, max columns); bm25: columns, max_columns, max, printed; body: omitted, line, long, lines~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 884,
+            "end_line": 884,
+            "label": "StandardImpl (impl header)"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 1290,
+            "end_line": 1352,
+            "label": "StandardImpl.write_exceeded_line"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 2494,
+            "end_line": 2517,
+            "label": "tests.max_columns_preview"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 103,
+            "end_line": 103,
+            "label": "StandardBuilder (impl header)"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 321,
+            "end_line": 324,
+            "label": "StandardBuilder.max_columns_preview"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 2648,
+            "end_line": 2676,
+            "label": "tests.max_columns_multi_line_preview"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 3818,
+            "end_line": 3819,
+            "label": "MaxColumnsPreview"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 3172,
+            "end_line": 3204,
+            "label": "tests.only_matching_max_columns_preview_multi_line1"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 3763,
+            "end_line": 3763,
+            "label": "MaxColumns (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 3782,
+            "end_line": 3789,
+            "label": "MaxColumns.doc_long"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 2470,
+            "end_line": 2492,
+            "label": "tests.max_columns"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "If I mistype a flag, e.g. `rg --hiden foo`, the error lists similar flags that do exist. Which function picks those similar flag names?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/core/flags/parse.rs",
+          "symbol": "find_similar_names",
+          "start_line": 418,
+          "end_line": 448
+        },
+        {
+          "path": "crates/core/flags/parse.rs",
+          "symbol": "suggest",
+          "start_line": 404,
+          "end_line": 415
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00018921,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.5346,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "crates/core/flags/parse.rs",
+            "symbol_id": "crates/core/flags/parse.rs::find_similar_names",
+            "start_line": 418,
+            "end_line": 448,
+            "kind": "symbol",
+            "score": 37.7995,
+            "match": "symbol",
+            "why": "name match: find_similar_names x1.29 (names, similar); bm25: names, similar, flag, flags"
+          },
+          {
+            "path": "crates/core/flags/parse.rs",
+            "symbol_id": "crates/core/flags/parse.rs::suggest",
+            "start_line": 404,
+            "end_line": 415,
+            "kind": "symbol",
+            "score": 32.4007,
+            "match": "symbol",
+            "why": "bm25: similar, names, flags, flag; body: lists~"
+          },
+          {
+            "path": "crates/core/flags/parse.rs",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 476,
+            "kind": "file",
+            "score": 19.2795,
+            "match": "file",
+            "why": "bm25: names, similar, flag, flags"
+          },
+          {
+            "path": "crates/ignore/src/types.rs",
+            "symbol_id": "crates/ignore/src/types.rs::TypesBuilder.add_def",
+            "start_line": 446,
+            "end_line": 483,
+            "kind": "symbol",
+            "score": 18.9816,
+            "match": null,
+            "why": "bm25: names, error, lists~, exist"
+          },
+          {
+            "path": "crates/ignore/src/lib.rs",
+            "symbol_id": "crates/ignore/src/lib.rs::Error.into_io_error",
+            "start_line": 232,
+            "end_line": 250,
+            "kind": "symbol",
+            "score": 18.1643,
+            "match": null,
+            "why": "name match: into_io_error x1.03 (error); bm25: error, similar, exist"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::tests.non_switches_have_variable_names",
+            "start_line": 7733,
+            "end_line": 7745,
+            "kind": "symbol",
+            "score": 17.9592,
+            "match": null,
+            "why": "name match: non_switches_have_variable_names x1.06 (names); bm25: names, flag, flags"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::TypeList.name_long",
+            "start_line": 7173,
+            "end_line": 7175,
+            "kind": "symbol",
+            "score": 16.6486,
+            "match": null,
+            "why": "name match: name_long x1.10 (names); owner match: TypeList x1.02; bm25: lists~, names~, flags, flag"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::TypeAdd.doc_long",
+            "start_line": 6956,
+            "end_line": 6992,
+            "kind": "symbol",
+            "score": 16.1001,
+            "match": null,
+            "why": "bm25: flag, flags; body: names, foo, rg, exist"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/core/flags/parse.rs",
+            "start_line": 418,
+            "end_line": 448,
+            "label": "find_similar_names"
+          },
+          {
+            "path": "crates/core/flags/parse.rs",
+            "start_line": 404,
+            "end_line": 415,
+            "label": "suggest"
+          },
+          {
+            "path": "crates/core/flags/parse.rs",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "crates/ignore/src/types.rs",
+            "start_line": 312,
+            "end_line": 312,
+            "label": "TypesBuilder (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/types.rs",
+            "start_line": 446,
+            "end_line": 483,
+            "label": "TypesBuilder.add_def"
+          },
+          {
+            "path": "crates/ignore/src/lib.rs",
+            "start_line": 156,
+            "end_line": 156,
+            "label": "Error (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/lib.rs",
+            "start_line": 232,
+            "end_line": 250,
+            "label": "Error.into_io_error"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 7733,
+            "end_line": 7745,
+            "label": "tests.non_switches_have_variable_names"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 7169,
+            "end_line": 7169,
+            "label": "TypeList (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 7173,
+            "end_line": 7175,
+            "label": "TypeList.name_long"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6940,
+            "end_line": 6940,
+            "label": "TypeAdd (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6956,
+            "end_line": 6992,
+            "label": "TypeAdd.doc_long"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "In the parallel directory walker, which function lets a thread that has run out of directories steal queued work from another thread?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/ignore/src/walk.rs",
+          "symbol": "Stack.steal",
+          "start_line": 1702,
+          "end_line": 1714
+        },
+        {
+          "path": "crates/ignore/src/walk.rs",
+          "symbol": "Stack.pop",
+          "start_line": 1697,
+          "end_line": 1699
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000188244,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3178,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::Stack.steal",
+            "start_line": 1702,
+            "end_line": 1714,
+            "kind": "symbol",
+            "score": 41.8141,
+            "match": "symbol",
+            "why": "name match: steal x1.12 (steal); bm25: steal, another, queued~; body: lets~"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::Worker.get_work",
+            "start_line": 1942,
+            "end_line": 1992,
+            "kind": "symbol",
+            "score": 19.4495,
+            "match": null,
+            "why": "name match: get_work x1.05 (work); bm25: work, directory; body: thread, lets~"
+          },
+          {
+            "path": "crates/ignore/examples/walk.rs",
+            "symbol_id": "crates/ignore/examples/walk.rs::main",
+            "start_line": 5,
+            "end_line": 50,
+            "kind": "symbol",
+            "score": 30.8638,
+            "match": null,
+            "why": "bm25: body: walker, parallel, thread, directory~, lets~, run"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::Stack.new_for_each_thread",
+            "start_line": 1662,
+            "end_line": 1689,
+            "kind": "symbol",
+            "score": 29.7787,
+            "match": null,
+            "why": "name match: new_for_each_thread x1.04 (thread); bm25: steal, thread, work; body: directory, directories, out, lets~"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::WalkParallel.visit",
+            "start_line": 1452,
+            "end_line": 1535,
+            "kind": "symbol",
+            "score": 24.0745,
+            "match": null,
+            "why": "bm25: parallel, directory; body: thread, run, work, lets~, directories"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 2775,
+            "kind": "file",
+            "score": 23.4712,
+            "match": "file",
+            "why": "bm25: parallel, directory~, run, thread, work, steal"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::WalkParallel",
+            "start_line": 1411,
+            "end_line": 1422,
+            "kind": "symbol",
+            "score": 21.8456,
+            "match": null,
+            "why": "name match: WalkParallel x1.06 (parallel); class boost; bm25: parallel, directory, directories"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::Worker.run_one",
+            "start_line": 1769,
+            "end_line": 1859,
+            "kind": "symbol",
+            "score": 21.789,
+            "match": null,
+            "why": "name match: run_one x1.05 (run); bm25: run, work; body: directory, lets~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1658,
+            "end_line": 1658,
+            "label": "Stack (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1702,
+            "end_line": 1714,
+            "label": "Stack.steal"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1756,
+            "end_line": 1756,
+            "label": "Worker (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1942,
+            "end_line": 1992,
+            "label": "Worker.get_work"
+          },
+          {
+            "path": "crates/ignore/examples/walk.rs",
+            "start_line": 5,
+            "end_line": 50,
+            "label": "main"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1662,
+            "end_line": 1689,
+            "label": "Stack.new_for_each_thread"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1424,
+            "end_line": 1424,
+            "label": "WalkParallel (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1452,
+            "end_line": 1535,
+            "label": "WalkParallel.visit"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1411,
+            "end_line": 1422,
+            "label": "WalkParallel"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 1769,
+            "end_line": 1859,
+            "label": "Worker.run_one"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "category": "locate-symbol",
+      "lang": "en",
+      "question": "Once the regex reports a match at some byte offset inside the search buffer, which function widens that offset to the start and end of the whole line that gets reported?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/searcher/src/lines.rs",
+          "symbol": "locate",
+          "start_line": 134,
+          "end_line": 147
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000173502,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.3937,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "symbol_id": "crates/regex/src/matcher.rs::RegexMatcherBuilder.whole_line",
+            "start_line": 358,
+            "end_line": 361,
+            "kind": "symbol",
+            "score": 53.6486,
+            "match": null,
+            "why": "name match: whole_line x1.17 (line, whole, whole line); owner match: RegexMatcherBuilder x1.04; bm25: whole, whole_line, line, regex, match"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "symbol_id": "crates/pcre2/src/matcher.rs::RegexMatcherBuilder.whole_line",
+            "start_line": 191,
+            "end_line": 194,
+            "kind": "symbol",
+            "score": 53.4262,
+            "match": null,
+            "why": "name match: whole_line x1.17 (line, whole, whole line); owner match: RegexMatcherBuilder x1.04; bm25: whole, whole_line, line, regex, match"
+          },
+          {
+            "path": "crates/regex/src/config.rs",
+            "symbol_id": "crates/regex/src/config.rs::ConfiguredHIR.into_whole_line",
+            "start_line": 306,
+            "end_line": 312,
+            "kind": "symbol",
+            "score": 42.8025,
+            "match": null,
+            "why": "name match: into_whole_line x1.14 (line, whole); bm25: whole, line, start, end, regex, match"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::tests.reports_binary",
+            "start_line": 1803,
+            "end_line": 1827,
+            "kind": "symbol",
+            "score": 38.232,
+            "match": null,
+            "why": "name match: reports_binary x1.10 (reports); bm25: reports; body: byte, line, offset, search, regex, match"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::tests.byte_offset",
+            "start_line": 2418,
+            "end_line": 2440,
+            "kind": "symbol",
+            "score": 37.351,
+            "match": null,
+            "why": "name match: byte_offset x1.14 (byte, byte offset, offset); bm25: byte_offset, byte, offset; body: line, search, match, regex"
+          },
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "symbol_id": "crates/searcher/src/line_buffer.rs::LineBufferReader.absolute_byte_offset",
+            "start_line": 233,
+            "end_line": 235,
+            "kind": "symbol",
+            "score": 35.6396,
+            "match": null,
+            "why": "name match: absolute_byte_offset x1.11 (byte, offset); owner match: LineBufferReader x1.03; bm25: byte, offset, line, buffer, reports~, start, search"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::tests.reports_match",
+            "start_line": 1780,
+            "end_line": 1801,
+            "kind": "symbol",
+            "score": 35.4717,
+            "match": null,
+            "why": "name match: reports_match x1.17 (match, reports); bm25: reports, match; body: line, search, regex, byte~"
+          },
+          {
+            "path": "crates/regex/src/config.rs",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 356,
+            "kind": "file",
+            "score": 34.7999,
+            "match": null,
+            "why": "bm25: whole, line, start, end, regex, byte~, match"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 34,
+            "end_line": 34,
+            "label": "RegexMatcherBuilder (impl header)"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 358,
+            "end_line": 361,
+            "label": "RegexMatcherBuilder.whole_line"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "start_line": 20,
+            "end_line": 20,
+            "label": "RegexMatcherBuilder (impl header)"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "start_line": 191,
+            "end_line": 194,
+            "label": "RegexMatcherBuilder.whole_line"
+          },
+          {
+            "path": "crates/regex/src/config.rs",
+            "start_line": 163,
+            "end_line": 163,
+            "label": "ConfiguredHIR (impl header)"
+          },
+          {
+            "path": "crates/regex/src/config.rs",
+            "start_line": 306,
+            "end_line": 312,
+            "label": "ConfiguredHIR.into_whole_line"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 1803,
+            "end_line": 1827,
+            "label": "tests.reports_binary"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 2418,
+            "end_line": 2440,
+            "label": "tests.byte_offset"
+          },
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "start_line": 213,
+            "end_line": 213,
+            "label": "LineBufferReader (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "start_line": 233,
+            "end_line": 235,
+            "label": "LineBufferReader.absolute_byte_offset"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 1780,
+            "end_line": 1801,
+            "label": "tests.reports_match"
+          },
+          {
+            "path": "crates/regex/src/config.rs",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": ".gitignore dosyasindaki tek bir satir (basinda ! olan, / ile biten, icinde / gecmeyen gibi) nerede glob desenine cevriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/ignore/src/gitignore.rs",
+          "symbol": "GitignoreBuilder.add_line",
+          "start_line": 463,
+          "end_line": 544
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000151956,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3372,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::GitignoreBuilder.add_line",
+            "start_line": 463,
+            "end_line": 544,
+            "kind": "symbol",
+            "score": 21.6638,
+            "match": "symbol",
+            "why": "name match: add_line x1.12 (satir); owner match: GitignoreBuilder x1.02; bm25: gitignore, line~; body: glob"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::Glob",
+            "start_line": 31,
+            "end_line": 43,
+            "kind": "symbol",
+            "score": 23.1688,
+            "match": null,
+            "why": "name match: Glob x1.28 (glob); class boost; bm25: gitignore, glob"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::Gitignore",
+            "start_line": 80,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 25.7323,
+            "match": null,
+            "why": "name match: Gitignore x1.37 (gitignore); class boost; bm25: gitignore, glob"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "symbol_id": "crates/ignore/src/dir.rs::IgnoreMatch.gitignore",
+            "start_line": 56,
+            "end_line": 58,
+            "kind": "symbol",
+            "score": 24.9553,
+            "match": null,
+            "why": "name match: gitignore x1.37 (gitignore); bm25: gitignore, glob"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::GitignoreBuilder",
+            "start_line": 319,
+            "end_line": 326,
+            "kind": "symbol",
+            "score": 20.683,
+            "match": null,
+            "why": "name match: GitignoreBuilder x1.25 (gitignore); class boost; bm25: gitignore, glob"
+          },
+          {
+            "path": "crates/ignore/benches/workloads.rs",
+            "symbol_id": "crates/ignore/benches/workloads.rs::build_python_gitignore",
+            "start_line": 316,
+            "end_line": 323,
+            "kind": "symbol",
+            "score": 18.7116,
+            "match": null,
+            "why": "name match: build_python_gitignore x1.20 (gitignore); bm25: gitignore; body: line~"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::GitignoreBuilder.add_str",
+            "start_line": 445,
+            "end_line": 455,
+            "kind": "symbol",
+            "score": 18.3704,
+            "match": null,
+            "why": "bm25: gitignore, line~, glob"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::tests.gitignore",
+            "start_line": 2345,
+            "end_line": 2361,
+            "kind": "symbol",
+            "score": 17.9029,
+            "match": null,
+            "why": "name match: gitignore x1.37 (gitignore); bm25: gitignore"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 328,
+            "end_line": 328,
+            "label": "GitignoreBuilder (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 463,
+            "end_line": 544,
+            "label": "GitignoreBuilder.add_line"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 31,
+            "end_line": 43,
+            "label": "Glob"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 80,
+            "end_line": 88,
+            "label": "Gitignore"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "start_line": 51,
+            "end_line": 51,
+            "label": "IgnoreMatch (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "start_line": 56,
+            "end_line": 58,
+            "label": "IgnoreMatch.gitignore"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 319,
+            "end_line": 326,
+            "label": "GitignoreBuilder"
+          },
+          {
+            "path": "crates/ignore/benches/workloads.rs",
+            "start_line": 316,
+            "end_line": 323,
+            "label": "build_python_gitignore"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 445,
+            "end_line": 455,
+            "label": "GitignoreBuilder.add_str"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 2345,
+            "end_line": 2361,
+            "label": "tests.gitignore"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "`--max-filesize 2M` gibi bir değerdeki `K`/`M`/`G` sonekini bayt sayısına çeviren fonksiyon hangisi?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/cli/src/human.rs",
+          "symbol": "parse_human_readable_size",
+          "start_line": 79,
+          "end_line": 100
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00014217,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4039,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::MaxFilesize.update",
+            "start_line": 4036,
+            "end_line": 4040,
+            "kind": "symbol",
+            "score": 40.4916,
+            "match": null,
+            "why": "bm25: filesize, maxfilesize, value~, max; body: max_filesize, convert"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::MaxFilesize",
+            "start_line": 4005,
+            "end_line": 4006,
+            "kind": "symbol",
+            "score": 55.9096,
+            "match": null,
+            "why": "name match: MaxFilesize x1.41 (filesize, max, max filesize); class boost; bm25: filesize, maxfilesize, max"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::WalkBuilder.max_filesize",
+            "start_line": 762,
+            "end_line": 765,
+            "kind": "symbol",
+            "score": 51.2931,
+            "match": null,
+            "why": "name match: max_filesize x1.41 (filesize, max, max filesize); bm25: filesize, max_filesize, max"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::tests.max_filesize",
+            "start_line": 2538,
+            "end_line": 2570,
+            "kind": "symbol",
+            "score": 48.6908,
+            "match": null,
+            "why": "name match: max_filesize x1.41 (filesize, max, max filesize); bm25: filesize, max_filesize, max"
+          },
+          {
+            "path": "crates/ignore/src/incremental.rs",
+            "symbol_id": "crates/ignore/src/incremental.rs::tests.max_filesize",
+            "start_line": 1194,
+            "end_line": 1213,
+            "kind": "symbol",
+            "score": 47.9811,
+            "match": null,
+            "why": "name match: max_filesize x1.41 (filesize, max, max filesize); bm25: filesize, max_filesize, max"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::test_max_filesize",
+            "start_line": 4043,
+            "end_line": 4058,
+            "kind": "symbol",
+            "score": 46.6289,
+            "match": null,
+            "why": "name match: test_max_filesize x1.33 (filesize, max); bm25: filesize, max; body: max_filesize"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::skip_filesize",
+            "start_line": 2063,
+            "end_line": 2083,
+            "kind": "symbol",
+            "score": 39.7719,
+            "match": null,
+            "why": "name match: skip_filesize x1.16 (filesize); bm25: filesize, max_filesize, max"
+          },
+          {
+            "path": "crates/ignore/src/incremental.rs",
+            "symbol_id": "crates/ignore/src/incremental.rs::tests.max_filesize_respects_follow_links",
+            "start_line": 1228,
+            "end_line": 1248,
+            "kind": "symbol",
+            "score": 33.1827,
+            "match": null,
+            "why": "name match: max_filesize_respects_follow_links x1.24 (filesize, max); bm25: filesize, max; body: max_filesize"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 4008,
+            "end_line": 4008,
+            "label": "MaxFilesize (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 4036,
+            "end_line": 4040,
+            "label": "MaxFilesize.update"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 4005,
+            "end_line": 4006,
+            "label": "MaxFilesize"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 545,
+            "end_line": 545,
+            "label": "WalkBuilder (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 762,
+            "end_line": 765,
+            "label": "WalkBuilder.max_filesize"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 2538,
+            "end_line": 2570,
+            "label": "tests.max_filesize"
+          },
+          {
+            "path": "crates/ignore/src/incremental.rs",
+            "start_line": 1194,
+            "end_line": 1213,
+            "label": "tests.max_filesize"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 4043,
+            "end_line": 4058,
+            "label": "test_max_filesize"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 2063,
+            "end_line": 2083,
+            "label": "skip_filesize"
+          },
+          {
+            "path": "crates/ignore/src/incremental.rs",
+            "start_line": 1228,
+            "end_line": 1248,
+            "label": "tests.max_filesize_respects_follow_links"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "category": "locate-symbol",
+      "lang": "tr",
+      "question": "`rg -t rust` yazınca `rust` türünün `*.rs` dosyalarına karşılık geldiği yerleşik dosya türü listesi nerede tanımlı?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/ignore/src/default_types.rs",
+          "start_line": 11,
+          "end_line": 346
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000161112,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3031,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "crates/ignore/src/types.rs",
+            "symbol_id": "crates/ignore/src/types.rs::tests.types",
+            "start_line": 533,
+            "end_line": 544,
+            "kind": "symbol",
+            "score": 17.8836,
+            "match": null,
+            "why": "bm25: body: rust, rs"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::TypeList",
+            "start_line": 7166,
+            "end_line": 7167,
+            "kind": "symbol",
+            "score": 11.9298,
+            "match": null,
+            "why": "name match: TypeList x1.16 (listesi); class boost; bm25: list"
+          },
+          {
+            "path": "crates/core/main.rs",
+            "symbol_id": "crates/core/main.rs::types",
+            "start_line": 329,
+            "end_line": 348,
+            "kind": "symbol",
+            "score": 10.1917,
+            "match": null,
+            "why": "bm25: list; body: write~"
+          },
+          {
+            "path": "crates/ignore/src/incremental.rs",
+            "symbol_id": "crates/ignore/src/incremental.rs::tests.file_types_are_applied",
+            "start_line": 778,
+            "end_line": 793,
+            "kind": "symbol",
+            "score": 12.5655,
+            "match": null,
+            "why": "bm25: body: rust, rs"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "symbol_id": "crates/core/flags/hiargs.rs::HiArgs.matcher_rust",
+            "start_line": 461,
+            "end_line": 514,
+            "kind": "symbol",
+            "score": 11.2937,
+            "match": null,
+            "why": "name match: matcher_rust x1.19 (rust); bm25: rust"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "symbol_id": "crates/globset/src/lib.rs::tests.matches_all_required_extensions",
+            "start_line": 1228,
+            "end_line": 1236,
+            "kind": "symbol",
+            "score": 10.1869,
+            "match": null,
+            "why": "bm25: body: rs"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::test_type_list",
+            "start_line": 7198,
+            "end_line": 7206,
+            "kind": "symbol",
+            "score": 10.0994,
+            "match": null,
+            "why": "name match: test_type_list x1.13 (listesi); bm25: list"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "symbol_id": "crates/globset/src/lib.rs::tests.matches_all_extensions",
+            "start_line": 1217,
+            "end_line": 1226,
+            "kind": "symbol",
+            "score": 9.756,
+            "match": null,
+            "why": "bm25: body: rs"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/ignore/src/types.rs",
+            "start_line": 533,
+            "end_line": 544,
+            "label": "tests.types"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 7166,
+            "end_line": 7167,
+            "label": "TypeList"
+          },
+          {
+            "path": "crates/core/main.rs",
+            "start_line": 329,
+            "end_line": 348,
+            "label": "types"
+          },
+          {
+            "path": "crates/ignore/src/incremental.rs",
+            "start_line": 778,
+            "end_line": 793,
+            "label": "tests.file_types_are_applied"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 108,
+            "end_line": 108,
+            "label": "HiArgs (impl header)"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 461,
+            "end_line": 514,
+            "label": "HiArgs.matcher_rust"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "start_line": 1228,
+            "end_line": 1236,
+            "label": "tests.matches_all_required_extensions"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 7198,
+            "end_line": 7206,
+            "label": "test_type_list"
+          },
+          {
+            "path": "crates/globset/src/lib.rs",
+            "start_line": 1217,
+            "end_line": 1226,
+            "label": "tests.matches_all_extensions"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "When ripgrep has many globs at once (several `-g '*.rs' -g '*.toml' -g Makefile`, or all lines of a big .gitignore), how does it avoid running one regex per glob for every path it checks?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/globset/src/lib.rs",
+          "symbol": "GlobSet.new",
+          "start_line": 461,
+          "end_line": 564
+        },
+        {
+          "path": "crates/globset/src/glob.rs",
+          "symbol": "MatchStrategy.new",
+          "start_line": 53,
+          "end_line": 71
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000181062,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3196,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::GitignoreBuilder.build",
+            "start_line": 349,
+            "end_line": 369,
+            "kind": "symbol",
+            "score": 24.5692,
+            "match": null,
+            "why": "bm25: globs, gitignore"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::Gitignore",
+            "start_line": 80,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 28.9358,
+            "match": null,
+            "why": "name match: Gitignore x1.05 (gitignore); class boost; bm25: gitignore, globs, one"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::Gitignore.empty",
+            "start_line": 151,
+            "end_line": 160,
+            "kind": "symbol",
+            "score": 24.8512,
+            "match": null,
+            "why": "bm25: gitignore; body: globs, path"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::GitignoreBuilder.add_line",
+            "start_line": 463,
+            "end_line": 544,
+            "kind": "symbol",
+            "score": 24.6563,
+            "match": null,
+            "why": "name match: add_line x1.03 (lines); owner match: GitignoreBuilder x1.01; bm25: gitignore, lines~, path; body: globs, ripgrep"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::GitignoreBuilder.add_str",
+            "start_line": 445,
+            "end_line": 455,
+            "kind": "symbol",
+            "score": 24.2303,
+            "match": null,
+            "why": "bm25: gitignore, lines, path, globs~"
+          },
+          {
+            "path": "crates/searcher/src/searcher/glue.rs",
+            "symbol_id": "crates/searcher/src/searcher/glue.rs::tests.big_error_one_line",
+            "start_line": 658,
+            "end_line": 676,
+            "kind": "symbol",
+            "score": 23.084,
+            "match": null,
+            "why": "name match: big_error_one_line x1.16 (big, lines, one); bm25: big, one, lines~; body: regex"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::GitignoreBuilder.new",
+            "start_line": 335,
+            "end_line": 344,
+            "kind": "symbol",
+            "score": 22.478,
+            "match": null,
+            "why": "bm25: gitignore, path; body: globs"
+          },
+          {
+            "path": "crates/core/search.rs",
+            "symbol_id": "crates/core/search.rs::SearchWorkerBuilder.preprocessor_globs",
+            "start_line": 108,
+            "end_line": 114,
+            "kind": "symbol",
+            "score": 22.3101,
+            "match": null,
+            "why": "name match: preprocessor_globs x1.05 (globs); bm25: globs, running~, every"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 328,
+            "end_line": 328,
+            "label": "GitignoreBuilder (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 349,
+            "end_line": 369,
+            "label": "GitignoreBuilder.build"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 80,
+            "end_line": 88,
+            "label": "Gitignore"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 90,
+            "end_line": 90,
+            "label": "Gitignore (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 151,
+            "end_line": 160,
+            "label": "Gitignore.empty"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 463,
+            "end_line": 544,
+            "label": "GitignoreBuilder.add_line"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 445,
+            "end_line": 455,
+            "label": "GitignoreBuilder.add_str"
+          },
+          {
+            "path": "crates/searcher/src/searcher/glue.rs",
+            "start_line": 658,
+            "end_line": 676,
+            "label": "tests.big_error_one_line"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 335,
+            "end_line": 344,
+            "label": "GitignoreBuilder.new"
+          },
+          {
+            "path": "crates/core/search.rs",
+            "start_line": 52,
+            "end_line": 52,
+            "label": "SearchWorkerBuilder (impl header)"
+          },
+          {
+            "path": "crates/core/search.rs",
+            "start_line": 108,
+            "end_line": 114,
+            "label": "SearchWorkerBuilder.preprocessor_globs"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "How does ripgrep notice that a file is binary (a NUL byte) while searching it, and where does it stop reading such a file?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/searcher/src/line_buffer.rs",
+          "symbol": "LineBuffer.fill",
+          "start_line": 406,
+          "end_line": 472
+        },
+        {
+          "path": "crates/searcher/src/searcher/core.rs",
+          "symbol": "Core.detect_binary",
+          "start_line": 215,
+          "end_line": 238
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000160062,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3977,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 16,
+        "top_hits": [
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "symbol_id": "crates/searcher/src/line_buffer.rs::LineBuffer.fill",
+            "start_line": 406,
+            "end_line": 472,
+            "kind": "symbol",
+            "score": 22.5196,
+            "match": "symbol",
+            "why": "bm25: reading, searching~; body: byte, binary"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::Binary.doc_long",
+            "start_line": 445,
+            "end_line": 479,
+            "kind": "symbol",
+            "score": 29.5142,
+            "match": null,
+            "why": "bm25: binary; body: searching, byte, ripgrep, stop"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "symbol_id": "crates/printer/src/standard.rs::StandardImpl.write_binary_message",
+            "start_line": 1388,
+            "end_line": 1419,
+            "kind": "symbol",
+            "score": 22.6151,
+            "match": null,
+            "why": "name match: write_binary_message x1.07 (binary); bm25: binary; body: byte, searching, stop"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::Text.doc_long",
+            "start_line": 6652,
+            "end_line": 6669,
+            "kind": "symbol",
+            "score": 22.5513,
+            "match": null,
+            "why": "bm25: body: binary, searching, byte, ripgrep, stop"
+          },
+          {
+            "path": "crates/searcher/src/searcher/glue.rs",
+            "symbol_id": "crates/searcher/src/searcher/glue.rs::ReadByLine.should_binary_quit",
+            "start_line": 90,
+            "end_line": 93,
+            "kind": "symbol",
+            "score": 21.9117,
+            "match": null,
+            "why": "name match: should_binary_quit x1.07 (binary); owner match: ReadByLine x1.01; bm25: binary, reading~, searching~; body: byte"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::FilesWithMatches.doc_long",
+            "start_line": 2192,
+            "end_line": 2206,
+            "kind": "symbol",
+            "score": 21.1813,
+            "match": null,
+            "why": "bm25: body: searching, binary, ripgrep, stop"
+          },
+          {
+            "path": "crates/searcher/src/searcher/core.rs",
+            "symbol_id": "crates/searcher/src/searcher/core.rs::Core.binary_byte_offset",
+            "start_line": 91,
+            "end_line": 93,
+            "kind": "symbol",
+            "score": 20.979,
+            "match": null,
+            "why": "name match: binary_byte_offset x1.20 (binary, byte); bm25: byte, binary, searching~"
+          },
+          {
+            "path": "crates/searcher/src/sink.rs",
+            "symbol_id": "crates/searcher/src/sink.rs::SinkFinish.binary_byte_offset",
+            "start_line": 358,
+            "end_line": 361,
+            "kind": "symbol",
+            "score": 20.5622,
+            "match": null,
+            "why": "name match: binary_byte_offset x1.20 (binary, byte); bm25: byte, binary, searching~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "start_line": 325,
+            "end_line": 325,
+            "label": "LineBuffer (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "start_line": 406,
+            "end_line": 472,
+            "label": "LineBuffer.fill"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 429,
+            "end_line": 429,
+            "label": "Binary (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 445,
+            "end_line": 479,
+            "label": "Binary.doc_long"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 884,
+            "end_line": 884,
+            "label": "StandardImpl (impl header)"
+          },
+          {
+            "path": "crates/printer/src/standard.rs",
+            "start_line": 1388,
+            "end_line": 1419,
+            "label": "StandardImpl.write_binary_message"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6633,
+            "end_line": 6633,
+            "label": "Text (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6652,
+            "end_line": 6669,
+            "label": "Text.doc_long"
+          },
+          {
+            "path": "crates/searcher/src/searcher/glue.rs",
+            "start_line": 17,
+            "end_line": 22,
+            "label": "ReadByLine (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/glue.rs",
+            "start_line": 90,
+            "end_line": 93,
+            "label": "ReadByLine.should_binary_quit"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 2176,
+            "end_line": 2176,
+            "label": "FilesWithMatches (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 2192,
+            "end_line": 2206,
+            "label": "FilesWithMatches.doc_long"
+          },
+          {
+            "path": "crates/searcher/src/searcher/core.rs",
+            "start_line": 39,
+            "end_line": 39,
+            "label": "Core (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/core.rs",
+            "start_line": 91,
+            "end_line": 93,
+            "label": "Core.binary_byte_offset"
+          },
+          {
+            "path": "crates/searcher/src/sink.rs",
+            "start_line": 345,
+            "end_line": 345,
+            "label": "SinkFinish (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/sink.rs",
+            "start_line": 358,
+            "end_line": 361,
+            "label": "SinkFinish.binary_byte_offset"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "Instead of running the full regex on every line, how does ripgrep use a cheap literal search to find candidate lines and only then confirm them with the real regex?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/regex/src/literal.rs",
+          "symbol": "InnerLiterals.new",
+          "start_line": 54,
+          "end_line": 92
+        },
+        {
+          "path": "crates/regex/src/literal.rs",
+          "symbol": "InnerLiterals.one_regex",
+          "start_line": 106,
+          "end_line": 122
+        },
+        {
+          "path": "crates/regex/src/matcher.rs",
+          "symbol": "RegexMatcher.find_candidate_line",
+          "start_line": 490,
+          "end_line": 506
+        },
+        {
+          "path": "crates/searcher/src/searcher/core.rs",
+          "symbol": "Core.find_by_line_fast",
+          "start_line": 475,
+          "end_line": 519
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000169932,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3021,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 13,
+        "top_hits": [
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "symbol_id": "crates/regex/src/matcher.rs::RegexMatcher.find_candidate_line",
+            "start_line": 490,
+            "end_line": 506,
+            "kind": "symbol",
+            "score": 45.6037,
+            "match": "symbol",
+            "why": "name match: find_candidate_line x1.17 (candidate, find, line); owner match: RegexMatcher x1.03; bm25: candidate, line, find, regex; body: confirm, search"
+          },
+          {
+            "path": "crates/searcher/src/searcher/core.rs",
+            "symbol_id": "crates/searcher/src/searcher/core.rs::Core.find_by_line_fast",
+            "start_line": 475,
+            "end_line": 519,
+            "kind": "symbol",
+            "score": 28.9573,
+            "match": "symbol",
+            "why": "name match: find_by_line_fast x1.06 (find, line); bm25: line, find, search; body: candidate, confirm, lines"
+          },
+          {
+            "path": "crates/searcher/src/testutil.rs",
+            "symbol_id": "crates/searcher/src/testutil.rs::RegexMatcher.find_candidate_line",
+            "start_line": 86,
+            "end_line": 105,
+            "kind": "symbol",
+            "score": 46.4067,
+            "match": null,
+            "why": "name match: find_candidate_line x1.17 (candidate, find, line); owner match: RegexMatcher x1.03; bm25: candidate, line, find, regex, search; body: confirm, every"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "symbol_id": "crates/regex/src/matcher.rs::tests.candidate_lines",
+            "start_line": 638,
+            "end_line": 669,
+            "kind": "symbol",
+            "score": 64.3452,
+            "match": null,
+            "why": "name match: candidate_lines x1.12 (candidate, candidate lines, lines); bm25: candidate, candidate_lines, line, lines, regex; body: confirm, find, literal"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "symbol_id": "crates/pcre2/src/matcher.rs::tests.candidate_lines",
+            "start_line": 492,
+            "end_line": 504,
+            "kind": "symbol",
+            "score": 61.3581,
+            "match": null,
+            "why": "name match: candidate_lines x1.12 (candidate, candidate lines, lines); bm25: candidate, candidate_lines, line, lines; body: confirm, find, regex"
+          },
+          {
+            "path": "crates/matcher/src/lib.rs",
+            "symbol_id": "crates/matcher/src/lib.rs::Matcher.find_candidate_line",
+            "start_line": 1124,
+            "end_line": 1130,
+            "kind": "symbol",
+            "score": 42.5231,
+            "match": null,
+            "why": "name match: find_candidate_line x1.17 (candidate, find, line); bm25: candidate, confirm, line, find"
+          },
+          {
+            "path": "crates/searcher/src/testutil.rs",
+            "symbol_id": "crates/searcher/src/testutil.rs::RegexMatcher.every_line_is_candidate",
+            "start_line": 54,
+            "end_line": 60,
+            "kind": "symbol",
+            "score": 41.921,
+            "match": null,
+            "why": "name match: every_line_is_candidate x1.16 (candidate, every, line); owner match: RegexMatcher x1.03; bm25: candidate, every, line, regex, search"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 670,
+            "kind": "file",
+            "score": 35.1539,
+            "match": "file",
+            "why": "bm25: candidate, line, candidate_lines, find, regex, literal, lines"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 409,
+            "end_line": 409,
+            "label": "RegexMatcher (impl header)"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 490,
+            "end_line": 506,
+            "label": "RegexMatcher.find_candidate_line"
+          },
+          {
+            "path": "crates/searcher/src/searcher/core.rs",
+            "start_line": 39,
+            "end_line": 39,
+            "label": "Core (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/core.rs",
+            "start_line": 475,
+            "end_line": 519,
+            "label": "Core.find_by_line_fast"
+          },
+          {
+            "path": "crates/searcher/src/testutil.rs",
+            "start_line": 63,
+            "end_line": 63,
+            "label": "RegexMatcher (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/testutil.rs",
+            "start_line": 86,
+            "end_line": 105,
+            "label": "RegexMatcher.find_candidate_line"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 638,
+            "end_line": 669,
+            "label": "tests.candidate_lines"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "start_line": 492,
+            "end_line": 504,
+            "label": "tests.candidate_lines"
+          },
+          {
+            "path": "crates/matcher/src/lib.rs",
+            "start_line": 546,
+            "end_line": 546,
+            "label": "Matcher (interface header)"
+          },
+          {
+            "path": "crates/matcher/src/lib.rs",
+            "start_line": 1124,
+            "end_line": 1130,
+            "label": "Matcher.find_candidate_line"
+          },
+          {
+            "path": "crates/searcher/src/testutil.rs",
+            "start_line": 30,
+            "end_line": 30,
+            "label": "RegexMatcher (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/testutil.rs",
+            "start_line": 54,
+            "end_line": 60,
+            "label": "RegexMatcher.every_line_is_candidate"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "category": "locate-feature",
+      "lang": "en",
+      "question": "When does ripgrep read a file through a memory map instead of its normal read buffer?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/core/flags/hiargs.rs",
+          "start_line": 222,
+          "end_line": 249
+        },
+        {
+          "path": "crates/searcher/src/searcher/mmap.rs",
+          "symbol": "MmapChoice.open",
+          "start_line": 65,
+          "end_line": 115
+        },
+        {
+          "path": "crates/searcher/src/searcher/mod.rs",
+          "symbol": "Searcher.search_file_maybe_path",
+          "start_line": 678,
+          "end_line": 714
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00022428,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4149,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 15,
+        "top_hits": [
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "symbol_id": "crates/searcher/src/searcher/mod.rs::Searcher.search_file_maybe_path",
+            "start_line": 678,
+            "end_line": 714,
+            "kind": "symbol",
+            "score": 12.9491,
+            "match": "symbol",
+            "why": "bm25: body: memory, buffer, read, map"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mmap.rs",
+            "symbol_id": "crates/searcher/src/searcher/mmap.rs::MmapChoice.open",
+            "start_line": 65,
+            "end_line": 115,
+            "kind": "symbol",
+            "score": 18.4478,
+            "match": "symbol",
+            "why": "bm25: memory, map; body: ripgrep, read"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::Mmap.doc_long",
+            "start_line": 4080,
+            "end_line": 4093,
+            "kind": "symbol",
+            "score": 17.6719,
+            "match": null,
+            "why": "bm25: body: memory, map, ripgrep"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "symbol_id": "crates/searcher/src/searcher/mod.rs::SearcherBuilder.memory_map",
+            "start_line": 495,
+            "end_line": 501,
+            "kind": "symbol",
+            "score": 33.8477,
+            "match": null,
+            "why": "name match: memory_map x1.28 (map, memory, memory map); bm25: memory_map, memory, map"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "symbol_id": "crates/searcher/src/searcher/mod.rs::Searcher.fill_multi_line_buffer_from_file",
+            "start_line": 940,
+            "end_line": 969,
+            "kind": "symbol",
+            "score": 15.8343,
+            "match": null,
+            "why": "name match: fill_multi_line_buffer_from_file x1.06 (buffer); bm25: buffer, read; body: map"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "symbol_id": "crates/searcher/src/searcher/mod.rs::Searcher.fill_multi_line_buffer_from_reader",
+            "start_line": 975,
+            "end_line": 1028,
+            "kind": "symbol",
+            "score": 15.7249,
+            "match": null,
+            "why": "name match: fill_multi_line_buffer_from_reader x1.04 (buffer); bm25: read, buffer; body: memory, map"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::NullData.doc_long",
+            "start_line": 5029,
+            "end_line": 5045,
+            "kind": "symbol",
+            "score": 15.3975,
+            "match": null,
+            "why": "bm25: body: memory, instead, ripgrep"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::BlockBuffered.doc_long",
+            "start_line": 536,
+            "end_line": 547,
+            "kind": "symbol",
+            "score": 15.1689,
+            "match": null,
+            "why": "bm25: buffer; body: ripgrep, memory"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 627,
+            "end_line": 627,
+            "label": "Searcher (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 678,
+            "end_line": 714,
+            "label": "Searcher.search_file_maybe_path"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mmap.rs",
+            "start_line": 27,
+            "end_line": 27,
+            "label": "MmapChoice (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mmap.rs",
+            "start_line": 65,
+            "end_line": 115,
+            "label": "MmapChoice.open"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 4064,
+            "end_line": 4064,
+            "label": "Mmap (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 4080,
+            "end_line": 4093,
+            "label": "Mmap.doc_long"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 308,
+            "end_line": 308,
+            "label": "SearcherBuilder (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 495,
+            "end_line": 501,
+            "label": "SearcherBuilder.memory_map"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 833,
+            "end_line": 833,
+            "label": "Searcher (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 940,
+            "end_line": 969,
+            "label": "Searcher.fill_multi_line_buffer_from_file"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 975,
+            "end_line": 1028,
+            "label": "Searcher.fill_multi_line_buffer_from_reader"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 5016,
+            "end_line": 5016,
+            "label": "NullData (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 5029,
+            "end_line": 5045,
+            "label": "NullData.doc_long"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 520,
+            "end_line": 520,
+            "label": "BlockBuffered (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 536,
+            "end_line": 547,
+            "label": "BlockBuffered.doc_long"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "Bir dosya hem `.ignore` hem `.gitignore` içinde farklı kurallarla geçiyorsa hangisi kazanır? Bu öncelik sırası nerede belirleniyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/ignore/src/dir.rs",
+          "symbol": "Ignore.matched_ignore",
+          "start_line": 578,
+          "end_line": 715
+        },
+        {
+          "path": "crates/ignore/src/dir.rs",
+          "symbol": "Ignore.matched",
+          "start_line": 530,
+          "end_line": 574
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000147756,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3145,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 9,
+        "top_hits": [
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "symbol_id": "crates/ignore/src/dir.rs::tests.ignore_over_gitignore",
+            "start_line": 1319,
+            "end_line": 1328,
+            "kind": "symbol",
+            "score": 31.8795,
+            "match": null,
+            "why": "name match: ignore_over_gitignore x1.67 (gitignore, ignore); bm25: gitignore, ignore"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "symbol_id": "crates/ignore/src/dir.rs::create_gitignore",
+            "start_line": 1047,
+            "end_line": 1082,
+            "kind": "symbol",
+            "score": 20.8755,
+            "match": null,
+            "why": "name match: create_gitignore x1.35 (gitignore); bm25: gitignore, ignore"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "symbol_id": "crates/ignore/src/dir.rs::IgnoreMatch.gitignore",
+            "start_line": 56,
+            "end_line": 58,
+            "kind": "symbol",
+            "score": 34.2891,
+            "match": null,
+            "why": "name match: gitignore x1.53 (gitignore); owner match: IgnoreMatch x1.08; bm25: gitignore, ignore"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::Gitignore",
+            "start_line": 80,
+            "end_line": 88,
+            "kind": "symbol",
+            "score": 29.8167,
+            "match": null,
+            "why": "name match: Gitignore x1.53 (gitignore); class boost; bm25: gitignore, ignore"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "symbol_id": "crates/ignore/src/dir.rs::tests.gitignore",
+            "start_line": 1203,
+            "end_line": 1214,
+            "kind": "symbol",
+            "score": 28.2431,
+            "match": null,
+            "why": "name match: gitignore x1.53 (gitignore); bm25: gitignore, ignore"
+          },
+          {
+            "path": "crates/ignore/src/overrides.rs",
+            "symbol_id": "crates/ignore/src/overrides.rs::tests.gitignore",
+            "start_line": 236,
+            "end_line": 247,
+            "kind": "symbol",
+            "score": 28.1657,
+            "match": null,
+            "why": "name match: gitignore x1.53 (gitignore); bm25: gitignore, ignore"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "symbol_id": "crates/ignore/src/walk.rs::tests.gitignore",
+            "start_line": 2345,
+            "end_line": 2361,
+            "kind": "symbol",
+            "score": 26.1127,
+            "match": null,
+            "why": "name match: gitignore x1.53 (gitignore); bm25: gitignore, ignore"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "symbol_id": "crates/ignore/src/gitignore.rs::GitignoreBuilder",
+            "start_line": 319,
+            "end_line": 326,
+            "kind": "symbol",
+            "score": 23.1827,
+            "match": null,
+            "why": "name match: GitignoreBuilder x1.35 (gitignore); class boost; bm25: gitignore, ignore"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "start_line": 1319,
+            "end_line": 1328,
+            "label": "tests.ignore_over_gitignore"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "start_line": 1047,
+            "end_line": 1082,
+            "label": "create_gitignore"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "start_line": 51,
+            "end_line": 51,
+            "label": "IgnoreMatch (impl header)"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "start_line": 56,
+            "end_line": 58,
+            "label": "IgnoreMatch.gitignore"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 80,
+            "end_line": 88,
+            "label": "Gitignore"
+          },
+          {
+            "path": "crates/ignore/src/dir.rs",
+            "start_line": 1203,
+            "end_line": 1214,
+            "label": "tests.gitignore"
+          },
+          {
+            "path": "crates/ignore/src/overrides.rs",
+            "start_line": 236,
+            "end_line": 247,
+            "label": "tests.gitignore"
+          },
+          {
+            "path": "crates/ignore/src/walk.rs",
+            "start_line": 2345,
+            "end_line": 2361,
+            "label": "tests.gitignore"
+          },
+          {
+            "path": "crates/ignore/src/gitignore.rs",
+            "start_line": 319,
+            "end_line": 326,
+            "label": "GitignoreBuilder"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "category": "locate-feature",
+      "lang": "tr",
+      "question": "--smart-case acikken desende buyuk harf yoksa arama buyuk/kucuk harfe duyarsiz yapiliyor; bu karar nerede veriliyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/regex/src/config.rs",
+          "symbol": "Config.is_case_insensitive",
+          "start_line": 84,
+          "end_line": 92
+        },
+        {
+          "path": "crates/pcre2/src/matcher.rs",
+          "symbol": "has_uppercase_literal",
+          "start_line": 422,
+          "end_line": 432
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00010479,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3236,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "crates/regex/src/config.rs",
+            "symbol_id": "crates/regex/src/config.rs::Config.is_case_insensitive",
+            "start_line": 84,
+            "end_line": 92,
+            "kind": "symbol",
+            "score": 34.0514,
+            "match": "symbol",
+            "why": "name match: is_case_insensitive x1.29 (case); bm25: case, smart, smart_case"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::SmartCase.doc_long",
+            "start_line": 6159,
+            "end_line": 6177,
+            "kind": "symbol",
+            "score": 22.025,
+            "match": null,
+            "why": "bm25: case, smartcase, smart"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::SmartCase.update",
+            "start_line": 6179,
+            "end_line": 6183,
+            "kind": "symbol",
+            "score": 25.7329,
+            "match": null,
+            "why": "bm25: case, smart, smartcase"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::SmartCase",
+            "start_line": 6140,
+            "end_line": 6141,
+            "kind": "symbol",
+            "score": 107.973,
+            "match": null,
+            "why": "name match: SmartCase; class boost; bm25: case, smartcase, smart"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "symbol_id": "crates/regex/src/matcher.rs::tests.case_smart",
+            "start_line": 625,
+            "end_line": 634,
+            "kind": "symbol",
+            "score": 66.3501,
+            "match": null,
+            "why": "name match: case_smart; bm25: case, smart"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "symbol_id": "crates/pcre2/src/matcher.rs::tests.case_smart",
+            "start_line": 480,
+            "end_line": 489,
+            "kind": "symbol",
+            "score": 65.912,
+            "match": null,
+            "why": "name match: case_smart; bm25: case, smart"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "symbol_id": "crates/regex/src/matcher.rs::RegexMatcherBuilder.case_smart",
+            "start_line": 120,
+            "end_line": 123,
+            "kind": "symbol",
+            "score": 65.7386,
+            "match": null,
+            "why": "name match: case_smart; bm25: case, smart"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "symbol_id": "crates/pcre2/src/matcher.rs::RegexMatcherBuilder.case_smart",
+            "start_line": 115,
+            "end_line": 118,
+            "kind": "symbol",
+            "score": 65.7142,
+            "match": null,
+            "why": "name match: case_smart; bm25: case, smart"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/regex/src/config.rs",
+            "start_line": 71,
+            "end_line": 71,
+            "label": "Config (impl header)"
+          },
+          {
+            "path": "crates/regex/src/config.rs",
+            "start_line": 84,
+            "end_line": 92,
+            "label": "Config.is_case_insensitive"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6143,
+            "end_line": 6143,
+            "label": "SmartCase (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6159,
+            "end_line": 6177,
+            "label": "SmartCase.doc_long"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6179,
+            "end_line": 6183,
+            "label": "SmartCase.update"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6140,
+            "end_line": 6141,
+            "label": "SmartCase"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 625,
+            "end_line": 634,
+            "label": "tests.case_smart"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "start_line": 480,
+            "end_line": 489,
+            "label": "tests.case_smart"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 34,
+            "end_line": 34,
+            "label": "RegexMatcherBuilder (impl header)"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 120,
+            "end_line": 123,
+            "label": "RegexMatcherBuilder.case_smart"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "start_line": 20,
+            "end_line": 20,
+            "label": "RegexMatcherBuilder (impl header)"
+          },
+          {
+            "path": "crates/pcre2/src/matcher.rs",
+            "start_line": 115,
+            "end_line": 118,
+            "label": "RegexMatcherBuilder.case_smart"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "category": "flow",
+      "lang": "en",
+      "question": "When ripgrep runs with several threads, how does a file found by the directory walker end up being searched and its matching lines printed?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/core/main.rs",
+          "symbol": "search_parallel",
+          "start_line": 160,
+          "end_line": 229
+        },
+        {
+          "path": "crates/core/search.rs",
+          "symbol": "SearchWorker.search",
+          "start_line": 245,
+          "end_line": 267
+        },
+        {
+          "path": "crates/searcher/src/searcher/mod.rs",
+          "symbol": "Searcher.search_file_maybe_path",
+          "start_line": 678,
+          "end_line": 714
+        },
+        {
+          "path": "crates/printer/src/standard.rs",
+          "symbol": "StandardSink.matched",
+          "start_line": 766,
+          "end_line": 791
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000182154,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3107,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "crates/core/main.rs",
+            "symbol_id": "crates/core/main.rs::run",
+            "start_line": 77,
+            "end_line": 101,
+            "kind": "symbol",
+            "score": 24.2146,
+            "match": null,
+            "why": "name match: run x1.12 (runs); bm25: runs~, ripgrep; body: threads, searched~, matching~"
+          },
+          {
+            "path": "crates/ignore/examples/walk.rs",
+            "symbol_id": "crates/ignore/examples/walk.rs::main",
+            "start_line": 5,
+            "end_line": 50,
+            "kind": "symbol",
+            "score": 24.6439,
+            "match": null,
+            "why": "bm25: body: walker, threads, directory~, runs~"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "symbol_id": "crates/core/flags/hiargs.rs::HiArgs.printer_standard",
+            "start_line": 608,
+            "end_line": 646,
+            "kind": "symbol",
+            "score": 21.6869,
+            "match": null,
+            "why": "name match: printer_standard x1.05 (printed); bm25: printed, lines, matching; body: threads, searched~"
+          },
+          {
+            "path": "crates/printer/src/stats.rs",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 171,
+            "kind": "file",
+            "score": 27.9583,
+            "match": null,
+            "why": "bm25: searched, printed, lines, matching~"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "symbol_id": "crates/core/flags/hiargs.rs::HiArgs.threads",
+            "start_line": 853,
+            "end_line": 855,
+            "kind": "symbol",
+            "score": 25.1404,
+            "match": null,
+            "why": "name match: threads x1.09 (threads); bm25: threads, ripgrep, searched~"
+          },
+          {
+            "path": "crates/printer/src/stats.rs",
+            "symbol_id": "crates/printer/src/stats.rs::Stats.add",
+            "start_line": 118,
+            "end_line": 129,
+            "kind": "symbol",
+            "score": 25.0621,
+            "match": null,
+            "why": "bm25: printed; body: searched, lines, matching~"
+          },
+          {
+            "path": "crates/core/main.rs",
+            "symbol_id": "crates/core/main.rs::eprint_nothing_searched",
+            "start_line": 414,
+            "end_line": 420,
+            "kind": "symbol",
+            "score": 24.13,
+            "match": null,
+            "why": "name match: eprint_nothing_searched x1.05 (searched); bm25: searched, printed~; body: runs~, ripgrep"
+          },
+          {
+            "path": "crates/printer/src/stats.rs",
+            "symbol_id": "crates/printer/src/stats.rs::Stats.add_assign",
+            "start_line": 139,
+            "end_line": 147,
+            "kind": "symbol",
+            "score": 24.1158,
+            "match": null,
+            "why": "bm25: printed; body: searched, lines, matching~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/core/main.rs",
+            "start_line": 77,
+            "end_line": 101,
+            "label": "run"
+          },
+          {
+            "path": "crates/ignore/examples/walk.rs",
+            "start_line": 5,
+            "end_line": 50,
+            "label": "main"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 108,
+            "end_line": 108,
+            "label": "HiArgs (impl header)"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 608,
+            "end_line": 646,
+            "label": "HiArgs.printer_standard"
+          },
+          {
+            "path": "crates/printer/src/stats.rs",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 853,
+            "end_line": 855,
+            "label": "HiArgs.threads"
+          },
+          {
+            "path": "crates/printer/src/stats.rs",
+            "start_line": 115,
+            "end_line": 115,
+            "label": "Stats (impl header)"
+          },
+          {
+            "path": "crates/printer/src/stats.rs",
+            "start_line": 118,
+            "end_line": 129,
+            "label": "Stats.add"
+          },
+          {
+            "path": "crates/core/main.rs",
+            "start_line": 414,
+            "end_line": 420,
+            "label": "eprint_nothing_searched"
+          },
+          {
+            "path": "crates/printer/src/stats.rs",
+            "start_line": 138,
+            "end_line": 138,
+            "label": "Stats (impl header)"
+          },
+          {
+            "path": "crates/printer/src/stats.rs",
+            "start_line": 139,
+            "end_line": 147,
+            "label": "Stats.add_assign"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": 0.0,
+        "hit@1": false,
+        "hit@3": false,
+        "hit_at_k": false,
+        "loose_hit@1": false,
+        "loose_hit@3": false,
+        "loose_hit_at_k": false,
+        "all_at_k": null,
+        "chunk_recall": false,
+        "chunk_coverage": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "category": "flow",
+      "lang": "tr",
+      "question": "--replace '$1' verdigimde eslesen satirdaki metin nasil degistiriliyor, $1 yakalama grubunun degerine nerede donusuyor?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/printer/src/standard.rs",
+          "symbol": "StandardSink.replace",
+          "start_line": 741,
+          "end_line": 760
+        },
+        {
+          "path": "crates/printer/src/util.rs",
+          "symbol": "Replacer.replace_all",
+          "start_line": 51,
+          "end_line": 109
+        },
+        {
+          "path": "crates/matcher/src/lib.rs",
+          "symbol": "Captures.interpolate",
+          "start_line": 440,
+          "end_line": 460
+        },
+        {
+          "path": "crates/matcher/src/interpolate.rs",
+          "symbol": "interpolate",
+          "start_line": 13,
+          "end_line": 56
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.00017178,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.4406,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "crates/printer/src/util.rs",
+            "symbol_id": "crates/printer/src/util.rs::Replacer.replace_all",
+            "start_line": 51,
+            "end_line": 109,
+            "kind": "symbol",
+            "score": 21.6461,
+            "match": "symbol",
+            "why": "name match: replace_all x1.16 (replace); bm25: replace, match, string; body: line~"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::Replace.doc_long",
+            "start_line": 5994,
+            "end_line": 6028,
+            "kind": "symbol",
+            "score": 22.3404,
+            "match": null,
+            "why": "bm25: replace, string; body: modify, text, line~, match"
+          },
+          {
+            "path": "crates/matcher/src/lib.rs",
+            "symbol_id": "crates/matcher/src/lib.rs::Matcher.replace",
+            "start_line": 901,
+            "end_line": 919,
+            "kind": "symbol",
+            "score": 20.1475,
+            "match": null,
+            "why": "name match: replace x1.24 (replace); owner match: Matcher x1.08; bm25: replace, match"
+          },
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "symbol_id": "crates/searcher/src/line_buffer.rs::tests.replace_str",
+            "start_line": 573,
+            "end_line": 581,
+            "kind": "symbol",
+            "score": 36.9625,
+            "match": null,
+            "why": "name match: replace_str x1.55 (metin, replace); bm25: replace, string, line~"
+          },
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "symbol_id": "crates/searcher/src/line_buffer.rs::tests.replace",
+            "start_line": 583,
+            "end_line": 593,
+            "kind": "symbol",
+            "score": 27.4914,
+            "match": null,
+            "why": "name match: replace x1.24 (replace); bm25: replace, line~; body: string~"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::test_replace",
+            "start_line": 6036,
+            "end_line": 6058,
+            "kind": "symbol",
+            "score": 25.6491,
+            "match": null,
+            "why": "name match: test_replace x1.16 (replace); bm25: replace; body: string"
+          },
+          {
+            "path": "crates/core/flags/doc/help.rs",
+            "symbol_id": "crates/core/flags/doc/help.rs::remove_roff",
+            "start_line": 216,
+            "end_line": 259,
+            "kind": "symbol",
+            "score": 25.4954,
+            "match": null,
+            "why": "bm25: string, text; body: replace, line~"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::Replace.doc_short",
+            "start_line": 5991,
+            "end_line": 5993,
+            "kind": "symbol",
+            "score": 24.3043,
+            "match": null,
+            "why": "bm25: replace, string~; body: text, match"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/printer/src/util.rs",
+            "start_line": 37,
+            "end_line": 37,
+            "label": "Replacer (impl header)"
+          },
+          {
+            "path": "crates/printer/src/util.rs",
+            "start_line": 51,
+            "end_line": 109,
+            "label": "Replacer.replace_all"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 5975,
+            "end_line": 5975,
+            "label": "Replace (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 5994,
+            "end_line": 6028,
+            "label": "Replace.doc_long"
+          },
+          {
+            "path": "crates/matcher/src/lib.rs",
+            "start_line": 546,
+            "end_line": 546,
+            "label": "Matcher (interface header)"
+          },
+          {
+            "path": "crates/matcher/src/lib.rs",
+            "start_line": 901,
+            "end_line": 919,
+            "label": "Matcher.replace"
+          },
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "start_line": 573,
+            "end_line": 581,
+            "label": "tests.replace_str"
+          },
+          {
+            "path": "crates/searcher/src/line_buffer.rs",
+            "start_line": 583,
+            "end_line": 593,
+            "label": "tests.replace"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6036,
+            "end_line": 6058,
+            "label": "test_replace"
+          },
+          {
+            "path": "crates/core/flags/doc/help.rs",
+            "start_line": 216,
+            "end_line": 259,
+            "label": "remove_roff"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 5991,
+            "end_line": 5993,
+            "label": "Replace.doc_short"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "category": "flow",
+      "lang": "en",
+      "question": "How do the arguments I type on the command line and the ones in the file named by `RIPGREP_CONFIG_PATH` get merged into the final settings that `main` uses, and which side wins on a conflict?",
+      "accept_any": true,
+      "expected": [
+        {
+          "path": "crates/core/flags/parse.rs",
+          "symbol": "parse_low",
+          "start_line": 64,
+          "end_line": 113
+        },
+        {
+          "path": "crates/core/flags/config.rs",
+          "symbol": "args",
+          "start_line": 16,
+          "end_line": 53
+        },
+        {
+          "path": "crates/core/flags/parse.rs",
+          "symbol": "parse",
+          "start_line": 49,
+          "end_line": 54
+        },
+        {
+          "path": "crates/core/flags/hiargs.rs",
+          "symbol": "HiArgs.from_low_args",
+          "start_line": 113,
+          "end_line": 322
+        }
+      ],
+      "pointer": [],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000245238,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3411,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "crates/core/flags/parse.rs",
+            "symbol_id": "crates/core/flags/parse.rs::parse_low",
+            "start_line": 64,
+            "end_line": 113,
+            "kind": "symbol",
+            "score": 34.2609,
+            "match": "symbol",
+            "why": "bm25: arguments; body: final, config, ripgrep_config_path, ripgrep, settings~, uses~, path"
+          },
+          {
+            "path": "crates/printer/src/color.rs",
+            "symbol_id": "crates/printer/src/color.rs::ColorSpecs.new",
+            "start_line": 213,
+            "end_line": 225,
+            "kind": "symbol",
+            "score": 40.9649,
+            "match": null,
+            "why": "bm25: body: merged, type, line, path"
+          },
+          {
+            "path": "crates/core/flags/config.rs",
+            "symbol_id": "crates/core/flags/config.rs::args",
+            "start_line": 16,
+            "end_line": 53,
+            "kind": "symbol",
+            "score": 39.4525,
+            "match": "symbol",
+            "why": "name match: args x1.07 (arguments); bm25: arguments, ripgrep, config; body: ripgrep_config_path, path, settings~"
+          },
+          {
+            "path": "crates/ignore/src/incremental.rs",
+            "symbol_id": "crates/ignore/src/incremental.rs::tests.ignored_ancestor_wins",
+            "start_line": 811,
+            "end_line": 828,
+            "kind": "symbol",
+            "score": 33.9207,
+            "match": null,
+            "why": "name match: ignored_ancestor_wins x1.06 (wins); bm25: wins; body: path, line, ones~"
+          },
+          {
+            "path": "crates/core/flags/parse.rs",
+            "symbol_id": "crates/core/flags/parse.rs::Parser",
+            "start_line": 160,
+            "end_line": 169,
+            "kind": "symbol",
+            "score": 31.6269,
+            "match": null,
+            "why": "class boost; bm25: arguments, command, line, type~, settings~"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "symbol_id": "crates/core/flags/hiargs.rs::types",
+            "start_line": 1186,
+            "end_line": 1206,
+            "kind": "symbol",
+            "score": 28.2913,
+            "match": null,
+            "why": "name match: types x1.04 (type); bm25: type, arguments; body: named~"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "symbol_id": "crates/core/flags/hiargs.rs::Paths.from_low_args",
+            "start_line": 1071,
+            "end_line": 1134,
+            "kind": "symbol",
+            "score": 27.0792,
+            "match": null,
+            "why": "name match: from_low_args x1.04 (arguments); bm25: arguments, path; body: ones~, uses~, type, ripgrep, get"
+          },
+          {
+            "path": "crates/printer/src/color.rs",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 396,
+            "kind": "file",
+            "score": 25.1239,
+            "match": null,
+            "why": "bm25: merged~, type, line, path"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/core/flags/parse.rs",
+            "start_line": 64,
+            "end_line": 113,
+            "label": "parse_low"
+          },
+          {
+            "path": "crates/printer/src/color.rs",
+            "start_line": 210,
+            "end_line": 210,
+            "label": "ColorSpecs (impl header)"
+          },
+          {
+            "path": "crates/printer/src/color.rs",
+            "start_line": 213,
+            "end_line": 225,
+            "label": "ColorSpecs.new"
+          },
+          {
+            "path": "crates/core/flags/config.rs",
+            "start_line": 16,
+            "end_line": 53,
+            "label": "args"
+          },
+          {
+            "path": "crates/ignore/src/incremental.rs",
+            "start_line": 811,
+            "end_line": 828,
+            "label": "tests.ignored_ancestor_wins"
+          },
+          {
+            "path": "crates/core/flags/parse.rs",
+            "start_line": 160,
+            "end_line": 169,
+            "label": "Parser"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 1186,
+            "end_line": 1206,
+            "label": "types"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 1069,
+            "end_line": 1069,
+            "label": "Paths (impl header)"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 1071,
+            "end_line": 1134,
+            "label": "Paths.from_low_args"
+          },
+          {
+            "path": "crates/printer/src/color.rs",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          }
+        ],
+        "rank": 1,
+        "loose_rank": 1,
+        "rr": 1.0,
+        "hit@1": true,
+        "hit@3": true,
+        "hit_at_k": true,
+        "loose_hit@1": true,
+        "loose_hit@3": true,
+        "loose_hit_at_k": true,
+        "all_at_k": null,
+        "chunk_recall": true,
+        "chunk_coverage": [
+          1.0,
+          1.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "category": "not-in-repo",
+      "lang": "en",
+      "question": "Where is the regex engine itself implemented, the NFA / lazy DFA code that scans a file's bytes for my pattern?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "crates/regex/src/config.rs",
+          "symbol": "ConfiguredHIR.to_regex",
+          "start_line": 242,
+          "end_line": 260
+        },
+        {
+          "path": "crates/regex/src/matcher.rs",
+          "symbol": "RegexMatcherBuilder.build_many",
+          "start_line": 53,
+          "end_line": 85
+        },
+        {
+          "path": "crates/regex/src/matcher.rs",
+          "symbol": "RegexMatcher.find_at",
+          "start_line": 413,
+          "end_line": 421
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000202188,
+        "reranked": false,
+        "off_target": true,
+        "error": null
+      },
+      "elapsed_s": 0.3635,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 12,
+        "top_hits": [
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::DfaSizeLimit.doc_long",
+            "start_line": 1524,
+            "end_line": 1535,
+            "kind": "symbol",
+            "score": 25.2164,
+            "match": null,
+            "why": "bm25: dfa; body: engine, pattern, bytes, regex"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::test_engine",
+            "start_line": 1748,
+            "end_line": 1779,
+            "kind": "symbol",
+            "score": 24.4821,
+            "match": null,
+            "why": "name match: test_engine x1.10 (engine); bm25: engine; body: regex"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::Engine",
+            "start_line": 1690,
+            "end_line": 1691,
+            "kind": "symbol",
+            "score": 24.3968,
+            "match": null,
+            "why": "name match: Engine x1.15 (engine); class boost; bm25: engine"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "symbol_id": "crates/regex/src/matcher.rs::RegexMatcherBuilder.dfa_size_limit",
+            "start_line": 223,
+            "end_line": 229,
+            "kind": "symbol",
+            "score": 23.8229,
+            "match": null,
+            "why": "name match: dfa_size_limit x1.10 (dfa); owner match: RegexMatcherBuilder x1.01; bm25: dfa, bytes, regex"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::test_auto_hybrid_regex",
+            "start_line": 301,
+            "end_line": 337,
+            "kind": "symbol",
+            "score": 22.786,
+            "match": null,
+            "why": "name match: test_auto_hybrid_regex x1.03 (regex); bm25: regex; body: engine"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "symbol_id": "crates/core/flags/hiargs.rs::HiArgs.matcher",
+            "start_line": 368,
+            "end_line": 402,
+            "kind": "symbol",
+            "score": 22.6071,
+            "match": null,
+            "why": "bm25: engine, pattern; body: regex"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::AutoHybridRegex.doc_long",
+            "start_line": 260,
+            "end_line": 288,
+            "kind": "symbol",
+            "score": 21.5423,
+            "match": null,
+            "why": "bm25: regex; body: engine, pattern"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "symbol_id": "crates/core/flags/hiargs.rs::suggest_other_engine",
+            "start_line": 1422,
+            "end_line": 1427,
+            "kind": "symbol",
+            "score": 20.2761,
+            "match": null,
+            "why": "name match: suggest_other_engine x1.08 (engine); bm25: engine, regex"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 1508,
+            "end_line": 1508,
+            "label": "DfaSizeLimit (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 1524,
+            "end_line": 1535,
+            "label": "DfaSizeLimit.doc_long"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 1748,
+            "end_line": 1779,
+            "label": "test_engine"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 1690,
+            "end_line": 1691,
+            "label": "Engine"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 34,
+            "end_line": 34,
+            "label": "RegexMatcherBuilder (impl header)"
+          },
+          {
+            "path": "crates/regex/src/matcher.rs",
+            "start_line": 223,
+            "end_line": 229,
+            "label": "RegexMatcherBuilder.dfa_size_limit"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 301,
+            "end_line": 337,
+            "label": "test_auto_hybrid_regex"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 108,
+            "end_line": 108,
+            "label": "HiArgs (impl header)"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 368,
+            "end_line": 402,
+            "label": "HiArgs.matcher"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 244,
+            "end_line": 244,
+            "label": "AutoHybridRegex (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 260,
+            "end_line": 288,
+            "label": "AutoHybridRegex.doc_long"
+          },
+          {
+            "path": "crates/core/flags/hiargs.rs",
+            "start_line": 1422,
+            "end_line": 1427,
+            "label": "suggest_other_engine"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": null,
+        "pointer_at_k": false,
+        "pointer_chunk_recall": false
+      }
+    },
+    {
+      "id": "q19",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "UTF-16 ile kaydedilmiş bir dosyayı ararken baytları UTF-8'e çeviren kod (decoder) nerede yazılmış?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "crates/searcher/src/searcher/mod.rs",
+          "symbol": "SearcherBuilder.build",
+          "start_line": 315,
+          "end_line": 337
+        },
+        {
+          "path": "crates/searcher/src/searcher/mod.rs",
+          "symbol": "Searcher.search_reader",
+          "start_line": 727,
+          "end_line": 765
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000150948,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3321,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 10,
+        "top_hits": [
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "symbol_id": "crates/searcher/src/searcher/mod.rs::SearcherBuilder.build",
+            "start_line": 315,
+            "end_line": 337,
+            "kind": "symbol",
+            "score": 12.7231,
+            "match": "symbol",
+            "why": "bm25: body: decoder~, utf"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "symbol_id": "crates/searcher/src/searcher/mod.rs::Searcher.search_reader",
+            "start_line": 727,
+            "end_line": 765,
+            "kind": "symbol",
+            "score": 22.6604,
+            "match": "symbol",
+            "why": "bm25: write~; body: decoder"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "symbol_id": "crates/searcher/src/searcher/mod.rs::slice_has_bom",
+            "start_line": 1036,
+            "end_line": 1044,
+            "kind": "symbol",
+            "score": 14.5794,
+            "match": null,
+            "why": "bm25: 16, utf"
+          },
+          {
+            "path": "crates/searcher/src/sink.rs",
+            "symbol_id": "crates/searcher/src/sink.rs::sinks.UTF8",
+            "start_line": 539,
+            "end_line": 542,
+            "kind": "symbol",
+            "score": 21.6434,
+            "match": null,
+            "why": "name match: UTF8 x1.28 (utf, utf 8); class boost; bm25: utf8, utf"
+          },
+          {
+            "path": "crates/globset/src/glob.rs",
+            "symbol_id": "crates/globset/src/glob.rs::bytes_to_escaped_literal",
+            "start_line": 796,
+            "end_line": 809,
+            "kind": "symbol",
+            "score": 13.3073,
+            "match": null,
+            "why": "bm25: utf, convert; body: write~"
+          },
+          {
+            "path": "crates/regex/src/non_matching.rs",
+            "symbol_id": "crates/regex/src/non_matching.rs::tests.extract",
+            "start_line": 89,
+            "end_line": 93,
+            "kind": "symbol",
+            "score": 11.8743,
+            "match": null,
+            "why": "bm25: body: utf8, utf"
+          },
+          {
+            "path": "crates/printer/src/hyperlink/mod.rs",
+            "symbol_id": "crates/printer/src/hyperlink/mod.rs::tests.convert_to_hyperlink_path",
+            "start_line": 1095,
+            "end_line": 1122,
+            "kind": "symbol",
+            "score": 11.4873,
+            "match": null,
+            "why": "name match: convert_to_hyperlink_path x1.09 (çeviren); bm25: convert; body: utf"
+          },
+          {
+            "path": "crates/ignore/benches/workloads.rs",
+            "symbol_id": "crates/ignore/benches/workloads.rs::dense_ignore_workspace",
+            "start_line": 391,
+            "end_line": 404,
+            "kind": "symbol",
+            "score": 11.1484,
+            "match": null,
+            "why": "bm25: body: 16, write~"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 308,
+            "end_line": 308,
+            "label": "SearcherBuilder (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 315,
+            "end_line": 337,
+            "label": "SearcherBuilder.build"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 627,
+            "end_line": 627,
+            "label": "Searcher (impl header)"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 727,
+            "end_line": 765,
+            "label": "Searcher.search_reader"
+          },
+          {
+            "path": "crates/searcher/src/searcher/mod.rs",
+            "start_line": 1036,
+            "end_line": 1044,
+            "label": "slice_has_bom"
+          },
+          {
+            "path": "crates/searcher/src/sink.rs",
+            "start_line": 539,
+            "end_line": 542,
+            "label": "sinks.UTF8"
+          },
+          {
+            "path": "crates/globset/src/glob.rs",
+            "start_line": 796,
+            "end_line": 809,
+            "label": "bytes_to_escaped_literal"
+          },
+          {
+            "path": "crates/regex/src/non_matching.rs",
+            "start_line": 89,
+            "end_line": 93,
+            "label": "tests.extract"
+          },
+          {
+            "path": "crates/printer/src/hyperlink/mod.rs",
+            "start_line": 1095,
+            "end_line": 1122,
+            "label": "tests.convert_to_hyperlink_path"
+          },
+          {
+            "path": "crates/ignore/benches/workloads.rs",
+            "start_line": 391,
+            "end_line": 404,
+            "label": "dense_ignore_workspace"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    },
+    {
+      "id": "q20",
+      "category": "not-in-repo",
+      "lang": "tr",
+      "question": "-z ile .gz dosyalarini ararken gzip acma (decompress) algoritmasi hangi dosyada?",
+      "accept_any": true,
+      "expected": [],
+      "pointer": [
+        {
+          "path": "crates/cli/src/decompress.rs",
+          "symbol": "default_decompression_commands",
+          "start_line": 490,
+          "end_line": 532
+        },
+        {
+          "path": "crates/cli/src/decompress.rs",
+          "symbol": "DecompressionReaderBuilder.build",
+          "start_line": 221,
+          "end_line": 244
+        },
+        {
+          "path": "crates/core/search.rs",
+          "symbol": "SearchWorker.search_decompress",
+          "start_line": 329,
+          "end_line": 339
+        }
+      ],
+      "error": null,
+      "decision": {
+        "calls": 1,
+        "cost_usd": 0.000167202,
+        "reranked": true,
+        "off_target": false,
+        "error": null
+      },
+      "elapsed_s": 0.3859,
+      "retrieval": {
+        "n_hits": 8,
+        "n_chunks": 11,
+        "top_hits": [
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "symbol_id": "crates/cli/src/decompress.rs::default_decompression_commands",
+            "start_line": 490,
+            "end_line": 532,
+            "kind": "symbol",
+            "score": 15.5883,
+            "match": "symbol",
+            "why": "bm25: decompress; body: gzip, gz"
+          },
+          {
+            "path": "crates/core/search.rs",
+            "symbol_id": "crates/core/search.rs::SearchWorker.search_decompress",
+            "start_line": 329,
+            "end_line": 339,
+            "kind": "symbol",
+            "score": 9.6329,
+            "match": "symbol",
+            "why": "name match: search_decompress x1.20 (decompress); bm25: decompress"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "symbol_id": null,
+            "start_line": 1,
+            "end_line": 532,
+            "kind": "file",
+            "score": 6.2847,
+            "match": "file",
+            "why": "path match: decompress x1.18 (decompress); bm25: decompress"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "symbol_id": "crates/cli/src/decompress.rs::DecompressionMatcher.command",
+            "start_line": 179,
+            "end_line": 187,
+            "kind": "symbol",
+            "score": 6.0999,
+            "match": null,
+            "why": "bm25: decompress"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "symbol_id": "crates/cli/src/decompress.rs::DecompressionReaderBuilder.build",
+            "start_line": 221,
+            "end_line": 244,
+            "kind": "symbol",
+            "score": 6.0379,
+            "match": "symbol",
+            "why": "bm25: decompress"
+          },
+          {
+            "path": "crates/core/search.rs",
+            "symbol_id": "crates/core/search.rs::SearchWorker.should_decompress",
+            "start_line": 276,
+            "end_line": 280,
+            "kind": "symbol",
+            "score": 10.6474,
+            "match": null,
+            "why": "name match: should_decompress x1.20 (decompress); bm25: decompress"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "symbol_id": "crates/core/flags/defs.rs::SearchZip.doc_long",
+            "start_line": 6083,
+            "end_line": 6098,
+            "kind": "symbol",
+            "score": 8.6056,
+            "match": null,
+            "why": "bm25: body: gzip, decompress"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "symbol_id": "crates/cli/src/decompress.rs::DecompressionCommand",
+            "start_line": 24,
+            "end_line": 32,
+            "kind": "symbol",
+            "score": 8.3492,
+            "match": null,
+            "why": "class boost; bm25: decompress"
+          }
+        ],
+        "chunks": [
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "start_line": 490,
+            "end_line": 532,
+            "label": "default_decompression_commands"
+          },
+          {
+            "path": "crates/core/search.rs",
+            "start_line": 243,
+            "end_line": 243,
+            "label": "SearchWorker (impl header)"
+          },
+          {
+            "path": "crates/core/search.rs",
+            "start_line": 329,
+            "end_line": 339,
+            "label": "SearchWorker.search_decompress"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "start_line": 1,
+            "end_line": 60,
+            "label": "module head"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "start_line": 162,
+            "end_line": 162,
+            "label": "DecompressionMatcher (impl header)"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "start_line": 179,
+            "end_line": 187,
+            "label": "DecompressionMatcher.command"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "start_line": 203,
+            "end_line": 203,
+            "label": "DecompressionReaderBuilder (impl header)"
+          },
+          {
+            "path": "crates/cli/src/decompress.rs",
+            "start_line": 221,
+            "end_line": 244,
+            "label": "DecompressionReaderBuilder.build"
+          },
+          {
+            "path": "crates/core/search.rs",
+            "start_line": 276,
+            "end_line": 280,
+            "label": "SearchWorker.should_decompress"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6064,
+            "end_line": 6064,
+            "label": "SearchZip (impl header)"
+          },
+          {
+            "path": "crates/core/flags/defs.rs",
+            "start_line": 6083,
+            "end_line": 6098,
+            "label": "SearchZip.doc_long"
+          }
+        ],
+        "rank": null,
+        "loose_rank": null,
+        "rr": null,
+        "hit@1": null,
+        "hit@3": null,
+        "hit_at_k": null,
+        "loose_hit@1": null,
+        "loose_hit@3": null,
+        "loose_hit_at_k": null,
+        "all_at_k": null,
+        "chunk_recall": null,
+        "chunk_coverage": [],
+        "pointer_rank": 1,
+        "pointer_at_k": true,
+        "pointer_chunk_recall": true
+      }
+    }
+  ]
+}

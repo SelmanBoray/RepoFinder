@@ -9,6 +9,11 @@ their exact answer locations, and a runner that scores the product against it.
 | `golden/flask.json` | 30 questions about Flask at commit `d086db8`, every location checked by reading the file |
 | `golden/httpx.json` | 20 questions about httpx at commit `b5addb6`, written blind (first held-out set), every location checked with `ast` |
 | `golden/rea.json` | 20 questions about the TypeScript repository morluto/rea at commit `fe2a398`, written blind to `search.py` (first TypeScript set, the tuning set for search v4); 104 locations verified with tree-sitter and the TypeScript compiler |
+| `golden/axios.json` | 20 questions about axios (JavaScript) at commit `a81d62a`, written blind for the JavaScript indexer (12 en, 8 tr); untouched, held out for future tuning |
+| `golden/gin.json` | 20 questions about gin (Go) at commit `0f09c3a`, same design; untouched, held out |
+| `golden/gson.json` | 20 questions about gson (Java) at commit `65df6e5`, same design; untouched, held out |
+| `golden/ripgrep.json` | 20 questions about ripgrep (Rust) at commit `91f5d22`, same design; examined question by question during the diagnosis, so a development set now |
+| `golden/flame.json` | 20 questions about flame (Dart) at commit `88c0438`, same design; examined during the diagnosis, a development set now |
 | `golden/chat_routes.json` | 24 conversations, 73 user turns, each turn labelled with its route (locate, followup, explain, chat, outside); written blind to the routing code |
 | `golden/chat_routes_rea.json` | Chat routing conversations over the REA repository, same format and route labels as `golden/chat_routes.json` |
 | `run_eval.py` | The runner: validates the golden set, calls the pipeline, scores, writes a report |
@@ -254,8 +259,11 @@ Answers (one LLM call per question):
    ```
 
    This checks that ids are unique, categories and languages are valid, every
-   path exists, every range fits its file, each `symbol` is defined by a
-   `def`/`class` inside its range and the range starts at it or its decorators,
+   path exists, every range fits its file, each `symbol` is declared inside its range
+   and the range starts at the declaration or at its decorators or attributes
+   (a line starting with `@` or Rust's `#[`). The declaration patterns are chosen by
+   the file's language: Python `def`/`class`, TypeScript and JavaScript forms,
+   Java, Go, Rust and Dart declarations,
    and that the checkout is at `repo.commit` (otherwise the line numbers may have
    drifted). `tests/test_eval.py` runs the same check on the Flask checkout.
 6. Keep the mix balanced: the test suite pins the Flask set at 30 questions (12
@@ -804,3 +812,71 @@ optimistic. The body weight was chosen looking at Flask and requests too, so req
 is no longer a clean set. httpx is the only clean set and was run once, after v4 was
 frozen. One run each. The agent that implemented v4 was interrupted once by an API
 timeout and resumed; the measurements were logged per step.
+
+## JavaScript, Go, Rust and Java: first baselines (2026-11-08)
+
+RepoFinder now indexes JavaScript, Go, Rust and Java (Dart came earlier as an
+optional extra). Four new golden sets measure them, and one for Dart (flame): 20
+questions each, 12 en and 8 tr, written blind to `search.py`; search was not
+tuned for them. Repositories and commits: axios (JavaScript) `a81d62a`, gin
+(Go) `0f09c3a`, gson (Java) `65df6e5`, ripgrep (Rust) `91f5d22`, flame (Dart)
+`88c0438`.
+
+Strict, k=8, local checkouts at the golden commits (hit@1 / hit@3 / hit@8, MRR):
+
+| set | search | search + Jev, 16 candidates |
+| --- | --- | --- |
+| axios (JS) | .59 / .71 / .77, .65 | .71 / .71 / .77, .72 |
+| gin (Go) | .35 / .71 / .82, .54 | .82 / .94 / .94, .88 |
+| gson (Java) | .41 / .59 / .71, .52 | .65 / .77 / .77, .70 |
+| ripgrep (Rust) | .12 / .23 / .53, .24 | .59 / .59 / .59, .59 |
+| flame (Dart) | .23 / .35 / .47, .31 | .59 / .59 / .59, .59 |
+
+Jev cost: 20 calls per set, $0.0027 to $0.0052 per set.
+
+Old sets after the change, search only: Flask .74 / .85 / .93 (MRR .81),
+requests .59 / .77 / .88 (MRR .69) and httpx .35 / .59 / .77 (MRR .47) are
+identical to before. The REA set (the TypeScript tuning set) went from
+.41 / .47 / .71 (MRR .49) to .35 / .47 / .65 (MRR .44), because REA's 420
+JavaScript files (mostly `scripts/`, `experiments/` and `tests/fixtures`) are
+now indexed and compete with the TypeScript answers: q04 2 -> 3, q12 1 -> 2,
+q14 5 -> 6 and q16 5 -> a miss. With Jev (16 candidates) REA is
+.53 / .65 / .71 (MRR .59). Jev reranking varies slightly between runs: this
+REA hit@3 moved from .71 to .65 between two runs on the same code.
+
+Reports (in `results/`, named like the older ones): `axios-search-v4-a81d62a-k8.json`,
+`gin-search-v4-0f09c3a-k8.json`, `gson-search-v4-65df6e5-k8.json`,
+`ripgrep-search-v4-91f5d22-k8.json`, `flame-search-v4-88c0438-k8.json` and, with
+Jev, `<set>-pipeline-jev-c16-searchv4-<commit>-k8.json` for each of the same five.
+REA after JavaScript indexing: `rea-search-v4-js-fe2a398-k8.json` and
+`rea-pipeline-jev-c16-searchv4-js-fe2a398-k8.json`; the earlier
+`rea-*-v4-fe2a398-k8.json` reports are the pre-JavaScript numbers and stay as they were.
+
+### Diagnosis
+
+In ripgrep and flame the misses are recall, not ordering: in about 40% of the
+questions the answer is not among the top 16 candidates, and whenever it was,
+Jev put it first (hit@1 = hit@3 = hit@8 = .59 for both sets). The causes found
+are search problems, listed here as next steps and not done:
+
+- Rust inline tests (`#[cfg(test)] mod tests`, `#[test]`) cannot be told apart
+  by path, so search does not treat them as tests: they are 31% of ripgrep's
+  top-8 hits.
+- Example, documentation, benchmark and script directories are not down-weighted
+  in search: they are 33% of flame's top-8 hits, and the same effect is behind
+  REA's JavaScript regression above.
+- Turkish vocabulary gaps: on gson, Turkish hit@8 is 0.43 against 0.90 for
+  English. A prefix bug in the lexicon also reads "öncelik" (priority) as
+  "önce" (before).
+
+### Status of the sets
+
+axios, gin and gson are untouched and stay held out for future tuning. ripgrep
+and flame were examined question by question during the diagnosis, so from now
+on they count as development sets, and their numbers above are no longer a
+clean measurement. Flow questions use `accept_any=false` in axios, gin and
+gson and `true` in ripgrep and flame (the authors' choice); this affects only
+`chunk_recall` and `all@k`, not `hit@k`, so those two numbers are not
+comparable across the sets.
+
+These rows are first baselines, not the result of tuning.

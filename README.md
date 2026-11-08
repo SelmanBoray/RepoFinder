@@ -4,7 +4,7 @@
 RepoFinder helps you find your way around a large open-source project before
 you contribute to it. Give it a GitHub repository and it draws an architecture
 map and answers "where is feature X implemented?" with `path:start-end`
-citations into the code. It reads Python and TypeScript projects (Dart optional).
+citations into the code. It reads Python, TypeScript, JavaScript, Go, Rust and Java projects (Dart optional).
 
 ## Install
 
@@ -125,7 +125,7 @@ one model call per file (about 80 for Flask), so try `--limit 10` first.
 
 | Command | What it does |
 | --- | --- |
-| `repofinder index <source> [--refresh]` | Clone (for a URL) and index the Python and TypeScript files (and Dart with the `dart` extra). `--refresh` rebuilds an existing index and keeps the summaries of files that still exist. |
+| `repofinder index <source> [--refresh]` | Clone (for a URL) and index the Python, TypeScript, JavaScript, Go, Rust and Java files (and Dart with the `dart` extra). `--refresh` rebuilds an existing index and keeps the summaries of files that still exist. |
 | `repofinder map <source> [--out FILE] [--max-modules N]` | Architecture map in Markdown: entry points, core modules by fan-in, package layout, hot spots and where to start. |
 | `repofinder ask <source> "question" [-k N] [--show-context] [--decisions jev\|rules] [--candidates N] [--json]` | Answer with citations. `-k` sets how many search hits become context (default 8); `--show-context` lists the excerpts sent to Claude; `--decisions` picks the decision layer for this run (default: Jev when set up, else the rules); with Jev, one call reranks the first `--candidates` hits (default 16, at most 16) before the top `-k` become context; `--json` prints `answer`, `citations`, `hits`, `chunks`, `model`, `backend`, `usage`, `elapsed_s`, `decisions` (`name`, `calls`, `cost_usd`, `reranked`, `off_target`, `error`), `candidates` and `probabilities` (`path:start-end` to p). |
 | `repofinder chat <source> [-k N] [--decisions jev\|rules] [--json]` | A conversation about the code, one message per line from stdin (see [Chat mode](#chat-mode)). `-k` sets the search hits per search (default 8); `--decisions` picks the decision layer for this run. `/context` lists the excerpts of the last search, `/route` shows how the last message was routed, `/help` lists the commands, `/quit` or the end of input leaves. `--json` prints one JSON object per line for every turn (`route`, `answer`, `citations`, `reused_context`, `widened`, `usage`, `decisions`, ...). The `you>` prompt is shown only when you type in a terminal, so piped output stays clean. |
@@ -178,7 +178,7 @@ for under 0.02 cents per question ([details](eval/README.md#jev-in-the-pipeline-
 
 ## How it works
 
-Tree-sitter parses every Python and TypeScript file (and Dart, if installed) into classes, functions,
+Tree-sitter parses every Python, TypeScript, JavaScript, Go, Rust and Java file (and Dart, if installed) into classes, functions,
 methods and imports, which are stored in a SQLite database together with an import graph
 (fan-in, fan-out, entry points). A question is answered by a lexical search
 (BM25 over symbol names, signatures, docstrings, paths and file summaries) that
@@ -190,23 +190,95 @@ identifier abbreviations ("python file" finds `from_pyfile`), and Turkish
 questions are supported by dropping Turkish filler words and translating the
 rest through a small lexicon. The selected symbols' exact source lines become
 excerpts (whole functions and classes, long ones in windows of about 100 lines,
-the class header for methods), about 36,000 characters in all. Claude answers
+the class header for methods; for Java, Go and Rust methods the owner's header, see [Languages](#languages)), about 36,000 characters in all. Claude answers
 from those excerpts only and cites `path:start-end`; the Sources list keeps
 only citations that fall inside the excerpts.
 
 ### Languages
 
-Python (`.py`) and TypeScript (`.ts`, `.mts`, `.cts`, `.tsx`) are indexed.
+Python (`.py`), TypeScript (`.ts`, `.mts`, `.cts`, `.tsx`), JavaScript, Go,
+Rust and Java are indexed; Dart is optional (below).
 TypeScript symbols are functions, classes, methods, interfaces, types, enums,
 namespaces and arrow-function consts, with the JSDoc comment as the docstring.
 Relative imports are resolved (`./a.js` finds `a.ts` or `index.ts`), a file
 named `index.ts` names its directory, and `*.test.ts`, `*.spec.ts` and
 `__tests__/` count as tests. `node_modules`, `dist`, `build`, `third_party`,
-`licenses`, minified files and files over 2 MB are skipped. JavaScript
-(`.js`, `.mjs`) is not parsed yet. On morluto/rea (3,119 files, 747k lines)
-indexing took 5.4 s and produced 15,267 symbols in a 12.5 MB index, with 59
-files that did not parse (tree-sitter 0.23 cannot read
-`importOriginal<typeof import("x")>()`); search answers instantly.
+`licenses`, minified files and files over 2 MB are skipped. On morluto/rea
+(3,119 files, 747k lines) indexing took 5.4 s and produced 15,267 symbols in a
+12.5 MB index, with 59 files that did not parse (tree-sitter 0.23 cannot read
+`importOriginal<typeof import("x")>()`); search answers instantly. (These
+figures were taken before JavaScript was indexed; REA's 420 JavaScript files
+are indexed now.)
+
+JavaScript (`.js`, `.jsx`, `.mjs`, `.cjs`; grammar `tree-sitter-javascript`,
+JSX included) shares the TypeScript extractor, so it gives the same symbols,
+plus class fields that hold functions and the assignments only JavaScript code
+uses: `X.prototype.m = function` is the method `X.m`, `exports.f = ...` and
+`module.exports.f = ...` are functions `f`, `obj.f = function` is a function
+with the qualname `obj.f`, and `module.exports = function name() {}` is
+`name` (an anonymous one gets no symbol). Relative import specifiers are
+resolved with the TypeScript rules: every file candidate comes before any
+directory index, TypeScript before JavaScript, and the file as written wins
+when it is indexed. `require()` and `import()` calls give import edges too. A
+`.js`, `.jsx`, `.mjs` or `.cjs` file next to a TypeScript source with the same
+stem (`a.js` beside `a.ts`) is treated as compiled output and skipped; a
+declaration file (`.d.ts`) does not count as that source.
+
+Go (`.go`): functions, methods (`Recv.Name`), structs (as `class`),
+interfaces (as `interface`, with their methods) and other types (as `type`)
+are symbols, with the doc comment as the docstring. An import is resolved
+through the nearest `go.mod` inside the repository to a non-test file of the
+package it names; the standard library and other modules stay unresolved.
+Generated files are skipped (`*.pb.go`, `*.pb.gw.go`, `zz_generated*`, and any
+file whose header has `// Code generated ... DO NOT EDIT.`). `*_test.go`,
+`testdata/` and test directories count as tests; `main.go` and
+`cmd/<name>/main.go` are entry points. Build constraints (`//go:build`) are
+ignored, so every variant of a package contributes its symbols.
+
+Rust (`.rs`): `fn`, methods in `impl` blocks (`Type.method`), traits (as
+`interface`), structs and unions (as `class`), enums, type aliases and inline
+`mod` blocks (as `namespace`) are symbols; a range starts at the item's first
+attribute, and `///` comments are the docstring. Every `use` leaf is an import
+edge, and `mod` declarations are edges too. `crate::`, `self::` and `super::`
+are resolved by file paths, and so are other crates of the same workspace,
+found through the `[package]` name in `Cargo.toml`. Not followed: `#[cfg]`,
+`#[path]`, macros and re-export chains (`use crate::Foo` resolves to the file
+that re-exports `Foo`). A `target/` directory next to `Cargo.toml` is skipped.
+Entry points come from `[[bin]]` in `Cargo.toml` and the default
+`src/main.rs`; `lib.rs` ranks below every binary. In search, a question's
+`a::b::C` is read like `a.b.C`, and `mod.rs` names its directory.
+
+Java (`.java`): classes and records (as `class`), interfaces and `@interface`
+(as `interface`), enums, nested types (`Outer.Inner`), methods and
+constructors (`Type.Type`) are symbols; overloads share one id, and Javadoc is
+the docstring. Single, wildcard and static imports are resolved by path
+suffix (`a.b.C` is a file ending in `a/b/C.java`), preferring a non-test file
+and then the shortest path; module imports (`import module ...`) give no
+edge. A `target/` directory next to `pom.xml` is skipped. `*Test.java`,
+`*Tests.java`, `*IT.java` and `src/test` count as tests.
+
+For methods in Java, Go and Rust, the excerpt carries the owner's header: the
+class, record, interface or enum header in Java, the receiver type in Go when it
+is declared in the same file, and the `impl` line in Rust.
+
+The grammar versions are pinned in `pyproject.toml` (`tree-sitter>=0.25`;
+JavaScript and Go 0.25.x, Rust 0.24.x, Java 0.23.x) because the extractors
+depend on the grammars' node names.
+
+Measured quality (strict, k=8, hit@1 / hit@8) on the first blind golden sets
+written for these languages, 20 questions each (12 English, 8 Turkish). Search
+was not tuned for them:
+
+| set (language, commit) | search | search + Jev (16 candidates) |
+| --- | --- | --- |
+| axios (JavaScript, `a81d62a`) | 0.59 / 0.77 | 0.71 / 0.77 |
+| gin (Go, `0f09c3a`) | 0.35 / 0.82 | 0.82 / 0.94 |
+| gson (Java, `65df6e5`) | 0.41 / 0.71 | 0.65 / 0.77 |
+| ripgrep (Rust, `91f5d22`) | 0.12 / 0.53 | 0.59 / 0.59 |
+| flame (Dart, `88c0438`) | 0.23 / 0.47 | 0.59 / 0.59 |
+
+These are first baselines; see [eval/README.md](eval/README.md) for the full
+numbers and the diagnosis of the misses.
 
 Dart (`.dart`) is optional: install it with `pip install -e ".[dart]"`. The
 first `.dart` file indexed downloads the grammar (about 22 MB, once, then
@@ -217,7 +289,8 @@ syntax is read, including primary constructors. Generated files
 skipped; this list is all there is, other generated Dart files are indexed.
 Mixins, extensions and extension types are indexed as classes;
 getters, setters, operators and constructors as methods. Top-level variables
-are not extracted as symbols. Dart search quality has not been measured yet.
+are not extracted as symbols. Dart search quality was measured once, on Flame
+(hit@1 0.23, hit@8 0.47 for search alone; see the table below).
 
 What the `dart` extra means for trust and offline use: the grammar is a native
 library that `tree-sitter-language-pack` downloads from a GitHub release and
@@ -244,8 +317,18 @@ file is deleted), `repofinder index --refresh` fixes it.
 
 ## Limitations
 
-- Python and TypeScript (plus optional Dart) only for now; JavaScript is not
-  parsed yet (other languages need a parser registration).
+- Python, TypeScript, JavaScript, Go, Rust and Java (plus optional Dart) only
+  for now; other languages need a parser registration.
+- Search quality is measured per language (see
+  [eval/README.md](eval/README.md#javascript-go-rust-and-java-first-baselines-2026-11-08))
+  and is uneven. On the first blind sets for Rust (ripgrep) and Dart (flame)
+  the answer is outside the top 16 candidates in about 40% of the questions,
+  and Jev cannot rescue what search did not retrieve. Known causes, not fixed
+  yet: Rust inline tests (`#[cfg(test)] mod tests`, `#[test]`) are not treated
+  as tests; example, documentation, benchmark and script directories are not
+  down-weighted; Turkish vocabulary has gaps. The REA TypeScript results
+  dropped a little when its JavaScript files (scripts, experiments, fixtures)
+  began to be indexed.
 - Retrieval is lexical, not semantic: the question has to share words with
   the code (identifiers, docstrings, file names). If the answer looks wrong,
   `repofinder search` shows what was retrieved; rephrasing with the names you
@@ -280,7 +363,8 @@ deterministic search, `rerank_retrieve` adds the decision layer), `chat` and
 Notes for contributors:
 
 - `Symbol.id` (`path::qualname`) is not unique: a property getter and setter,
-  `@overload` stubs and conditional redefinitions share one. Key on
+  `@overload` stubs, conditional redefinitions, Java overloads, Go `init`
+  functions and Rust trait impls of the same method name share one. Key on
   `(id, start_line)`.
 - `FileRecord.parse_ok=False` means tree-sitter reported a syntax error; the
   file's symbols may be incomplete.
