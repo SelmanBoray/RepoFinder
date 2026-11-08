@@ -11,13 +11,14 @@ from typing import Literal, Optional
 
 # "interface", "type", "enum" and "namespace" come from TypeScript; Python
 # produces only the first three.
+# Other languages map onto these kinds: Go struct / Rust struct+union / Java class+record -> "class"; Go interface / Rust trait / Java interface+@interface -> "interface"; enums -> "enum"; Rust inline `mod` -> "namespace"; Go/Rust/Java methods and Java constructors -> "method".
 SymbolKind = Literal["function", "class", "method", "interface", "type", "enum", "namespace"]
 
 
 @dataclass
 class FileRecord:
     path: str          # repo-relative, POSIX separators ("src/flask/app.py")
-    language: str      # "python", "typescript", "tsx", "dart"
+    language: str      # "python", "typescript", "tsx", "javascript", "go", "rust", "java", "dart"
     size: int          # bytes
     n_lines: int
     parse_ok: bool     # False if tree-sitter reported errors; symbols may be partial

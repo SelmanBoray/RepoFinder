@@ -844,6 +844,7 @@ def resolve_dart_uri(src_path: str, uri: str, known: set[str] | frozenset[str]) 
     return _DartPackages(known).resolve(src_path, uri)
 
 
-def dart_resolver(files: list[FileRecord]) -> Resolver:
+def dart_resolver(files: list[FileRecord], root: Optional[str] = None) -> Resolver:
+    """Resolver for Dart URIs over the paths of ``files`` (``root`` is not used)."""
     packages = _DartPackages(frozenset(f.path for f in files))
     return lambda edge: packages.resolve(edge.src_path, edge.dst_module)

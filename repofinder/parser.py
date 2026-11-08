@@ -4,10 +4,18 @@ The module is organised around a small language registry (``LANGUAGES``) so more
 tree-sitter grammars can be added later. Each :class:`LanguageSpec` declares the
 file extensions it handles, how to load its grammar, and an extractor that turns
 a syntax tree into :class:`Symbol` and :class:`ImportEdge` records, and a
-resolver that maps its import edges to repository files. Python (``.py``) and
-TypeScript (``typescript``: ``.ts``/``.mts``/``.cts``; ``tsx``: ``.tsx``) are
-implemented, and Dart (``.dart``, :mod:`repofinder.parser_dart`) when the optional
-language pack is installed.
+resolver that maps its import edges to repository files. Implemented:
+
+* Python (``python``: ``.py``);
+* TypeScript (``typescript``: ``.ts``/``.mts``/``.cts``; ``tsx``: ``.tsx``);
+* JavaScript (``javascript``: ``.js``/``.jsx``/``.mjs``/``.cjs``, JSX included),
+  which shares the TypeScript extractor and resolver, plus the
+  CommonJS/prototype assignments only JavaScript code uses;
+* Go (``go``: ``.go``, :mod:`repofinder.parser_go`);
+* Rust (``rust``: ``.rs``, :mod:`repofinder.parser_rust`);
+* Java (``java``: ``.java``, :mod:`repofinder.parser_java`);
+* Dart (``dart``: ``.dart``, :mod:`repofinder.parser_dart`) when the optional
+  language pack is installed.
 
 Public contract:
 
@@ -27,6 +35,7 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Callable, Iterator, Optional
 
+import tree_sitter_javascript
 import tree_sitter_python
 import tree_sitter_typescript
 from tree_sitter import Language, Node, Parser, Query, QueryCursor, Tree
@@ -39,6 +48,9 @@ from .parser_dart import (
     dart_resolver,
     extract_dart,
 )
+from .parser_go import extract_go, go_grammar, go_resolver
+from .parser_java import extract_java, java_grammar, java_resolver
+from .parser_rust import extract_rust, rust_grammar, rust_resolver
 
 DOCSTRING_MAX_CHARS = 400
 _BOM = chr(0xFEFF)
@@ -62,9 +74,11 @@ class SourceFile:
 Extractor = Callable[[SourceFile, Tree], tuple[list[Symbol], list[ImportEdge]]]
 # Resolves one edge to a repo-relative path (or None).
 Resolver = Callable[[ImportEdge], Optional[str]]
-# Builds a Resolver from every file of the index (all languages): languages
-# pick the files they can import from.
-ResolverFactory = Callable[[list[FileRecord]], Resolver]
+# Builds a Resolver from every file of the index (all languages; languages pick
+# the files they can import from) and the repository root (``RepoIndex.root``,
+# None when unknown), passed positionally. Factories that need no root accept
+# and ignore it: ``def factory(files, root=None)``.
+ResolverFactory = Callable[[list[FileRecord], Optional[str]], Resolver]
 
 
 @dataclass(frozen=True)
@@ -74,7 +88,7 @@ class LanguageSpec:
     grammar: Callable[[], object]   # returns the tree-sitter language pointer
     extractor: Extractor
     # Fills ImportEdge.dst_path in :func:`resolve_imports`. Languages that share
-    # a factory (typescript and tsx) share one resolver per index.
+    # a factory (typescript, tsx and javascript) share one resolver per index.
     resolver: Optional[ResolverFactory] = None
 
 
@@ -501,8 +515,8 @@ def _python_package_parts(root: Path, rel_path: str) -> list[str]:
     return dirs
 
 
-def _python_resolver(files: list[FileRecord]) -> Resolver:
-    """Python module names resolved against the Python files of the index."""
+def _python_resolver(files: list[FileRecord], root: Optional[str] = None) -> Resolver:
+    """Python module names resolved against the Python files of the index (``root`` unused)."""
     return _ImportResolver([f.path for f in files if f.language == "python"]).resolve
 
 
@@ -718,9 +732,24 @@ def resolve_imports(index: RepoIndex) -> None:
       the global roots of :func:`module_roots` for every importer, plus the
       scoped nested roots whose scope contains the importer (checked first for
       each candidate name). Stdlib and third-party modules keep ``dst_path=None``.
-    * TypeScript/TSX: relative specifiers are resolved by path against every
-      file of the index (:func:`resolve_ts_specifier`); bare package names keep
-      ``dst_path=None``.
+    * TypeScript/TSX/JavaScript: relative specifiers are resolved by path
+      against every file of the index (:func:`resolve_ts_specifier`), so a
+      TypeScript file can import a JavaScript one and vice versa; bare package
+      names keep ``dst_path=None``.
+    * Go: import paths of the importing file's own module (nearest ``go.mod``)
+      resolve to a file of that package (:func:`repofinder.parser_go.go_resolver`).
+    * Rust: ``use``/``mod`` paths follow the module tree to ``.rs`` files of
+      the repository's crates (:func:`repofinder.parser_rust.rust_resolver`);
+      ``std``, ``core``, ``alloc`` and outside crates keep ``dst_path=None``.
+    * Java: imports resolve to the ``.java`` files of the repository by package
+      path (:func:`repofinder.parser_java.java_resolver`); ``java.*`` and
+      ``javax.*`` never resolve.
+    * Dart (when registered): ``package:`` and relative URIs
+      (:func:`repofinder.parser_dart.dart_resolver`).
+
+    Every resolver factory is called once per index as
+    ``factory(index.files, index.root)``; languages that share a factory share
+    the resolver it builds.
     """
     language_of = {f.path: f.language for f in index.files}
     resolvers: dict[ResolverFactory, Resolver] = {}
@@ -734,12 +763,13 @@ def resolve_imports(index: RepoIndex) -> None:
             continue
         resolve = resolvers.get(spec.resolver)
         if resolve is None:
-            resolve = resolvers[spec.resolver] = spec.resolver(index.files)
+            resolve = resolvers[spec.resolver] = spec.resolver(index.files, index.root)
         edge.dst_path = resolve(edge)
 
 
 # --------------------------------------------------------------------------- #
-# TypeScript extraction (the ``typescript`` and ``tsx`` grammars share it)
+# TypeScript extraction (the ``typescript``, ``tsx`` and ``javascript`` grammars
+# share it; the JavaScript grammar has no TypeScript-only node kinds)
 # --------------------------------------------------------------------------- #
 
 SIGNATURE_MAX_CHARS = 200
@@ -783,6 +813,9 @@ _TS_NAMESPACES = frozenset({"internal_module", "module"})
 _TS_SIGNATURE_ONLY = frozenset({"function_signature", "method_signature", "abstract_method_signature"})
 # Initialisers that make ``const x = ...`` or a class property ``p = ...`` a function.
 _TS_FUNCTION_VALUES = frozenset({"arrow_function", "function_expression", "function", "generator_function"})
+# Class properties: TypeScript ``public_field_definition`` (name in ``name``),
+# JavaScript ``field_definition`` (name in ``property``).
+_TS_FIELD_NAME = {"public_field_definition": "name", "field_definition": "property"}
 
 # require("x") and import("x") can sit anywhere in an expression, so they are
 # found with a query over the whole tree instead of the statement walk.
@@ -813,7 +846,7 @@ def _extract_typescript(source: SourceFile, tree: Tree) -> tuple[list[Symbol], l
 
 
 class _TsExtractor:
-    """Symbols and imports of one TypeScript/TSX file.
+    """Symbols and imports of one TypeScript/TSX/JavaScript file.
 
     Qualnames follow the Python conventions: ``Class.method``, ``Namespace.fn``
     and ``outer.<locals>.inner`` for definitions inside function bodies. The
@@ -822,12 +855,18 @@ class _TsExtractor:
     the first declarator in ``const a = () => 1, b = ...``, or the first
     decorator in front of a class member. ``start_line`` and the JSDoc lookup
     use the anchor (decorators and ``export`` are included, as decorators are
-    for Python); the signature starts at the definition itself.
+    for Python); the signature starts at the definition itself. JavaScript
+    member decorators are children of the member, which then starts at them.
+
+    JavaScript files also get the CommonJS/prototype assignments of
+    :meth:`_js_assignment` at module level.
     """
 
     def __init__(self, source: SourceFile) -> None:
         self.source = source
         self.data = source.data
+        spec = language_for_path(source.rel_path)
+        self.language = spec.name if spec is not None else None
         self.found: list[tuple[Symbol, bool]] = []  # (symbol, signature-only)
         self.imports: list[ImportEdge] = []
 
@@ -844,6 +883,11 @@ class _TsExtractor:
 
     def _visit(self, node: Node, scope: _Scope, anchor: Optional[Node]) -> list[_TsItem]:
         ntype = node.type
+
+        if ntype == "expression_statement" and scope.kind is None and self.language == "javascript":
+            items = self._js_assignment(node)
+            if items is not None:
+                return items
 
         if ntype in _TS_CONTAINERS:
             return [(child, scope, None) for child in node.named_children]
@@ -885,13 +929,14 @@ class _TsExtractor:
             signature = _ts_signature(self.data, node, _ts_header_start(node), _ts_body_start(node, body))
             return self._function(node, _ts_name(node.child_by_field_name("name")), scope, anchor, signature, body)
 
-        if ntype == "public_field_definition":
+        name_field = _TS_FIELD_NAME.get(ntype)
+        if name_field is not None:
             value = node.child_by_field_name("value")
             if scope.kind != "class" or value is None or value.type not in _TS_FUNCTION_VALUES:
                 return []
             end = _ts_function_header_end(value)
             signature = _ts_signature(self.data, node, _ts_header_start(node), end)
-            name = _ts_name(node.child_by_field_name("name"))
+            name = _ts_name(node.child_by_field_name(name_field))
             return self._function(node, name, scope, anchor, signature, value.child_by_field_name("body"))
 
         if ntype in _TS_SIGNATURE_ONLY:
@@ -1059,6 +1104,53 @@ class _TsExtractor:
             return self._class(value, name, scope, export, signature, body)
         return []
 
+    def _js_assignment(self, statement: Node) -> Optional[list[_TsItem]]:
+        """A function assigned to a member at module level (JavaScript only).
+
+        Module level includes top-level blocks (``if``, ``try``), as it does for
+        declarations; function and class bodies are not module level.
+
+        * ``X.prototype.m = function () {}`` -> method ``X.m``, parent ``X``;
+        * ``exports.f = ...`` and ``module.exports.f = ...`` -> function ``f``;
+        * ``module.exports = function name() {}`` -> function ``name``; an
+          anonymous function gets no symbol;
+        * ``obj.f = ...`` for any other identifier ``obj`` -> function ``obj.f``
+          named ``f``, without a parent.
+
+        The value must be a function expression or an arrow function. The
+        symbol spans the whole statement and takes the JSDoc above it; the
+        signature runs from the assignment target to the function header.
+        Returns None when ``statement`` is no such assignment.
+        """
+        expr = next((c for c in statement.named_children if c.type != "comment"), None)
+        if expr is None or expr.type != "assignment_expression":
+            return None
+        left = expr.child_by_field_name("left")
+        value = expr.child_by_field_name("right")
+        if left is None or value is None or value.type not in _TS_FUNCTION_VALUES:
+            return None
+        path = _js_member_path(left)
+        if path is None:
+            return None
+
+        name: Optional[str]
+        if path == ["module", "exports"]:
+            name, scope = _ts_name(value.child_by_field_name("name")), _MODULE_SCOPE
+            if name is None:
+                return []
+        elif len(path) == 2:
+            owner, name = path
+            scope = _MODULE_SCOPE if owner == "exports" else _Scope(kind=None, qualname=None, prefix=owner)
+        elif len(path) == 3 and path[1] == "prototype":
+            owner, _, name = path
+            scope = _Scope(kind="class", qualname=owner, prefix=owner)
+        elif len(path) == 3 and path[:2] == ["module", "exports"]:
+            name, scope = path[2], _MODULE_SCOPE
+        else:
+            return None
+        signature = _ts_signature(self.data, statement, expr.start_byte, _ts_function_header_end(value))
+        return self._function(statement, name, scope, None, signature, value.child_by_field_name("body"))
+
     def _symbols(self) -> list[Symbol]:
         """Drop signature-only entries shadowed by an implementation (overloads)
         and keep the first of repeated signature-only entries."""
@@ -1076,12 +1168,9 @@ class _TsExtractor:
     # -- require() / import() ----------------------------------------------- #
 
     def _call_imports(self, tree: Tree) -> None:
-        if not _TS_CALL_IMPORT_RE.search(self.data):
+        if not _TS_CALL_IMPORT_RE.search(self.data) or self.language is None:
             return
-        spec = language_for_path(self.source.rel_path)
-        if spec is None:
-            return
-        query = _ts_call_import_query(spec.name)
+        query = _ts_call_import_query(self.language)
         for _pattern, captures in QueryCursor(query).matches(tree.root_node):
             for src in captures.get("src", ()):
                 module = _ts_string_value(src)
@@ -1095,6 +1184,22 @@ class _TsExtractor:
 
 def _ts_qualname(scope: _Scope, name: str) -> str:
     return f"{scope.prefix}.{name}" if scope.prefix else name
+
+
+def _js_member_path(node: Node) -> Optional[list[str]]:
+    """``a.b.c`` -> ``["a", "b", "c"]`` when every part is a plain name, else None."""
+    parts: list[str] = []
+    while node.type == "member_expression":
+        prop = node.child_by_field_name("property")
+        obj = node.child_by_field_name("object")
+        if prop is None or obj is None or prop.type != "property_identifier":
+            return None
+        parts.append(_text(prop))
+        node = obj
+    if node.type != "identifier" or not parts:
+        return None
+    parts.append(_text(node))
+    return parts[::-1]
 
 
 def _ts_name(node: Optional[Node]) -> Optional[str]:
@@ -1304,18 +1409,37 @@ _TS_EMITTED_TO_SOURCE = {
     ".cjs": (".cts", ".d.cts"),
 }
 _TS_INDEX_FILES = ("index.ts", "index.tsx", "index.d.ts")
+# JavaScript names are tried after the TypeScript ones of the same kind: file
+# candidates first (TS, then JS), directory indexes last (TS, then JS), as Node
+# and TypeScript with allowJs prefer a file to a directory. Between a TS and a
+# JS file of the same name:
+# * the specifier as written wins whenever that file is indexed: "./w.mjs" is
+#   w.mjs (the implementation) even when w.d.mts is indexed as well;
+# * ingest does not index JavaScript compiled from a TypeScript source in the
+#   same directory (a.js next to a.ts), so "./a.js" then reaches a.ts through
+#   the emitted-name rewrite;
+# * a specifier without extension tries the TypeScript extensions first,
+#   declaration files included: "./a" is a.d.ts when a.d.ts and a.js are both
+#   indexed, and a.js when there is no declaration.
+_JS_EXTENSIONS = (".js", ".jsx", ".mjs", ".cjs")
+_JS_INDEX_FILES = ("index.js", "index.jsx", "index.mjs", "index.cjs")
 
 
 def resolve_ts_specifier(src_path: str, specifier: str, known: set[str] | frozenset[str]) -> Optional[str]:
-    """Repo-relative file a relative TS import specifier points at, or None.
+    """Repo-relative file a relative TS/JS import specifier points at, or None.
 
     Candidates, in order: the specifier as written; with ``.ts``, ``.tsx``,
     ``.mts``, ``.cts``, ``.d.ts`` appended; the emitted-name rewrites ``.js`` ->
-    ``.ts``/``.tsx``/``.d.ts``, ``.jsx`` -> ``.tsx``, ``.mjs`` -> ``.mts``, ``.cjs``
-    -> ``.cts``; then ``<dir>/index.ts``, ``index.tsx``, ``index.d.ts``. The first
-    candidate in ``known`` wins. Bare (package) specifiers, absolute paths and
-    paths that leave the repository return None; tsconfig ``paths`` aliases are
-    not consulted.
+    ``.ts``/``.tsx``/``.d.ts``, ``.jsx`` -> ``.tsx``, ``.mjs`` -> ``.mts``/``.d.mts``,
+    ``.cjs`` -> ``.cts``/``.d.cts``; with ``.js``, ``.jsx``, ``.mjs``, ``.cjs``
+    appended; then the directory indexes ``<dir>/index.ts``, ``index.tsx``,
+    ``index.d.ts``, ``index.js``, ``index.jsx``, ``index.mjs``, ``index.cjs``. Every
+    file candidate thus comes before every directory index. The first candidate
+    in ``known`` wins, whatever the importer's language, so a file named as
+    written wins over its declaration file (``./w.mjs`` is ``w.mjs`` rather than
+    ``w.d.mts`` when both are known). Bare (package) specifiers, absolute paths
+    and paths that leave the repository return None; tsconfig ``paths`` aliases
+    and ``package.json`` fields are not consulted.
     """
     if not (specifier in (".", "..") or specifier.startswith(("./", "../"))):
         return None
@@ -1328,13 +1452,19 @@ def resolve_ts_specifier(src_path: str, specifier: str, known: set[str] | frozen
         candidates.extend(base + ext for ext in _TS_EXTENSIONS)
         stem, suffix = posixpath.splitext(base)
         candidates.extend(stem + ext for ext in _TS_EMITTED_TO_SOURCE.get(suffix, ()))
+        candidates.extend(base + ext for ext in _JS_EXTENSIONS)
     directory = "" if base == "." else f"{base}/"
     candidates.extend(directory + index for index in _TS_INDEX_FILES)
+    candidates.extend(directory + index for index in _JS_INDEX_FILES)
     return next((c for c in candidates if c in known), None)
 
 
-def _typescript_resolver(files: list[FileRecord]) -> Resolver:
-    """Relative specifiers resolved by path against every file of the index."""
+def _typescript_resolver(files: list[FileRecord], root: Optional[str] = None) -> Resolver:
+    """Relative specifiers resolved by path against every file of the index.
+
+    Shared by typescript, tsx and javascript, so one resolver serves them all.
+    ``root`` is not used: resolution needs the paths alone.
+    """
     known = frozenset(f.path for f in files)
     return lambda edge: resolve_ts_specifier(edge.src_path, edge.dst_module, known)
 
@@ -1355,6 +1485,43 @@ register_language(
         grammar=tree_sitter_typescript.language_tsx,
         extractor=_extract_typescript,
         resolver=_typescript_resolver,
+    )
+)
+# The JavaScript grammar parses JSX in every one of these files.
+register_language(
+    LanguageSpec(
+        name="javascript",
+        extensions=(".js", ".jsx", ".mjs", ".cjs"),
+        grammar=tree_sitter_javascript.language,
+        extractor=_extract_typescript,
+        resolver=_typescript_resolver,
+    )
+)
+register_language(
+    LanguageSpec(
+        name="go",
+        extensions=(".go",),
+        grammar=go_grammar,
+        extractor=extract_go,
+        resolver=go_resolver,
+    )
+)
+register_language(
+    LanguageSpec(
+        name="rust",
+        extensions=(".rs",),
+        grammar=rust_grammar,
+        extractor=extract_rust,
+        resolver=rust_resolver,
+    )
+)
+register_language(
+    LanguageSpec(
+        name="java",
+        extensions=(".java",),
+        grammar=java_grammar,
+        extractor=extract_java,
+        resolver=java_resolver,
     )
 )
 # Dart needs the optional language pack; without it ".dart" stays an unknown extension.

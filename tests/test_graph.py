@@ -550,14 +550,17 @@ def test_entry_ranking_in_a_mixed_repo(make_repo: MakeRepo) -> None:
     index = build_index(root, "mixed", str(root))
     indexed = {f.path for f in index.files}
     assert {"src/cli.ts", "experiments/x.py", "tests/x.test.ts"} <= indexed
-    assert "scripts/tool.mjs" not in indexed   # JavaScript is not indexed
+    # JavaScript is indexed now: the .mjs/.cjs bins are parsed. Only extension-less files
+    # ("bin/run", "bin/blob") stay unindexed.
+    assert {"scripts/tool.mjs", "packages/app/cli.cjs"} <= indexed
+    assert not {"bin/run", "bin/blob"} & indexed
 
     found = find_entry_points(index)
     assert [(e.path, e.score, e.indexed) for e in found] == [
         ("bin/blob", 100, False),                 # package.json bin, on disk, not indexed
         ("bin/run", 100, False),
-        ("packages/app/cli.cjs", 100, False),
-        ("scripts/tool.mjs", 100, False),
+        ("packages/app/cli.cjs", 100, True),      # package.json bin, now indexed (no TypeScript source)
+        ("scripts/tool.mjs", 100, True),
         ("src/cli.ts", 80, True),                 # conventional name directly in src/
         ("src/pkg/__main__.py", 70, True),
         ("src/server/app.ts", 60, True),          # conventional name deeper down
@@ -569,19 +572,21 @@ def test_entry_ranking_in_a_mixed_repo(make_repo: MakeRepo) -> None:
     reasons = {e.path: e.reason for e in found}
     # Two commands naming one file give one reason; the language comes from the
     # extension, else from the "#!" interpreter, else it is left out.
-    assert reasons["scripts/tool.mjs"] == "`package.json` bin (not indexed: JavaScript)"
+    # The two indexed JavaScript bins now carry the plain declared-script reason.
+    assert reasons["scripts/tool.mjs"] == (
+        "script `tool` = `./scripts/tool.mjs` (package.json [bin]); "
+        "script `tool-alias` = `scripts/tool.mjs` (package.json [bin])"
+    )
     assert reasons["bin/run"] == "`package.json` bin (not indexed: JavaScript)"
     assert reasons["bin/blob"] == "`package.json` bin (not indexed)"
-    assert reasons["packages/app/cli.cjs"] == "`packages/app/package.json` bin (not indexed: JavaScript)"
+    assert reasons["packages/app/cli.cjs"] == "script `app` = `cli.cjs` (packages/app/package.json [bin])"
     assert reasons["experiments/x.py"] == 'has `if __name__ == "__main__"`'
     # entry_point_reasons covers indexed files only.
     assert set(entry_point_reasons(index)) == {e.path for e in found if e.indexed}
 
     graph = build_graph(index)
     assert graph.all_entry_points() == found
-    assert [e.path for e in graph.unindexed_entries] == [
-        "bin/blob", "bin/run", "packages/app/cli.cjs", "scripts/tool.mjs",
-    ]
+    assert [e.path for e in graph.unindexed_entries] == ["bin/blob", "bin/run"]  # no extension: not parsed
     assert [n.path for n in graph.entry_points()] == [e.path for e in found if e.indexed]
     assert graph.nodes["src/cli.ts"].entry_score == 80
     assert not graph.nodes["tests/x.test.ts"].is_entry and graph.nodes["tests/x.test.ts"].entry_score == 0
@@ -727,3 +732,138 @@ def test_package_json_build_output_lib_still_maps_to_src(make_repo: MakeRepo) ->
     assert entry_point_reasons(only_src) == {
         "src/server.ts": "main `lib/server.js` (package.json); conventional name `server.ts`"
     }
+
+
+# --- JavaScript / Go / Rust / Java rules -------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "path,expected",
+    [
+        ("gin/context_test.go", True),
+        ("binding/testdata/x.go", True),
+        ("src/main/java/a/GsonTest.java", True),
+        ("core/FooTests.java", True),
+        ("it/BarIT.java", True),
+        ("src/printer/tests.rs", True),
+        ("src/main/java/a/Testing.java", False),
+        ("pkg/contest.go", False),
+        ("src/protest.rs", False),
+        ("binding/json.go", False),
+    ],
+)
+def test_is_test_path_go_rust_java(path: str, expected: bool) -> None:
+    assert is_test_path(path) is expected
+
+
+def test_language_names_and_directory_packages_for_new_languages() -> None:
+    from repofinder import graph as g
+
+    assert g.LANGUAGE_NAMES["go"] == "Go"
+    assert g.LANGUAGE_NAMES["rust"] == "Rust"
+    assert g.LANGUAGE_NAMES["java"] == "Java"
+    assert g.LANGUAGE_NAMES["javascript"] == "JavaScript"
+    for name in ("Go", "Rust", "Java", "TypeScript", "JavaScript", "Dart"):
+        assert name in g.DIRECTORY_PACKAGE_LANGUAGES
+
+
+def test_entry_filenames_and_peripheral_dirs_for_new_languages() -> None:
+    from repofinder import graph as g
+
+    for name in (
+        "index.js", "main.js", "cli.js", "server.js", "app.js", "index.mjs", "index.cjs",
+        "main.go", "main.rs", "lib.rs", "Main.java", "App.java", "Application.java",
+    ):
+        assert name in g.ENTRY_FILENAMES
+    assert "benches" in g.PERIPHERAL_DIRS and "testdata" in g.PERIPHERAL_DIRS
+    for ext in (".go", ".rs", ".java"):
+        assert ext in g.PATH_MODULE_EXTENSIONS
+
+
+@pytest.mark.parametrize(
+    "path,expected",
+    [
+        ("pkg/index.go", "pkg/index"),  # the index rule is JS/TS only
+        ("src/printer/mod.rs", "src/printer"),
+        ("src/main.rs", "src/main"),
+        ("binding/json.go", "binding/json"),
+        ("src/main/java/com/x/Gson.java", "src/main/java/com/x/Gson"),
+        ("src/util/index.ts", "src/util"),
+        ("src/util/strings.ts", "src/util/strings"),
+    ],
+)
+def test_path_module_name_go_rust_java(path: str, expected: str) -> None:
+    assert path_module_name(path) == expected
+
+
+def test_go_entry_ranking_prefers_cmd_main() -> None:
+    files = ["internal/x/main.go", "cmd/tool/main.go", "server.go", "tools/cmd/y/main.go"]
+    index = RepoIndex("r", "Z:/does/not/exist", "r", files=[FileRecord(p, "go", 1, 1, True) for p in files])
+    order = [e.path for e in find_entry_points(index)]
+    scores = {e.path: e.score for e in find_entry_points(index)}
+    assert "cmd/tool/main.go" in order and "internal/x/main.go" in order
+    assert order.index("cmd/tool/main.go") < order.index("internal/x/main.go")
+    assert scores["tools/cmd/y/main.go"] == scores["cmd/tool/main.go"]
+    assert scores["cmd/tool/main.go"] > scores["internal/x/main.go"]
+
+
+def test_package_json_bin_js_and_ts_source_wins(make_repo: MakeRepo) -> None:
+    indexed = ["lib/cli.js", "src/cli.ts"]
+    files: dict[str, str | bytes] = {p: "x\n" for p in indexed}
+    files["package.json"] = json.dumps({"bin": {"tool": "lib/cli.js"}})
+    root = make_repo(files)
+    records = [FileRecord("lib/cli.js", "javascript", 1, 1, True), FileRecord("src/cli.ts", "typescript", 1, 1, True)]
+    index = RepoIndex("r", str(root), "r", files=records)
+    reasons = entry_point_reasons(index)
+    declared = [p for p, r in reasons.items() if "package.json" in r]
+    assert declared == ["src/cli.ts"]
+
+
+def test_package_json_bin_pure_js_maps_to_itself(make_repo: MakeRepo) -> None:
+    files: dict[str, str | bytes] = {"bin/cli.js": "x\n", "package.json": json.dumps({"bin": "bin/cli.js"})}
+    root = make_repo(files)
+    index = RepoIndex("r", str(root), "r", files=[FileRecord("bin/cli.js", "javascript", 1, 1, True)])
+    reasons = entry_point_reasons(index)
+    assert "bin/cli.js" in reasons
+    assert "package.json" in reasons["bin/cli.js"]
+    assert "not indexed" not in reasons["bin/cli.js"]
+    assert all("not indexed" not in r for r in reasons.values())
+
+
+@pytest.mark.parametrize(
+    "path,expected",
+    [
+        ("test_helpers.go", False),
+        ("pkg/test_util.go", False),
+        ("pkg/x_test.go", True),
+        ("tests/test_x.py", True),
+        ("pkg/test_utils.py", True),
+    ],
+)
+def test_is_test_path_go_has_no_test_prefix_rule(path: str, expected: bool) -> None:
+    assert is_test_path(path) is expected
+
+
+def test_rust_workspace_bin_path_outranks_lib_rs(make_repo: MakeRepo) -> None:
+    indexed = [f"crates/{c}/src/lib.rs" for c in "abcde"] + ["crates/core/main.rs"]
+    files: dict[str, str | bytes] = {p: "fn f() {}\n" for p in indexed}
+    files["Cargo.toml"] = (
+        '[package]\nname = "ripgrep"\n\n[[bin]]\nname = "rg"\npath = "crates/core/main.rs"\n\n'
+        '[workspace]\nmembers = ["crates/a", "crates/b", "crates/c", "crates/d", "crates/e"]\n'
+    )
+    root = make_repo(files)
+    index = RepoIndex("rs", str(root), "rs", files=[FileRecord(p, "rust", 1, 1, True) for p in sorted(indexed)])
+    ranked = [e.path for e in find_entry_points(index)]
+    assert "crates/core/main.rs" in ranked
+    pos = ranked.index("crates/core/main.rs")
+    for p in indexed[:-1]:
+        if p in ranked:
+            assert pos < ranked.index(p)
+
+
+def test_bin_cli_js_scores_at_least_bin_foo_js() -> None:
+    files = ["bin/cli.js", "bin/foo.js"]
+    index = RepoIndex("r", "Z:/does/not/exist", "r", files=[FileRecord(p, "javascript", 1, 1, True) for p in files])
+    scores = {e.path: e.score for e in find_entry_points(index)}
+    assert "bin/cli.js" in scores
+    assert scores["bin/cli.js"] >= scores.get("bin/foo.js", 0)

@@ -322,20 +322,23 @@ def test_mixed_repo_entry_table_and_language_sentence(make_repo) -> None:
     )
     index = build_index(root, "mixed", str(root))
     md = render_map(index, build_graph(index))
-    # 18 TypeScript lines, 2 Python lines.
+    # 18 TypeScript lines, 2 Python lines, 1 JavaScript line (`scripts/run.mjs` is indexed now):
+    # 18/21 = 85% (rounded down), Python 2 lines before JavaScript 1 line.
     assert section(md, "## Overview").strip() == (
-        "`mixed` has 3 source files, mostly TypeScript (90%) with some Python, in 3 top-level directories: "
-        "`experiments` (1 file), `src` (1 file) and `tests` (1 file). 1 file is tests."
+        "`mixed` has 4 source files, mostly TypeScript (85%) with some Python and JavaScript, in 4 top-level "
+        "directories: `experiments` (1 file), `scripts` (1 file), `src` (1 file) and `tests` (1 file). "
+        "1 file is tests."
     )
     assert section(md, "## Entry points").strip().splitlines() == [
         "| path | reason |",
         "|---|---|",
-        "| `scripts/run.mjs` | `package.json` bin (not indexed: JavaScript) |",
+        # JavaScript is indexed now, so the bin is an ordinary declared script, not "not indexed".
+        "| `scripts/run.mjs` | script `tool` = `scripts/run.mjs` (package.json [bin]) |",
         "| `src/cli.ts` | conventional name `cli.ts` |",
         '| `experiments/x.py` | has `if __name__ == "__main__"` |',
     ]
     assert section(md, "## Where to start").strip().splitlines()[:3] == [
-        "- `scripts/run.mjs` — entry point: `package.json` bin (not indexed: JavaScript).",
+        "- `scripts/run.mjs` — entry point: script `tool` = `scripts/run.mjs` (package.json [bin]).",
         "- `src/cli.ts` — entry point: conventional name `cli.ts`.",
         '- `experiments/x.py` — entry point: has `if __name__ == "__main__"`.',
     ]

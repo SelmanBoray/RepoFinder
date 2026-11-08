@@ -63,7 +63,7 @@ def test_typescript_languages_are_registered() -> None:
     assert language_for_path("src/a.cts").name == "typescript"
     assert language_for_path("types/env.d.ts").name == "typescript"  # declaration files too
     assert language_for_path("src/App.tsx").name == "tsx"
-    assert language_for_path("src/a.js") is None  # JavaScript is not indexed yet
+    assert language_for_path("src/a.js").name == "javascript"  # JavaScript has its own language
     assert language_for_path("src/a.py").name == "python"
 
 
