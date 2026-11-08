@@ -1,4 +1,4 @@
-"""Turkish query translation: stem boundaries and the code vocabulary."""
+"""Turkish query translation: where a lexicon stem ends and a suffix begins."""
 
 from __future__ import annotations
 
@@ -69,17 +69,10 @@ def test_oncelik_query_finds_priority_not_before() -> None:
         # new words, inflected
         ("önceliği", "priority"),
         ("öncelikleri", "priority"),
-        ("tamponu", "buffer"),
-        ("kilidi", "lock"),             # kilit -> kilid-
-        ("eklentiler", "plugin"),
-        ("izinleri", "permission"),
-        ("yineleyiciyi", "iterator"),
         ("çerezleri", "cookie"),
         ("serileştiriliyor", "serialize"),
         ("ayrıştırılıyor", "parse"),
         ("ayrıştırıcı", "parser"),      # agent noun with a key of its own
-        ("benzersiz", "unique"),        # -siz word with a key of its own
-        ("katmanında", "layer"),
     ],
 )
 def test_inflected_forms_translate(word: str, english: str) -> None:
@@ -106,7 +99,6 @@ def test_words_with_their_own_key_beat_the_base() -> None:
     assert _translate_tr("kullanıcı") == ("user",)
     assert "encode" in (_translate_tr("kodlanıyor") or ())  # kodla: encode, not filler "kod"
     assert _translate_tr("kodları") == ()                   # plural of kod stays filler
-    assert "timer" in (_translate_tr("zamanlayıcı") or ())  # not time
 
 
 def test_turkish_phrases_with_inflection() -> None:
@@ -123,8 +115,6 @@ def test_turkish_phrases_with_inflection() -> None:
     hits = search.search("zaman aşımına nerede bakılıyor?")
     assert hits[0].symbol_id == "pkg/net.py::Client.timeout"
     assert "pkg/clock.py::current_time" not in [h.symbol_id for h in hits]
-    assert search.search("iş parçacığı nerede başlatılıyor?")[0].symbol_id == "pkg/work.py::Thread"
-    assert search.search("ara katmanlar nasıl ekleniyor?")[0].symbol_id == "pkg/web.py::middleware"
 
 
 # --------------------------------------------------------------------------- #
@@ -149,8 +139,8 @@ def test_english_queries_are_not_translated() -> None:
         ]
     )
     search = SearchIndex(index)
-    # "dal", "tampon", "kilit" are Turkish keys, but an English query is never translated.
-    q = search._analyze("where is the dal tampon kilit timeout")
-    assert "branch" not in q.tokens and "buffer" not in q.tokens and "lock" not in q.tokens
+    # "rota", "yol", "sil" are Turkish keys, but an English query is never translated.
+    q = search._analyze("where is the rota yol sil timeout")
+    assert "route" not in q.tokens and "path" not in q.tokens and "delet" not in q.tokens
     assert search.search("where is the request timeout set")[0].symbol_id == "pkg/net.py::Client.timeout"
     assert search.search("image rotation") == []

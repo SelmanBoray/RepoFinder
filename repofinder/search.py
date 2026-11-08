@@ -22,8 +22,8 @@ A query is analysed into *units* (see :meth:`SearchIndex._analyze`):
 
 * its content words. Natural-language filler ("where", "implemented"; Turkish
   "nerede", "tanımlı", ...) is dropped. In a query that looks Turkish, a word
-  that is not in the index vocabulary is translated through a stem-prefix
-  lexicon of code vocabulary ("kaydediliyor" -> register, "uygulamaya" -> app,
+  that is not in the index vocabulary is translated through a small
+  stem-prefix lexicon ("kaydediliyor" -> register, "uygulamaya" -> app,
   application; two-word phrases such as "zaman aşımı" -> timeout) and matched
   by the translation's stem. A key matches only where the rest of the word
   reads as inflection (case, plural, possessive, voice, tense, and the
@@ -234,7 +234,7 @@ _ABBREVIATIONS: dict[str, tuple[str, ...]] = {
 # where it makes a different word the lexicon has a key of its own ("kodla":
 # encode, and "kodlar", the plural of the filler "kod", too). A derived word
 # means what its base means only through a key of its own ("ayrıştırıcı":
-# parser, "benzersiz": unique, "öncelik": priority).
+# parser, "okuyucu": reader, "öncelik": priority).
 _TR_FILLER = frozenset(
     {
         "ne", "mi", "mı", "mu", "mü", "ve", "veya", "ile", "bu", "şu", "o", "bir", "da",
@@ -242,9 +242,7 @@ _TR_FILLER = frozenset(
         "kadar", "ler", "lar", "leri", "ları", "nin", "nın", "nun", "nün", "in", "ın",
         "un", "ün", "yi", "yı", "yu", "yü", "ye", "den", "dan", "ten", "tan", "deki",
         "daki", "dir", "dır", "tir", "tır", "nasıl", "neden", "niye", "niçin", "hangi",
-        "hangisi", "orada", "burada", "şurada", "içinde", "olarak", "nedir", "neresi",
-        "tarafından", "sırasında", "üzerinde", "üzerinden", "arasında", "aracılığıyla",
-        "göre", "her", "tüm", "bütün", "sadece", "yalnızca", "hangisinde",
+        "hangisi", "orada", "burada", "şurada", "içinde", "olarak",
     }
 )
 # Only unambiguous mappings: "bağlantı" is a connection here far more often
@@ -254,10 +252,9 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     "nere": (), "tanım": (), "tanımlı": (), "fonksiyon": (), "metod": (), "metot": (),
     "modül": (), "kod": (), "kodlar": (), "dosya": (), "kullan": (), "yapıl": (), "edil": (),
     "ediyor": (), "olan": (), "oluyor": (), "gel": (), "döndür": (), "dönüş": (), "göster": (),
-    "işlev": (), "yöntem": (), "yazılım": (), "depo": (), "depolar": (), "proje": (),
-    "açıkla": (), "sürekli": (),
-    # "veri" (data) is a prefix of forms of "ver" (give): verilen, verir, veriyor
-    "veril": (), "verir": (), "veriyor": (),
+    # "yazılım" (software) is not "yaz" (write) + -ılım; forms of "ver" (give)
+    # that begin like "veri" (data): verilen, verir, veriyor
+    "yazılım": (), "veril": (), "verir": (), "veriyor": (),
     "sınıf": ("class",),
     # code vocabulary
     "uygulama": ("app", "application"), "uygula": ("apply",), "fabrika": ("factory",),
@@ -267,7 +264,7 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     "yanıt": ("response",), "cevap": ("response",), "istek": ("request",),
     "oturum": ("session",), "çerez": ("cookie",), "imza": ("sign", "signature"),
     "kayd": ("register",), "kayıt": ("register",), "ekle": ("add",),
-    "eklenti": ("plugin", "extension"),
+    "eklenti": ("extension",),
     "çağır": ("call",), "çağr": ("call",), "bul": ("find",), "çalıştır": ("run",),
     "çalış": ("run",), "çevir": ("convert",), "çevri": ("convert",),
     "dönüştür": ("convert",),
@@ -299,107 +296,15 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     # derived words of the keys above, which do not inherit their meaning
     "öncelik": ("priority",), "öncelikli": ("priority",), "önceki": ("previous", "prev"),
     "sonraki": ("next",), "kayıtlı": ("register",), "imzalı": ("sign", "signature"),
-    "kaydet": ("register", "save"), "kaydır": ("scroll",), "değerlendir": ("evaluate", "eval"),
+    "kaydır": ("scroll",), "değerlendir": ("evaluate", "eval"),
     "seçici": ("selector",), "şifrele": ("encrypt",), "şifreler": ("password",),
     "şifreli": ("encrypt", "encrypted"), "okuyucu": ("reader",), "yazıcı": ("writer",),
     "derleyici": ("compiler",), "doğrulayıcı": ("validator",), "ayrıştırıcı": ("parser",),
     "serileştirici": ("serializer",), "dönüştürücü": ("converter",),
-    "biçimlendirici": ("formatter",), "oluşturucu": ("builder", "constructor"),
+    "oluşturucu": ("builder", "constructor"),
     "yükleyici": ("loader",), "yönlendirici": ("router",), "bulut": ("cloud",),
     "sayısal": ("numeric",),
-    # concurrency, timing, control flow
-    "parçacık": ("thread",), "parça": ("chunk", "part"), "kilit": ("lock",),
-    "eşzamansız": ("async", "asynchronous"), "asenkron": ("async", "asynchronous"),
-    "eşzamanlı": ("sync", "concurrent"), "senkron": ("sync", "synchronous"),
-    "eşzamanlılık": ("concurrency",), "paralel": ("parallel",), "işçi": ("worker",),
-    "havuz": ("pool",), "görev": ("task", "job"), "kuyruk": ("queue",),
-    "zamanlayıcı": ("timer", "scheduler"), "zamanlama": ("schedule", "timing"),
-    "gecik": ("delay",), "bekle": ("wait",), "beklen": ("expect",), "uyku": ("sleep",),
-    "süre": ("duration",), "dene": ("attempt",), "deneysel": ("experimental",),
-    "tekrarla": ("repeat",), "yinele": ("iterate", "repeat"), "yineleyici": ("iterator",),
-    "özyinele": ("recursive", "recursion"), "döngü": ("loop",), "koşul": ("condition",),
-    "durdur": ("stop",), "iptal": ("cancel",), "sonlandır": ("terminate",),
-    "tamamla": ("complete",), "dinle": ("listen",), "dinleyici": ("listener",),
-    "tetikle": ("trigger",), "tetikleyici": ("trigger",), "yayınla": ("publish", "emit"),
-    "yayımla": ("publish",), "abone": ("subscribe", "subscriber", "subscription"),
-    "kanca": ("hook",), "kanal": ("channel",), "boru": ("pipe",), "akış": ("stream", "flow"),
-    "tüket": ("consume",), "tüketici": ("consumer",), "üret": ("generate", "produce"),
-    "üretici": ("producer",), "üreteç": ("generator",), "yakala": ("catch",),
-    "fırlat": ("throw", "raise"), "uyarı": ("warning", "warn"),
-    # data and structures
-    "veri": ("data",), "veriler": ("data",), "tampon": ("buffer",), "arabellek": ("buffer",),
-    "bellek": ("memory",), "sızıntı": ("leak",), "çöp": ("garbage",),
-    "yığın": ("stack", "heap"), "ağaç": ("tree",), "düğüm": ("node",), "kenar": ("edge",),
-    "kök": ("root",), "yaprak": ("leaf",), "dal": ("branch",), "çatal": ("fork",),
-    "dizi": ("array",), "küme": ("set",), "öğe": ("item", "element"),
-    "eleman": ("element", "item"), "tablo": ("table",), "sütun": ("column",),
-    "kolon": ("column",), "hücre": ("cell",), "bayt": ("byte", "bytes"),
-    "karakter": ("char", "character"), "dilim": ("slice",), "aralık": ("range", "interval"),
-    "sınır": ("limit", "bound"), "eşik": ("threshold",), "boyut": ("size",),
-    "uzunluk": ("length",), "genişlik": ("width",), "yükseklik": ("height",),
-    "konum": ("position", "location"), "girdi": ("input",), "çıktı": ("output",),
-    "sayaç": ("counter",), "toplam": ("total", "sum"), "topla": ("collect",),
-    "rastgele": ("random",), "benzersiz": ("unique",), "boş": ("empty",),
-    "boşluk": ("whitespace", "space"), "ham": ("raw",), "ifade": ("expression", "expr"),
-    "sözdizimi": ("syntax",), "belirteç": ("token",), "jeton": ("token",),
-    "şema": ("schema",), "kural": ("rule",), "etiket": ("tag", "label"),
-    "bayrak": ("flag",), "sürüm": ("version",), "yama": ("patch",),
-    # types and objects
-    "arayüz": ("interface",), "soyut": ("abstract",), "kalıtım": ("inherit", "inheritance"),
-    "miras": ("inherit",), "türet": ("derive",), "tür": ("type",), "tip": ("type",),
-    "nitelik": ("attribute",), "öznitelik": ("attribute",), "özellik": ("property", "feature"),
-    "sabit": ("constant", "const"), "varsayılan": ("default",), "küresel": ("global",),
-    "yerel": ("local",), "uzak": ("remote",), "ortak": ("common", "shared"),
-    "paylaş": ("share",), "geçersiz": ("invalid",), "kimlik": ("id", "identity"),
-    "tanımlayıcı": ("identifier", "id"), "isim": ("name",), "adlandır": ("name",),
-    "işaretçi": ("pointer",), "gösterici": ("pointer",), "sanal": ("virtual",),
-    "sarmala": ("wrap",), "sarmalayıcı": ("wrapper",), "dekoratör": ("decorator",),
-    "yardımcı": ("helper", "util"), "araç": ("tool",), "kapsayıcı": ("container",),
-    "konteyner": ("container",), "yerleşik": ("builtin",), "ana": ("main",),
-    "çekirdek": ("core", "kernel"), "motor": ("engine",), "sistem": ("system",),
-    "bileşen": ("component",), "katman": ("layer",), "arakatman": ("middleware",),
-    # operations
-    "kodla": ("encode",), "kodlama": ("encoding", "encode"), "kodlayıcı": ("encoder",),
-    "çöz": ("decode", "resolve"), "çözücü": ("decoder", "resolver"),
-    "çözümle": ("resolve", "parse"), "çözümleyici": ("resolver", "parser"),
-    "sıkıştır": ("compress",), "sırala": ("sort",), "sıralı": ("sorted", "ordered"),
-    "filtre": ("filter",), "fark": ("diff",), "karşılaştır": ("compare",),
-    "ayır": ("split", "separate"), "ayırıcı": ("separator", "delimiter"), "böl": ("split",),
-    "bölüm": ("section",), "kopyala": ("copy",), "taşı": ("move",), "kaldır": ("remove",),
-    "sakla": ("store",), "depola": ("store",), "indir": ("download",),
-    "kurulum": ("install", "setup"), "hesap": ("account",), "hesapla": ("compute", "calculate"),
-    "analiz": ("analyze", "analysis"), "arama": ("search",), "aran": ("search",),
-    "tara": ("scan",), "tarayıcı": ("browser", "scanner"), "indeks": ("index",),
-    "denetle": ("check", "audit"), "denetleyici": ("controller",),
-    "kontrol": ("check", "control"), "kontrolör": ("controller",),
-    "yönet": ("manage",), "yönetici": ("manager", "admin"), "işlemci": ("processor",),
-    "izle": ("watch", "monitor"), "izleyici": ("watcher", "observer"),
-    "gözlemci": ("observer",), "takip": ("track",), "ölç": ("measure",),
-    "ölçek": ("scale",), "bildir": ("notify",), "bildirim": ("notification", "notify"),
-    "rapor": ("report",), "günlük": ("log", "logger"), "sahte": ("mock", "fake"),
-    "kaçış": ("escape",), "uzantı": ("extension", "ext"), "mutlak": ("absolute",),
-    "sonek": ("suffix",), "üstbilgi": ("header",), "üstveri": ("metadata",),
-    "yorum": ("comment",), "yorumlar": ("comment",), "yorumla": ("interpret",),
-    "yorumlayıcı": ("interpreter",), "belge": ("doc", "document"),
-    "açıklama": ("description",), "açıl": ("open",), "dil": ("language",),
-    "yerelleştir": ("localize", "locale"),
-    # security, network, packaging
-    "izin": ("permission", "allow"), "yetki": ("permission", "auth"),
-    "yetkilendir": ("authorize", "auth"), "rol": ("role",), "grup": ("group",),
-    "erişim": ("access",), "eriş": ("access",), "koru": ("protect", "guard"),
-    "güvenlik": ("security",), "güvenli": ("safe", "secure"), "güvensiz": ("unsafe", "insecure"),
-    "sertifika": ("cert", "certificate"), "vekil": ("proxy",), "soket": ("socket",),
-    "posta": ("mail", "email"), "ileti": ("message",), "mesaj": ("message",),
-    "bağımlılık": ("dependency",), "paket": ("package",), "kütüphane": ("library",),
-    "çerçeve": ("framework",), "sürücü": ("driver",), "kaynak": ("source", "resource"),
-    "sağlık": ("health",), "uyum": ("compatible", "compat"),
-    # user interface
-    "sayfa": ("page",), "düğme": ("button",), "pencere": ("window",), "ekran": ("screen",),
-    "simge": ("icon",), "resim": ("image",), "görüntü": ("image",),
-    "görüntüle": ("display", "render"), "görüntüler": ("image",), "görsel": ("image", "visual"),
-    "renk": ("color", "colour"), "grafik": ("chart", "graphic"), "çiz": ("draw",),
-    "sekme": ("tab",), "kısayol": ("shortcut",), "klavye": ("keyboard",),
-    "tıkla": ("click",), "sürükle": ("drag",), "odak": ("focus",),
+    "kodla": ("encode",),
 }
 # Two-word phrases: (first stem, second stem) -> English. The first word is
 # then filler and the second carries the translation ("zaman aşımı" -> timeout,
@@ -408,29 +313,6 @@ _TR_PHRASES: dict[tuple[str, str], tuple[str, ...]] = {
     ("zaman", "aşım"): ("timeout",), ("yeniden", "dene"): ("retry",),
     ("tekrar", "dene"): ("retry",), ("kimlik", "bilgi"): ("credential",),
     ("içe", "aktar"): ("import",), ("dışa", "aktar"): ("export",),
-    ("yeniden", "başlat"): ("restart",), ("yeniden", "yükle"): ("reload",),
-    ("yeniden", "adlandır"): ("rename",), ("yeniden", "bağlan"): ("reconnect",),
-    ("yeniden", "oluştur"): ("rebuild",), ("kimlik", "doğrula"): ("auth", "authenticate"),
-    ("oturum", "aç"): ("login",), ("oturum", "kapat"): ("logout",),
-    ("izin", "ver"): ("allow",), ("süre", "dol"): ("expire",),
-    ("iş", "parçacık"): ("thread",), ("ara", "katman"): ("middleware",),
-    ("ara", "yazılım"): ("middleware",), ("kod", "çöz"): ("decode",),
-    ("şifre", "çöz"): ("decrypt",), ("geri", "çağır"): ("callback",),
-    ("geri", "çağr"): ("callback",), ("geri", "al"): ("undo", "revert"),
-    ("hata", "ayıkla"): ("debug",), ("hata", "ayıklayıcı"): ("debugger",),
-    ("çöp", "topla"): ("gc", "garbage"), ("çöp", "toplayıcı"): ("gc", "garbage"),
-    ("yığın", "iz"): ("traceback", "stacktrace", "trace"), ("saat", "dilim"): ("timezone", "tz"),
-    ("ağ", "geçit"): ("gateway",), ("bağlantı", "nokta"): ("port",),
-    ("uç", "nokta"): ("endpoint",), ("alan", "ad"): ("domain",),
-    ("giriş", "nokta"): ("entry", "main"), ("ön", "uç"): ("frontend",),
-    ("arka", "uç"): ("backend",), ("arka", "plan"): ("background",),
-    ("komut", "satır"): ("cli", "command"), ("alt", "süreç"): ("subprocess",),
-    ("alt", "sınıf"): ("subclass",), ("üst", "sınıf"): ("base", "parent"),
-    ("üst", "bilgi"): ("header",), ("üst", "veri"): ("metadata",),
-    ("meta", "veri"): ("metadata",), ("dosya", "sistem"): ("filesystem", "fs"),
-    ("çalışma", "zaman"): ("runtime",), ("boru", "hat"): ("pipeline",),
-    ("işlem", "hat"): ("pipeline",), ("yazı", "tip"): ("font",),
-    ("kullanım", "dış"): ("deprecated",),
 }
 _TR_MIN_STEM = 3
 # A query is treated as Turkish when it has a Turkish letter or one of these
@@ -440,7 +322,6 @@ _TR_HINTS = frozenset(
     {
         "nerede", "nereden", "nasil", "hangi", "hangisi", "neden", "niye", "nicin", "icin",
         "icinde", "ile", "veya", "gibi", "kadar", "olarak", "orada", "burada", "tanimli",
-        "nedir", "neresi", "nerde", "nereye", "hangisinde",
     }
 )
 _TR_FOLD = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
