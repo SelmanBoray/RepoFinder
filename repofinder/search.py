@@ -44,7 +44,7 @@ abbreviation) never weighs more than the word itself: in the requests repo
   (snake/camel pieces) found in the query. A name that is the whole query gets
   the full boost; a common word that happens to be a name ("loads", "session")
   in a longer question gets little; ``teardown_appcontext`` for "app context
-  teardown" gets much. In a test file only a full name match counts (tests are
+  teardown" gets much. In test code only a full name match counts (tests are
   named after what they test), unless the query asks about tests;
 * explicit identifier: a name the query writes as code (backticked, dotted
   ``Session.request``/``requests.get``, snake_case or camelCase) gets the full
@@ -57,7 +57,8 @@ abbreviation) never weighs more than the word itself: in the requests repo
   strongly the name itself matched;
 * qualname/path: a dotted or slashed query term names the symbol or file
   (``requests.get`` also names ``get`` in module ``requests.api``);
-* class, kind ("which class ..."), test-file and nested-function adjustments;
+* class, kind ("which class ..."), test-code and nested-function adjustments
+  (test code: a test file, or a Rust test inline in a source file);
 * type declarations: a TypeScript ``interface`` or ``type`` alias is a data
   shape, rarely what "where is X done" asks for: x :data:`TYPE_PENALTY` unless
   the query mentions types or interfaces;
@@ -188,7 +189,7 @@ QUERY_FILLER = frozenset(
     }
 )
 
-# A query word from this set lifts the test-file penalty, unless it is part of a
+# A query word from this set lifts the test-code penalty, unless it is part of a
 # joined identifier ("the test client" -> test_client is not a request for tests).
 _TEST_WORDS = frozenset({"test", "tests", "testing", "pytest", "conftest", "fixture", "fixtures"})
 _CLASS_WORDS = frozenset(
@@ -774,50 +775,121 @@ def _json_strings(value: object) -> list[str]:
 
 
 # A line-based reader for the few TOML keys of :func:`_shipped_paths`; not a
-# TOML parser (compare ``parser_rust._parse_manifest``).
-_TOML_KEY_PART = r"""[A-Za-z0-9_-]+|"(?:[^"\\\n]|\\.)*"|'[^'\n]*'"""
-_TOML_KEY = rf"(?:{_TOML_KEY_PART})(?:\s*\.\s*(?:{_TOML_KEY_PART}))*"
-_TOML_HEADER_RE = re.compile(rf"^\s*\[\[?\s*({_TOML_KEY})\s*\]\]?\s*(?:#.*)?$")
-_TOML_ASSIGN_RE = re.compile(rf"^\s*({_TOML_KEY})\s*=\s*")
-_TOML_PART_RE = re.compile(r"""[A-Za-z0-9_-]+|"((?:[^"\\\n]|\\.)*)"|'([^'\n]*)'""")
+# TOML parser (compare ``parser_rust._parse_manifest``). Each line is split
+# into tokens once, left to right, by anchored matches that consume what they
+# match, so reading takes linear time whatever the manifest holds.
 _TOML_STRING_RE = re.compile(r""""((?:[^"\\\n]|\\.)*)"|'([^'\n]*)'""")
-_TOML_PAIR_RE = re.compile(rf"""({_TOML_KEY})\s*=\s*(?:"((?:[^"\\\n]|\\.)*)"|'([^'\n]*)')""")
-
-
-def _toml_key(text: str) -> tuple[str, ...]:
-    """``tool."poetry".scripts`` -> ``("tool", "poetry", "scripts")``."""
-    return tuple(
-        _toml_unescape(m.group(1)) if m.group(1) is not None else m.group(2) if m.group(2) is not None else m.group()
-        for m in _TOML_PART_RE.finditer(text)
-    )
+_TOML_BARE_RE = re.compile(r"[A-Za-z0-9_-]+")
+_Token = tuple[str, str]  # ("s", string value) | ("k", bare word) | ("p", one other character)
 
 
 def _toml_unescape(text: str) -> str:
     return re.sub(r"\\(.)", r"\1", text)
 
 
-def _toml_scan(text: str, strings: list[str]) -> int:
-    """Append the strings of one value line to ``strings``; return its bracket
-    balance (``[``/``{`` minus ``]``/``}`` outside strings). A comment ends it."""
-    balance = 0
-    i, n = 0, len(text)
+def _toml_tokens(line: str) -> list[_Token]:
+    """The tokens of one line, whitespace skipped. A comment ends the line, and
+    so does an unterminated (or multi-line) string."""
+    out: list[_Token] = []
+    i, n = 0, len(line)
     while i < n:
-        ch = text[i]
-        if ch in "\"'":
-            m = _TOML_STRING_RE.match(text, i)
+        ch = line[i]
+        if ch in " \t\r":
+            i += 1
+        elif ch in "\"'":
+            m = _TOML_STRING_RE.match(line, i)
             if m is None:
-                break  # unterminated or multi-line: the rest of the line is not read
-            strings.append(_toml_unescape(m.group(1)) if m.group(1) is not None else m.group(2))
+                break
+            out.append(("s", _toml_unescape(m.group(1)) if m.group(1) is not None else m.group(2)))
             i = m.end()
-            continue
-        if ch == "#":
+        elif ch == "#":
             break
-        if ch in "[{":
+        else:
+            m = _TOML_BARE_RE.match(line, i)
+            if m is not None:
+                out.append(("k", m.group()))
+                i = m.end()
+            else:
+                out.append(("p", ch))
+                i += 1
+    return out
+
+
+def _toml_key_at(tokens: list[_Token], i: int) -> tuple[tuple[str, ...], int]:
+    """The dotted key (``tool."poetry".scripts``) that starts at ``tokens[i]``:
+    its parts and the index after it; no parts if none starts there."""
+    parts: list[str] = []
+    while i < len(tokens) and tokens[i][0] in ("k", "s"):
+        parts.append(tokens[i][1])
+        if i + 2 < len(tokens) and tokens[i + 1] == ("p", ".") and tokens[i + 2][0] in ("k", "s"):
+            i += 2
+        else:
+            i += 1
+            break
+    return tuple(parts), i
+
+
+def _toml_header(tokens: list[_Token]) -> Optional[tuple[str, ...]]:
+    """The key of a ``[table]`` or ``[[array]]`` header line, else None."""
+    depth = 0
+    while depth < 2 and depth < len(tokens) and tokens[depth] == ("p", "["):
+        depth += 1
+    if not depth:
+        return None
+    key, i = _toml_key_at(tokens, depth)
+    if key and tokens[i:] == [("p", "]")] * depth:
+        return key
+    return None
+
+
+def _toml_value(tokens: list[_Token], strings: list[str]) -> int:
+    """Append the strings of a value's tokens to ``strings``; return their
+    bracket balance (``[``/``{`` minus ``]``/``}``)."""
+    balance = 0
+    for kind, text in tokens:
+        if kind == "s":
+            strings.append(text)
+        elif kind == "p" and text in "[{":
             balance += 1
-        elif ch in "]}":
+        elif kind == "p" and text in "]}":
             balance -= 1
-        i += 1
     return balance
+
+
+def _toml_inline_pairs(tokens: list[_Token]) -> list[tuple[tuple[str, ...], str]]:
+    """``key = "string"`` pairs directly inside the inline table that
+    ``tokens`` open with ``{`` (nested tables and arrays are skipped)."""
+    pairs: list[tuple[tuple[str, ...], str]] = []
+    depth = 0
+    i, n = 0, len(tokens)
+    while i < n:
+        kind, text = tokens[i]
+        if kind == "p" and text in "[{":
+            depth += 1
+            i += 1
+            continue
+        if kind == "p" and text in "]}":
+            depth -= 1
+            if depth <= 0:
+                break
+            i += 1
+            continue
+        if depth != 1 or (kind == "p" and text == ","):
+            i += 1
+            continue
+        key, j = _toml_key_at(tokens, i)
+        if (
+            key
+            and j + 1 < n
+            and tokens[j] == ("p", "=")
+            and tokens[j + 1][0] == "s"
+            and (j + 2 == n or tokens[j + 2] in (("p", ","), ("p", "}")))
+        ):
+            pairs.append((key, tokens[j + 1][1]))
+            i = j + 2
+        else:
+            i = max(j, i + 1)
+    return pairs
 
 
 def _toml_strings(text: str) -> dict[tuple[str, ...], list[str]]:
@@ -837,7 +909,7 @@ def _toml_strings(text: str) -> dict[tuple[str, ...], list[str]]:
     for line in text.splitlines():
         if open_array is not None:
             key, balance = open_array
-            balance += _toml_scan(line, out[key])
+            balance += _toml_value(_toml_tokens(line), out[key])
             open_array = (key, balance) if balance > 0 else None
             continue
         if open_string is not None:
@@ -848,22 +920,21 @@ def _toml_strings(text: str) -> dict[tuple[str, ...], list[str]]:
         if opened is not None:
             open_string = opened
             continue
-        header = _TOML_HEADER_RE.match(line)
+        tokens = _toml_tokens(line)
+        header = _toml_header(tokens)
         if header is not None:
-            table = _toml_key(header.group(1))
+            table = header
             continue
-        assign = _TOML_ASSIGN_RE.match(line)
-        if assign is None:
+        name, i = _toml_key_at(tokens, 0)
+        if not name or i >= len(tokens) or tokens[i] != ("p", "="):
             continue
-        key = table + _toml_key(assign.group(1))
-        rest = line[assign.end() :]
-        if rest.startswith("{"):
-            for pair in _TOML_PAIR_RE.finditer(rest):
-                value = _toml_unescape(pair.group(2)) if pair.group(2) is not None else pair.group(3)
-                out.setdefault(key + _toml_key(pair.group(1)), []).append(value)
+        key = table + name
+        value = tokens[i + 1 :]
+        if value[:1] == [("p", "{")]:
+            for pair_key, pair_value in _toml_inline_pairs(value):
+                out.setdefault(key + pair_key, []).append(pair_value)
             continue
-        values = out.setdefault(key, [])
-        balance = _toml_scan(rest, values)
+        balance = _toml_value(value, out.setdefault(key, []))
         if balance > 0:
             open_array = (key, balance)
     return out
@@ -1202,7 +1273,7 @@ class SearchIndex:
         if doc.is_test and not q.mentions_tests:
             f *= TEST_PENALTY
             if why is not None:
-                why.append(f"test file x{TEST_PENALTY:g}")
+                why.append(f"test code x{TEST_PENALTY:g}")
         if doc.is_aux and not q.wants_aux:
             # A test of an example is penalised once, by the stronger of the
             # two penalties: both say "not product code".

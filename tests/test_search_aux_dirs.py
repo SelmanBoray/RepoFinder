@@ -8,6 +8,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -211,7 +212,7 @@ def test_a_test_in_an_aux_dir_gets_the_stronger_penalty_not_both(monkeypatch: py
         assert boost_of(si, "load config", "examples/app/loader.py") == pytest.approx(base * penalty)
         assert boost_of(si, "load config", "tests/test_loader.py") == pytest.approx(base * search.TEST_PENALTY)
         # Asking for tests lifts only the test penalty, asking for examples
-        # only the other (then it ranks as any test file does).
+        # only the other (then it ranks as any test code does).
         assert boost_of(si, "load config tests", aux_test) == pytest.approx(
             boost_of(si, "load config tests", PRODUCT) * penalty)
         assert boost_of(si, "load config example", aux_test) == pytest.approx(
@@ -254,6 +255,41 @@ def test_a_hostile_manifest_gives_no_exemption_and_never_breaks_indexing(
     si = pair(tmp_path, "scripts/a.py")  # builds: the manifest beside scripts/ is read
     assert order(si, "load config") == [PRODUCT, "scripts/a.py"]
     assert _AuxDirs(str(tmp_path)).is_aux("scripts/a.py")
+
+
+LONG = 120_000  # characters of one hostile line (the read cap is 256 KiB)
+
+
+def _long(head: str, unit: str) -> str:
+    return head + unit * ((LONG - len(head)) // len(unit))
+
+
+@pytest.mark.parametrize("name, text", [
+    ("pyproject.toml", _long("x = {", "a")),            # inline table, a key that never meets "="
+    ("pyproject.toml", _long("x = {", "a.")),
+    ("pyproject.toml", _long("x = {", "a = ")),
+    ("pyproject.toml", _long("x = {", '"a",')),
+    ("pyproject.toml", _long("x = {", '"a')),
+    ("Cargo.toml", _long("[", "a.")),                    # a header that never closes
+    ("Cargo.toml", _long("", "a.")),                     # a key that never meets "="
+    ("Cargo.toml", _long("", "a ")),
+    ("Cargo.toml", _long("x = [", '"a",')),
+    ("Cargo.toml", _long('x = "', "a")),
+    ("Cargo.toml", _long("", "\"a\\")),
+    ("setup.py", _long("", "'a")),
+    ("setup.py", _long("", "'a = ")),
+    ("setup.py", _long("scripts=[", "'a")),
+], ids=[
+    "inline-key-no-eq", "inline-dotted-key", "inline-repeated-eq", "inline-strings", "inline-open-quotes",
+    "open-header", "dotted-key-no-eq", "spaced-key-no-eq", "long-array", "open-string", "escaped-quotes",
+    "setup-open-quotes", "setup-key-no-colon", "setup-open-scripts",
+])
+def test_reading_a_manifest_takes_linear_time(name: str, text: str) -> None:
+    """One long line of any content is read in about a millisecond per 10 KB;
+    a backtracking regex would take minutes."""
+    start = time.perf_counter()
+    search._declared_paths(name, text)
+    assert time.perf_counter() - start < 2.0
 
 
 def test_an_oversized_manifest_is_not_read(tmp_path: Path) -> None:
