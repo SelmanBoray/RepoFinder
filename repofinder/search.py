@@ -25,7 +25,12 @@ A query is analysed into *units* (see :meth:`SearchIndex._analyze`):
   that is not in the index vocabulary is translated through a small
   stem-prefix lexicon ("kaydediliyor" -> register, "uygulamaya" -> app,
   application; two-word phrases such as "zaman aşımı" -> timeout) and matched
-  by the translation's stem. Turkish typed in ASCII ("govdesi", "basligina")
+  by the translation's stem. A key matches only where the rest of the word
+  reads as inflection (case, plural, possessive, voice, tense, and the
+  verb-making -la/-le: "listeleniyor" -> list), not as a derivational suffix
+  that makes another word (-lik, -li, -siz, -ci, -(y)ici, -sel, -leş):
+  "öncelik" (priority) is not "önce" (before) + -lik, and such words need keys
+  of their own. Turkish typed in ASCII ("govdesi", "basligina")
   is matched too: words and lexicon keys are compared ASCII-folded;
 * runs of adjacent words that, joined, form an identifier present in the index
   ("app context" -> ``app_context``/``appcontext``; with common abbreviations,
@@ -262,12 +267,24 @@ _ABBREVIATIONS: dict[str, tuple[str, ...]] = {
 }
 
 # Turkish. Function words are dropped outright. The lexicon maps a stem prefix
-# to English words (the longest stem the word starts with wins; an empty tuple
-# means "filler"). Both apply only to a query that looks Turkish and only to
-# words outside the index vocabulary, so an English or code word is never
-# translated ("rotate" does not become "route", "silent" not "delete"). Words
-# and keys are compared ASCII-folded (:func:`_fold`), so Turkish typed without
-# its letters ("govdesi", "istegi", "basligina") matches too.
+# to English words (an empty tuple means "filler"). Both apply only to a query
+# that looks Turkish and only to words outside the index vocabulary, so an
+# English or code word is never translated ("rotate" does not become "route",
+# "silent" not "delete"). Words and keys are compared ASCII-folded
+# (:func:`_fold`), so Turkish typed without its letters ("govdesi", "istegi",
+# "basligina") matches too.
+#
+# Stem boundary (:func:`_tr_inflects`): the longest key whose rest reads as
+# inflection wins. The rest may start with a vowel or one of y n s d t m r k c l
+# (case, plural, possessive, voice, tense: "uygulama-ya", "kayd-ediliyor",
+# "sil-inir"), but not with a derivational suffix that makes another word
+# (:data:`_TR_DERIVATIONS`: "önce-lik" is priority, not before; "hata-sız",
+# "yol-cu", "sil-ici"). The verb-making -la/-le is let through: it mostly makes
+# the verb of the same thing ("liste-le-niyor" -> list, "sorgu-la" -> query);
+# where it makes a different word the lexicon has a key of its own ("kodla":
+# encode, and "kodlar", the plural of the filler "kod", too). A derived word
+# means what its base means only through a key of its own ("ayrıştırıcı":
+# parser, "okuyucu": reader, "öncelik": priority).
 _TR_FILLER = frozenset(
     {
         "ne", "mi", "mı", "mu", "mü", "ve", "veya", "ile", "bu", "şu", "o", "bir", "da",
@@ -282,9 +299,12 @@ _TR_FILLER = frozenset(
 # than a link, and "işle" (handle, process, operate, ...) has no one sense.
 _TR_LEXICON: dict[str, tuple[str, ...]] = {
     # question words and words that only describe the question
-    "nere": (), "tanım": (), "fonksiyon": (), "metod": (), "metot": (), "modül": (),
-    "kod": (), "dosya": (), "kullan": (), "yapıl": (), "edil": (), "ediyor": (),
-    "olan": (), "oluyor": (), "gel": (), "döndür": (), "dönüş": (), "göster": (),
+    "nere": (), "tanım": (), "tanımlı": (), "fonksiyon": (), "metod": (), "metot": (),
+    "modül": (), "kod": (), "kodlar": (), "dosya": (), "kullan": (), "yapıl": (), "edil": (),
+    "ediyor": (), "olan": (), "oluyor": (), "gel": (), "döndür": (), "dönüş": (), "göster": (),
+    # "yazılım" (software) is not "yaz" (write) + -ılım; forms of "ver" (give)
+    # that begin like "veri" (data): verilen, verir, veriyor
+    "yazılım": (), "veril": (), "verir": (), "veriyor": (),
     "sınıf": ("class",),
     # code vocabulary
     "uygulama": ("app", "application"), "uygula": ("apply",), "fabrika": ("factory",),
@@ -293,7 +313,8 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     "nesne": ("object",), "metin": ("text", "string", "str"), "metn": ("text", "string", "str"),
     "yanıt": ("response",), "cevap": ("response",), "istek": ("request",),
     "oturum": ("session",), "çerez": ("cookie",), "imza": ("sign", "signature"),
-    "kayd": ("register",), "kayıt": ("register",), "ekle": ("add",), "eklenti": ("extension",),
+    "kayd": ("register",), "kayıt": ("register",), "ekle": ("add",),
+    "eklenti": ("extension",),
     "çağır": ("call",), "çağr": ("call",), "bul": ("find",), "çalıştır": ("run",),
     "çalış": ("run",), "çevir": ("convert",), "çevri": ("convert",),
     "dönüştür": ("convert",),
@@ -322,10 +343,22 @@ _TR_LEXICON: dict[str, tuple[str, ...]] = {
     "incele": ("inspect",), "seçenek": ("option",), "satır": ("line",), "ajan": ("agent",),
     "hedef": ("target",), "enjekte": ("inject",), "senaryo": ("scenario",), "göreli": ("relative",),
     "bağlan": ("connect", "attach"), "alanlar": ("field",), "oyun": ("game",),
+    # derived words of the keys above, which do not inherit their meaning
+    "öncelik": ("priority",), "öncelikli": ("priority",), "önceki": ("previous", "prev"),
+    "sonraki": ("next",), "kayıtlı": ("register",), "imzalı": ("sign", "signature"),
+    "kaydır": ("scroll",), "değerlendir": ("evaluate", "eval"),
+    "seçici": ("selector",), "şifrele": ("encrypt",), "şifreler": ("password",),
+    "şifreli": ("encrypt", "encrypted"), "okuyucu": ("reader",), "yazıcı": ("writer",),
+    "derleyici": ("compiler",), "doğrulayıcı": ("validator",), "ayrıştırıcı": ("parser",),
+    "serileştirici": ("serializer",), "dönüştürücü": ("converter",),
+    "oluşturucu": ("builder", "constructor"),
+    "yükleyici": ("loader",), "yönlendirici": ("router",), "bulut": ("cloud",),
+    "sayısal": ("numeric",),
+    "kodla": ("encode",),
 }
 # Two-word phrases: (first stem, second stem) -> English. The first word is
 # then filler and the second carries the translation ("zaman aşımı" -> timeout,
-# not time + exceed).
+# not time + exceed). Both words follow the stem boundary of the lexicon.
 _TR_PHRASES: dict[tuple[str, str], tuple[str, ...]] = {
     ("zaman", "aşım"): ("timeout",), ("yeniden", "dene"): ("retry",),
     ("tekrar", "dene"): ("retry",), ("kimlik", "bilgi"): ("credential",),
@@ -344,6 +377,17 @@ _TR_HINTS = frozenset(
 _TR_FOLD = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
 # Final consonants that soften before a vowel suffix: örnek -> örneği, kayıt -> kaydı.
 _TR_SOFTEN = {"k": "ğ", "t": "d", "p": "b", "ç": "c"}
+# The stem boundary, on ASCII-folded text. An inflection starts with a vowel or
+# one of these consonants (-ya, -nın, -sı, -da, -tan, -mak, -r, -ki, -ca, -lar).
+_TR_VOWELS = ("a", "e", "i", "o", "u")
+_TR_SUFFIX_START = frozenset("aeiouyndstmrkcl")
+# Derivational suffixes that make another word: -li/-lik (-lı, -lu, -lük, ...),
+# -laş/-leş, -ci/-cik (-çı, -cu, ...), -(y)ici/-(y)ucu, -siz/-suz, -sal/-sel.
+_TR_DERIVATIONS = ("li", "lu", "las", "les", "ci", "cu", "ici", "ucu", "yici", "yucu", "siz", "suz", "sal", "sel")
+# ... but -le + the progressive -iyor ("liste-liyor") only looks like -li.
+_TR_NOT_DERIVATIONS = ("liyor", "luyor")
+# A verb stem ending in -a/-e narrows that vowel before -iyor: yükle -> yüklüyor.
+_TR_NARROWED = ("iyor", "uyor")
 
 
 def tokenize(text: str) -> list[str]:
@@ -471,34 +515,68 @@ def _fold(word: str) -> str:
     return word.translate(_TR_FOLD)
 
 
-def _tr_lexicon() -> dict[str, tuple[str, ...]]:
-    """The lexicon keyed by ASCII-folded stems, softened stems included."""
-    table: dict[str, tuple[str, ...]] = {}
-    for stem_, english in _TR_LEXICON.items():
-        table.setdefault(_fold(stem_), english)
-    for stem_, english in _TR_LEXICON.items():
-        soft = _TR_SOFTEN.get(stem_[-1])
-        if soft:
-            table.setdefault(_fold(stem_[:-1] + soft), english)
+def _tr_keys(stem_: str) -> list[tuple[str, tuple[str, ...]]]:
+    """The ASCII-folded keys of a Turkish stem, each with what the rest of the
+    word must start with (``()``: anything): the stem itself; its softened form,
+    before a vowel (istek -> isteğ-i); a verb's narrowed form, before -iyor
+    (yükle -> yükl-üyor)."""
+    keys: list[tuple[str, tuple[str, ...]]] = [(_fold(stem_), ())]
+    soft = _TR_SOFTEN.get(stem_[-1])
+    if soft:
+        keys.append((_fold(stem_[:-1] + soft), _TR_VOWELS))
+    if stem_[-1] in "ae" and len(stem_) > _TR_MIN_STEM:
+        keys.append((_fold(stem_[:-1]), _TR_NARROWED))
+    return keys
+
+
+def _tr_inflects(rest: str, need: tuple[str, ...] = ()) -> bool:
+    """Whether ``rest`` (ASCII-folded), what follows a key in a word, reads as
+    inflection: empty, or starting with a vowel or one of y n s d t m r k c l,
+    and not with a derivational suffix (:data:`_TR_DERIVATIONS`). ``need``: the
+    prefixes the rest must start with (a softened key wants a vowel)."""
+    if need and not rest.startswith(need):
+        return False
+    if not rest:
+        return True
+    if rest[0] not in _TR_SUFFIX_START:
+        return False
+    return rest.startswith(_TR_NOT_DERIVATIONS) or not rest.startswith(_TR_DERIVATIONS)
+
+
+def _tr_starts(word: str, keys: list[tuple[str, tuple[str, ...]]]) -> bool:
+    """Whether the ASCII-folded ``word`` is one of ``keys`` (see :func:`_tr_keys`) inflected."""
+    return any(word.startswith(k) and _tr_inflects(word[len(k):], need) for k, need in keys)
+
+
+def _tr_lexicon() -> dict[str, list[tuple[tuple[str, ...], tuple[str, ...]]]]:
+    """The lexicon by ASCII-folded key -> [(what the rest must start with,
+    English)], softened and narrowed keys included. A stem's own key comes
+    before another stem's softened or narrowed form of the same spelling."""
+    table: dict[str, list[tuple[tuple[str, ...], tuple[str, ...]]]] = {}
+    variants = [(k, need, english) for stem_, english in _TR_LEXICON.items() for k, need in _tr_keys(stem_)]
+    for k, need, english in sorted(variants, key=lambda v: bool(v[1])):
+        if (need, english) not in table.setdefault(k, []):
+            table[k].append((need, english))
     return table
 
 
 _TR = _tr_lexicon()
-_TR_PHRASES_FOLDED = {(_fold(a), _fold(b)): english for (a, b), english in _TR_PHRASES.items()}
+_TR_PHRASES_FOLDED = [(_tr_keys(a), _tr_keys(b), english) for (a, b), english in _TR_PHRASES.items()]
 _TR_FILLER_FOLDED = frozenset(_fold(w) for w in _TR_FILLER)
 _CLASS_WORDS_FOLDED = frozenset(_fold(w) for w in _CLASS_WORDS)
 _TYPE_WORDS_FOLDED = frozenset(_fold(w) for w in _TYPE_WORDS)
 
 
 def _translate_tr(word: str) -> Optional[tuple[str, ...]]:
-    """English words for a Turkish ``word`` (empty: filler), or None if unknown."""
+    """English words for a Turkish ``word`` (empty: filler), or None if unknown:
+    those of the longest key whose rest reads as inflection (:func:`_tr_inflects`)."""
     word = _fold(word)
     if word in _TR_FILLER_FOLDED:
         return ()
     for end in range(len(word), _TR_MIN_STEM - 1, -1):
-        hit = _TR.get(word[:end])
-        if hit is not None:
-            return hit
+        for need, english in _TR.get(word[:end], ()):
+            if _tr_inflects(word[end:], need):
+                return english
     return None
 
 
@@ -508,8 +586,8 @@ def _tr_phrases(words: list[str]) -> dict[int, tuple[str, ...]]:
     folded = [_fold(w) for w in words]
     out: dict[int, tuple[str, ...]] = {}
     for i in range(len(folded) - 1):
-        for (first, second), english in _TR_PHRASES_FOLDED.items():
-            if folded[i].startswith(first) and folded[i + 1].startswith(second):
+        for first, second, english in _TR_PHRASES_FOLDED:
+            if _tr_starts(folded[i], first) and _tr_starts(folded[i + 1], second):
                 out[i], out[i + 1] = (), english
     return out
 
