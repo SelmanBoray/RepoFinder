@@ -6,6 +6,7 @@ from a checkout; files are only read.
 
 from __future__ import annotations
 
+import codecs
 import logging
 import os
 import re
@@ -54,8 +55,9 @@ SKIP_DIRS = frozenset(
 They hold dependencies, environments, generated output or vendored code, not
 the repository's own source. Every directory whose name starts with ``.`` is
 skipped as well (``.github``, ``.next``, ``.cache``, ...), and so is a
-``vendor/`` directory next to a package manifest (:data:`VENDOR_MANIFESTS`).
-Test, example, documentation, website and experiment directories are source
+``vendor/`` directory next to a package manifest (:data:`VENDOR_MANIFESTS`),
+and so is a ``target/`` directory next to a Cargo or Maven manifest
+(:data:`TARGET_MANIFESTS`). Test, example, documentation, website and experiment directories are source
 and are kept.
 """
 
@@ -66,12 +68,36 @@ files: there it holds installed dependencies (npm, Go modules, Composer,
 Bundler). Elsewhere, e.g. in a Python project that vendors and patches code it
 imports, ``vendor/`` is indexed like any other directory."""
 
+TARGET_DIR_NAME = "target"
+TARGET_MANIFESTS = frozenset({"Cargo.toml", "pom.xml"})
+"""A ``target/`` directory is skipped when its parent directory has one of these
+files: there it holds Cargo or Maven build output. Elsewhere (``src/target/``
+with no manifest next to it) it is an ordinary source directory and is walked."""
+
 SKIP_FILE_SUFFIXES = (
     ".min.js", ".min.mjs", ".min.cjs",
+    # generated Go (protoc-gen-go, grpc-gateway)
+    ".pb.go", ".pb.gw.go",
     # generated Dart (build_runner, json_serializable, freezed, mockito, auto_route, protobuf)
     ".g.dart", ".freezed.dart", ".mocks.dart", ".gr.dart", ".pb.dart",
 )
-"""Minified bundles and generated Dart code: never indexed, whatever languages are registered."""
+"""Minified bundles and generated Dart/Go code: never indexed, whatever languages are registered."""
+
+GENERATED_GO_PREFIX = "zz_generated"
+"""Go files whose basename starts with this (Kubernetes code generators) are skipped."""
+
+GO_HEADER_BYTES = 8 * 1024
+_GO_GENERATED_RE = re.compile(r"^// Code generated .* DO NOT EDIT\.$")
+_GO_PACKAGE_RE = re.compile(r"^package(\s|$)")
+
+# Compiled JavaScript is skipped when its TypeScript source sits in the same
+# directory. Declaration files (``.d.ts``, ``.d.cts``) are not sources.
+_TS_SOURCES_FOR_JS = {
+    ".js": (".ts", ".tsx"),
+    ".jsx": (".tsx",),
+    ".mjs": (".mts",),
+    ".cjs": (".cts",),
+}
 
 CLONE_TIMEOUT_SECONDS = 600
 
@@ -203,7 +229,66 @@ class SourceScan:
 
     files: list[Path] = field(default_factory=list)      # kept, in repo-relative POSIX order
     too_large: list[str] = field(default_factory=list)   # repo-relative paths over MAX_FILE_BYTES
-    minified: list[str] = field(default_factory=list)    # repo-relative paths matching SKIP_FILE_SUFFIXES
+    # repo-relative paths skipped as minified or generated: SKIP_FILE_SUFFIXES, generated Go
+    # (zz_generated*, "Code generated ... DO NOT EDIT." header) and JS compiled from a sibling TS file
+    minified: list[str] = field(default_factory=list)
+
+
+def _is_generated_go(full: Path, filename: str) -> bool:
+    """True for a ``zz_generated*`` file or one whose header (the lines before the
+    ``package`` clause, within the first :data:`GO_HEADER_BYTES`) carries Go's
+    ``// Code generated ... DO NOT EDIT.`` marker."""
+    if filename.startswith(GENERATED_GO_PREFIX):
+        return True
+    try:
+        with open(full, "rb") as handle:
+            data = handle.read(GO_HEADER_BYTES)
+    except OSError:
+        return False
+    truncated = len(data) == GO_HEADER_BYTES
+    if data.startswith(codecs.BOM_UTF8):  # Go ignores a leading byte order mark
+        data = data[3:]
+    lines = data.decode("utf-8", errors="replace").split(chr(10))
+    if truncated:
+        lines.pop()  # possibly cut mid-line
+    in_block_comment = False
+    for line in lines:
+        line = line.rstrip(chr(13))
+        if in_block_comment:
+            in_block_comment = "*/" not in line
+            continue
+        if _GO_GENERATED_RE.match(line):
+            return True
+        if _GO_PACKAGE_RE.match(line):
+            return False
+        if line.lstrip().startswith("/*") and "*/" not in line:
+            in_block_comment = True
+    return False
+
+
+def _is_indexable(full: Path, extensions: tuple[str, ...]) -> bool:
+    """True when the scan would index ``full``: a requested extension, not skipped
+    by suffix, a regular non-link file within :data:`MAX_FILE_BYTES`."""
+    name = full.name
+    if not name.endswith(extensions) or name.lower().endswith(SKIP_FILE_SUFFIXES):
+        return False
+    try:
+        return not full.is_symlink() and full.is_file() and full.stat().st_size <= MAX_FILE_BYTES
+    except OSError:
+        return False
+
+
+def _is_compiled_js(dirpath: str, filename: str, siblings: frozenset[str],
+                    extensions: tuple[str, ...]) -> bool:
+    """True when ``filename`` is JavaScript whose TypeScript source sits next to it
+    and will itself be indexed (a linked, oversized or unrequested sibling does not count)."""
+    stem, dot, ext = filename.rpartition(".")
+    sources = _TS_SOURCES_FOR_JS.get(dot + ext)
+    if not stem or sources is None:
+        return False
+    return any(
+        stem + s in siblings and _is_indexable(Path(dirpath, stem + s), extensions) for s in sources
+    )
 
 
 def default_languages() -> tuple[str, ...]:
@@ -224,12 +309,15 @@ def scan_source_files(root: Path, languages: Optional[tuple[str, ...]] = None) -
     found: list[tuple[str, Path]] = []
     for dirpath, dirnames, filenames in os.walk(root):
         vendor_is_dependencies = not VENDOR_MANIFESTS.isdisjoint(filenames)
+        target_is_build_output = not TARGET_MANIFESTS.isdisjoint(filenames)
+        siblings = frozenset(filenames)
         dirnames[:] = [
             d
             for d in dirnames
             if d not in SKIP_DIRS
             and not d.startswith(".")
             and not (d == VENDOR_DIR_NAME and vendor_is_dependencies)
+            and not (d == TARGET_DIR_NAME and target_is_build_output)
             and not _is_link(os.path.join(dirpath, d))
         ]
         for filename in filenames:
@@ -247,6 +335,13 @@ def scan_source_files(root: Path, languages: Optional[tuple[str, ...]] = None) -
                     continue
             except OSError:
                 continue
+            # Generated/compiled checks run last, only on files that would be indexed
+            # (never on links, non-regular or oversized files).
+            if _is_compiled_js(dirpath, filename, siblings, extensions) or (
+                filename.endswith(".go") and _is_generated_go(full, filename)
+            ):
+                scan.minified.append(full.relative_to(root).as_posix())
+                continue
             found.append((full.relative_to(root).as_posix(), full))
     found.sort(key=lambda item: item[0])
     scan.files = [full for _rel, full in found]
@@ -261,8 +356,10 @@ def iter_source_files(root: Path, languages: Optional[tuple[str, ...]] = None) -
     ``languages`` defaults to every language registered in
     :data:`parser.LANGUAGES`. Skips the directories in :data:`SKIP_DIRS`, any
     directory starting with ``.``, a ``vendor/`` next to a package manifest
-    (:data:`VENDOR_MANIFESTS`), symlinks, minified bundles
-    (:data:`SKIP_FILE_SUFFIXES`) and files larger than :data:`MAX_FILE_BYTES`.
+    (:data:`VENDOR_MANIFESTS`), a ``target/`` next to ``Cargo.toml`` or
+    ``pom.xml``, symlinks, minified bundles and generated code
+    (:data:`SKIP_FILE_SUFFIXES`, generated Go, JavaScript compiled from a sibling
+    TypeScript file) and files larger than :data:`MAX_FILE_BYTES`.
     Tests are kept.
     """
     yield from scan_source_files(root, languages).files
