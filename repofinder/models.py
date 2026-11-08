@@ -43,7 +43,7 @@ class ImportEdge:
     src_path: str              # importing file, repo-relative POSIX
     dst_module: str            # dotted module as written/resolved, e.g. "flask.app" or "os.path"
     dst_path: Optional[str]    # repo-relative path if the module resolves inside the repo, else None
-    names: list[str]           # imported names; ["*"] for star; [] for plain "import x"
+    names: list[str]           # imported names; ["*"] for star; [] for plain "import x"; Rust "mod m;": its test/#[path] attributes ("#[cfg(test)]")
     line: int                  # 1-based
 
 

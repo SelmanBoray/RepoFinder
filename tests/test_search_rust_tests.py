@@ -2,8 +2,10 @@
 
 Items inside a ``#[cfg(test)]`` module and functions carrying ``#[test]`` (or a
 ``*::test`` attribute) take the test penalty unless the query mentions tests;
-product code of the same file does not. The flag is read from what the store
-keeps (the signature and the range), so it survives a save/load round trip.
+product code of the same file does not. A module file declared
+``#[cfg(test)] mod m;`` (and every module below it) is test code as a whole.
+The flags are read from what the store keeps (signatures, ranges, import
+edges), so they survive a save/load round trip.
 """
 
 from __future__ import annotations
@@ -15,7 +17,7 @@ import pytest
 
 pytest.importorskip("tree_sitter_rust")
 
-from repofinder.graph import inline_test_scopes, is_test_symbol  # noqa: E402
+from repofinder.graph import inline_test_scopes, is_test_symbol, rust_test_module_files  # noqa: E402
 from repofinder.ingest import build_index  # noqa: E402
 from repofinder.models import FileRecord, RepoIndex, Symbol  # noqa: E402
 from repofinder.search import SearchIndex  # noqa: E402
@@ -130,6 +132,115 @@ def test_the_penalty_lifts_when_the_query_mentions_tests(rust_index: RepoIndex) 
     assert all("test file" not in h.why for h in tests.values())
     helper = "src/lib.rs::tests.count_matches_helper"
     assert tests[helper].score > plain[helper].score
+
+
+CRATE_FILES = {
+    "Cargo.toml": '[package]\nname = "demo"\n',
+    "src/lib.rs": """
+        mod util;
+        mod printer;
+        #[cfg(test)]
+        mod testutil;
+        #[cfg(feature = "simd")]
+        mod simd;
+
+        #[cfg(test)]
+        mod checks {
+            use super::util::Matcher;
+            mod fixtures;
+        }
+        """,
+    "src/util.rs": """
+        /// Finds the matching lines of a haystack.
+        pub struct Matcher;
+        """,
+    "src/simd.rs": "pub fn fast_matcher() {}\n",
+    "src/testutil.rs": """
+        mod deeper;
+
+        /// A regex matcher for tests: finds the matching lines of a haystack.
+        pub struct RegexMatcher;
+
+        impl RegexMatcher {
+            pub fn new() -> RegexMatcher { RegexMatcher }
+        }
+        """,
+    "src/testutil/deeper.rs": "pub fn deeper_matcher() {}\n",
+    "src/checks/fixtures.rs": "pub fn fixture_matcher() {}\n",
+    "src/printer/mod.rs": """
+        mod standard;
+        #[cfg(test)]
+        #[path = "../support/shared.rs"]
+        mod shared;
+        #[cfg(test)]
+        mod helpers;
+        """,
+    "src/printer/standard.rs": "pub fn standard_matcher() {}\n",
+    "src/printer/helpers.rs": "pub fn helper_matcher() {}\n",
+    "src/support/shared.rs": "pub fn shared_matcher() {}\n",
+}
+
+TEST_FILES = {
+    "src/testutil.rs", "src/testutil/deeper.rs", "src/checks/fixtures.rs",
+    "src/printer/helpers.rs", "src/support/shared.rs",
+}
+
+
+@pytest.fixture()
+def crate_index(tmp_path: Path) -> RepoIndex:
+    for rel, text in CRATE_FILES.items():
+        _write(tmp_path, rel, text)
+    return build_index(tmp_path, "t", str(tmp_path))
+
+
+def _file_flags(index: RepoIndex) -> dict[str, bool]:
+    scopes = inline_test_scopes(index.symbols)
+    files = rust_test_module_files(index.imports, scopes)
+    return {f.path: f.path in files for f in index.files if f.path.endswith(".rs")}
+
+
+def test_files_declared_by_a_cfg_test_mod_are_tests(crate_index: RepoIndex) -> None:
+    flags = _file_flags(crate_index)
+    assert {p for p, flag in flags.items() if flag} == TEST_FILES
+    # ``use super::util::Matcher`` inside the test module does not make util.rs a test
+    assert flags["src/util.rs"] is False
+    assert flags["src/simd.rs"] is False and flags["src/printer/standard.rs"] is False
+
+    scopes = inline_test_scopes(crate_index.symbols)
+    files = rust_test_module_files(crate_index.imports, scopes)
+    by_qualname = {(s.path, s.qualname): is_test_symbol(s, scopes, files) for s in crate_index.symbols}
+    assert by_qualname[("src/testutil.rs", "RegexMatcher")] is True
+    assert by_qualname[("src/testutil.rs", "RegexMatcher.new")] is True
+    assert by_qualname[("src/util.rs", "Matcher")] is False
+    # without the file set only the declaration's own marker counts
+    assert not is_test_symbol(next(s for s in crate_index.symbols if s.qualname == "RegexMatcher"), scopes)
+
+
+def test_test_module_files_survive_a_store_round_trip(crate_index: RepoIndex) -> None:
+    with Store(Path(":memory:")) as store:
+        store.save_index(crate_index)
+        loaded = store.load_index()
+    assert _file_flags(loaded) == _file_flags(crate_index)
+
+
+def test_symbols_and_file_of_a_test_module_file_rank_as_tests(crate_index: RepoIndex) -> None:
+    search = SearchIndex(crate_index)
+    hits = search.search("matcher matching lines haystack", k=30)
+    by_id = {h.symbol_id or h.path: h for h in hits}
+    product = by_id["src/util.rs::Matcher"]
+    assert "test file" not in product.why
+    test_hit = by_id["src/testutil.rs::RegexMatcher"]
+    assert "test file" in test_hit.why
+    assert hits.index(product) < hits.index(test_hit)
+    for name in ("src/testutil/deeper.rs::deeper_matcher", "src/support/shared.rs::shared_matcher",
+                 "src/printer/helpers.rs::helper_matcher", "src/checks/fixtures.rs::fixture_matcher"):
+        assert "test file" in by_id[name].why
+    for name in ("src/simd.rs::fast_matcher", "src/printer/standard.rs::standard_matcher"):
+        assert "test file" not in by_id[name].why
+    files = {h.path: h for h in search.search("testutil", k=30) if h.kind == "file"}
+    assert "test file" in files["src/testutil.rs"].why
+    lifted = search.search("tests for the regex matcher", k=30)
+    assert all("test file" not in h.why for h in lifted)
 
 
 def test_a_hand_built_index_without_test_markers_stays_product() -> None:

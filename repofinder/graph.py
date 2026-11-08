@@ -28,8 +28,9 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from . import parser
-from .models import FileRecord, RepoIndex, Symbol
+from .models import FileRecord, ImportEdge, RepoIndex, Symbol
 from .parser import build_module_map
+from .parser_rust import is_test_module_edge as is_rust_test_module_edge
 from .parser_rust import is_test_signature
 
 # File names that conventionally start an application, a command or (Rust
@@ -226,7 +227,9 @@ def is_test_path(path: str) -> bool:
     Java under ``src/test/`` and Rust integration tests under ``tests/`` are covered by
     the directory rule. Rust unit tests inline in a source file (``#[cfg(test)] mod
     tests { ... }``, ``#[test] fn``) cannot be told apart by path: the file stays
-    product code here, and :func:`is_test_symbol` tells its test symbols apart."""
+    product code here, and :func:`is_test_symbol` tells its test symbols apart. Nor
+    can a module file declared ``#[cfg(test)] mod testutil;``: that takes the
+    import edges, see :func:`rust_test_module_files`."""
     parts = path.split("/")
     base = parts[-1]
     if any(part in TEST_DIR_NAMES for part in parts[:-1]):
@@ -268,9 +271,52 @@ def inline_test_scopes(symbols: Iterable[Symbol]) -> TestScopes:
     return scopes
 
 
-def is_test_symbol(symbol: Symbol, scopes: Optional[TestScopes] = None) -> bool:
-    """True for a symbol of test code: one in a test file (:func:`is_test_path`),
-    or a Rust unit test inline in a source file.
+def rust_test_module_files(imports: Iterable[ImportEdge], scopes: TestScopes) -> frozenset[str]:
+    """Rust module files that are test-only by the way they are declared.
+
+    A file is one when it is the body of a ``mod m;`` declared with a test
+    attribute (``#[cfg(test)] mod testutil;``, see
+    :func:`repofinder.parser_rust.is_test_module_edge`) or declared inside a marked
+    inline module (``#[cfg(test)] mod tests { mod fixtures; }``: an edge of that
+    module's lines whose ``dst_module`` lies below it, ``self::tests::fixtures``).
+    Every module below such a file is one too: whatever its ``self::`` edges
+    resolve to (its ``mod`` declarations, ``m.rs`` or ``m/mod.rs`` beside a
+    ``mod.rs``, ``lib.rs`` or ``main.rs``, under ``foo/`` for ``foo.rs``). The
+    files are those the edges' ``dst_path`` names, so ``#[path = "..."]`` counts
+    where the resolver honours it. ``scopes`` comes from :func:`inline_test_scopes`.
+    """
+    children: dict[str, set[str]] = {}
+    found: set[str] = set()
+    for edge in imports:
+        src, dst = edge.src_path, edge.dst_path
+        if dst is None or dst == src or not src.endswith(_RUST_EXTENSION):
+            continue
+        module = edge.dst_module
+        if module == "self" or module.startswith("self::"):
+            children.setdefault(src, set()).add(dst)
+        if is_rust_test_module_edge(edge):
+            found.add(dst)
+            continue
+        for start, end, prefix in scopes.get(src, ()):
+            inline = "self::" + prefix[:-1].replace(".", "::") + "::"
+            if start <= edge.line <= end and module.startswith(inline):
+                found.add(dst)
+                break
+    pending = list(found)
+    while pending:
+        for child in children.get(pending.pop(), ()):
+            if child not in found:
+                found.add(child)
+                pending.append(child)
+    return frozenset(found)
+
+
+def is_test_symbol(
+    symbol: Symbol, scopes: Optional[TestScopes] = None, test_files: frozenset[str] = frozenset()
+) -> bool:
+    """True for a symbol of test code: one in a test file (:func:`is_test_path`,
+    or a Rust module file in ``test_files``, see :func:`rust_test_module_files`), or a
+    Rust unit test inline in a source file.
 
     A Rust symbol is a test when its own signature is marked (see
     :func:`inline_test_scopes`), or when it lies inside a marked symbol of the same
@@ -282,7 +328,7 @@ def is_test_symbol(symbol: Symbol, scopes: Optional[TestScopes] = None) -> bool:
     own marker counts. Everything here is read from what the store keeps, so a
     loaded index gives the same answer as a freshly built one.
     """
-    if is_test_path(symbol.path):
+    if is_test_path(symbol.path) or symbol.path in test_files:
         return True
     if not symbol.path.endswith(_RUST_EXTENSION):
         return False

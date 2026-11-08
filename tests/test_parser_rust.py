@@ -770,6 +770,60 @@ def test_resolve_non_mod_file_child(tmp_path):
     assert _resolve(tmp_path, "src/lib.rs")[("self::a", ())] == "src/a.rs"
 
 
+def test_mod_declaration_edge_carries_test_and_path_attributes():
+    src = """
+        #[cfg(test)]
+        mod testutil;
+        #[cfg(feature = "serde")]
+        mod json;
+        #[allow(dead_code)]
+        #[path = "support/shared.rs"]
+        #[cfg(all(test, unix))]
+        mod shared;
+        mod plain;
+        """
+    assert _pairs(src) == [
+        ("self::testutil", ["#[cfg(test)]"]),
+        ("self::json", []),
+        ("self::shared", ['#[path = "support/shared.rs"]', "#[cfg(all(test, unix))]"]),
+        ("self::plain", []),
+    ]
+    from repofinder.parser_rust import is_test_module_edge
+
+    assert [is_test_module_edge(e) for e in _imports(src)] == [True, False, True, False]
+    # use edges never carry attributes
+    assert _pairs("#[cfg(test)]\nuse crate::a::B;\n") == [("crate::a", ["B"])]
+
+
+def test_resolve_test_and_path_mod_declarations(tmp_path):
+    _write(tmp_path, "Cargo.toml", '[package]\nname = "demo"\n')
+    _write(
+        tmp_path,
+        "src/lib.rs",
+        """
+        #[cfg(test)]
+        mod testutil;
+        #[path = "support/shared.rs"]
+        mod shared;
+        #[path = "missing.rs"]
+        mod gone;
+        mod a {
+            #[path = "ignored.rs"]
+            mod inner;
+        }
+        """,
+    )
+    _write(tmp_path, "src/testutil.rs", "pub fn helper() {}\n")
+    _write(tmp_path, "src/support/shared.rs", "pub fn shared() {}\n")
+    _write(tmp_path, "src/a/inner.rs", "pub fn inner() {}\n")
+    r = _resolve(tmp_path, "src/lib.rs")
+    assert r[("self::testutil", ("#[cfg(test)]",))] == "src/testutil.rs"
+    assert r[("self::shared", ('#[path = "support/shared.rs"]',))] == "src/support/shared.rs"
+    assert r[("self::gone", ('#[path = "missing.rs"]',))] is None
+    # inside an inline module #[path] is not honoured: the usual module path
+    assert r[("self::a::inner", ('#[path = "ignored.rs"]',))] == "src/a/inner.rs"
+
+
 def test_resolve_workspace_crate(tmp_path):
     _write(tmp_path, "crates/searcher/Cargo.toml", '[package]\nname = "grep-searcher"\n')
     _write(tmp_path, "crates/searcher/src/lib.rs", "pub struct Searcher;\n")

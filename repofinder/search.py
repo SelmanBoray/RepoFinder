@@ -85,7 +85,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from .graph import PATH_MODULE_EXTENSIONS, is_test_path, module_names, path_module_name, split_source_extension
-from .graph import inline_test_scopes, is_test_symbol
+from .graph import inline_test_scopes, is_test_symbol, rust_test_module_files
 from .models import RepoIndex, Symbol
 
 K1 = 1.5
@@ -638,8 +638,10 @@ class SearchIndex:
             if name.rpartition(".")[2] in _INDEXED_FILE_EXTENSION_WORDS
         )
 
-        # Rust unit tests inline in a source file are tests too (graph.is_test_symbol).
+        # Rust unit tests inline in a source file are tests too (graph.is_test_symbol),
+        # and so are the module files of a ``#[cfg(test)] mod m;`` and those below them.
         test_scopes = inline_test_scopes(index.symbols)
+        test_files = rust_test_module_files(index.imports, test_scopes)
         for sym in index.symbols:
             names_by_file.setdefault(sym.path, []).append(sym.name)
             qual = _LOCALS_RE.sub("", sym.qualname)
@@ -668,7 +670,7 @@ class SearchIndex:
                     qualname=qual.lower(),
                     dotted=f".{module}.{qual}.".lower() if module else f".{qual}.".lower(),
                     slashed="/" + sym.path.lower(),
-                    is_test=is_test_symbol(sym, test_scopes),
+                    is_test=is_test_symbol(sym, test_scopes, test_files),
                     is_class=sym.kind == "class",
                     is_type=sym.kind in _TYPE_KINDS,
                     is_nested="<locals>" in sym.qualname,
@@ -702,8 +704,9 @@ class SearchIndex:
                     qualname="",
                     dotted=f".{module}.".lower() if module else "",
                     slashed="/" + record.path.lower(),
-                    # By path only: a file that holds inline tests is product code.
-                    is_test=is_test_path(record.path),
+                    # A file that only holds inline tests is product code; a Rust
+                    # module file declared test-only is not.
+                    is_test=is_test_path(record.path) or record.path in test_files,
                     is_class=False,
                     is_type=False,
                     is_nested=False,
